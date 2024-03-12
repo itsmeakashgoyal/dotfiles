@@ -1,0 +1,48 @@
+{
+  "workbench.colorTheme": "Predawn",
+  "workbench.iconTheme": "ayu",
+  "editor.fontFamily": "Source Code Pro",
+  "debug.console.fontFamily": "Source Code Pro",
+  "editor.fontWeight": "500",
+  "terminal.integrated.fontWeight": "600",
+  "editor.fontSize": 16, //Use 22 for Screen Recordings
+  "debug.console.fontSize": 16, //Use 22 for Screen Recordings
+  "terminal.integrated.fontSize": 16, //Use 22 for Screen Recordings
+  "window.zoomLevel": 0, // Use 2 for Screen Recordings
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+    }
+  },
+  "pylint.args": ["--disable=C0114,C0115,C0116"],
+  "code-runner.clearPreviousOutput": true,
+  "code-runner.showExecutionMessage": false,
+  "code-runner.ignoreSelection": true,
+  "code-runner.saveFileBeforeRun": true,
+  "code-runner.executorMap": {
+    "python": "\"$pythonPath\" -u $fullFileName"
+  },
+  "[plaintext]": {
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  },
+  "editor.quickSuggestionsDelay": 100,
+  "zenMode.centerLayout": false,
+  "zenMode.fullScreen": false,
+  "zenMode.hideLineNumbers": false,
+  "editor.minimap.enabled": false,
+  "workbench.settings.openDefaultSettings": true,
+  "workbench.settings.useSplitJSON": false,
+  "workbench.settings.editor": "json",
+  "workbench.startupEditor": "newUntitledFile"
+}
