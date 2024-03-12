@@ -31,16 +31,18 @@
     "*.psd",
     "*.sublime-workspace"
   ],
-  "font_face": "Source Code Pro",
+  "font_face": "Fira Code",
   "font_options": ["no_round"],
-  "font_size": 20,
+  "font_size": 16,
   "highlight_line": true,
   "highlight_modified_tabs": true,
   "line_padding_bottom": 1,
   "line_padding_top": 1,
   "match_brackets_content": false,
+  "match_brackets_angle": true,
   "match_selection": false,
   "match_tags": false,
+  "remember_open_files": true,
   "material_theme_accent_graphite": true,
   "material_theme_compact_sidebar": true,
   "mini_diff": false,
@@ -59,5 +61,5 @@
   "translate_tabs_to_spaces": true,
   "trim_trailing_white_space_on_save": true,
   "use_simple_full_screen": true,
-  "word_wrap": false
+  "word_wrap": true
 }

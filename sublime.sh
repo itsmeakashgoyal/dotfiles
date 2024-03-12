@@ -73,14 +73,6 @@ cp "settings/SublimeLinter.sublime-settings" "$USER_PACKAGES_DIR/SublimeLinter.s
 # Copy custom build systems
 cp "settings/Python-3.sublime-build" "$USER_PACKAGES_DIR/Python-3.sublime-build"
 
-# I had issues with using the $HOME variable in a Sublime build system
-# So I just create this file manually in the shell and push it with the home directory hard coded
-echo "{
-  \"cmd\": [\"$HOME/tutorial/bin/python\", \"-u\", \"\$file\"],
-  \"file_regex\": \"^[ ]*File \\\"(...*?)\\\", line ([0-9]*)\",
-  \"quiet\": true
-}" >"$USER_PACKAGES_DIR/Python-Tut-Env.sublime-build"
-
 echo "Custom Sublime Text settings and packages have been copied."
 
 # Open Sublime Text to check for errors and to enter your license key
