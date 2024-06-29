@@ -1,0 +1,13 @@
+{
+  "installed_packages": [
+    "SublimeLinter",
+    "SublimeLinter-pylint",
+    "Sublime​Linter-cpplint",
+    "python-black",
+    "JsPrettier",
+    "BracketHighlighter",
+    "Material Theme",
+    "Predawn",
+    "SideBarEnhancements"
+  ]
+}
