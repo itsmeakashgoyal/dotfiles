@@ -1,0 +1,21 @@
+[user]
+    name = Akash Goyal
+    email = <EMAIL_ID>
+[push]
+    default = current
+[diff]
+    tool = vimdiff3
+[difftool "vimdiff3"]
+    path = nvim
+[merge]
+    tool = vimdiff3
+[mergetool "vimdiff3"]
+    cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
+[mergetool]
+    prompt = false
+[core]
+    editor = vim
+[credential "https://github.com"]
+        helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+        helper = !/usr/bin/gh auth git-credential
