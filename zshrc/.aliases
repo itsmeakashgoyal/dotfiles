@@ -1,0 +1,115 @@
+if [ -x "$(command -v fzf)"  ]
+then
+    # Append this line to ~/.zshrc to enable fzf keybindings for Zsh:
+    source /opt/homebrew/Cellar/fzf/0.54.3/shell/key-bindings.zsh
+    # Append this line to ~/.zshrc to enable fuzzy auto-completion for Zsh:
+    source /opt/homebrew/Cellar/fzf/0.54.3/shell/completion.zsh
+fi
+
+# Define aliases.
+alias tree='tree -a -I .git'
+
+# Eza
+alias l="eza -l --icons --git -a"
+alias lt="eza --tree --level=2 --long --icons --git"
+alias ld='eza -lD'      # lists only directories (no files)
+alias lf='eza -lF --color=always | grep -v /'       # lists only files (no directories)
+alias lh='eza -dl .* --group-directories-first'     # lists only hidden files (no directories)
+alias ll='eza -al --group-directories-first'        # lists everything with directories first
+alias ls='eza -lF --color=always --sort=size | grep -v /'      # lists only files sorted by size
+
+# Colorls
+# source $(dirname $(gem which colorls))/tab_complete.sh
+# alias ls='colorls'
+# alias ll='colorls -lrti'
+# alias la='colorls -lrtia'
+# alias lt='colorls -t -1'       ## Sort by modification time
+
+# Add flags to existing aliases.
+# alias ls='ls -p --group-directories-first --color=auto'
+# alias ls="${aliases[ls]:-ls} -A"
+# alias ll='ls -ailF'
+# alias la='ls -A'
+# alias l='ls -CF'
+alias setdev='~/dotfiles-dev/extras/setup_vscode.sh'
+alias setdevc='~/dotfiles-dev/extras/setup_vscode_c_c++.sh'
+alias setdevcl='~/dotfiles-dev/extras/setup_vscode_clangd.sh'
+alias c='clear'
+alias myip="curl ipinfo.io/ip"
+alias sshp="sshpass -p welcome ssh "
+alias vi='nvim'
+alias z='zellij'
+alias ch='caffeinate -u -t 10000'
+
+# Git
+##########
+alias gcg="git config --edit --global"
+alias gcl="git config --edit --local"
+alias gs="git status -s \
+    | fzf --no-sort --reverse \
+    --preview 'git diff --color=always {+2} | diff-so-fancy' \
+    --bind=ctrl-j:preview-down --bind=ctrl-k:preview-up \
+    --preview-window=right:60%:wrap"
+
+alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+alias glogNoDays="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit"
+alias epoc="date +%s"
+
+# Tmux
+# Attaches tmux to a session (example: ta portal)
+alias ta='tmux attach -t'
+# Creates a new session
+alias tn='tmux new-session -s '
+# Kill session
+alias tk='tmux kill-session -t '
+# Lists all ongoing sessions
+alias tl='tmux list-sessions'
+# Detach from session
+alias td='tmux detach'
+# Tmux Clear pane
+alias tc='clear; tmux clear-history; clear'
+
+# General
+##########
+alias whereami='npx @rafaelrinaldi/whereami -f json'
+# alias l='exa --long --header --all --icons'
+# alias ls='exa --header --sort=modified'
+# alias tree='exa --tree --level=2'
+alias lip="ip addr show en0"
+
+# Get OS X Software Updates
+alias update_system='sudo softwareupdate -i -a'
+
+# Update/upgrade Homebrew and their installed packages
+alias update_brew='brew update; brew upgrade; brew upgrade --cask; brew cleanup'
+
+# Show/hide hidden files in Finder
+# As of macOS Sierra (10.12) and later, you can simply press Cmd + Shift + . (period) while in Finder to toggle the visibility of hidden files.
+alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+
+# Google Chrome
+alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+
+# local IP address
+alias localip="ipconfig getifaddr en0"
+
+# Recursively delete `.DS_Store` files
+alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
+
+# Hide/show all desktop icons (useful when presenting)
+alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
+alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
+
+# Lock the screen (when going AFK)
+alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+
+# Reload the shell (i.e. invoke as a login shell)
+alias reload="exec ${SHELL} -l"
+
+# Print each PATH entry on a separate line
+alias path='echo -e ${PATH//:/\\n}'
+
+# fzf
+# FZF, open selected file in nvim with preview!
+alias of="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}' | xargs nvim"

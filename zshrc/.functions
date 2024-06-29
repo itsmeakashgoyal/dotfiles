@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+
+# Create a new directory and enter it
+function mkd() {
+	mkdir -p "$@" && cd "$_";
+}
+
+# Determine size of a file or total size of a directory
+function fs() {
+	if du -b /dev/null > /dev/null 2>&1; then
+		local arg=-sbh;
+	else
+		local arg=-sh;
+	fi
+	if [[ -n "$@" ]]; then
+		du $arg -- "$@";
+	else
+		du $arg .[^.]* ./*;
+	fi;
+}
+
+## Function wrappers
+# wrapper for easy extraction of compressed files
+function extract () {
+	if [ -f $1 ] ; then
+		case $1 in
+			*.tar.xz)    tar xvJf $1    ;;
+			*.tar.bz2)   tar xvjf $1    ;;
+			*.tar.gz)    tar xvzf $1    ;;
+			*.bz2)       bunzip2 $1     ;;
+			*.rar)       unrar e $1     ;;
+			*.gz)        gunzip $1      ;;
+			*.tar)       tar xvf $1     ;;
+			*.tbz2)      tar xvjf $1    ;;
+			*.tgz)       tar xvzf $1    ;;
+			*.apk)       unzip $1       ;;
+			*.epub)      unzip $1       ;;
+			*.xpi)       unzip $1       ;;
+			*.zip)       unzip $1       ;;
+			*.war)       unzip $1       ;;
+			*.jar)       unzip $1       ;;
+			*.Z)         uncompress $1  ;;
+			*.7z)        7z x $1        ;;
+			*)           echo "don't know how to extract '$1'..." ;;
+		esac
+	else
+		echo "'$1' is not a valid file!"
+	fi
+}
+
+_fzf_complete_git() {
+	_fzf_complete -- "$@" < <(
+		git --help -a | grep -E '^\s+' | awk '{print $1}'
+	)
+}
+
+_fzf_comprun() {
+	local command=$1
+	shift
+
+	case "$command" in
+		tree)         find . -type d | fzf --preview 'tree -C {}' "$@";;
+		*)            fzf "$@" ;;
+	esac
+}
+
+function delete-branches() {
+	git branch |
+		grep --invert-match '\*' |
+		cut -c 3- |
+		fzf --multi --preview="git log {} --" |
+		xargs --no-run-if-empty git branch --delete --force
+}
+
+function delete-remote-branches() {
+	git branch -r |
+		grep 'akgoyal' |
+		grep --invert-match '\*' |
+		cut -c 3- |
+		fzf --multi --preview="git log {} --" |
+		xargs --no-run-if-empty git branch --delete --force
+}
+
+function pr-checkout() {
+	local jq_template pr_number
+
+	jq_template='"'\
+	'#\(.number) - \(.title)'\
+	'\t'\
+	'Author: \(.user.login)\n'\
+	'Created: \(.created_at)\n'\
+	'Updated: \(.updated_at)\n\n'\
+	'\(.body)'\
+	'"'
+
+	pr_number=$(
+		gh api 'repos/:owner/:repo/pulls' |
+		jq ".[] | $jq_template" |
+		sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
+		fzf \
+		--with-nth=1 \
+		--delimiter='\t' \
+		--preview='echo -e {2}' \
+		--preview-window=top:wrap |
+		sed 's/^#\([0-9]\+\).*/\1/'
+	)
+
+	if [ -n "$pr_number" ]; then
+		gh pr checkout "$pr_number"
+	fi
+}
+
+# navigation
+cx() { cd "$@" && l; }
+fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && l; }
+f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy }
+fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
+
+# turn hidden files on/off in Finder
+function hiddenOn() { defaults write com.apple.Finder AppleShowAllFiles YES ; }
+function hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO ; }
+
+# myIP address
+function myip() {
+    ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0       : " $2}'
+    ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
+    ifconfig en0 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en0 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
+    ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
+    ifconfig en1 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en1 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
+}

@@ -1,6 +1,6 @@
 [user]
     name = Akash Goyal
-    email = <EMAIL_ID>
+    email = ag.akgoyal@gmail.com
 [push]
     default = current
 [diff]
@@ -14,7 +14,7 @@
 [mergetool]
     prompt = false
 [core]
-    editor = vim
+    editor = nvim
 [credential "https://github.com"]
         helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
