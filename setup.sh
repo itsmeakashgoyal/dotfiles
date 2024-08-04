@@ -39,4 +39,7 @@ done
 # Run the Sublime Script
 ./scripts/sublime.sh
 
+# Install diff-so-fancy-install.sh
+./scripts/diff-so-fancy-install.sh
+
 echo "Installation Complete!"

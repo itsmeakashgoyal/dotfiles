@@ -31,9 +31,6 @@ alias ls='eza -lF --color=always --sort=size | grep -v /'      # lists only file
 # alias ll='ls -ailF'
 # alias la='ls -A'
 # alias l='ls -CF'
-alias setdev='~/dotfiles-dev/extras/setup_vscode.sh'
-alias setdevc='~/dotfiles-dev/extras/setup_vscode_c_c++.sh'
-alias setdevcl='~/dotfiles-dev/extras/setup_vscode_clangd.sh'
 alias c='clear'
 alias myip="curl ipinfo.io/ip"
 alias sshp="sshpass -p welcome ssh "
