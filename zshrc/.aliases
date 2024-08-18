@@ -31,9 +31,6 @@ alias ls='eza -lF --color=always --sort=size | grep -v /'      # lists only file
 # alias ll='ls -ailF'
 # alias la='ls -A'
 # alias l='ls -CF'
-alias setdev='~/dotfiles-dev/extras/setup_vscode.sh'
-alias setdevc='~/dotfiles-dev/extras/setup_vscode_c_c++.sh'
-alias setdevcl='~/dotfiles-dev/extras/setup_vscode_clangd.sh'
 alias c='clear'
 alias myip="curl ipinfo.io/ip"
 alias sshp="sshpass -p welcome ssh "
@@ -83,6 +80,9 @@ alias update_system='sudo softwareupdate -i -a'
 # Update/upgrade Homebrew and their installed packages
 alias update_brew='brew update; brew upgrade; brew upgrade --cask; brew cleanup'
 
+# Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
+
 # Show/hide hidden files in Finder
 # As of macOS Sierra (10.12) and later, you can simply press Cmd + Shift + . (period) while in Finder to toggle the visibility of hidden files.
 alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
@@ -113,3 +113,11 @@ alias path='echo -e ${PATH//:/\\n}'
 # fzf
 # FZF, open selected file in nvim with preview!
 alias of="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}' | xargs nvim"
+
+alias -g H=' --help'
+alias -g L='| less'
+alias -g R="2>&1 | tee output.txt"
+alias -g T="| tail -n +2"
+alias -g V=' --version'
+alias -g W='| nvim -c "setlocal buftype=nofile bufhidden=wipe" -c "nnoremap <buffer> q :q!<CR>" -'
+

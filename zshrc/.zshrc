@@ -37,7 +37,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
 # Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
+zstyle ':omz:update' frequency 13
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
@@ -78,7 +78,7 @@ zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search ruby fzf-tab)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search colored-man-pages zsh-vi-mode ruby fzf-tab)
 
 source $ZSH/oh-my-zsh.sh
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
@@ -124,6 +124,9 @@ bindkey '^u' autosuggest-toggle
 bindkey '^L' vi-forward-word
 bindkey '^k' up-line-or-search
 bindkey '^j' down-line-or-search
+
+zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
