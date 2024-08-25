@@ -40,3 +40,4 @@ zsh-autosuggestions
 zsh-syntax-highlighting
 diff-so-fancy
 luarocks
+xclip

@@ -1,0 +1,354 @@
+extends c
+
+## Main
+# main()
+snippet mainn
+    int main()
+    {
+        ${0}
+        return 0;
+    }
+##
+## Preprocessor
+# #include <...>
+snippet incc
+    #include <${1:iostream}>
+##
+
+## 1-letter shortcuts for most common things
+snippet s
+    std::
+snippet c
+    const ${1}
+## nullptr
+snippet null
+    nullptr
+snippet nopt
+    std::nullopt
+snippet likely
+    [[likely]]
+snippet unlikely
+    [[unlikely]]
+## Basic-ish types
+snippet sz
+    size_t
+snippet u8
+    uint8_t
+snippet u16
+    uint16_t
+snippet u32
+    uint32_t
+snippet u64
+    uint64_t
+snippet i8
+    int8_t
+snippet i16
+    int16_t
+snippet i32
+    int32_t
+snippet i64
+    int64_t
+snippet f32
+    float
+snippet f64
+    double
+snippet b
+    bool
+snippet str
+    std::string
+snippet cstr
+    const char*
+## Basic standard utility types & functions
+snippet tup
+    std::tuple<${1:uint32_t}, ${2:uint32_t}>
+snippet tie
+    std::tie(${1:a}, ${2:b})
+snippet make_t
+    std::make_tuple(${1:a}, ${2:b})
+snippet opt
+    std::optional<${1:uint32_t}>
+snippet var
+    std::variant<${1:uint32_t}, ${2:float}>
+snippet visit
+    template<class> inline constexpr bool always_false_v = false;
+    std::visit([${2:&}](auto&& arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, ${3:uint32_t}>)
+        {
+            ${4}
+        }
+        else if constexpr (std::is_same_v<T, ${5:float}>)
+        {
+            ${6}
+        }${7}
+        else 
+        {
+            static_assert(always_false_v<T>, "non-exhaustive visitor!");
+        }
+    }, ${1:variant_name});
+snippet span
+    std::span<${1:uint32_t}>
+snippet limits
+    std::numeric_limits<${1:uint32_t}>::${2:max}();
+snippet min
+    std::min(${1:a}, ${2:b})
+snippet max
+    std::max(${1:a}, ${2:b})
+snippet random
+    std::default_random_engine generator;
+    std::uniform_real_distribution<${1:float}> distribution(${2:0}, ${3:1});
+    $1 result = distribution(generator);
+## Standard threading/lock-free stuff
+# std::atomic
+snippet atom
+    std::atomic<${1:uint32_t}>
+## Algorithms
+# std::fill
+snippet fill 
+    std::fill(${1:items}${2:.begin()}, $1${3:.end()}, ${4:value});
+# std::copy
+snippet copy 
+    std::copy(${1:items}${2:.begin()}, $1${3:.end()}, ${4:std::back_inserter($1)});
+# std::sort
+snippet sort
+    std::sort(${1:items}${2:.begin()}, $1${3:.end()}, [](${4:auto} a, $4 b){ 
+        return ${5:a < b}; 
+    });
+# std::find/find_if
+snippet find
+    std::${1:find_if}(${2:items}${3:.begin()}, $2${4:.end()}, $5);
+# std::hash specialization
+snippet hash
+    namespace std
+    {
+    template <>
+    struct hash<${1:T}>
+    {
+        size_t operator()(const $1& rhs) const
+        {
+            ${2:return ((hash<uint32_t>()(rhs.a) ^ (hash<float>()(rhs.b) << 1)) >> 1);}
+        }
+    };
+    }
+# stdio
+snippet fopen 
+    FILE* const ${1:file} = std::fopen(${2:path}, "${3:w}");
+    if (!$1)
+    {
+        fprintf( stderr, "Failed to open '%s'", $2);
+        return -1;
+    }
+
+    if (ferror($1))
+    {
+        fprintf( stderr, "I/O error occured at some point when working with '%s'", $2);
+    }
+    fclose($1);
+
+    
+## STL Collections
+# std::array
+snippet arr
+    std::array<${1:T}, ${2:N}>
+# std::vector
+snippet vec
+    std::vector<${1:T}>
+# std::deque
+snippet deque
+    std::deque<${1:T}>
+# std::forward_list
+snippet flist
+    std::forward_list<${1:T}>
+# std::list
+snippet list
+    std::list<${1:T}>
+# std::set
+snippet set
+    std::set<${1:T}>
+# std::map
+snippet map
+    std::map<${1:Key}, ${2:T}>
+# std::multiset
+snippet mset
+    std::multiset<${1:T}>
+# std::unordered_set
+snippet uset
+    std::unordered_set<${1:T}>
+# std::unordered_map
+snippet umap
+    std::unordered_map<${1:Key}, ${2:T}>
+# std::unordered_multiset
+snippet umset
+    std::unordered_multiset<${1:T}>
+# std::unordered_multimap
+snippet ummap
+    std::unordered_multimap<${1:Key}, ${2:T}>
+# std::stack
+snippet stack
+    std::stack<${1:T}>
+# std::queue
+snippet queue
+    std::queue<${1:T}>
+# std::priority_queue
+snippet pqueue
+    std::priority_queue<${1:T}>
+##
+## STL smart pointers
+# std::shared_ptr
+snippet sp
+    std::shared_ptr<${1:T}>
+snippet make_s
+    std::make_shared<${2:T}>(${3})
+snippet wp
+    std::weak_ptr<${1:T}>
+# std::unique_ptr
+snippet up
+    std::unique_ptr<${1:T}>
+snippet make_u
+    std::make_unique<${2:T}>(${3})
+##
+## Access Modifiers
+# private
+snippet pri
+    private:
+        ${1}
+# protected
+snippet pro
+    protected:
+        ${1}
+# public
+snippet pub
+    public:
+        ${1}
+# friend
+snippet fr
+    friend
+# mutable
+snippet mut
+    mutable
+##
+## Template
+snippet temp
+    template<typename ${1:T}>
+    ${2}
+## Operators
+snippet op
+    ${1:auto} operator ${2:+} ( const ${3:type} rhs${4} )
+## Class
+# class
+snippet cl
+    class ${1:`vim_snippets#Filename('$1', 'name')`}
+    {
+    public:
+        $1( ${2} ) 
+        {
+            ${3}
+        }
+
+        /// Cannot be default-constructed, copied or moved.
+        $1()                         = delete;
+        $1($1 const &)               = delete;
+        $1 & operator = ($1 const &) = delete;
+        $1($1 &&)                    = delete;
+        $1 & operator = ($1 &&)      = delete;
+
+    private:
+        ${4}
+    };
+# enum
+snippet enum
+    enum ${1:class} ${2:name}: ${3:uint32_t}
+    {
+        ${4}
+    };
+# namespace
+snippet ns
+    namespace ${1}
+    {
+        ${0}
+    } /* namespace $1 */
+##
+## Input/Output
+# std::cout
+snippet cout
+    std::cout << ${1} << std::endl;
+# std::cin
+snippet cin
+    std::cin >> ${1};
+##
+## Casts
+snippet cast
+    ${1:static}_cast<${2:uint32_t}>(${3:expr})
+snippet move
+    std::move(${1})
+snippet forw
+    std::forward(${1})
+## Iteration
+# for i
+snippet fori
+    for (uint32_t ${2:i} = 0; $2 < ${1:count}; $2++)
+    {
+        ${4:$TM_SELECTED_TEXT}
+    }
+
+# foreach
+snippet fore
+    for (${1:auto} ${2:item}: ${3:container})
+    {
+        ${4:$TM_SELECTED_TEXT}
+    }
+
+##
+## Lambdas
+# lamda (one line)
+snippet ld
+    [${1:&}](${2}){${3}};
+# wrap code in a nested function
+snippet nest
+    auto ${1:name} = [${2:&}](${3}){
+        ${4:$TM_SELECTED_TEXT}
+    };
+# snippets exception
+snippet try
+    try
+    {
+
+    }
+    catch(${1}) 
+    {
+
+    }
+
+
+# Google test
+snippet ex
+    EXPECT_${1:TRUE}(${2}) << "${3:message}";
+snippet fail
+    ADD_FAILURE(${1}) << "${2:message}";
+# nanoprof
+snippet prof
+    NANOPROF${1:_NODE}(nanoprof_event_${2:timepoint}( ${3:profiler}, ${4:timepoint::}${5:Name}));
+# fmt
+snippet format
+    fmt::format("${1:format string}", ${2})
+snippet iterator
+    struct ${1:name}_iterator 
+    {
+        using iterator_category = std::${2:forward}_iterator_tag;
+        using difference_type   = ${3:std::ptrdiff_t};
+        using value_type        = ${4:int};
+        using pointer           = $4*;
+        using reference         = $4&;
+
+        $1_iterator(const pointer rhs) : ptr(rhs) {}
+
+        reference operator*() const { return *ptr; }
+        pointer operator->()        { return ptr; }
+        $1_iterator& operator++()   { ptr++; return *this; }
+        $1_iterator operator++(int) { $1_iterator tmp = *this; ++(*this); return tmp; }
+        friend bool operator== (const $1_iterator& a, const $1_iterator& b) { return a.ptr == b.ptr; };
+        friend bool operator!= (const $1_iterator& a, const $1_iterator& b) { return a.ptr != b.ptr; };
+
+    private:
+        pointer ptr;
+    };

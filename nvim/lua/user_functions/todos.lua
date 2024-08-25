@@ -12,9 +12,14 @@ function M.insert_todo_and_comment()
     vim.cmd [[execute "normal \A "]]
 end
 
-vim.api.nvim_set_keymap("i", "<c-a>", "<C-o>:lua require('user_functions.todos').insert_todo_and_comment()<CR>", {
-    noremap = true,
-    silent = true
-})
+vim.api.nvim_set_keymap(
+    "i",
+    "<c-a>",
+    "<C-o>:lua require('user_functions.todos').insert_todo_and_comment()<CR>",
+    {
+        noremap = true,
+        silent = true
+    }
+)
 
 return M

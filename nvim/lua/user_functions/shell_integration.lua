@@ -84,40 +84,53 @@ function M.execute_visual_selection()
     local bufs = vim.api.nvim_list_bufs()
     local target_buf = bufs[#bufs]
 
-    _G.job_id = vim.fn.jobstart(command, {
-        on_stdout = function(_, data)
-            if data then
-                vim.api.nvim_buf_set_lines(target_buf, -1, -1, false, data)
-                local win_ids = vim.fn.win_findbuf(target_buf)
-                for _, win_id in ipairs(win_ids) do
-                    vim.api.nvim_win_set_cursor(win_id, {vim.api.nvim_buf_line_count(target_buf), 0})
+    _G.job_id =
+        vim.fn.jobstart(
+        command,
+        {
+            on_stdout = function(_, data)
+                if data then
+                    vim.api.nvim_buf_set_lines(target_buf, -1, -1, false, data)
+                    local win_ids = vim.fn.win_findbuf(target_buf)
+                    for _, win_id in ipairs(win_ids) do
+                        vim.api.nvim_win_set_cursor(win_id, {vim.api.nvim_buf_line_count(target_buf), 0})
+                    end
                 end
-            end
-        end,
-        on_stderr = function(_, data)
-            if data then
-                vim.api.nvim_buf_set_lines(target_buf, -1, -1, false, data)
-                local win_ids = vim.fn.win_findbuf(target_buf)
-                for _, win_id in ipairs(win_ids) do
-                    vim.api.nvim_win_set_cursor(win_id, {vim.api.nvim_buf_line_count(target_buf), 0})
+            end,
+            on_stderr = function(_, data)
+                if data then
+                    vim.api.nvim_buf_set_lines(target_buf, -1, -1, false, data)
+                    local win_ids = vim.fn.win_findbuf(target_buf)
+                    for _, win_id in ipairs(win_ids) do
+                        vim.api.nvim_win_set_cursor(win_id, {vim.api.nvim_buf_line_count(target_buf), 0})
+                    end
                 end
-            end
-        end,
-        stdout_buffered = false,
-        stderr_buffered = false
-    })
+            end,
+            stdout_buffered = false,
+            stderr_buffered = false
+        }
+    )
 
-    vim.api.nvim_buf_set_keymap(target_buf, "n", "<C-c>",
-        "<cmd>lua require('user_functions.shell_integration').interrupt_process()<CR>", {
+    vim.api.nvim_buf_set_keymap(
+        target_buf,
+        "n",
+        "<C-c>",
+        "<cmd>lua require('user_functions.shell_integration').interrupt_process()<CR>",
+        {
             noremap = true,
             silent = true
-        })
+        }
+    )
 end
 
 -- Map <leader>ex in visual mode to the function
-vim.api.nvim_set_keymap("x", "<leader>ex",
-    [[:lua require('user_functions.shell_integration').execute_visual_selection()<CR>]], {
+vim.api.nvim_set_keymap(
+    "x",
+    "<leader>ex",
+    [[:lua require('user_functions.shell_integration').execute_visual_selection()<CR>]],
+    {
         noremap = true,
         silent = true
-    })
+    }
+)
 return M

@@ -30,9 +30,12 @@ function source:complete(params, callback)
     local project_names = fetch_project_names()
     local items = {}
     for _, name in ipairs(project_names) do
-        table.insert(items, {
-            label = name
-        })
+        table.insert(
+            items,
+            {
+                label = name
+            }
+        )
     end
     callback(items)
 end

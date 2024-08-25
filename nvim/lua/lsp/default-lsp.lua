@@ -9,21 +9,41 @@ M.on_attach = function(_, bufnr)
             desc = "LSP: " .. desc
         end
 
-        vim.keymap.set("n", keys, func, {
-            buffer = bufnr,
-            desc = desc
-        })
+        vim.keymap.set(
+            "n",
+            keys,
+            func,
+            {
+                buffer = bufnr,
+                desc = desc
+            }
+        )
     end
     vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, {
-        desc = "Go to previous diagnostic message"
-    })
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, {
-        desc = "Go to next diagnostic message"
-    })
-    vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help, {
-        buffer = 0
-    })
+    vim.keymap.set(
+        "n",
+        "[d",
+        vim.diagnostic.goto_prev,
+        {
+            desc = "Go to previous diagnostic message"
+        }
+    )
+    vim.keymap.set(
+        "n",
+        "]d",
+        vim.diagnostic.goto_next,
+        {
+            desc = "Go to next diagnostic message"
+        }
+    )
+    vim.keymap.set(
+        "i",
+        "<C-k>",
+        vim.lsp.buf.signature_help,
+        {
+            buffer = 0
+        }
+    )
     nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 
     nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
@@ -41,13 +61,15 @@ M.on_attach = function(_, bufnr)
     -- Lesser used LSP functionality
     nmap("<leader>wA", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
     nmap("<leader>wr", vim.lsp.buf.remove_workspace_folder, "[W]orkspace [R]emove Folder")
-    nmap("<leader>wl", function()
-        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, "[W]orkspace [L]ist Folders")
+    nmap(
+        "<leader>wl",
+        function()
+            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        end,
+        "[W]orkspace [L]ist Folders"
+    )
 
     nmap("<c-f>", vim.lsp.buf.format, "Format Buffer")
-
-    nmap("<leader>br", require("dap").toggle_breakpoint, "Toggle Breakpoint")
 end
 
 return M

@@ -37,11 +37,16 @@ function M.select_header(outer, count)
 end
 
 for _, mapping in ipairs {{"o", "ih"}, {"o", "ah"}, {"x", "ih"}, {"x", "ah"}} do
-    vim.keymap.set(mapping[1], mapping[2], function()
-        M.select_header(mapping[2] == "ah", vim.v.count1)
-    end, {
-        silent = true
-    })
+    vim.keymap.set(
+        mapping[1],
+        mapping[2],
+        function()
+            M.select_header(mapping[2] == "ah", vim.v.count1)
+        end,
+        {
+            silent = true
+        }
+    )
 end
 
 return M

@@ -1,0 +1,255 @@
+## Main
+# main
+snippet main
+    int main( int argc, char *argv[] )
+    {
+        ${0}
+    }
+# main(void)
+snippet mainn
+    int main( void )
+    {
+        ${0}
+    }
+##
+## Preprocessor
+# #include <...>
+snippet inc
+    #include <${1:stdio}.h>
+    $0
+# #include "..."
+snippet Inc
+    #include "${1:`vim_snippets#Filename("$1.h")`}"
+    $0
+# ifndef...define...endif
+snippet ndef
+    #ifndef $1
+    #define ${1:SYMBOL} ${2:value}
+    #endif /* ifndef $1 */
+# define
+snippet def
+    #define
+# ifdef...endif
+snippet ifdef
+    #ifdef ${1:FOO}
+    ${2:#define }
+    #endif
+# if
+snippet #if
+    #if ${1:FOO}
+    ${0:$TM_SELECTED_TEXT}
+    #endif
+# #pragma once - nonstandard but common
+snippet once
+    #pragma once
+# Disable C++ name mangling in C headers
+snippet nocxx
+    #ifdef __cplusplus
+    extern "C" {
+    #endif
+
+    ${0}
+
+    #ifdef __cplusplus
+    } /* extern "C" */
+    #endif
+##
+## Control Statements
+# if
+snippet i
+    if (${1:true}) 
+    {
+        ${0:$TM_SELECTED_TEXT}
+    }
+snippet ife
+    if (${1:true}) 
+    {
+        ${2:$TM_SELECTED_TEXT}
+    }
+    else 
+    {
+        ${0}
+    }
+# else
+snippet e
+    else
+    {
+        ${0:$TM_SELECTED_TEXT}
+    }
+# else if
+snippet elif
+    else if (${1:true})
+    {
+        ${0:$TM_SELECTED_TEXT}
+    }
+# ternary
+snippet :? Ternary: `condition ? true : false`
+    $1 ? $2 : $0
+# switch
+snippet sw
+    switch (${1:/* variable */})
+    {
+        case ${2:/* variable case */}:
+            ${3}
+            break;
+        ${4}
+        default:
+            ${5}
+    }
+# case
+snippet case
+    case ${1:/* variable case */}:
+        ${2}
+        break;
+snippet r
+    return ${0};
+snippet ex
+    exit($0);
+##
+## Loops
+# for
+snippet for
+    for (${1:uint32_t} ${2:i} = 0; $2 ${3:< count}; $2${4:++})
+    {
+        ${5:$TM_SELECTED_TEXT}
+    }
+# while
+snippet w
+    while (${1:1})
+    {
+        ${0:$TM_SELECTED_TEXT}
+    }
+snippet wht
+    while (true)
+    {
+        ${0:$TM_SELECTED_TEXT}
+    }
+# do... while
+snippet do
+    do
+    {
+        ${0:$TM_SELECTED_TEXT}
+    } while ($1);
+##
+## Functions
+# function definition (can also use to wrap/refactor code)
+snippet f
+    ${1:void} ${2:function_name}( ${3} )
+    {
+        ${4:$TM_SELECTED_TEXT}
+    }
+# function declaration
+snippet fnd
+    ${1:void} ${2:function_name}( ${3} );
+##
+## Types
+# typedef
+snippet td
+    typedef ${1:int} ${2:MyCustomType};
+# struct
+snippet st
+    struct ${1:`vim_snippets#Filename('$1_t', 'name')`}
+    {
+        ${2:Data}
+    };
+snippet enum
+    enum ${1:name}
+    {
+        ${0}
+    };
+##
+## Input/Output
+# printf
+snippet pr
+    printf( "${1:%s}\n"${2} );
+# fprintf (again, this isn't as nice as TextMate's version, but it works)
+snippet fpr
+    fprintf( ${1:stderr}, "${2:%s}\n"${3} );
+# getopt
+snippet getopt
+    int choice;
+    while (1)
+    {
+        static struct option long_options[] =
+        {
+            /* Use flags like so:
+            {"verbose", no_argument,    &verbose_flag, 'V'}*/
+            /* Argument styles: no_argument, required_argument, optional_argument */
+            {"version", no_argument,    0,  'v'},
+            {"help",    no_argument,    0,  'h'},
+            ${1}
+            {0,0,0,0}
+        };
+
+        int option_index = 0;
+
+        /* Argument parameters:
+            no_argument: " "
+            required_argument: ":"
+            optional_argument: "::" */
+
+        choice = getopt_long( argc, argv, "vh",
+                    long_options, &option_index);
+
+        if (choice == -1)
+            break;
+
+        switch( choice )
+        {
+            case 'v':
+                ${2}
+                break;
+
+            case 'h':
+                ${3}
+                break;
+
+            case '?':
+                /* getopt_long will have already printed an error */
+                break;
+
+            default:
+                /* Not sure how to get here... */
+                return EXIT_FAILURE;
+        }
+    }
+
+    /* Deal with non-option arguments here */
+    if ( optind < argc )
+    {
+        while ( optind < argc )
+        {
+            ${0}
+        }
+    }
+
+## Assertions
+snippet ass
+    assert($1 && "$2");
+
+## Dynamic Allocation
+snippet mlc
+    ${1:type} *const ${2:ptr} = ($1*) malloc(${3:count} * sizeof($1));
+
+snippet clc
+    ${1:type} *const ${2:ptr} = ($1*) calloc(${3:count}, sizeof($1));
+
+snippet rlc
+    ${1:ptr} = realloc($1, ${2:count} * sizeof(${3:type}));
+
+snippet fre
+    free(${1:ptr});
+
+##
+# TODO section
+snippet todo
+    /// TODO ${1:Todo description here}
+snippet XXX
+    /// XXX ${1:Todo description here}
+
+snippet asm
+    __asm__ __volatile__(
+    "${0}\n\t"
+    :
+    :
+    );

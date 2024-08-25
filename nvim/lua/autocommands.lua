@@ -1,61 +1,125 @@
 local sysname = vim.loop.os_uname().sysname
 local api = vim.api
 
-local indentSettings = vim.api.nvim_create_augroup("IndentSettings", {
-    clear = true
-})
-local goSettings = vim.api.nvim_create_augroup("Go Settings", {
-    clear = true
-})
-local yamlSettings = vim.api.nvim_create_augroup("Yaml Settings", {
-    clear = true
-})
+local indentSettings =
+    vim.api.nvim_create_augroup(
+    "IndentSettings",
+    {
+        clear = true
+    }
+)
+local goSettings =
+    vim.api.nvim_create_augroup(
+    "Go Settings",
+    {
+        clear = true
+    }
+)
+local yamlSettings =
+    vim.api.nvim_create_augroup(
+    "Yaml Settings",
+    {
+        clear = true
+    }
+)
 
-vim.api.nvim_create_user_command("Pretty", "Prettier", {
-    bang = true
-})
+vim.api.nvim_create_user_command(
+    "Pretty",
+    "Prettier",
+    {
+        bang = true
+    }
+)
 
-vim.api.nvim_create_user_command("Browse", function(opts)
-    vim.fn.system {"xdg-open", opts.fargs[1]}
-end, {
-    nargs = 1
-})
+vim.api.nvim_create_user_command(
+    "Browse",
+    function(opts)
+        vim.fn.system {"xdg-open", opts.fargs[1]}
+    end,
+    {
+        nargs = 1
+    }
+)
 
 vim.cmd [[
   autocmd BufWritePost mappings.lua normal! mM
 ]]
 
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = {"go"},
-    command = "nmap <buffer><silent> <leader>fld :%g/ {/normal! zf%<CR>",
-    group = goSettings
-})
-vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = {"*test*.go"},
-    command = ":silent! GoTestFile",
-    group = goSettings
-})
+vim.api.nvim_create_autocmd(
+    "User",
+    {
+        pattern = "MasonToolsStartingInstall",
+        callback = function()
+            vim.schedule(
+                function()
+                    print "mason-tool-installer is starting"
+                end
+            )
+        end
+    }
+)
 
-vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = {"*.go"},
-    command = ":silent! Neoformat",
-    group = goSettings
-})
+vim.api.nvim_create_autocmd(
+    "User",
+    {
+        pattern = "MasonToolsUpdateCompleted",
+        callback = function(e)
+            vim.schedule(
+                function()
+                    print(vim.inspect(e.data)) -- print the table that lists the programs that were installed
+                end
+            )
+        end
+    }
+)
 
-vim.api.nvim_create_user_command("StartEmpty", function()
-    vim.cmd "enew"
-    vim.bo.buftype = "nofile"
-    vim.bo.bufhidden = "hide"
-    vim.bo.swapfile = false
-end, {})
+vim.api.nvim_create_autocmd(
+    "FileType",
+    {
+        pattern = {"go"},
+        command = "nmap <buffer><silent> <leader>fld :%g/ {/normal! zf%<CR>",
+        group = goSettings
+    }
+)
+vim.api.nvim_create_autocmd(
+    "BufWritePost",
+    {
+        pattern = {"*test*.go"},
+        command = ":silent! GoTestFile",
+        group = goSettings
+    }
+)
+
+vim.api.nvim_create_autocmd(
+    "BufWritePost",
+    {
+        pattern = {"*.go"},
+        command = ":silent! Neoformat",
+        group = goSettings
+    }
+)
+
+vim.api.nvim_create_user_command(
+    "StartEmpty",
+    function()
+        vim.cmd "enew"
+        vim.bo.buftype = "nofile"
+        vim.bo.bufhidden = "hide"
+        vim.bo.swapfile = false
+    end,
+    {}
+)
 
 -- Function to dynamically set up Vale based on the file's directory
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "*",
-    callback = function()
-        vim.opt_local.formatoptions:remove "o"
-    end
-})
+vim.api.nvim_create_autocmd(
+    "FileType",
+    {
+        pattern = "*",
+        callback = function()
+            vim.opt_local.formatoptions:remove "o"
+        end
+    }
+)
 
 local function toggle_formatoptions_o()
     local current_formatoptions = vim.opt.formatoptions:get()
@@ -68,11 +132,15 @@ local function toggle_formatoptions_o()
     end
 end
 
-vim.api.nvim_create_user_command("TmuxLayout", function()
-    local layout = vim.fn.system "tmux list-windows | sed -n 's/.*layout \\(.*\\)] @.*/\\1/p'"
-    layout = layout:gsub("^%s*(.-)%s*$", "%1") -- Trim whitespace
-    vim.api.nvim_put({"      layout: " .. layout}, "l", true, true)
-end, {})
+vim.api.nvim_create_user_command(
+    "TmuxLayout",
+    function()
+        local layout = vim.fn.system "tmux list-windows | sed -n 's/.*layout \\(.*\\)] @.*/\\1/p'"
+        layout = layout:gsub("^%s*(.-)%s*$", "%1") -- Trim whitespace
+        vim.api.nvim_put({"      layout: " .. layout}, "l", true, true)
+    end,
+    {}
+)
 
 -- Create a user command to toggle formatoptions
 vim.api.nvim_create_user_command("ToggleFormatoptions", toggle_formatoptions_o, {})
@@ -106,51 +174,70 @@ local function dynamicValeSetup()
 end
 
 -- Autocommand to configure Vale on entering a buffer or when the filetype is markdown
-vim.api.nvim_create_autocmd({"BufEnter", "FileType"}, {
-    pattern = "*.md",
-    callback = function()
-        dynamicValeSetup()
-    end
-})
--- Run Vale on markdown files in crossplane-docs
-vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = "*.md",
-    callback = function(args)
-        local file_path = vim.fn.getcwd()
-        if string.match(file_path, "crossplane%-docs/content") then
-            local current_dir = vim.fn.getcwd()
-            vim.cmd "lcd %:p:h"
-            vim.cmd ":silent! Vale"
-            vim.cmd("lcd " .. current_dir)
+vim.api.nvim_create_autocmd(
+    {"BufEnter", "FileType"},
+    {
+        pattern = "*.md",
+        callback = function()
+            dynamicValeSetup()
         end
-    end
-})
+    }
+)
+-- Run Vale on markdown files in crossplane-docs
+vim.api.nvim_create_autocmd(
+    "BufWritePost",
+    {
+        pattern = "*.md",
+        callback = function(args)
+            local file_path = vim.fn.getcwd()
+            if string.match(file_path, "crossplane%-docs/content") then
+                local current_dir = vim.fn.getcwd()
+                vim.cmd "lcd %:p:h"
+                vim.cmd ":silent! Vale"
+                vim.cmd("lcd " .. current_dir)
+            end
+        end
+    }
+)
 
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = {"c", "cpp"},
-    command = "setlocal expandtab shiftwidth=2 softtabstop=2 cindent",
-    group = indentSettings
-})
+vim.api.nvim_create_autocmd(
+    "FileType",
+    {
+        pattern = {"c", "cpp"},
+        command = "setlocal expandtab shiftwidth=2 softtabstop=2 cindent",
+        group = indentSettings
+    }
+)
 
-vim.api.nvim_create_user_command("WS", function()
-    vim.cmd "write | source %"
-end, {
-    bang = false
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = {"python"},
-    command = "setlocal expandtab shiftwidth=4 softtabstop=4 autoindent",
-    group = indentSettings
-})
-
-vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = "*.yaml",
-    callback = function()
-        vim.cmd "silent Neoformat"
+vim.api.nvim_create_user_command(
+    "WS",
+    function()
+        vim.cmd "write | source %"
     end,
-    group = yamlSettings
-})
+    {
+        bang = false
+    }
+)
+
+vim.api.nvim_create_autocmd(
+    "FileType",
+    {
+        pattern = {"python"},
+        command = "setlocal expandtab shiftwidth=4 softtabstop=4 autoindent",
+        group = indentSettings
+    }
+)
+
+vim.api.nvim_create_autocmd(
+    "BufWritePost",
+    {
+        pattern = "*.yaml",
+        callback = function()
+            vim.cmd "silent Neoformat"
+        end,
+        group = yamlSettings
+    }
+)
 
 -- vim.api.nvim_create_autocmd("BufWritePost", {
 -- pattern = "*.md",
@@ -169,18 +256,24 @@ function StyluaFormat()
     vim.cmd("silent! !stylua --search-parent-directories " .. vim.fn.expand "%:p")
     vim.cmd("cd " .. current_dir)
 end
-vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = "*.lua",
-    callback = function()
-        StyluaFormat()
-    end,
-    desc = "Auto-format Lua files with Stylua"
-})
+vim.api.nvim_create_autocmd(
+    "BufWritePost",
+    {
+        pattern = "*.lua",
+        callback = function()
+            StyluaFormat()
+        end,
+        desc = "Auto-format Lua files with Stylua"
+    }
+)
 
-vim.api.nvim_create_autocmd({"bufwritepost"}, {
-    pattern = {"*.sh"},
-    command = "silent! !shfmt -l -w %"
-})
+vim.api.nvim_create_autocmd(
+    {"bufwritepost"},
+    {
+        pattern = {"*.sh"},
+        command = "silent! !shfmt -l -w %"
+    }
+)
 
 vim.cmd [[
   command! TMarkn execute "r !~/dev/dotfiles/scripts/__list_tasks_as_markdown.pl '+next'"
@@ -188,37 +281,50 @@ vim.cmd [[
 vim.cmd [[
   command! ClearQF call setqflist([])
 ]]
-api.nvim_exec([[
+api.nvim_exec(
+    [[
     augroup fileTypes
      autocmd BufRead,BufNewFile .envrc set filetype=sh
     augroup end
-  ]], false)
+  ]],
+    false
+)
 
-api.nvim_exec([[
+api.nvim_exec(
+    [[
     augroup helpers
      autocmd!
      autocmd TermOpen term://* startinsert
      autocmd BufEnter * silent! lcd %:p:h
     augroup end
-  ]], false)
+  ]],
+    false
+)
 
-api.nvim_exec([[
+api.nvim_exec(
+    [[
     augroup plantuml
      autocmd BufWritePost *.puml silent! !java -DPLANTUML_LIMIT_SIZE=8192 -jar /usr/local/bin/plantuml.jar -tsvg <afile> -o ./rendered
     augroup end
-  ]], false)
+  ]],
+    false
+)
 
-api.nvim_exec([[
+api.nvim_exec(
+    [[
     augroup last_cursor_position
      autocmd!
      autocmd BufReadPost *
        \ if line("'\"") > 1 && line("'\"") <= line("$") && &ft !~# 'commit' | execute "normal! g`\"zvzz" | endif
     augroup end
-  ]], false)
+  ]],
+    false
+)
 -- Compile packages on add
 
 if sysname == "Darwin" then
-    api.nvim_exec([[
+    api.nvim_exec(
+        [[
          augroup plant_folder
           autocmd FileType plantuml let g:plantuml_previewer#plantuml_jar_path = get(
               \  matchlist(system('cat `which plantuml` | grep plantuml.jar'), '\v.*\s[''"]?(\S+plantuml\.jar).*'),
@@ -226,26 +332,39 @@ if sysname == "Darwin" then
               \  0
               \)
          augroup end
-       ]], false)
+       ]],
+        false
+    )
 end
 
 -- Add -name: to composition resources
-vim.api.nvim_create_user_command("AddNames",
-    "g/apiVersion: \\(apiextensions\\|platform-composites\\)\\@!/normal!O- name:", {
+vim.api.nvim_create_user_command(
+    "AddNames",
+    "g/apiVersion: \\(apiextensions\\|platform-composites\\)\\@!/normal!O- name:",
+    {
         bang = false
-    })
+    }
+)
 
 -- Open Buildin terminal vertical mode
-vim.api.nvim_create_user_command("VT", 'vsplit | terminal bash -c "cd %:p:h;zsh"', {
-    bang = false,
-    nargs = "*"
-})
+vim.api.nvim_create_user_command(
+    "VT",
+    'vsplit | terminal bash -c "cd %:p:h;zsh"',
+    {
+        bang = false,
+        nargs = "*"
+    }
+)
 
 -- Open Buildin terminal
-vim.api.nvim_create_user_command("T", 'split | resize 15 | terminal bash -c "cd %:p:h;zsh"', {
-    bang = true,
-    nargs = "*"
-})
+vim.api.nvim_create_user_command(
+    "T",
+    'split | resize 15 | terminal bash -c "cd %:p:h;zsh"',
+    {
+        bang = true,
+        nargs = "*"
+    }
+)
 
 -- Define a Lua function to create the scratch buffer, execute the shell command, and set the keymap
 function create_scratch_buffer(args)
@@ -260,81 +379,106 @@ function create_scratch_buffer(args)
     local buf = vim.api.nvim_get_current_buf()
 
     -- Set the 'q' key to exit the buffer in the scratch buffer
-    vim.api.nvim_buf_set_keymap(buf, "n", "q", ":q!<CR>", {
-        noremap = true,
-        silent = true
-    })
+    vim.api.nvim_buf_set_keymap(
+        buf,
+        "n",
+        "q",
+        ":q!<CR>",
+        {
+            noremap = true,
+            silent = true
+        }
+    )
 end
 
 -- Create a user command 'R' to execute your Lua function, passing along any arguments
-vim.api.nvim_create_user_command("R", "lua create_scratch_buffer(<q-args>)", {
-    bang = false,
-    nargs = "*",
-    complete = "shellcmd"
-})
+vim.api.nvim_create_user_command(
+    "R",
+    "lua create_scratch_buffer(<q-args>)",
+    {
+        bang = false,
+        nargs = "*",
+        complete = "shellcmd"
+    }
+)
 
 -- Highlighting when yanking text
-vim.api.nvim_create_autocmd("TextYankPost", {
-    desc = "Highlight yanked text",
-    pattern = "*",
-    callback = function()
-        vim.highlight.on_yank {
-            higroup = "IncSearch",
-            timeout = 250
-        }
-    end
-})
+vim.api.nvim_create_autocmd(
+    "TextYankPost",
+    {
+        desc = "Highlight yanked text",
+        pattern = "*",
+        callback = function()
+            vim.highlight.on_yank {
+                higroup = "IncSearch",
+                timeout = 250
+            }
+        end
+    }
+)
 
 -- Get diff for current file
-vim.api.nvim_create_user_command("Gdiff", "execute  'w !git diff --no-index -- % -'", {
-    bang = false
-})
+vim.api.nvim_create_user_command(
+    "Gdiff",
+    "execute  'w !git diff --no-index -- % -'",
+    {
+        bang = false
+    }
+)
 
-vim.api.nvim_create_user_command("Ghistory", function()
-    -- Get the current file path
-    local file_path = vim.api.nvim_buf_get_name(0)
+vim.api.nvim_create_user_command(
+    "Ghistory",
+    function()
+        -- Get the current file path
+        local file_path = vim.api.nvim_buf_get_name(0)
 
-    -- Run git diff and capture the output
-    local handle = io.popen("git log -p --all -- " .. file_path, "r")
-    local result = handle:read "*a"
-    handle:close()
+        -- Run git diff and capture the output
+        local handle = io.popen("git log -p --all -- " .. file_path, "r")
+        local result = handle:read "*a"
+        handle:close()
 
-    -- Split the output into lines for the floating window
-    local content = {}
-    for line in result:gmatch "([^\n]*)\n?" do
-        table.insert(content, line)
-    end
+        -- Split the output into lines for the floating window
+        local content = {}
+        for line in result:gmatch "([^\n]*)\n?" do
+            table.insert(content, line)
+        end
 
-    -- Display the result in a floating scratch buffer
-    require("user_functions.utils").create_floating_scratch(content)
-end, {
-    bang = false,
-    desc = "Show git history for the current file"
-})
+        -- Display the result in a floating scratch buffer
+        require("user_functions.utils").create_floating_scratch(content)
+    end,
+    {
+        bang = false,
+        desc = "Show git history for the current file"
+    }
+)
 
-vim.api.nvim_create_user_command("Gdiffu", function()
-    -- Save the current buffer
-    vim.cmd "w"
+vim.api.nvim_create_user_command(
+    "Gdiffu",
+    function()
+        -- Save the current buffer
+        vim.cmd "w"
 
-    -- Get the current file path
-    local file_path = vim.api.nvim_buf_get_name(0)
+        -- Get the current file path
+        local file_path = vim.api.nvim_buf_get_name(0)
 
-    -- Run git diff and capture the output
-    local handle = io.popen("git diff --unified=0 -- " .. file_path)
-    local result = handle:read "*a"
-    handle:close()
+        -- Run git diff and capture the output
+        local handle = io.popen("git diff --unified=0 -- " .. file_path)
+        local result = handle:read "*a"
+        handle:close()
 
-    -- Split the output into lines for the floating window
-    local content = {}
-    for line in result:gmatch "([^\n]*)\n?" do
-        table.insert(content, line)
-    end
+        -- Split the output into lines for the floating window
+        local content = {}
+        for line in result:gmatch "([^\n]*)\n?" do
+            table.insert(content, line)
+        end
 
-    -- Display the result in a floating scratch buffer
-    require("user_functions.utils").create_floating_scratch(content)
-end, {
-    bang = false
-})
+        -- Display the result in a floating scratch buffer
+        require("user_functions.utils").create_floating_scratch(content)
+    end,
+    {
+        bang = false
+    }
+)
 
 vim.cmd [[
 function! WinMove(key)

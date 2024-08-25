@@ -18,9 +18,14 @@ function M.grepInProject()
     }
 end
 
-vim.keymap.set("n", "<leader>fw", M.grepInProject, {
-    noremap = true,
-    silent = true
-})
+vim.keymap.set(
+    "n",
+    "<leader>fw",
+    M.grepInProject,
+    {
+        noremap = true,
+        silent = true
+    }
+)
 
 return M

@@ -12,9 +12,14 @@ function M.toggle_zoom()
     end
 end
 
-vim.keymap.set("n", "<leader>zw", M.toggle_zoom, {
-    noremap = true,
-    silent = true
-})
+vim.keymap.set(
+    "n",
+    "<leader>zw",
+    M.toggle_zoom,
+    {
+        noremap = true,
+        silent = true
+    }
+)
 
 return M

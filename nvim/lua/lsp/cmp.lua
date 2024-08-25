@@ -17,7 +17,6 @@ cmp.setup {
             vim.fn["vsnip#anonymous"](args.body)
         end
     },
-
     formatting = {
         expandable_indicator = true,
         fields = {"abbr", "kind", "menu"},
@@ -35,7 +34,6 @@ cmp.setup {
             }
         }
     },
-
     mapping = {
         ["<C-p>"] = cmp.mapping.select_prev_item(),
         ["<C-n>"] = cmp.mapping.select_next_item(),
@@ -47,66 +45,94 @@ cmp.setup {
             behavior = cmp.ConfirmBehavior.Replace,
             select = true
         },
-
-        ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-                cmp.select_next_item()
-            elseif vim.fn["vsnip#available"](1) == 1 then
-                feedkey("<Plug>(vsnip-expand-or-jump)", "")
-            elseif has_words_before() then
-                cmp.complete()
-            else
-                fallback()
-            end
-        end, {"i", "s"}),
-
-        ["<S-Tab>"] = cmp.mapping(function()
-            if cmp.visible() then
-                cmp.select_prev_item()
-            elseif vim.fn["vsnip#jumpable"](-1) == 1 then
-                feedkey("<Plug>(vsnip-jump-prev)", "")
-            end
-        end, {"i", "s"})
+        ["<Tab>"] = cmp.mapping(
+            function(fallback)
+                if cmp.visible() then
+                    cmp.select_next_item()
+                elseif vim.fn["vsnip#available"](1) == 1 then
+                    feedkey("<Plug>(vsnip-expand-or-jump)", "")
+                elseif has_words_before() then
+                    cmp.complete()
+                else
+                    fallback()
+                end
+            end,
+            {"i", "s"}
+        ),
+        ["<S-Tab>"] = cmp.mapping(
+            function()
+                if cmp.visible() then
+                    cmp.select_prev_item()
+                elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+                    feedkey("<Plug>(vsnip-jump-prev)", "")
+                end
+            end,
+            {"i", "s"}
+        )
     },
-
-    sources = {{
-        name = "nvim_lsp"
-    }, {
-        name = "nvim_lua",
-        priority = 100
-    }, {
-        name = "vsnip"
-    }, {
-        name = "buffer"
-    }, {
-        name = "emoji"
-    }, {
-        name = "path"
-    }, {
-        name = "crates"
-    }, {
-        name = "snippets"
-    }, {
-        name = "projects",
-        priority = 100
-    }}
+    sources = {
+        {
+            name = "nvim_lsp"
+        },
+        {
+            name = "nvim_lua",
+            priority = 100
+        },
+        {
+            name = "vsnip"
+        },
+        {
+            name = "buffer"
+        },
+        {
+            name = "emoji"
+        },
+        {
+            name = "path"
+        },
+        {
+            name = "crates"
+        },
+        {
+            name = "snippets"
+        },
+        {
+            name = "projects",
+            priority = 100
+        }
+    }
 }
 
 -- Use buffer source for `/`
-cmp.setup.cmdline("/", {
-    sources = {{
-        name = "buffer"
-    }}
-})
+cmp.setup.cmdline(
+    "/",
+    {
+        sources = {
+            {
+                name = "buffer"
+            }
+        }
+    }
+)
 
 -- Use cmdline & path source for ':'
-cmp.setup.cmdline(":", {
-    sources = cmp.config.sources({{
-        name = "path"
-    }}, {{
-        name = "cmdline"
-    }})
-})
+cmp.setup.cmdline(
+    ":",
+    {
+        sources = cmp.config.sources(
+            {
+                {
+                    name = "path"
+                }
+            },
+            {
+                {
+                    name = "cmdline"
+                }
+            }
+        )
+    }
+)
 
 -- local highlight = {
 --   "RainbowRed",
@@ -133,34 +159,72 @@ cmp.setup.cmdline(":", {
 
 -- require("ibl").setup { indent = { highlight = highlight } }
 
-local highlight = {"RainbowRed", "RainbowYellow", "RainbowBlue", "RainbowOrange", "RainbowGreen", "RainbowViolet",
-                   "RainbowCyan"}
+local highlight = {
+    "RainbowRed",
+    "RainbowYellow",
+    "RainbowBlue",
+    "RainbowOrange",
+    "RainbowGreen",
+    "RainbowViolet",
+    "RainbowCyan"
+}
 local hooks = require "ibl.hooks"
 -- create the highlight groups in the highlight setup hook, so they are reset
 -- every time the colorscheme changes
-hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-    vim.api.nvim_set_hl(0, "RainbowRed", {
-        fg = "#E06C75"
-    })
-    vim.api.nvim_set_hl(0, "RainbowYellow", {
-        fg = "#E5C07B"
-    })
-    vim.api.nvim_set_hl(0, "RainbowBlue", {
-        fg = "#61AFEF"
-    })
-    vim.api.nvim_set_hl(0, "RainbowOrange", {
-        fg = "#D19A66"
-    })
-    vim.api.nvim_set_hl(0, "RainbowGreen", {
-        fg = "#98C379"
-    })
-    vim.api.nvim_set_hl(0, "RainbowViolet", {
-        fg = "#C678DD"
-    })
-    vim.api.nvim_set_hl(0, "RainbowCyan", {
-        fg = "#56B6C2"
-    })
-end)
+hooks.register(
+    hooks.type.HIGHLIGHT_SETUP,
+    function()
+        vim.api.nvim_set_hl(
+            0,
+            "RainbowRed",
+            {
+                fg = "#E06C75"
+            }
+        )
+        vim.api.nvim_set_hl(
+            0,
+            "RainbowYellow",
+            {
+                fg = "#E5C07B"
+            }
+        )
+        vim.api.nvim_set_hl(
+            0,
+            "RainbowBlue",
+            {
+                fg = "#61AFEF"
+            }
+        )
+        vim.api.nvim_set_hl(
+            0,
+            "RainbowOrange",
+            {
+                fg = "#D19A66"
+            }
+        )
+        vim.api.nvim_set_hl(
+            0,
+            "RainbowGreen",
+            {
+                fg = "#98C379"
+            }
+        )
+        vim.api.nvim_set_hl(
+            0,
+            "RainbowViolet",
+            {
+                fg = "#C678DD"
+            }
+        )
+        vim.api.nvim_set_hl(
+            0,
+            "RainbowCyan",
+            {
+                fg = "#56B6C2"
+            }
+        )
+    end
+)
 
 vim.g.rainbow_delimiters = {
     highlight = highlight
@@ -172,4 +236,3 @@ require("ibl").setup {
 }
 
 hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
-

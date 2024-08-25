@@ -18,5 +18,3 @@ extras/*
 zshrc/.private
 zshrc/.zsh_history
 tmux/plugins/*
-git/.gitconfig
-nvim/lazy-lock.json

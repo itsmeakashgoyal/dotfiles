@@ -37,9 +37,14 @@ function M.AnnotateText()
     vim.api.nvim_buf_set_lines(0, i, i, false, {pipe_line})
 end
 
-vim.keymap.set("v", "<leader>an", M.AnnotateText, {
-    noremap = true,
-    silent = true
-})
+vim.keymap.set(
+    "v",
+    "<leader>an",
+    M.AnnotateText,
+    {
+        noremap = true,
+        silent = true
+    }
+)
 
 return M

@@ -31,9 +31,11 @@ end
 -- Remap for dealing with word wrap
 set.gp = "git grep -n"
 set.completeopt = {"menuone", "noselect", "noinsert"}
-set.shortmess = set.shortmess + {
-    c = true
-}
+set.shortmess =
+    set.shortmess +
+    {
+        c = true
+    }
 set.background = "dark"
 set.ignorecase = true -- ignore case in search
 set.infercase = true -- adjust case in search
@@ -46,24 +48,24 @@ set.splitbelow = true -- put new splits below
 set.lazyredraw = true -- do not redraw for macros, faster execution
 set.undofile = true -- persistent undo even after session close
 set.spellfile = vim.fn.stdpath "config" .. "/spell/en.utf-8.add"
-set.formatoptions:remove{"o"}
+set.formatoptions:remove {"o"}
 
-set.number = true -- Precede each line with its line number 
+set.number = true -- Precede each line with its line number
 set.encoding = "utf-8"
 set.cursorline = true
 
-set.expandtab = true -- Use the appropriate number of spaces to insert a Tab 
-set.shiftwidth = 4 -- Number of spaces to use for each step of indent  
-set.tabstop = 4 -- Number of visual <Space> per <Tab> 
-set.softtabstop = 4 -- Number of spaces per tab wwhile performing editing operations  
-set.autoindent = true -- Copy indent from current line when staring a new line 
-set.relativenumber = true -- Show the line number relative to the current line 
+set.expandtab = true -- Use the appropriate number of spaces to insert a Tab
+set.shiftwidth = 4 -- Number of spaces to use for each step of indent
+set.tabstop = 4 -- Number of visual <Space> per <Tab>
+set.softtabstop = 4 -- Number of spaces per tab wwhile performing editing operations
+set.autoindent = true -- Copy indent from current line when staring a new line
+set.relativenumber = true -- Show the line number relative to the current line
 set.incsearch = true
 set.inccommand = "split" -- preview of replacement operations
 set.laststatus = 2
 set.cmdheight = 1
-set.ruler = true -- Show the line and column number of cursor position 
-set.smarttab = true -- Insert blanks according to shiftwidth, or tabstop in front of lines 
+set.ruler = true -- Show the line and column number of cursor position
+set.smarttab = true -- Insert blanks according to shiftwidth, or tabstop in front of lines
 
 -- Disable copilot on boot
 vim.b.copilot_enabled = false
@@ -73,10 +75,15 @@ vim.cmd "command! GetCurrentFileDir lua print_current_file_dir()"
 -- Key mappings
 vim.cmd "command! Fold lua _G.toggle_function_folding()"
 
-vim.api.nvim_set_keymap("n", "fld", [[<Cmd>lua _G.toggle_function_folding()<CR>]], {
-    noremap = true,
-    silent = false
-})
+vim.api.nvim_set_keymap(
+    "n",
+    "fld",
+    [[<Cmd>lua _G.toggle_function_folding()<CR>]],
+    {
+        noremap = true,
+        silent = false
+    }
+)
 vim.cmd [[
   command! -range=% -nargs=* -complete=customlist,v:lua.my_custom_complete ProcessTasks :lua _G.process_task_list(<line1>, <line2>, <f-args>)
 ]]

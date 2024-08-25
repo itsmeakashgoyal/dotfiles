@@ -13,8 +13,16 @@ require("telescope").load_extension "cmdline"
 
 require("telescope").setup {
     defaults = {
-        vimgrep_arguments = {"rg", "--color=never", "--no-heading", "--with-filename", "--line-number", "--column",
-                             "--smart-case", "--hidden"}
+        vimgrep_arguments = {
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
+            "--hidden"
+        }
     },
     extensions = {
         live_grep_args = {
@@ -140,21 +148,31 @@ local function search_git(visual)
     end
 end
 
-vim.keymap.set("n", "<leader>lg", function()
-    search_git(false)
-end, {
-    remap = true,
-    silent = false,
-    desc = "Live grep in the git root folder"
-})
+vim.keymap.set(
+    "n",
+    "<leader>lg",
+    function()
+        search_git(false)
+    end,
+    {
+        remap = true,
+        silent = false,
+        desc = "Live grep in the git root folder"
+    }
+)
 
-vim.keymap.set("v", "<leader>lg", function()
-    search_git(true)
-end, {
-    remap = true,
-    silent = false,
-    desc = "Grep in the git root folder"
-})
+vim.keymap.set(
+    "v",
+    "<leader>lg",
+    function()
+        search_git(true)
+    end,
+    {
+        remap = true,
+        silent = false,
+        desc = "Grep in the git root folder"
+    }
+)
 -- Retrieve the current tmux session path
 -- This will not change when we navigate to a different pane
 local function search_tmux(visual)
@@ -193,47 +211,80 @@ local default_opts = {
     noremap = true,
     silent = true
 }
-vim.keymap.set("n", "<leader>lt", function()
-    search_tmux(false)
-end, {
-    remap = true,
-    silent = false,
-    desc = "Live grep in the current tmux session folder"
-})
+vim.keymap.set(
+    "n",
+    "<leader>lt",
+    function()
+        search_tmux(false)
+    end,
+    {
+        remap = true,
+        silent = false,
+        desc = "Live grep in the current tmux session folder"
+    }
+)
 
-vim.keymap.set("v", "<leader>lt", function()
-    search_tmux(true)
-end, {
-    remap = true,
-    silent = false,
-    desc = "Grep string in the current tmux session folder"
-})
-vim.api.nvim_set_keymap("v", "<leader>ls", 'y<ESC>:Telescope live_grep default_text=<c-r>0<CR> search_dirs={"$PWD"}',
-    default_opts)
-vim.api.nvim_set_keymap("n", "<leader>tm", ":lua require('telescope').extensions.tmuxinator.projects{}<CR>",
-    default_opts)
-vim.keymap.set("n", "<leader>/", function()
-    builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown {
-        winblend = 10,
-        previewer = false,
-        relative = "editor"
-    })
-end, {
-    desc = "Find in current buffer"
-})
+vim.keymap.set(
+    "v",
+    "<leader>lt",
+    function()
+        search_tmux(true)
+    end,
+    {
+        remap = true,
+        silent = false,
+        desc = "Grep string in the current tmux session folder"
+    }
+)
+vim.api.nvim_set_keymap(
+    "v",
+    "<leader>ls",
+    'y<ESC>:Telescope live_grep default_text=<c-r>0<CR> search_dirs={"$PWD"}',
+    default_opts
+)
+vim.api.nvim_set_keymap(
+    "n",
+    "<leader>tm",
+    ":lua require('telescope').extensions.tmuxinator.projects{}<CR>",
+    default_opts
+)
+vim.keymap.set(
+    "n",
+    "<leader>/",
+    function()
+        builtin.current_buffer_fuzzy_find(
+            require("telescope.themes").get_dropdown {
+                winblend = 10,
+                previewer = false,
+                relative = "editor"
+            }
+        )
+    end,
+    {
+        desc = "Find in current buffer"
+    }
+)
 
 local key = vim.api.nvim_set_keymap
 local set_up_telescope = function()
     local set_keymap = function(mode, bind, cmd)
-        key(mode, bind, cmd, {
-            noremap = true,
-            silent = true
-        })
+        key(
+            mode,
+            bind,
+            cmd,
+            {
+                noremap = true,
+                silent = true
+            }
+        )
     end
     set_keymap("n", "<Leader>fd", "<cmd>lua search_dev()<CR>")
     set_keymap("n", "<leader>bu", [[<cmd>lua require('telescope.builtin').buffers()<CR>]])
-    set_keymap("n", "<leader>ff",
-        [[<cmd>lua require('telescope.builtin').find_files({ find_command = {'rg', '--files', '--hidden', '-g', '!.git'}, search_dirs = {require('user_functions.shell_integration').get_tmux_working_directory()}, path_display = {"truncate"} })<CR>]])
+    set_keymap(
+        "n",
+        "<leader>ff",
+        [[<cmd>lua require('telescope.builtin').find_files({ find_command = {'rg', '--files', '--hidden', '-g', '!.git'}, search_dirs = {require('user_functions.shell_integration').get_tmux_working_directory()}, path_display = {"truncate"} })<CR>]]
+    )
     set_keymap("n", "<leader>fr", [[<cmd>lua require'telescope'.extensions.repo.list{search_dirs = {"~/dev"}}<CR>]])
     set_keymap("n", "<leader>fg", [[<cmd>lua require('telescope.builtin').git_files()<CR>]])
     set_keymap("n", "<leader>fo", [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]])

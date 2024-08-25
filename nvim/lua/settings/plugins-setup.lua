@@ -3,45 +3,68 @@ vim.notify = require "notify"
 require("mason").setup()
 
 require("neotest").setup {
-    adapters = {require("neotest-python")({
-        dap = {
-            justMyCode = false
-        }
-    }), require("neotest-plenary")}
+    adapters = {
+        require("neotest-python")(
+            {
+                dap = {
+                    justMyCode = false
+                }
+            }
+        ),
+        require("neotest-plenary")
+    }
 }
 
-require("gp").setup {require("gp").setup {
-    agents = { -- Disable ChatGPT 3.5
-    {
-        name = "ChatGPT3-5",
-        disable = true
-    }, {
-        name = "ChatGPT4",
-        chat = true,
-        command = true,
-        -- string with model name or table with model name and parameters
-        model = {
-            model = "gpt-4o",
-            temperature = 0.1,
-            top_p = 1
-        },
-        -- system prompt (use this to specify the persona/role of the AI)
-        system_prompt = "You are a specialized coding AI assistant.\n\n" ..
-            "The user provided the additional info about how they would like you to respond:\n\n" ..
-            "- If you're unsure don't guess and say you don't know instead.\n" ..
-            "- Ask question if you need clarification to provide better answer.\n" ..
-            "- Think deeply and carefully from first principles step by step.\n" ..
-            "- Make your answers short, conscience, to the point and helpful.\n" ..
-            "- Produce only valid and actionable code.\n" ..
-            "- Include only essencial response like code etc, DO NOT provide explanations unless specifically asked for\n" ..
-            "- Take a deep breath; You've got this!"
-    }}
-}}
+require("gp").setup {
+    require("gp").setup {
+        agents = {
+            -- Disable ChatGPT 3.5
+            {
+                name = "ChatGPT3-5",
+                disable = true
+            },
+            {
+                name = "ChatGPT4",
+                chat = true,
+                command = true,
+                -- string with model name or table with model name and parameters
+                model = {
+                    model = "gpt-4o",
+                    temperature = 0.1,
+                    top_p = 1
+                },
+                -- system prompt (use this to specify the persona/role of the AI)
+                system_prompt = "You are a specialized coding AI assistant.\n\n" ..
+                    "The user provided the additional info about how they would like you to respond:\n\n" ..
+                        "- If you're unsure don't guess and say you don't know instead.\n" ..
+                            "- Ask question if you need clarification to provide better answer.\n" ..
+                                "- Think deeply and carefully from first principles step by step.\n" ..
+                                    "- Make your answers short, conscience, to the point and helpful.\n" ..
+                                        "- Produce only valid and actionable code.\n" ..
+                                            "- Include only essencial response like code etc, DO NOT provide explanations unless specifically asked for\n" ..
+                                                "- Take a deep breath; You've got this!"
+            }
+        }
+    }
+}
 
 require("remote-sshfs").setup {}
 
 require("mini.align").setup()
-require("mini.ai").setup()
+-- Better Around/Inside textobjects
+--
+-- Examples:
+--  - va)  - [V]isually select [A]round [)]paren
+--  - yinq - [Y]ank [I]nside [N]ext [Q]uote
+--  - ci'  - [C]hange [I]nside [']quote
+require("mini.ai").setup {n_lines = 500}
+
+-- Add/delete/replace surroundings (brackets, quotes, etc.)
+--
+-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+-- - sd'   - [S]urround [D]elete [']quotes
+-- - sr)'  - [S]urround [R]eplace [)] [']
+require("mini.surround").setup()
 require("mini.files").setup {
     windows = {
         preview = true,
@@ -54,7 +77,6 @@ require("go").setup {
     gofmt = "gofumpt",
     lsp_gofumpt = true
 }
-require("dap-python").setup "~/.virtualenvs/debugpy/bin/python"
 
 require("goto-preview").setup {}
 
@@ -108,17 +130,20 @@ require("mdeval").setup {
 }
 
 require("obsidian").setup {
-    workspaces = {{
-        name = "main",
-        path = "/Users/akashgoyal/Workspace/obsidian",
-        -- Optional, override certain settings.
-        overrides = {
-            notes_subdir = "Notes"
+    workspaces = {
+        {
+            name = "main",
+            path = "/Users/akashgoyal/Workspace/obsidian",
+            -- Optional, override certain settings.
+            overrides = {
+                notes_subdir = "Notes"
+            }
+        },
+        {
+            name = "work",
+            path = "/Users/akashgoyal/Workspace/obsidian"
         }
-    }, {
-        name = "work",
-        path = "/Users/akashgoyal/Workspace/obsidian"
-    }},
+    },
     disable_frontmatter = false,
     -- open_app_foreground = true,
     templates = {
@@ -213,7 +238,6 @@ require("obsidian").setup {
         local path = spec.dir / tostring(spec.title)
         return path:with_suffix ".md"
     end,
-
     wiki_link_func = function(opts)
         if opts.label ~= opts.path then
             return string.format("[[%s|%s]]", opts.path, opts.label)
@@ -257,7 +281,6 @@ require("nvim-treesitter.configs").setup {
     },
     -- List of parsers to always install, useful for parsers without filetype
     modules = {},
-
     auto_install = true,
     rainbow = {
         enable = true,
@@ -320,10 +343,8 @@ require("nvim-treesitter.configs").setup {
         select = {
             enable = true,
             disable = {"yaml"},
-
             -- Automatically jump forward to textobj, similar to targets.vim
             lookahead = true,
-
             keymaps = {
                 -- You can use the capture groups defined in textobjects.scm
                 ["af"] = "@function.outer",
@@ -413,7 +434,7 @@ require("which-key").setup {
 require("lualine").setup {
     options = {
         theme = "tokyonight",
-        extensions = {"nvim-dap-ui"}
+        extensions = {}
     }
 }
 
@@ -492,13 +513,27 @@ vim.g.startify_session_number = 0
 vim.g.startify_files_number = 10
 vim.g.startify_session_delete_buffers = 0
 vim.g.startify_skiplist = {"^/tmp"}
-vim.g.startify_commands = {{"Search Workspace    :SPC fd",
-                            "Telescope find_files search_dirs=~/Workspace,--hidden,--with-filename"},
-                           {"Search dotfiles     :SPC fr",
-                            "lua require'telescope'.extensions.repo.list{search_dirs = {\"~/dotfiles-dev\"}}"},
-                           {"Change Color        :SPC fc", "Telescope colorscheme"},
-                           {"Transparent Bg      :SPC tr", "TransparentEnable"},
-                           {"Pick Emoji          :SPC fm", "Telescope emoji"}}
-vim.g.startify_bookmarks = {"~/.config/nvim/lua", "~/.zshrc", "~/.private", "~/.aliases", "~/.exports",
-                            "~/.config/tmux/tmux.conf", "~/dotfiles-dev/zsh", "~/.local/share/nvim/gp/chats"}
+vim.g.startify_commands = {
+    {
+        "Search Workspace    :SPC fd",
+        "Telescope find_files search_dirs=~/Workspace,--hidden,--with-filename"
+    },
+    {
+        "Search dotfiles     :SPC fr",
+        'lua require\'telescope\'.extensions.repo.list{search_dirs = {"~/dotfiles-dev"}}'
+    },
+    {"Change Color        :SPC fc", "Telescope colorscheme"},
+    {"Transparent Bg      :SPC tr", "TransparentEnable"},
+    {"Pick Emoji          :SPC fm", "Telescope emoji"}
+}
+vim.g.startify_bookmarks = {
+    "~/.config/nvim/lua",
+    "~/.zshrc",
+    "~/.private",
+    "~/.aliases",
+    "~/.exports",
+    "~/.config/tmux/tmux.conf",
+    "~/dotfiles-dev/zsh",
+    "~/.local/share/nvim/gp/chats"
+}
 vim.g.startify_custom_header = "startify#pad(split(system('fortune -s | cowsay | lolcat; date'), '\n'))"

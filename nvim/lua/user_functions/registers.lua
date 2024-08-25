@@ -21,29 +21,31 @@ function M.replace_with_register()
     require("telescope.builtin").registers {
         attach_mappings = function(prompt_bufnr, map)
             print "Register picker called from telescope"
-            actions.select_default:replace(function()
-                print "Inside actions.select_default:replace function"
-                -- Close the picker
-                actions.close(prompt_bufnr)
-                print "Picker closed"
+            actions.select_default:replace(
+                function()
+                    print "Inside actions.select_default:replace function"
+                    -- Close the picker
+                    actions.close(prompt_bufnr)
+                    print "Picker closed"
 
-                -- Get the selected register
-                local selection = action_state.get_selected_entry()
-                print(vim.inspect(selection))
+                    -- Get the selected register
+                    local selection = action_state.get_selected_entry()
+                    print(vim.inspect(selection))
 
-                -- Get the content of the selected register
-                local register_content = selection.content
-                print(vim.inspect(register_content))
+                    -- Get the content of the selected register
+                    local register_content = selection.content
+                    print(vim.inspect(register_content))
 
-                -- Set the content of the "a" register
-                vim.fn.setreg("a", register_content)
+                    -- Set the content of the "a" register
+                    vim.fn.setreg("a", register_content)
 
-                -- Set up the operator callback
-                vim.o.operatorfunc = "v:lua._G.operator_callback"
-                vim.api.nvim_feedkeys("g@`<", "ni", false) -- This triggers the operator callback on the visual selection
+                    -- Set up the operator callback
+                    vim.o.operatorfunc = "v:lua._G.operator_callback"
+                    vim.api.nvim_feedkeys("g@`<", "ni", false) -- This triggers the operator callback on the visual selection
 
-                print "Substitute command executed"
-            end)
+                    print "Substitute command executed"
+                end
+            )
             print "Exited from actions.select_default:replace function"
             return true -- Keep the rest of the mappings
         end
@@ -51,9 +53,14 @@ function M.replace_with_register()
 end
 
 -- Create a keymap to call the replace_with_register function
-vim.api.nvim_set_keymap("v", "<leader>rg", [[:lua require('user_functions.registers').replace_with_register()<CR>]], {
-    noremap = true,
-    silent = true
-})
+vim.api.nvim_set_keymap(
+    "v",
+    "<leader>rg",
+    [[:lua require('user_functions.registers').replace_with_register()<CR>]],
+    {
+        noremap = true,
+        silent = true
+    }
+)
 
 return M

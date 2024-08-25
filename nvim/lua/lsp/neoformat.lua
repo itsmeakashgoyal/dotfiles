@@ -11,4 +11,4 @@ vim.g.neoformat_cpp_clangformat = {
 }
 -- vim.g.neoformat_enabled_cpp = { "clangformat" }
 
-vim.g.neoformat_enabled_python = {'black'}
+vim.g.neoformat_enabled_python = {"black"}

@@ -30,8 +30,16 @@ _G.create_script_from_command = function()
 
     -- Replace the selected command with the script name
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", {})
-    local ok, err = pcall(vim.api.nvim_buf_set_text, bufnr, start_pos[1] - 1, start_pos[2], end_pos[1] - 1,
-        end_pos[2] - 1, {"./" .. script_name})
+    local ok, err =
+        pcall(
+        vim.api.nvim_buf_set_text,
+        bufnr,
+        start_pos[1] - 1,
+        start_pos[2],
+        end_pos[1] - 1,
+        end_pos[2] - 1,
+        {"./" .. script_name}
+    )
     if not ok then
         print("Error replacing text: " .. err)
     else
@@ -40,6 +48,11 @@ _G.create_script_from_command = function()
 end
 
 -- Create the keymap for the function
-vim.api.nvim_set_keymap("v", "<leader>c", ":<C-u>lua create_script_from_command()<CR>", {
-    silent = false
-})
+vim.api.nvim_set_keymap(
+    "v",
+    "<leader>c",
+    ":<C-u>lua create_script_from_command()<CR>",
+    {
+        silent = false
+    }
+)

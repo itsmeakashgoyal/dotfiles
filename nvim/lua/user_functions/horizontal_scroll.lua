@@ -23,8 +23,12 @@ function M.ToggleHorizontalScroll()
 end
 
 -- Register the command to toggle horizontal scrolling
-vim.api.nvim_create_user_command("HorizontalScrollMode", function()
-    M.ToggleHorizontalScroll()
-end, {})
+vim.api.nvim_create_user_command(
+    "HorizontalScrollMode",
+    function()
+        M.ToggleHorizontalScroll()
+    end,
+    {}
+)
 
 return M
