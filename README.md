@@ -55,7 +55,6 @@ This script will:
 - `settings/`: Directory containing editor settings and themes for Sublime Text, Visual Studio Code and iterm terminal.
 - `scripts/`: Containing common scripts to run while setting up the dotfiles.
 - `tmux/`: Containing tmux config files
-- `nvim/`: Containing nvim config files
 - `git/`: Containing git config file
 - `homebrew/`: Homebrew installed packages in my macbook.
 - `zshrc/`: Containing Shell configuration files for Zsh.
