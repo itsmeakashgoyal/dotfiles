@@ -274,3 +274,247 @@ function pkill() {
       fi
   ' --
 }
+
+function cds() {
+    session=$(tmux display-message -p '#{session_path}')
+    cd "$session"
+}
+
+function cfp() {
+    local file_path="$1"
+    local full_path=$(realpath "$file_path")
+    echo -n "$full_path" | xclip -selection clipboard
+}
+
+# Function to create and activate a Python virtual environment
+function mkvenv() {    # Set the environment directory name, default to 'venv' if no name provided
+    local env_dir=${1:-venv}
+    local requirements_path="captured-requirements.txt"
+    # Check if the environment already exists
+    # Create the virtual environment
+    echo "Creating new virtual environment '$env_dir'..."
+    python3 -m venv $env_dir
+    
+    # Activate the virtual environment
+    source $env_dir/bin/activate
+    
+    # Optional: Install any default packages
+    pip3 install --upgrade pip
+    pip3 install wheel
+
+    if [ -f "$requirements_path" ]; then
+        echo "Installing packages from '$requirements_path'..."
+        pip3 install -r "$requirements_path"
+    fi
+    
+    echo "Virtual environment '$env_dir' created and activated!"
+}
+
+function rmvenv() {
+    # Check if the environment is active
+    local requirements_path="captured-requirements.txt"
+    if [[ "$VIRTUAL_ENV" != "" ]]; then
+        if [[ ! -f "requirements.txt" ]]; then
+            pip3 freeze > "$requirements_path"
+        fi
+        # Deactivate the environment
+        deactivate
+        
+        echo "Virtual environment deactivated and all installed packages captured"
+    else
+        echo "No virtual environment is active."
+    fi
+}
+
+# PROJECT: git-log
+function logg() {
+    git lg | fzf --ansi --no-sort \
+        --preview 'echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % git show % --color=always' \
+        --preview-window=right:50%:wrap --height 100% \
+        --bind 'enter:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % sh -c "git show % | nvim -c \"setlocal buftype=nofile bufhidden=wipe noswapfile nowrap\" -c \"nnoremap <buffer> q :q!<CR>\" -")' \
+        --bind 'ctrl-e:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % sh -c "gh browse %")' \
+}
+
+# xev wrapper for ascii keycodes
+function char2hex() {
+    xev | awk -F'[ )]+' '/^KeyPress/ { a[NR+2] } NR in a { printf "%-3s %s\n", $5, $8 }'
+}
+
+# Creates a folder named with the current or prefixed date, using the format "prefix-YYYY-MM-DD" if a prefix is provided.
+function mkdd ()
+{
+    mkdir -p ${1:+$1$prefix_separator}"$(date +%F)";
+}
+
+# Creates a real-time countdown with alert sound, useful for bash scripts and terminal.
+function timer ()
+{
+    total=$1 
+    for ((i=total; i>0; i--)); do sleep 1; printf "Time remaining %s secs \r" "$i"; done
+    echo -e "\a" 
+}
+
+# Display calendar with day highlighted
+function cal ()
+{
+    if [ -t 1 ] ; then alias cal="ncal -b" ; else alias cal="/usr/bin/cal" ; fi
+}
+
+# Simplifies font installation, making font customization easier and improving visual experience in the shell
+function install_font ()
+{
+    if [[ -z $1 ]]; then
+    echo provide path to zipped font file 
+    return 1
+    fi
+    
+    font_zip=$(realpath "$1")
+
+    unzip "$font_zip" "*.ttf" "*.otf" -d ~/.local/share/fonts/
+    fc-cache -vf
+}
+
+# Common function to search for a string in files using rga and fzf, and opens the file with nvim.
+function _fif_common() {
+    local ignore_case_flag="$1"
+    shift
+
+    local files
+    local preview_cmd=$(printf "rga %s --pretty --context 10 '%s' {}" "$ignore_case_flag" "$*")
+    local rga_output=$(rga --max-count=1 $ignore_case_flag --files-with-matches --no-messages "$*")
+    # PROJECT: project
+    # This is used to copy file names so that they can be used a project documentaiton
+    echo "$rga_output" | xsel --clipboard --input
+    IFS=$'\n' files=($(echo "$rga_output" | fzf-tmux +m --preview="$preview_cmd" --multi --select-1 --exit-0)) || return 1
+
+    if [ ${#files[@]} -eq 0 ]; then
+        echo "No files selected."
+        return 0
+    fi
+
+    typeset -a temp_files
+    for i in {1..${#files[@]}}; do
+        if [[ -n "${files[i]}" ]]; then
+        temp_files[i]=$(realpath "${files[i]}")
+        fi
+    done
+    files=("${temp_files[@]}")
+    local nvim_cmd=""
+    case "${#files[@]}" in
+        2)
+        nvim -O "${files[1]}" "${files[2]}"
+        ;;
+        3)
+        nvim_cmd="nvim -O \"${files[1]}\" -c 'wincmd j' -c \"vsplit ${files[2]}\" -c \"split ${files[3]}\""
+        ;;
+        4)
+        nvim_cmd="nvim -O \"${files[1]}\" -c \"vsplit ${files[2]}\" -c \"split ${files[3]}\" -c 'wincmd h' -c \"split ${files[4]}\""
+        ;;
+        *)
+        nvim_cmd="nvim \"${files[@]}\""
+        ;;
+    esac
+
+    eval "$nvim_cmd"
+}
+
+# Wrapper function for case-sensitive search
+function fifs() {
+    _fif_common "" "$@"
+}
+
+# Wrapper function for case-insensitive search
+function fif() {
+    _fif_common "--ignore-case" "$@"
+}
+
+# Add all changes to git, commit with given message, and push
+function gac() {
+    git add .
+    git commit -m "$1"
+    git push
+}
+
+# Add all changes to git, commit with given message and signed-off-by line, and push
+function gacs() {
+    git add .
+    git commit -m "$1" -s
+    git push
+}
+
+# Find a repo for authenticated user with gh CLI and cd into it, clone and cd if not found on disk
+function repo() {
+    export repo=$(fd . ${HOME}/dev --type=directory --max-depth=1 --color always| awk -F "/" '{print $5}' | fzf --ansi --preview 'onefetch /home/decoder/dev/{1}' --preview-window up)
+    if [[ -z "$repo" ]]; then
+        echo "Repository not found"
+    else
+        echo "Repository found locally, entering"
+        cd ${HOME}/dev/$repo
+        if [[ -d .git ]]; then
+            echo "Fetching origin"
+            git fetch origin
+            onefetch
+        fi
+            create_tmux_session "${HOME}/dev/$repo"
+    fi
+}
+
+function create_tmux_session() {
+    local RESULT="$1"
+    zoxide add "$RESULT" &>/dev/null
+    local FOLDER=$(basename "$RESULT")
+    local SESSION_NAME=$(echo "$FOLDER" | tr ' .:' '_')
+    
+    if [ -d "$RESULT/.git" ]; then
+        SESSION_NAME+="_$(git -C "$RESULT" symbolic-ref --short HEAD 2>/dev/null)"
+    fi
+    
+    if ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+        tmux new-session -d -s "$SESSION_NAME" -c "$RESULT"
+    fi
+    
+    if [ -z "$TMUX" ]; then
+        tmux attach -t "$SESSION_NAME"
+    else
+        tmux switch-client -t "$SESSION_NAME"
+    fi
+}
+
+# Check system info using onefetch and output in terminal
+function checkfetch() {
+    local res=$(onefetch) &> /dev/null
+    if [[ "$res" =~ "Error" ]]; then
+        echo ""
+    else echo $(onefetch)
+    fi
+}
+
+function open_file_git_staged() {
+    ~/dotfiles-dev/scripts/_open-file-git-staged.sh 
+}
+
+# Binds Ctrl+Alt+O to open_file_git
+bindkey "^[^O" open_file_git_staged
+zle -N open_file_git_staged
+
+function zoxider() {
+    BUFFER=$(zoxide query -i)
+    zle accept-line
+}
+
+zle -N zoxider
+bindkey '^[j' zoxider
+
+function f_git_enter() {
+    BUFFER="~/dotfiles-dev/scripts/_open-file-git.sh"
+    zle accept-line
+}
+
+zle -N f_git_enter
+bindkey '^o' f_git_enter
+
+copy-line-to-clipboard() {
+    echo -n $BUFFER | xclip -selection clipboard
+}
+zle -N copy-line-to-clipboard
+bindkey '^Y' copy-line-to-clipboard

@@ -83,6 +83,22 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search colored-man-
 source $ZSH/oh-my-zsh.sh
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
 
+ZVM_INIT_MODE=sourcing
+compinit -d "${ZDOTDIR:-$HOME}/.zcompdump"
+
+# https://github.com/jeffreytse/zsh-vi-mode
+function zvm_config() {
+    ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+    ZVM_VI_INSERT_ESCAPE_BINDKEY=\;\;
+    ZVM_CURSOR_STYLE_ENABLED=false
+    ZVM_VI_EDITOR=nvim
+    # export KEYTIMEOUT=1
+}
+
+function zvm_after_init() {
+    zvm_bindkey viins '^Q' push-line
+}
+
 # User configuration
 
 export MANPATH="/usr/local/man:$MANPATH"
@@ -117,6 +133,7 @@ export LANG=en_US.UTF-8
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
+setopt extended_glob
 
 bindkey '^w' autosuggest-execute
 bindkey '^e' autosuggest-accept
@@ -144,6 +161,7 @@ zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':completion:*' list-max-items 20
 
 source <(fzf --zsh)
+zvm_after_init_commands+=('source <(fzf --zsh)')
 eval "$(zoxide init --cmd cd zsh)"
 
 # Load dotfiles:

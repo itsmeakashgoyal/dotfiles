@@ -121,3 +121,6 @@ alias -g T="| tail -n +2"
 alias -g V=' --version'
 alias -g W='| nvim -c "setlocal buftype=nofile bufhidden=wipe" -c "nnoremap <buffer> q :q!<CR>" -'
 
+alias diskusage='du -sh * | sort -h --reverse'
+alias ghc='~/dotfiles-dev/scripts/_gh_cli.sh'
+alias ghcurrentbranch='gh repo view --branch $(git rev-parse --abbrev-ref HEAD) --web'
