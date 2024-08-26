@@ -17,4 +17,3 @@ Thumbs.db
 extras/*
 zshrc/.private
 zshrc/.zsh_history
-tmux/plugins/*
