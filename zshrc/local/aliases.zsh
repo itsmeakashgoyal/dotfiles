@@ -31,4 +31,5 @@ alias -g T="| tail -n +2"
 alias -g V=' --version'
 alias -g W='| nvim -c "setlocal buftype=nofile bufhidden=wipe" -c "nnoremap <buffer> q :q!<CR>" -'
 
-
+# List out all globally installed npm packages
+alias list-npm-globals='npm list -g --depth=0'
