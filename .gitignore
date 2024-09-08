@@ -3,7 +3,7 @@
 
 # Folder view configuration files
 .DS_Store
-Desktop.ini
+*.swp
 
 # Thumbnail cache files
 ._*
@@ -12,8 +12,7 @@ Thumbs.db
 # Files that might appear on external disks
 .Spotlight-V100
 .Trashes
+zshrc/zsh_plugins.zsh
 
 # Private Information
-extras/*
-zshrc/.private
 zshrc/.zsh_history

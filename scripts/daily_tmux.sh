@@ -20,10 +20,6 @@ tmux send-keys "echo pane 1" C-m
 # create new window for irc 
 #tmux new-window -t irc
 
-
-
-
-
 # Set default window
 tmux select-window -t $SESSION:1
 

@@ -1,17 +1,14 @@
-#!/usr/bin/env bash
+# ------------------------------------------------------------------------------
+# General Exports
+# ------------------------------------------------------------------------------
+
+HOMEBREW_NO_AUTO_UPDATE=1
+HOMEBREW_PREFIX="/opt/homebrew"
+HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+HOMEBREW_REPOSITORY="/opt/homebrew"
 
 # Make vim the default editor.
-export EDITOR=/opt/homebrew/bin/nvim
-
-# Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
-export PYTHONIOENCODING='UTF-8';
-
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-    eval "$(pyenv init --path)"
-    eval "$(pyenv init -)"
-fi
+# export EDITOR=/opt/homebrew/bin/nvim
 
 # Prefer US English and use UTF-8.
 export LANG='en_US.UTF-8';
@@ -19,16 +16,6 @@ export LC_ALL='en_US.UTF-8';
 
 # export llvm path for clang++
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
-
-export FZF_DEFAULT_OPTS="--height=50% --min-height=15 --reverse"
-export FZF_DEFAULT_COMMAND='rg --files'
-
-export FZF_CTRL_T_OPTS="--height 60% \
-    --border sharp \
-    --layout reverse \
-    --prompt '∷ ' \
-    --pointer ▶ \
-    --marker ⇒"
 
 # colorful man pages
 export LESS_TERMCAP_mb=$'\e[1;31m'

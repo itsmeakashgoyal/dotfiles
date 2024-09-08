@@ -56,16 +56,8 @@ This script will:
 - `scripts/`: Containing common scripts to run while setting up the dotfiles.
 - `tmux/`: Containing tmux config files
 - `git/`: Containing git config file
-- `homebrew/`: Homebrew installed packages in my macbook.
 - `zshrc/`: Containing Shell configuration files for Zsh.
-    - `.aliases`: Aliases for common commands. Some are personalized to my machines specifically.
-    - `.exports`: Exports for packages path.
-    - `.functions`: Common useful functions.
-    - `.private`: This is a file you'll create locally to hold private information and shouldn't be uploaded to version control
-    - `.zshrc`: Shell configuration files for Bash and Zsh.
 - `bashrc/`: Containing Shell configuration files for Bash.
-    - `.bashrc`: Shell configuration files for Bash.
-    - `.bash_profile`: Setting system-wide environment variables
 
 ### Customizing Your Setup
 
@@ -80,9 +72,4 @@ Feel free to fork this repository and customize it for your setup. Pull requests
 ## License
 
 This project is licensed under the BSD 2-Clause License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- My dotfiles repo is inspired from [Corey M Schafer' dotfiles](https://github.com/CoreyMSchafer/dotfiles) and [Omer Hamerman](https://github.com/omerxx/dotfiles)
-- Thanks to all the open-source projects used in this setup.
 

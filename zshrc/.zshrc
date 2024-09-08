@@ -2,7 +2,7 @@
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 # If you come from bash you might have to change your $PATH.
@@ -84,7 +84,8 @@ source $ZSH/oh-my-zsh.sh
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
 
 ZVM_INIT_MODE=sourcing
-compinit -d "${ZDOTDIR:-$HOME}/.zcompdump"
+
+export ZSHRCDIR="$HOME/dotfiles-dev/zshrc"
 
 # https://github.com/jeffreytse/zsh-vi-mode
 function zvm_config() {
@@ -164,9 +165,24 @@ source <(fzf --zsh)
 zvm_after_init_commands+=('source <(fzf --zsh)')
 eval "$(zoxide init --cmd cd zsh)"
 
-# Load dotfiles:
-for file in ~/.{aliases,exports,functions,private}; do
-    [ -r "$file" ] && [ -f "$file" ] && source "$file";
-done;
-unset file;
+# ------------------------------------------------------------------
+## Antidote setup to load zsh plugins
+# ------------------------------------------------------------------
 
+# Ensure the .zsh_plugins.txt file exists so you can add plugins.
+[[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
+
+# Lazy-load antidote from its functions directory.
+fpath=(/opt/homebrew/opt/antidote/share/antidote/functions $fpath)
+autoload -Uz antidote
+source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
+
+# Compile bundles and source zshrc
+sz() {
+    sh ${ZSHRCDIR}/bundle_compile
+    exec zsh
+    echo 'Sourced zshrc'
+}
+
+# Source compiled antidote bundles and configs
+[ -f ${ZSHRCDIR}/zsh_plugins.zsh ] && source ${ZSHRCDIR}/zsh_plugins.zsh

@@ -10,8 +10,8 @@
 dotfiledir="${HOME}/dotfiles-dev"
 
 # list of files/folders to symlink in ${homedir}
-folders=(zshrc)
-files=()
+folders=("zshrc")
+files=(".zshrc" ".zprofile")
 
 # change to the dotfiles directory
 echo "Changing to the ${dotfiledir} directory"
@@ -22,8 +22,15 @@ for folder in "${folders[@]}"; do
     echo "Processing folder: ${folder}"
     for file in "${dotfiledir}/${folder}"/*; do
         filename=$(basename "${file}")
-        echo "Creating symlink to ${filename} in home directory."
-        ln -sf "${file}" "${HOME}/.${filename}"
+
+        # Check if the file matches any file in the list
+        if [[ " ${files[@]} " =~ " ${filename} " ]]; then
+            echo "Creating symlink to ${filename} in home directory."
+            # Create symbolic link in the home directory
+            ln -sf "${file}" "${HOME}/.${filename}"
+        else
+            echo "Skipping ${filename}, not in the list."
+        fi
     done
 done
 
@@ -33,13 +40,7 @@ done
 # Run the Homebrew Script
 ./scripts/brew.sh
 
-# Run VS Code Script
-./scripts/vscode.sh
-
 # Run the Sublime Script
 ./scripts/sublime.sh
-
-# Install diff-so-fancy-install.sh
-./scripts/diff-so-fancy-install.sh
 
 echo "Installation Complete!"
