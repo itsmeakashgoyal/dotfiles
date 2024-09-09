@@ -184,5 +184,7 @@ sz() {
     echo 'Sourced zshrc'
 }
 
+alias update-antidote='antidote bundle < ${ZSHRCDIR}/zsh_plugins.txt >| ${ZSHRCDIR}/zsh_plugins.zsh'
+
 # Source compiled antidote bundles and configs
 [ -f ${ZSHRCDIR}/zsh_plugins.zsh ] && source ${ZSHRCDIR}/zsh_plugins.zsh

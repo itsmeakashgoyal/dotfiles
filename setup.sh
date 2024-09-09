@@ -9,9 +9,20 @@
 # dotfiles directory
 dotfiledir="${HOME}/dotfiles-dev"
 
+# Run the MacOS Script
+./scripts/macOS.sh
+
+# Run the Homebrew Script
+./scripts/brew.sh
+
+# Run the Sublime Script
+./scripts/sublime.sh
+
+echo "Initiate the symlinking process..."
 # list of files/folders to symlink in ${homedir}
-folders=("zshrc")
+folders=("zshrc" "tmux" "nvim")
 files=(".zshrc" ".zprofile")
+config_folders=("tmux" "nvim")
 
 # change to the dotfiles directory
 echo "Changing to the ${dotfiledir} directory"
@@ -34,13 +45,11 @@ for folder in "${folders[@]}"; do
     done
 done
 
-# Run the MacOS Script
-./scripts/macOS.sh
-
-# Run the Homebrew Script
-./scripts/brew.sh
-
-# Run the Sublime Script
-./scripts/sublime.sh
+for folder in "${config_folders[@]}"; do
+    echo "Processing folder: ${folder}"
+    echo "Creating symlink to ${folder} in ~/.config directory."
+    # Create symbolic link in the home directory
+    ln -sf "${folder}" "${HOME}/.config/${folder}"
+done
 
 echo "Installation Complete!"
