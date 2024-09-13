@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Fzf Default Opts
+# Fzf Default Options
 # ------------------------------------------------------------------------------
 
 local fzf_default_opts=(
@@ -17,7 +17,7 @@ export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
 # Installer generated config completion, keybindings, etc.
 # ------------------------------------------------------------------------------
 
-# Setup fzf
+# Add FZF to PATH if not already present
 if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
     export PATH="${PATH:+${PATH}:}/opt/homebrew/opt/fzf/bin"
 fi
@@ -28,6 +28,7 @@ fi
 # Key bindings
 source "/opt/homebrew/opt/fzf/shell/key-bindings.zsh"
 
+# Custom completion function
 _fzf_comprun() {
 	local command=$1
 	shift
@@ -39,7 +40,7 @@ _fzf_comprun() {
 }
 
 # ------------------------------------------------------------------------------
-# Custom keybindings
+# Custom Keybindings and Aliases
 # ------------------------------------------------------------------------------
 
 bindkey '^F' fzf-file-widget
@@ -47,11 +48,18 @@ bindkey '^F' fzf-file-widget
 # FZF, open selected file in nvim with preview!
 alias of="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}' | xargs nvim"
 
-# navigation
+# ------------------------------------------------------------------------------
+# Navigation Functions
+# ------------------------------------------------------------------------------
+
 cx() { cd "$@" && l; }
 fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && l; }
 f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy }
 fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
+
+# ------------------------------------------------------------------------------
+# File Search Functions
+# ------------------------------------------------------------------------------
 
 # Common function to search for a string in files using rga and fzf, and opens the file with nvim.
 function _fif_common() {
@@ -61,7 +69,7 @@ function _fif_common() {
     local files
     local preview_cmd=$(printf "rga %s --pretty --context 10 '%s' {}" "$ignore_case_flag" "$*")
     local rga_output=$(rga --max-count=1 $ignore_case_flag --files-with-matches --no-messages "$*")
-    # PROJECT: project
+
     # This is used to copy file names so that they can be used a project documentaiton
     echo "$rga_output" | xsel --clipboard --input
     IFS=$'\n' files=($(echo "$rga_output" | fzf-tmux +m --preview="$preview_cmd" --multi --select-1 --exit-0)) || return 1

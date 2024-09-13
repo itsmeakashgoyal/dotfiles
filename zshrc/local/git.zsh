@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Aliases and functions for Git
+# Git Configuration: Aliases and Functions
 # ------------------------------------------------------------------------------
 
 # Unalias oh-my-zsh aliases, in favour of my own custom config
@@ -11,20 +11,26 @@ unalias gpr
 unalias gp
 unalias gstp
 
-alias gcg="git config --edit --global"
-alias gcl="git config --edit --local"
+# Git config aliases
+alias gcg="git config --edit --global"  # Edit global Git config
+alias gcl="git config --edit --local"   # Edit local Git config
+
+# Git status with fzf preview
 alias gs="git status -s \
     | fzf --no-sort --reverse \
     --preview 'git diff --color=always {+2} | diff-so-fancy' \
     --bind=ctrl-j:preview-down --bind=ctrl-k:preview-up \
     --preview-window=right:60%:wrap"
 
+# Git log aliases
 alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 alias glogNoDays="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit"
-alias epoc="date +%s"
-alias gc="git clean -f"
-alias ghcurrentbranch='gh repo view --branch $(git rev-parse --abbrev-ref HEAD) --web'
-alias ghc='~/dotfiles-dev/scripts/_gh_cli.sh'
+
+# Miscellaneous aliases
+alias epoc="date +%s"                   # Get current epoch time
+alias gc="git clean -f"                 # Force clean untracked files
+alias ghcurrentbranch='gh repo view --branch $(git rev-parse --abbrev-ref HEAD) --web'  # Open current branch on GitHub
+alias ghc='~/dotfiles-dev/scripts/_gh_cli.sh'  # Custom GitHub CLI script
 
 # Git status with fugitive
 # gs() {
@@ -129,12 +135,14 @@ nah() {
     fi
 }
 
+# FZF completion for git commands
 _fzf_complete_git() {
 	_fzf_complete -- "$@" < <(
 		git --help -a | grep -E '^\s+' | awk '{print $1}'
 	)
 }
 
+# Delete local branches interactively
 function delete-branches() {
 	git branch |
 		grep --invert-match '\*' |
@@ -143,6 +151,7 @@ function delete-branches() {
 		xargs --no-run-if-empty git branch --delete --force
 }
 
+# Delete remote branches interactively
 function delete-remote-branches() {
 	git branch -r |
 		grep 'akgoyal' |
@@ -152,6 +161,7 @@ function delete-remote-branches() {
 		xargs --no-run-if-empty git branch --delete --force
 }
 
+# Checkout GitHub PR interactively
 function pr-checkout() {
 	local jq_template pr_number
 
@@ -181,7 +191,6 @@ function pr-checkout() {
 	fi
 }
 
-
 # Use Git’s colored diff when available
 hash git &>/dev/null;
 if [ $? -eq 0 ]; then
@@ -190,6 +199,7 @@ if [ $? -eq 0 ]; then
 	}
 fi;
 
+# Interactive git log viewer
 function logg() {
     git lg | fzf --ansi --no-sort \
         --preview 'echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % git show % --color=always' \
@@ -229,20 +239,18 @@ function repo() {
     fi
 }
 
-
+# Open file from git staged changes
 function open_file_git_staged() {
     ~/dotfiles-dev/scripts/_open-file-git-staged.sh 
 }
-
 # Binds Ctrl+Alt+O to open_file_git
 bindkey "^[^O" open_file_git_staged
 zle -N open_file_git_staged
 
-
+# Open file from git changes
 function f_git_enter() {
     BUFFER="~/dotfiles-dev/scripts/_open-file-git.sh"
     zle accept-line
 }
-
 zle -N f_git_enter
 bindkey '^o' f_git_enter

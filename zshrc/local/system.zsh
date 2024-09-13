@@ -1,12 +1,15 @@
 # ------------------------------------------------------------------------------
-# Aliases and functions for system configuration
+# System Configuration: Aliases and Functions
 # ------------------------------------------------------------------------------
 
-alias myip="curl ipinfo.io/ip"
-alias ch='caffeinate -u -t 10000'
-alias whereami='npx @rafaelrinaldi/whereami -f json'
-alias lip="ip addr show en0"
-alias diskusage='du -sh * | sort -h --reverse'
+# Network and IP-related aliases
+alias myip="curl ipinfo.io/ip"                # Get public IP address
+alias lip="ip addr show en0"                  # Show local IP for en0 interface
+alias whereami='npx @rafaelrinaldi/whereami -f json'  # Get location info in JSON format
+
+# System utilities
+alias ch='caffeinate -u -t 10000'             # Prevent system sleep for ~2.7 hours
+alias diskusage='du -sh * | sort -h --reverse'  # Show disk usage, sorted
 
 # Determine size of a file or total size of a directory
 function fs() {
@@ -22,7 +25,7 @@ function fs() {
 	fi;
 }
 
-# myIP address
+# Detailed IP address information
 function myip() {
     ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0       : " $2}'
     ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
@@ -112,17 +115,22 @@ internet() {
 }
 
 # Creates a real-time countdown with alert sound, useful for bash scripts and terminal.
-function timer ()
-{
+function timer() {
     total=$1 
-    for ((i=total; i>0; i--)); do sleep 1; printf "Time remaining %s secs \r" "$i"; done
+    for ((i=total; i>0; i--)); do 
+        sleep 1
+        printf "Time remaining %s secs \r" "$i"
+    done
     echo -e "\a" 
 }
 
 # Display calendar with day highlighted
-function cal ()
-{
-    if [ -t 1 ] ; then alias cal="ncal -b" ; else alias cal="/usr/bin/cal" ; fi
+function cal() {
+    if [ -t 1 ] ; then 
+        alias cal="ncal -b"
+    else 
+        alias cal="/usr/bin/cal"
+    fi
 }
 
 # Simplifies font installation, making font customization easier and improving visual experience in the shell
@@ -144,6 +152,7 @@ function checkfetch() {
     local res=$(onefetch) &> /dev/null
     if [[ "$res" =~ "Error" ]]; then
         echo ""
-    else echo $(onefetch)
+    else 
+        echo $(onefetch)
     fi
 }

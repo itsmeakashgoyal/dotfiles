@@ -1,42 +1,79 @@
 # ------------------------------------------------------------------------------
-# Aliases and functions for MacOS
+# MacOS-specific aliases and functions
 # ------------------------------------------------------------------------------
 
-# Get OS X Software Updates
+# System Updates
+# Update macOS software
 alias update_system='sudo softwareupdate -i -a'
 
-# Update/upgrade Homebrew and their installed packages
+# Update/upgrade Homebrew and installed packages
 alias update_brew='brew update; brew upgrade; brew upgrade --cask; brew cleanup'
 
-# Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
+# Comprehensive update: macOS, Homebrew, npm, and Ruby gems
 alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
 
-# Show/hide hidden files in Finder
-# As of macOS Sierra (10.12) and later, you can simply press Cmd + Shift + . (period) while in Finder to toggle the visibility of hidden files.
+# Finder and Desktop
+# Toggle hidden files visibility in Finder
+# Note: As of macOS Sierra (10.12) and later, you can use Cmd + Shift + . in Finder
 alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
 alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
 
-# Google Chrome
-alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
-
-# local IP address
-alias localip="ipconfig getifaddr en0"
-
-# Recursively delete `.DS_Store` files
-alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
-
-# Hide/show all desktop icons (useful when presenting)
+# Toggle desktop icons visibility
 alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
 alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
 
-# Lock the screen (when going AFK)
+# Applications
+# Open Google Chrome from terminal
+alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+
+# Lock the screen (when going AFK - Away From Keyboard)
 alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
-# turn hidden files on/off in Finder
-function hiddenOn() { defaults write com.apple.Finder AppleShowAllFiles YES ; }
-function hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO ; }
+# Network
+# Display local IP address
+alias localip="ipconfig getifaddr en0"
 
-# Change working directory to the top-most Finder window location
-function cdf() { # short for `cdfinder`
-	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+# File Management
+# Recursively delete .DS_Store files
+alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
+
+# Finder Hidden Files Toggle
+# Functions to show/hide all files in Finder
+hiddenOn() { defaults write com.apple.Finder AppleShowAllFiles YES; }
+hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO; }
+
+# Change to Finder's current directory
+cdf() { # short for `cdfinder`
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
 }
+
+# ------------------------------------------------------------------------------
+# Homebrew Configuration
+# ------------------------------------------------------------------------------
+
+# Initialize Homebrew environment
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Set up Homebrew completions
+if type brew &>/dev/null
+then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+  autoload -Uz compinit
+  compinit
+fi
+
+# ------------------------------------------------------------------------------
+# Additional MacOS-specific configurations
+# ------------------------------------------------------------------------------
+
+# Add any other MacOS-specific configurations, functions, or aliases here
+# For example:
+# - Custom PATH modifications
+# - macOS-specific environment variables
+# - Additional application-specific aliases or functions
+
+# Example: Set JAVA_HOME for macOS
+# export JAVA_HOME=$(/usr/libexec/java_home)
+
+# Example: Add a custom directory to PATH
+# export PATH=$HOME/custom/bin:$PATH

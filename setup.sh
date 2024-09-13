@@ -9,16 +9,22 @@
 # dotfiles directory
 dotfiledir="${HOME}/dotfiles-dev"
 
-# Run the MacOS Script
-./scripts/macOS.sh
-
-# Run the Homebrew Script
-./scripts/brew.sh
-
-# Run the Sublime Script
-./scripts/sublime.sh
+# Run setup scripts
+scripts=("macOS" "brew" "sublime")
+for script in "${scripts[@]}"; do
+    script_path="./scripts/${script}.sh"
+    if [ -f "${script_path}" ]; then
+        echo "Running ${script} script..."
+        if ! "${script_path}"; then
+            echo "Error: ${script} script failed. Continuing..."
+        fi
+    else
+        echo "Warning: ${script_path} not found. Skipping..."
+    fi
+done
 
 echo "Initiate the symlinking process..."
+
 # list of files/folders to symlink in ${homedir}
 folders=("zshrc" "tmux" "nvim")
 files=(".zshrc" ".zprofile")
@@ -26,7 +32,7 @@ config_folders=("tmux" "nvim")
 
 # change to the dotfiles directory
 echo "Changing to the ${dotfiledir} directory"
-cd "${dotfiledir}" || exit
+cd "${dotfiledir}" || exit 1  # Exit if cd fails
 
 # Create symlinks for each file within the specified folders (will overwrite old dotfiles)
 for folder in "${folders[@]}"; do
@@ -47,9 +53,12 @@ done
 
 for folder in "${config_folders[@]}"; do
     echo "Processing folder: ${folder}"
-    echo "Creating symlink to ${folder} in ~/.config directory."
-    # Create symbolic link in the home directory
-    ln -sf "${folder}" "${HOME}/.config/${folder}"
+    if [ -d "${dotfiledir}/${folder}" ]; then
+        echo "Creating symlink to ${folder} in ~/.config directory."
+        ln -sf "${dotfiledir}/${folder}" "${HOME}/.config/${folder}"
+    else
+        echo "Warning: ${folder} not found in ${dotfiledir}. Skipping..."
+    fi
 done
 
 echo "Installation Complete!"

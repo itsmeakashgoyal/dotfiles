@@ -2,9 +2,8 @@
 # General Aliases
 # ------------------------------------------------------------------------------
 
+# File and Directory Listing
 alias tree='tree -a -I .git'
-
-# Eza
 alias l="eza -l --icons --git -a"
 alias lt="eza --tree --level=2 --long --icons --git"
 alias ld='eza -lD'      # lists only directories (no files)
@@ -13,17 +12,15 @@ alias lh='eza -dl .* --group-directories-first'     # lists only hidden files (n
 alias ll='eza -al --group-directories-first'        # lists everything with directories first
 alias ls='eza -lF --color=always --sort=size | grep -v /'      # lists only files sorted by size
 
+# System and Navigation
 alias c='clear'
 alias sshp="sshpass -p welcome ssh "
 alias vi='nvim'
 alias z='zellij'
+alias reload="exec ${SHELL} -l"     # Reload the shell (i.e. invoke as a login shell)
+alias path='echo -e ${PATH//:/\\n}'     # Print each PATH entry on a separate line 
 
-# Reload the shell (i.e. invoke as a login shell)
-alias reload="exec ${SHELL} -l"
-
-# Print each PATH entry on a separate line
-alias path='echo -e ${PATH//:/\\n}'
-
+# Global Aliases (can be used anywhere in the command line)
 alias -g H=' --help'
 alias -g L='| less'
 alias -g R="2>&1 | tee output.txt"

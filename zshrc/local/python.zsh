@@ -1,26 +1,30 @@
 # ------------------------------------------------------------------------------
-# Aliases and functions for Python
+# Python Configuration
 # ------------------------------------------------------------------------------
 
+# Aliases for Python and pip
 alias python="python3"
 alias pip="pip3"
 
-# Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
-export PYTHONIOENCODING='UTF-8';
+# Ensure Python uses UTF-8 encoding for stdin, stdout, and stderr
+export PYTHONIOENCODING='UTF-8'
 
+# pyenv configuration
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
+
+# Initialize pyenv if it's installed
 if command -v pyenv 1>/dev/null 2>&1; then
     eval "$(pyenv init --path)"
     eval "$(pyenv init -)"
 fi
 
-
 # Function to create and activate a Python virtual environment
-function mkvenv() {    # Set the environment directory name, default to 'venv' if no name provided
+function mkvenv() {
+    # Set the environment directory name, default to 'venv' if no name provided
     local env_dir=${1:-venv}
     local requirements_path="captured-requirements.txt"
-    # Check if the environment already exists
+
     # Create the virtual environment
     echo "Creating new virtual environment '$env_dir'..."
     python3 -m venv $env_dir
@@ -28,10 +32,12 @@ function mkvenv() {    # Set the environment directory name, default to 'venv' i
     # Activate the virtual environment
     source $env_dir/bin/activate
     
-    # Optional: Install any default packages
+    # Upgrade pip and install wheel
+    echo "Upgrading pip and installing wheel..."
     pip3 install --upgrade pip
     pip3 install wheel
 
+    # Install packages from requirements file if it exists
     if [ -f "$requirements_path" ]; then
         echo "Installing packages from '$requirements_path'..."
         pip3 install -r "$requirements_path"
@@ -40,17 +46,21 @@ function mkvenv() {    # Set the environment directory name, default to 'venv' i
     echo "Virtual environment '$env_dir' created and activated!"
 }
 
+# Function to deactivate and capture requirements of a virtual environment
 function rmvenv() {
-    # Check if the environment is active
     local requirements_path="captured-requirements.txt"
+
+    # Check if a virtual environment is active
     if [[ "$VIRTUAL_ENV" != "" ]]; then
+        # Capture installed packages if requirements.txt doesn't exist
         if [[ ! -f "requirements.txt" ]]; then
             pip3 freeze > "$requirements_path"
+            echo "Installed packages captured in $requirements_path"
         fi
+
         # Deactivate the environment
         deactivate
-        
-        echo "Virtual environment deactivated and all installed packages captured"
+        echo "Virtual environment deactivated"
     else
         echo "No virtual environment is active."
     fi

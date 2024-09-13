@@ -5,9 +5,6 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
-
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -83,6 +80,7 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search colored-man-
 source $ZSH/oh-my-zsh.sh
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
 
+# Zsh Vi Mode configuration
 ZVM_INIT_MODE=sourcing
 
 export ZSHRCDIR="$HOME/dotfiles-dev/zshrc"
@@ -93,7 +91,6 @@ function zvm_config() {
     ZVM_VI_INSERT_ESCAPE_BINDKEY=\;\;
     ZVM_CURSOR_STYLE_ENABLED=false
     ZVM_VI_EDITOR=nvim
-    # export KEYTIMEOUT=1
 }
 
 function zvm_after_init() {
@@ -106,16 +103,6 @@ export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
@@ -136,6 +123,7 @@ setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
 setopt extended_glob
 
+# Key bindings
 bindkey '^w' autosuggest-execute
 bindkey '^e' autosuggest-accept
 bindkey '^u' autosuggest-toggle
@@ -143,6 +131,7 @@ bindkey '^L' vi-forward-word
 bindkey '^k' up-line-or-search
 bindkey '^j' down-line-or-search
 
+# Completion styles
 zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
 zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 
@@ -161,13 +150,17 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':completion:*' list-max-items 20
 
+# FZF and Zoxide integration
 source <(fzf --zsh)
 zvm_after_init_commands+=('source <(fzf --zsh)')
 eval "$(zoxide init --cmd cd zsh)"
 
 # ------------------------------------------------------------------
-## Antidote setup to load zsh plugins
+## Antidote plugin manager setup
 # ------------------------------------------------------------------
+
+# Set the root name of the plugins files (.txt and .zsh) antidote will use.
+zsh_plugins=${ZSHRCDIR}/.zsh_plugins
 
 # Ensure the .zsh_plugins.txt file exists so you can add plugins.
 [[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
@@ -177,14 +170,14 @@ fpath=(/opt/homebrew/opt/antidote/share/antidote/functions $fpath)
 autoload -Uz antidote
 source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
 
-# Compile bundles and source zshrc
-sz() {
+# Helper function to compile bundles and source zshrc
+function compile_antidote() {
     sh ${ZSHRCDIR}/bundle_compile
     exec zsh
     echo 'Sourced zshrc'
 }
 
-alias update-antidote='antidote bundle < ${ZSHRCDIR}/zsh_plugins.txt >| ${ZSHRCDIR}/zsh_plugins.zsh'
+alias update-antidote='antidote bundle < ${ZSHRCDIR}/.zsh_plugins.txt >| ${ZSHRCDIR}/zsh_plugins.zsh'
 
 # Source compiled antidote bundles and configs
 [ -f ${ZSHRCDIR}/zsh_plugins.zsh ] && source ${ZSHRCDIR}/zsh_plugins.zsh

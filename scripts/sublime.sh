@@ -1,62 +1,68 @@
 #!/usr/bin/env zsh
 
+# Added set -euo pipefail for better error handling and script termination on errors.
+set -euo pipefail
+
+SUBLIME_APP="/Applications/Sublime Text.app"
+SUBLIME_BIN="${SUBLIME_APP}/Contents/SharedSupport/bin/subl"
+CONFIG_PATH="${HOME}/Library/Application Support/Sublime Text"
+USER_PACKAGES_DIR="${CONFIG_PATH}/Packages/User"
+MAX_WAIT=30
+
 # Check if Homebrew's bin exists and if it's not already in the PATH
 if [ -x "/opt/homebrew/bin/brew" ] && [[ ":$PATH:" != *":/opt/homebrew/bin:"* ]]; then
     export PATH="/opt/homebrew/bin:$PATH"
 fi
 
-# Check if 'subl' command is available
+# Create symlink for 'subl' command if not available
 if ! command -v subl &>/dev/null; then
     echo "'subl' command not found. Creating symlink for Sublime Text."
-
-    # Creating the symlink for Sublime Text's 'subl' command-line tool
-    # Ensure Sublime Text is installed in the Applications folder
-    if [ -e "/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl" ]; then
-        # Create the symlink in /usr/local/bin
-        ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl
+    if [ -e "${SUBLIME_BIN}" ]; then
+        sudo ln -sf "${SUBLIME_BIN}" /usr/local/bin/subl
         echo "Symlink created successfully."
     else
-        echo "Sublime Text application not found in the expected location. Please ensure it's installed in the Applications folder."
+        echo "Error: Sublime Text application not found in the expected location." >&2
+        exit 1
     fi
 else
     echo "'subl' command is already available."
 fi
 
+# Function to open Sublime Text and wait for initialization
+open_and_wait_sublime() {
+    subl .
+    waited=0
+    until [[ -d "${CONFIG_PATH}/Installed Packages" ]] || ((waited >= MAX_WAIT)); do
+        echo "Waiting for Sublime Text to initialize..."
+        sleep 1
+        ((waited++))
+    done
+
+    if [[ -d "${CONFIG_PATH}/Installed Packages" ]]; then
+        echo "Sublime Text initialized."
+    else
+        echo "Error: Sublime Text did not initialize within ${MAX_WAIT} seconds." >&2
+        exit 1
+    fi
+}
+
 # Open Sublime Text to create necessary folders
-subl .
+open_and_wait_sublime
 
-CONFIG_PATH="$HOME/Library/Application Support/Sublime Text/Installed Packages"
-MAX_WAIT=30 # Maximum number of seconds to wait
-waited=0
-
-until [[ -d "$CONFIG_PATH" ]] || [[ $waited -ge $MAX_WAIT ]]; do
-    echo "Waiting for Sublime Text to initialize..."
-    sleep 1
-    ((waited++))
-done
-
-if [[ -d "$CONFIG_PATH" ]]; then
-    echo "Sublime Text initialized."
-else
-    echo "Sublime Text did not initialize within $MAX_WAIT seconds."
-    exit 1
-fi
-
-# Quit Sublime after folder are created
+# Quit Sublime after folders are created
 osascript -e 'quit app "Sublime Text"'
 
-# Install Latest version of Package Control
-curl -L -o "$HOME/Library/Application Support/Sublime Text/Installed Packages/Package Control.sublime-package" "https://github.com/wbond/package_control/releases/latest/download/Package.Control.sublime-package"
-
-# Define paths for clarity and reusability
-USER_PACKAGES_DIR="$HOME/Library/Application Support/Sublime Text/Packages/User"
+# Install latest version of Package Control
+PACKAGE_CONTROL_URL="https://github.com/wbond/package_control/releases/latest/download/Package.Control.sublime-package"
+curl -L -o "${CONFIG_PATH}/Installed Packages/Package Control.sublime-package" "${PACKAGE_CONTROL_URL}"
 
 # Copy packages that should be installed
-cp "settings/Package Control.sublime-settings" "$HOME/Library/Application Support/Sublime Text/Packages/User/Package Control.sublime-settings"
+mkdir -p "${USER_PACKAGES_DIR}"
+cp "settings/Package Control.sublime-settings" "${USER_PACKAGES_DIR}/Package Control.sublime-settings"
 
 # Open Sublime Text to install packages
 echo "Opening Sublime to automatically install packages"
-subl .
+open_and_wait_sublime
 echo "Press Enter after Packages are all installed..."
 read
 
@@ -64,11 +70,9 @@ read
 osascript -e 'quit app "Sublime Text"'
 
 # Copy custom settings, keymaps, and other configurations
-cp "settings/Preferences.sublime-settings" "$USER_PACKAGES_DIR/Preferences.sublime-settings"
-cp "settings/SublimeLinter.sublime-settings" "$USER_PACKAGES_DIR/SublimeLinter.sublime-settings"
-
-# Copy custom build systems
-cp "settings/Python-3.sublime-build" "$USER_PACKAGES_DIR/Python-3.sublime-build"
+cp "settings/Preferences.sublime-settings" "${USER_PACKAGES_DIR}/Preferences.sublime-settings"
+cp "settings/SublimeLinter.sublime-settings" "${USER_PACKAGES_DIR}/SublimeLinter.sublime-settings"
+cp "settings/Python-3.sublime-build" "${USER_PACKAGES_DIR}/Python-3.sublime-build"
 
 echo "Custom Sublime Text settings and packages have been copied."
 

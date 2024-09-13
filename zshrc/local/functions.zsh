@@ -7,8 +7,7 @@ function mkd() {
 	mkdir -p "$@" && cd "$_";
 }
 
-## Function wrappers
-# wrapper for easy extraction of compressed files
+# Wrapper for easy extraction of compressed files
 function extract () {
 	if [ -f $1 ] ; then
 		case $1 in
@@ -99,29 +98,31 @@ function char2hex() {
 }
 
 # Creates a folder named with the current or prefixed date, using the format "prefix-YYYY-MM-DD" if a prefix is provided.
-function mkdd ()
-{
+function mkdd () {
     mkdir -p ${1:+$1$prefix_separator}"$(date +%F)";
 }
 
+# Zoxide interactive selection
 function zoxider() {
     BUFFER=$(zoxide query -i)
     zle accept-line
 }
-
 zle -N zoxider
 bindkey '^[j' zoxider
 
+# Copy current command line to clipboard
 copy-line-to-clipboard() {
     echo -n $BUFFER | xclip -selection clipboard
 }
 zle -N copy-line-to-clipboard
 bindkey '^Y' copy-line-to-clipboard
 
+# List all files in current directory and subdirectories
 function lsfiles() {
   ls **/*.**
 }
 
+# List all files in current directory and subdirectories, including hidden files
 function lsfilesh() {
   ls **/*.**(D)
 }

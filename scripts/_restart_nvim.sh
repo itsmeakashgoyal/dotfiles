@@ -1,22 +1,38 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+# Enable strict mode for better error handling
+set -euo pipefail
 
-# Add source and line number wher running in debug mode: __run_with_xtrace.sh __restart_nvim.sh
 # Set new line and tab for word splitting
 IFS=$'\n\t'
 
-if [ -z "$TMUX" ]; then
-	echo "This script must be run from inside a tmux session."
-	exit 1
+# Check if running inside a tmux session
+if [ -z "${TMUX:-}" ]; then
+    echo "Error: This script must be run from inside a tmux session." >&2
+    exit 1
 fi
 
+# Get the current tmux pane ID
 TMUX_PANE=$(tmux display-message -p '#D')
 
-tmux send-keys -t "$TMUX_PANE" 'Escape' C-m ':wq' C-m
+# Function to send keys to the current tmux pane
+send_keys() {
+    tmux send-keys -t "$TMUX_PANE" "$@"
+}
 
+# Save and quit Neovim
+send_keys 'Escape' C-m ':wq' C-m
+
+# Wait for Neovim to close
 sleep 0.5
 
 # Detach the script from Neovim and wait a bit to ensure Neovim exits
-# PROJECT: nvim-restart
-(nohup bash -c " sleep 0.5; tmux send-keys -t \"$TMUX_PANE\" 'lvim' C-m " &>/dev/null &)
+# Then restart Neovim (using lvim)
+(
+    nohup bash -c "
+        sleep 0.5
+        tmux send-keys -t \"$TMUX_PANE\" 'lvim' C-m
+    " &>/dev/null &
+)
+
+echo "Neovim restart initiated."
