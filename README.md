@@ -44,7 +44,7 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
    ```sh
    ./setup.sh
    ```
-5. Update the nvim git submodule
+5. Update the nvim and mybash git submodule
    - If it's the first time you check-out a repo you need to use --init first
     ```sh
     git submodule update --init --recursive

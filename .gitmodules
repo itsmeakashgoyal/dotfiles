@@ -1,3 +1,6 @@
 [submodule "nvim"]
 	path = nvim
 	url = https://github.com/itsmeakashgoyal/nvim.git
+[submodule "mybash"]
+	path = mybash
+	url = https://github.com/ChrisTitusTech/mybash.git
