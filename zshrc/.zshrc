@@ -75,7 +75,7 @@ zstyle ':omz:update' frequency 13
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting web-search colored-man-pages zsh-vi-mode ruby fzf-tab)
+plugins=(git web-search colored-man-pages zsh-vi-mode ruby fzf-tab)
 
 source $ZSH/oh-my-zsh.sh
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
@@ -150,6 +150,39 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':completion:*' list-max-items 20
 
+# Set Up Completion
+# ------------------------------------------------------------------------------
+# Problems with insecure directories under macOS?
+# -> see https://stackoverflow.com/a/13785716/149220 for a solution
+cache_directory="$XDG_CACHE_HOME/zsh"
+
+## Use cache
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$cache_directory/completion-cache"
+
+## These were created by `compinstall`
+zstyle ':completion:*' completer _complete _ignored _approximate
+zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]} r:|[._-]=* r:|=*' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}'
+zstyle ':completion:*' max-errors 2
+zstyle :compinstall filename "$ZDOTDIR/.zshrc"
+
+## Initialize completion system
+### Set location for compinit's dumpfile.
+autoload -Uz compinit && compinit -d "$cache_directory/compinit-dumpfile"
+
+
+# Homebrew (brew.sh)
+# ------------------------------------------------------------------------------
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+## Brew completions
+if type brew &>/dev/null
+then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+  autoload -Uz compinit
+  compinit -d "$cache_directory/compinit-dumpfile"
+fi
+
 # FZF and Zoxide integration
 source <(fzf --zsh)
 zvm_after_init_commands+=('source <(fzf --zsh)')
@@ -181,3 +214,8 @@ alias update-antidote='antidote bundle < ${ZSHRCDIR}/.zsh_plugins.txt >| ${ZSHRC
 
 # Source compiled antidote bundles and configs
 [ -f ${ZSHRCDIR}/zsh_plugins.zsh ] && source ${ZSHRCDIR}/zsh_plugins.zsh
+
+# Set Up Plugins
+# ------------------------------------------------------------------------------
+plugins_to_init=(zsh-autosuggestions zsh-syntax-highlighting)
+__init_plugins "${plugins_to_init[@]}"

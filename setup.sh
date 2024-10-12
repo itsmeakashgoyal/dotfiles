@@ -10,7 +10,7 @@
 dotfiledir="${HOME}/dotfiles-dev"
 
 # Run setup scripts
-scripts=("macOS" "brew" "sublime")
+scripts=("_macOS" "_brew" "_sublime")
 for script in "${scripts[@]}"; do
     script_path="./scripts/${script}.sh"
     if [ -f "${script_path}" ]; then

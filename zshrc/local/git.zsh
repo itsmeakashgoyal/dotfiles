@@ -16,11 +16,7 @@ alias gcg="git config --edit --global"  # Edit global Git config
 alias gcl="git config --edit --local"   # Edit local Git config
 
 # Git status with fzf preview
-alias gs="git status -s \
-    | fzf --no-sort --reverse \
-    --preview 'git diff --color=always {+2} | diff-so-fancy' \
-    --bind=ctrl-j:preview-down --bind=ctrl-k:preview-up \
-    --preview-window=right:60%:wrap"
+alias gs="git status"
 
 # Git log aliases
 alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
@@ -31,17 +27,6 @@ alias epoc="date +%s"                   # Get current epoch time
 alias gc="git clean -f"                 # Force clean untracked files
 alias ghcurrentbranch='gh repo view --branch $(git rev-parse --abbrev-ref HEAD) --web'  # Open current branch on GitHub
 alias ghc='~/dotfiles-dev/scripts/_gh_cli.sh'  # Custom GitHub CLI script
-
-# Git status with fugitive
-# gs() {
-#     if [ -n "$1" ]; then z $1; fi
-
-#     if git rev-parse --git-dir > /dev/null 2>&1; then
-#         $EDITOR '+Gedit :'
-#     else
-#         git status
-#     fi
-# }
 
 # Git checkout with fzf fuzzy search
 gco() {
