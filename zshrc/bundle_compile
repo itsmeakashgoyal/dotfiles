@@ -2,7 +2,6 @@
 
 # Generate a new static file whenever .zsh_plugins.txt is updated.
 if [[ ! ${ZSHRCDIR}/zsh_plugins.zsh -nt ${ZSHRCDIR}/.zsh_plugins.txt ]]; then
-    antidote bundle < ${ZSHRCDIR}/.zsh_plugins.txt >| ${ZSHRCDIR}/zsh_plugins.zsh
+    antidote bundle <${ZSHRCDIR}/.zsh_plugins.txt >|${ZSHRCDIR}/zsh_plugins.zsh
     echo "Compiled antibody bundles file"
 fi
-

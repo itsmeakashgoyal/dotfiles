@@ -28,7 +28,7 @@ t() {
     if [ -z $TMUX ]; then
         # If not in a tmux session, create a new one
         (z $1 && tmux new -A -s $sesh)
-    elif tmux has-session -t=$sesh 2> /dev/null; then
+    elif tmux has-session -t=$sesh 2>/dev/null; then
         # If the session exists, switch to it
         (tmux switch -t $sesh)
     else
@@ -38,11 +38,11 @@ t() {
 }
 
 # Tmux session management aliases
-alias tn='tmux new-session -s '  # Create a new session
-alias tk='tmux kill-session -t ' # Kill a session
-alias tl='tmux list-sessions'    # List all ongoing sessions
-alias td='tmux detach'           # Detach from current session
-alias tc='clear; tmux clear-history; clear'  # Clear tmux pane and history
+alias tn='tmux new-session -s '             # Create a new session
+alias tk='tmux kill-session -t '            # Kill a session
+alias tl='tmux list-sessions'               # List all ongoing sessions
+alias td='tmux detach'                      # Detach from current session
+alias tc='clear; tmux clear-history; clear' # Clear tmux pane and history
 
 # Function to change to the current tmux session's directory
 function cds() {
@@ -56,17 +56,17 @@ function create_tmux_session() {
     zoxide add "$RESULT" &>/dev/null
     local FOLDER=$(basename "$RESULT")
     local SESSION_NAME=$(echo "$FOLDER" | tr ' .:' '_')
-    
+
     # Append git branch name to session name if it's a git repository
     if [ -d "$RESULT/.git" ]; then
         SESSION_NAME+="_$(git -C "$RESULT" symbolic-ref --short HEAD 2>/dev/null)"
     fi
-    
+
     # Create a new session if it doesn't exist
     if ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
         tmux new-session -d -s "$SESSION_NAME" -c "$RESULT"
     fi
-    
+
     # Attach to the session or switch to it if already in tmux
     if [ -z "$TMUX" ]; then
         tmux attach -t "$SESSION_NAME"
@@ -87,6 +87,6 @@ function create_tmux_session() {
 
 # Example: Function to list tmux sessions with a preview
 # function tls() {
-#     tmux list-sessions -F "#{session_name}" | 
+#     tmux list-sessions -F "#{session_name}" |
 #     fzf --preview 'tmux list-windows -t {}'
 # }

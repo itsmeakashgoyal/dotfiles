@@ -7,7 +7,7 @@ source ~/dotfiles-dev/scripts/_trap.sh
 # The set -u referencing a previously undefined variable - with the exceptions of $* and $@ - is an error
 # The set -o pipefaile if any command in a pipeline fails, that return code will be used as the return code of the whole pipeline
 # https://bit.ly/37nFgin
-set -o pipefail
+set -eu pipefail
 
 help_function() {
 	echo "Usage: _open-file-git.sh [-h|--help]"

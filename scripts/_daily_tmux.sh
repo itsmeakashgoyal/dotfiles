@@ -7,7 +7,7 @@ SESSION="Daily"
 tmux -2 new-session -d -s $SESSION
 
 # create window called daily
-tmux rename-window -t  daily
+tmux rename-window -t daily
 
 # split window horizontally
 tmux split-window -h
@@ -17,7 +17,7 @@ tmux split-window -v
 tmux select-pane -t 1
 tmux send-keys "echo pane 1" C-m
 
-# create new window for irc 
+# create new window for irc
 #tmux new-window -t irc
 
 # Set default window

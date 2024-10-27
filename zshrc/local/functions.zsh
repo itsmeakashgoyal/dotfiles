@@ -4,7 +4,7 @@
 
 # Create a new directory and enter it
 function mkd() {
-	mkdir -p "$@" && cd "$_";
+	mkdir -p "$@" && cd "$_"
 }
 
 # Wrapper for easy extraction of compressed files
@@ -37,45 +37,45 @@ function extract () {
 
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
-	local tmpFile="${@%/}.tar";
-	tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1;
+	local tmpFile="${@%/}.tar"
+	tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1
 
 	size=$(
-		stat -f"%z" "${tmpFile}" 2> /dev/null; # macOS `stat`
-		stat -c"%s" "${tmpFile}" 2> /dev/null;  # GNU `stat`
-	);
+		stat -f"%z" "${tmpFile}" 2>/dev/null # macOS `stat`
+		stat -c"%s" "${tmpFile}" 2>/dev/null # GNU `stat`
+	)
 
-	local cmd="";
-	if (( size < 52428800 )) && hash zopfli 2> /dev/null; then
+	local cmd=""
+	if ((size < 52428800)) && hash zopfli 2>/dev/null; then
 		# the .tar file is smaller than 50 MB and Zopfli is available; use it
-		cmd="zopfli";
+		cmd="zopfli"
 	else
-		if hash pigz 2> /dev/null; then
-			cmd="pigz";
+		if hash pigz 2>/dev/null; then
+			cmd="pigz"
 		else
-			cmd="gzip";
-		fi;
-	fi;
+			cmd="gzip"
+		fi
+	fi
 
-	echo "Compressing .tar ($((size / 1000)) kB) using \`${cmd}\`…";
-	"${cmd}" -v "${tmpFile}" || return 1;
-	[ -f "${tmpFile}" ] && rm "${tmpFile}";
+	echo "Compressing .tar ($((size / 1000)) kB) using \`${cmd}\`…"
+	"${cmd}" -v "${tmpFile}" || return 1
+	[ -f "${tmpFile}" ] && rm "${tmpFile}"
 
 	zippedSize=$(
-		stat -f"%z" "${tmpFile}.gz" 2> /dev/null; # macOS `stat`
-		stat -c"%s" "${tmpFile}.gz" 2> /dev/null; # GNU `stat`
-	);
+		stat -f"%z" "${tmpFile}.gz" 2>/dev/null # macOS `stat`
+		stat -c"%s" "${tmpFile}.gz" 2>/dev/null # GNU `stat`
+	)
 
-	echo "${tmpFile}.gz ($((zippedSize / 1000)) kB) created successfully.";
+	echo "${tmpFile}.gz ($((zippedSize / 1000)) kB) created successfully."
 }
 
 # Create a data URL from a file
 function dataurl() {
-	local mimeType=$(file -b --mime-type "$1");
+	local mimeType=$(file -b --mime-type "$1")
 	if [[ $mimeType == text/* ]]; then
-		mimeType="${mimeType};charset=utf-8";
+		mimeType="${mimeType};charset=utf-8"
 	fi
-	echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')";
+	echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')"
 }
 
 # `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
@@ -83,47 +83,46 @@ function dataurl() {
 # `less` with options to preserve color and line numbers, unless the output is
 # small enough for one screen.
 function tre() {
-	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX
 }
 
 function cfp() {
-    local file_path="$1"
-    local full_path=$(realpath "$file_path")
-    echo -n "$full_path" | xclip -selection clipboard
+	local file_path="$1"
+	local full_path=$(realpath "$file_path")
+	echo -n "$full_path" | xclip -selection clipboard
 }
 
 # xev wrapper for ascii keycodes
 function char2hex() {
-    xev | awk -F'[ )]+' '/^KeyPress/ { a[NR+2] } NR in a { printf "%-3s %s\n", $5, $8 }'
+	xev | awk -F'[ )]+' '/^KeyPress/ { a[NR+2] } NR in a { printf "%-3s %s\n", $5, $8 }'
 }
 
 # Creates a folder named with the current or prefixed date, using the format "prefix-YYYY-MM-DD" if a prefix is provided.
-function mkdd () {
-    mkdir -p ${1:+$1$prefix_separator}"$(date +%F)";
+function mkdd() {
+	mkdir -p ${1:+$1$prefix_separator}"$(date +%F)"
 }
 
 # Zoxide interactive selection
 function zoxider() {
-    BUFFER=$(zoxide query -i)
-    zle accept-line
+	BUFFER=$(zoxide query -i)
+	zle accept-line
 }
 zle -N zoxider
 bindkey '^[j' zoxider
 
 # Copy current command line to clipboard
 copy-line-to-clipboard() {
-    echo -n $BUFFER | xclip -selection clipboard
+	echo -n $BUFFER | xclip -selection clipboard
 }
 zle -N copy-line-to-clipboard
 bindkey '^Y' copy-line-to-clipboard
 
 # List all files in current directory and subdirectories
 function lsfiles() {
-  ls **/*.**
+	ls **/*.**
 }
 
 # List all files in current directory and subdirectories, including hidden files
 function lsfilesh() {
-  ls **/*.**(D)
+	ls **/*.**(D)
 }
-

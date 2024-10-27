@@ -5,10 +5,6 @@
 # Set default editor to Neovim
 export EDITOR='nvim'
 
-# Aliases for Vim and Neovim
-alias vim='nvim'                      # Use Neovim as 'vim'
-alias bramvim='/opt/homebrew/bin/vim' # Alias for Homebrew's Vim installation
-
 # Function to open Vim with zoxide integration
 v() {
     if [ -n "$1" ]; then

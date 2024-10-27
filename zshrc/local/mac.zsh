@@ -44,7 +44,7 @@ hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO; }
 
 # Change to Finder's current directory
 cdf() { # short for `cdfinder`
-    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+  cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
 }
 
 # ------------------------------------------------------------------------------
@@ -55,16 +55,14 @@ cdf() { # short for `cdfinder`
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 ## Brew completions
-if type brew &>/dev/null
-then
+if type brew &>/dev/null; then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
   autoload -Uz compinit
   compinit -d "$cache_directory/compinit-dumpfile"
 fi
 
 # Set up Homebrew completions
-if type brew &>/dev/null
-then
+if type brew &>/dev/null; then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
   autoload -Uz compinit
   compinit

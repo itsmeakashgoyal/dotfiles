@@ -96,4 +96,3 @@ local function __load_plugin() {
   fi
   source "$plugin_dir/$(basename $plugin).zsh"
 }
-

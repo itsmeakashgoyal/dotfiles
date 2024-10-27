@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Enable strict mode for better error handling
-set -euo pipefail
+set -eu pipefail
 
 # Set the filename of the script containing the functions
 FILE="${HOME}/dotfiles-dev/zshrc/local/functions.zsh"
@@ -43,7 +43,7 @@ while IFS= read -r line; do
     if [[ -n "$result" ]]; then
         functions+=("$result")
     fi
-done < "$FILE"
+done <"$FILE"
 
 # Sort the functions alphabetically by name
 IFS=$'\n' sorted=($(sort <<<"${functions[*]}"))
@@ -53,6 +53,6 @@ unset IFS
 printf "%-20s %s\n" "Function" "Description"
 printf "%-20s %s\n" "--------" "-----------"
 for f in "${sorted[@]}"; do
-    IFS='|' read -r f_name com <<< "$f"
+    IFS='|' read -r f_name com <<<"$f"
     printf "%-20s %s\n" "$f_name" "$com"
 done

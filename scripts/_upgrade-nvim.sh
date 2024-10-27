@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eu pipefail
 
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
 # curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage

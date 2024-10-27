@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -e pipefail
 IFS=$'\n\t'
 
 # Check for -mp3 flag

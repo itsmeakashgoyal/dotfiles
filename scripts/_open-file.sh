@@ -4,11 +4,11 @@
 # The set -u referencing a previously undefined variable - with the exceptions of $* and $@ - is an error
 # The set -o pipefaile if any command in a pipeline fails, that return code will be used as the return code of the whole pipeline
 # https://bit.ly/37nFgin
-set -o pipefail
+set -eu pipefail
 
 # Function to display help information
 help_function() {
-    cat << EOF
+    cat <<EOF
 Usage: _open_file.sh [query] [-h|--help]
 
 This script opens files using fzf-tmux for selection and the configured editor (default: nvim) for viewing.
@@ -53,26 +53,26 @@ IFS=$'\n' files=($(fzf-tmux --preview '[[ -d {} ]] && exa --color=always --long 
 
 # Check if any files were selected, and exit if not
 if [ ${#files[@]} -eq 0 ]; then
-	exit 0
+    exit 0
 fi
 
 # Convert selected files to absolute paths
 for i in "${!files[@]}"; do
-	files[i]=$(realpath "${files[i]}")
+    files[i]=$(realpath "${files[i]}")
 done
 
 # Open files in the editor with different layouts based on the number of files
 case "${#files[@]}" in
-    2)
-        ${EDITOR:-nvim} -O +'silent! normal g;' "${files[@]}"
-        ;;
-    3)
-        ${EDITOR:-nvim} -O "${files[0]}" -c 'wincmd j' -c "silent! vsplit ${files[1]}" -c "silent! split ${files[2]}"
-        ;;
-    4)
-        ${EDITOR:-nvim} -O "${files[0]}" -c "silent! vsplit ${files[1]}" -c "silent! split ${files[2]}" -c 'wincmd h' -c "silent! split ${files[3]}"
-        ;;
-    *)
-        ${EDITOR:-nvim} "${files[@]}"
-        ;;
+2)
+    ${EDITOR:-nvim} -O +'silent! normal g;' "${files[@]}"
+    ;;
+3)
+    ${EDITOR:-nvim} -O "${files[0]}" -c 'wincmd j' -c "silent! vsplit ${files[1]}" -c "silent! split ${files[2]}"
+    ;;
+4)
+    ${EDITOR:-nvim} -O "${files[0]}" -c "silent! vsplit ${files[1]}" -c "silent! split ${files[2]}" -c 'wincmd h' -c "silent! split ${files[3]}"
+    ;;
+*)
+    ${EDITOR:-nvim} "${files[@]}"
+    ;;
 esac

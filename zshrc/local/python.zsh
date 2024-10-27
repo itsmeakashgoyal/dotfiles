@@ -28,10 +28,10 @@ function mkvenv() {
     # Create the virtual environment
     echo "Creating new virtual environment '$env_dir'..."
     python3 -m venv $env_dir
-    
+
     # Activate the virtual environment
     source $env_dir/bin/activate
-    
+
     # Upgrade pip and install wheel
     echo "Upgrading pip and installing wheel..."
     pip3 install --upgrade pip
@@ -42,7 +42,7 @@ function mkvenv() {
         echo "Installing packages from '$requirements_path'..."
         pip3 install -r "$requirements_path"
     fi
-    
+
     echo "Virtual environment '$env_dir' created and activated!"
 }
 
@@ -54,7 +54,7 @@ function rmvenv() {
     if [[ "$VIRTUAL_ENV" != "" ]]; then
         # Capture installed packages if requirements.txt doesn't exist
         if [[ ! -f "requirements.txt" ]]; then
-            pip3 freeze > "$requirements_path"
+            pip3 freeze >"$requirements_path"
             echo "Installed packages captured in $requirements_path"
         fi
 

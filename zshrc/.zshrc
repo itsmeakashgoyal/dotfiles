@@ -37,10 +37,18 @@ zstyle ':omz:update' frequency 13
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git web-search colored-man-pages zsh-vi-mode ruby fzf-tab zsh-completions)
-
-fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
-source $ZSH/custom/plugins/zsh-completions/zsh-completions.plugin.zsh
+plugins=(
+    git
+    sudo
+    history-substring-search
+    colored-man-pages
+    zsh-vi-mode
+    ruby
+    fzf-tab
+    zsh-syntax-highlighting
+    zsh-autosuggestions
+    zsh-autocomplete
+)
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
 source $ZSH/oh-my-zsh.sh
 
@@ -91,6 +99,13 @@ bindkey '^L' vi-forward-word
 bindkey '^k' up-line-or-search
 bindkey '^j' down-line-or-search
 
+# autocompletion using arrow keys (based on history)
+bindkey "^[[A" history-beginning-search-backward
+bindkey "^[[B" history-beginning-search-forward
+
+zle -N menu-search
+zle -N recent-paths
+
 # Completion styles
 zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
 
@@ -138,13 +153,15 @@ autoload -Uz compinit && compinit -d "$cache_directory/compinit-dumpfile"
 eval "$(oh-my-posh init zsh --config /opt/homebrew/opt/oh-my-posh/themes/emodipt-extend.omp.json)"
 
 # FZF and Zoxide integration
-source <(fzf --zsh)
-zvm_after_init_commands+=('source <(fzf --zsh)')
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
 eval "$(zoxide init --cmd cd zsh)"
 
 # ------------------------------------------------------------------
 ## Antidote plugin manager setup
 # ------------------------------------------------------------------
+
+export ANTIDOTE_DIR="/opt/homebrew/opt/antidote/share/antidote"
 
 # Set the root name of the plugins files (.txt and .zsh) antidote will use.
 zsh_plugins=${ZSHRCDIR}/.zsh_plugins
@@ -153,9 +170,9 @@ zsh_plugins=${ZSHRCDIR}/.zsh_plugins
 [[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
 
 # Lazy-load antidote from its functions directory.
-fpath=(/opt/homebrew/opt/antidote/share/antidote/functions $fpath)
+fpath=(${ANTIDOTE_DIR}/functions $fpath)
 autoload -Uz antidote
-source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
+source ${ANTIDOTE_DIR}/antidote.zsh
 
 # Helper function to compile bundles and source zshrc
 function compile_antidote() {
@@ -168,9 +185,3 @@ alias update_antidote='antidote bundle < ${ZSHRCDIR}/.zsh_plugins.txt >| ${ZSHRC
 
 # Source compiled antidote bundles and configs
 [ -f ${ZSHRCDIR}/zsh_plugins.zsh ] && source ${ZSHRCDIR}/zsh_plugins.zsh
-
-# Set Up Plugins
-# ------------------------------------------------------------------------------
-plugins_to_init=(zsh-autosuggestions zsh-syntax-highlighting)
-__init_plugins "${plugins_to_init[@]}"
-

@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # Added set -euo pipefail for better error handling and script termination on errors.
-set -euo pipefail
+set -eu pipefail
 
 SUBLIME_APP="/Applications/Sublime Text.app"
 SUBLIME_BIN="${SUBLIME_APP}/Contents/SharedSupport/bin/subl"

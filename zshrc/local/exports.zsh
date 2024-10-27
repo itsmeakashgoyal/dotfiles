@@ -10,8 +10,8 @@ HOMEBREW_REPOSITORY="/opt/homebrew"
 
 # Locale Settings
 # Prefer US English and use UTF-8.
-export LANG='en_US.UTF-8';
-export LC_ALL='en_US.UTF-8';
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
 
 # Path Exports
 export PATH="$HOME/bin:$HOME/.local/bin:/usr/local:/usr/local/bin:$PATH"
@@ -32,7 +32,7 @@ export LESS_TERMCAP_us=$'\e[1;4;32m'
 
 # History Configuration
 # the detailed meaning of the below three variable can be found in `man zshparam`.
-export HISTSIZE=1000000   # Number of items for the internal history list
+export HISTSIZE=1000000 # Number of items for the internal history list
 export HISTFILE=~/.zsh_history
 export SAVEHIST=$HISTSIZE # Maximum number of items for the history file
 

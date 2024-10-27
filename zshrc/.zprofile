@@ -1,4 +1,3 @@
-
 # Set PATHS
 if [ -x "/opt/homebrew/bin/brew" ]; then
     # For Apple Silicon Macs

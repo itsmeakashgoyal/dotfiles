@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-set -euo pipefail
+set -eu pipefail
 
 # Function to check if a command was successful
 check_command() {
