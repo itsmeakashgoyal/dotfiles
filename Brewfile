@@ -58,8 +58,6 @@ brew "xclip"
 brew "youtube-dl"
 brew "zoxide"
 brew "zsh"
-brew "zsh-autosuggestions"
-brew "zsh-syntax-highlighting"
 
 # Cask
 cask "font-3270-nerd-font"

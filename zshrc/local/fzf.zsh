@@ -18,15 +18,15 @@ export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
 # ------------------------------------------------------------------------------
 
 # Add FZF to PATH if not already present
-if [[ ! "$PATH" == *${HOME}/.fzf/bin* ]]; then
-    export PATH="${PATH:+${PATH}:}/${HOME}/.fzf/bin"
+if [[ ! "$PATH" == *${HOME}/.config/.fzf/bin* ]]; then
+    export PATH="${PATH:+${PATH}:}/${HOME}/.config/.fzf/bin"
 fi
 
 # Auto-completion
-[[ $- == *i* ]] && source "${HOME}/.fzf/shell/completion.zsh" 2> /dev/null
+[[ $- == *i* ]] && source "${HOME}/.config/.fzf/shell/completion.zsh" 2> /dev/null
 
 # Key bindings
-source "${HOME}/.fzf/shell/key-bindings.zsh"
+source "${HOME}/.config/.fzf/shell/key-bindings.zsh"
 
 # Custom completion function
 _fzf_comprun() {
