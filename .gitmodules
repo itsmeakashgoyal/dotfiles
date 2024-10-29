@@ -3,4 +3,4 @@
 	url = https://github.com/ChrisTitusTech/mybash.git
 [submodule "nvim"]
 	path = nvim
-	url = https://github.com/adibhanna/nvim.git
+	url = https://github.com/itsmeakashgoyal/neovim.git
