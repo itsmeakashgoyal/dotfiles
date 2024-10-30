@@ -21,7 +21,9 @@ CONFIG_DIR="${HOME}/.config"
 log "-> pwd: ${pwd}"
 
 # Run setup scripts
-scripts=("_macOS" "_brew" "_sublime")
+# Uncomment below line to setup sublime also
+# scripts=("_macOS" "_brew" "_sublime")
+scripts=("_macOS" "_brew")
 for script in "${scripts[@]}"; do
     script_path="./scripts/${script}.sh"
     if [ -f "${script_path}" ]; then

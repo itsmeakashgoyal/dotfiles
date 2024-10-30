@@ -64,16 +64,10 @@ cp "settings/Package Control.sublime-settings" "${USER_PACKAGES_DIR}/Package Con
 echo "Opening Sublime to automatically install packages"
 open_and_wait_sublime
 echo "Press Enter after Packages are all installed..."
-# read  TODO: uncomment this or think something else
-# waiting for 10 sec to install the packages
-sleep 10
-
-echo "time up ->"
+read
 
 # Quit Sublime after packages are installed
 osascript -e 'quit app "Sublime Text"'
-
-echo "quit sublime text"
 
 # Copy custom settings, keymaps, and other configurations
 cp "settings/Preferences.sublime-settings" "${USER_PACKAGES_DIR}/Preferences.sublime-settings"

@@ -3,6 +3,9 @@
 # Enable strict mode for better error handling
 set -euo pipefail
 
+# Define variables
+DOTFILES_DIR="${HOME}/dotfiles-dev"
+
 # Function to check if a command was successful
 check_command() {
     if [ $? -ne 0 ]; then
@@ -65,7 +68,8 @@ check_command "Changing default shell"
 
 # Setup Git config
 echo "Setting up Git config..."
-sh ~/dotfiles-dev/scripts/_git_config.sh
+echo "pwd: ${pwd}"
+sh ${DOTFILES_DIR}/scripts/_git_config.sh
 check_command "Git config setup"
 
 # Install Prettier
