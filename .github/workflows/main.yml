@@ -1,0 +1,34 @@
+---
+name: Test Setup dotfiles on Mac OS
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["master", "main"]
+    paths:
+      - ".github/workflows/main.yml"
+      - "setup.sh"
+      - "_*"
+      - "gradle.properties"
+  pull_request:
+    branches: ["master", "main"]
+    paths:
+      - ".github/workflows/main.yml"
+      - "setup.sh"
+      - "_*"
+      - "gradle.properties"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_test:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@master
+      - name: Run setup dotfiles
+        run: |
+          set -eo pipefail
+          export CI=1
+          ./setup.sh # Test dotfile setup
