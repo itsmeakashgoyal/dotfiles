@@ -23,14 +23,14 @@ FOLDERS=("zshrc" "git" "confrc")
 # List of files to symlink directly in home directory
 FILES=(".zshrc" ".zprofile" ".gitconfig" ".gitignore" ".gitattributes" ".curlrc" ".gdbinit" ".wgetrc")
 # List of folders to symlink in .config directory
-CONFIG_FOLDERS=("tmux" "nvim" "nix")
+CONFIG_FOLDERS=("tmux" "nvim")
 
 # Run setup scripts
 scripts=("_macOS" "_brew" "_sublime")
 for script in "${scripts[@]}"; do
     script_path="./scripts/${script}.sh"
     if [ -f "${script_path}" ]; then
-        echo "Running ${script} script..."
+        echo "Running ${script_path} script..."
         if ! "${script_path}"; then
             echo "Error: ${script} script failed. Continuing..."
         fi

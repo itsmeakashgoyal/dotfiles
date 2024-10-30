@@ -10,9 +10,14 @@ check_command() {
     fi
 }
 
-# Install Xcode Command Line Tools
-xcode-select --install
-check_command "Xcode Command Line Tools installation"
+# Check if Xcode Command Line Tools are already installed
+if xcode-select -p &>/dev/null; then
+    echo "Xcode Command Line Tools are already installed."
+else
+    # Install Xcode Command Line Tools
+    xcode-select --install
+    check_command "Xcode Command Line Tools installation"
+fi
 
 echo "Complete the installation of Xcode Command Line Tools before proceeding."
 read -p "Press enter to continue..."

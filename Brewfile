@@ -1,8 +1,6 @@
 # Taps
 tap "homebrew/cask"
 tap "homebrew/bundle"
-tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
 tap "homebrew/command-not-found"
 
 # Brew
@@ -80,27 +78,12 @@ cask "visual-studio-code"
 # mas install
 
 # vscode --install-extension
-vscode "codeium.codeium"
-vscode "eamodio.gitlens"
 vscode "freecodecamp.freecodecamp-dark-vscode-theme"
 vscode "github.github-vscode-theme"
-vscode "jeff-hykin.better-cpp-syntax"
-vscode "josetr.cmake-language-support-vscode"
-vscode "koihik.vscode-lua-format"
-vscode "llvm-vs-code-extensions.vscode-clangd"
-vscode "ms-azuretools.vscode-docker"
-vscode "ms-dotnettools.vscode-dotnet-runtime"
 vscode "ms-vscode-remote.remote-containers"
 vscode "ms-vscode-remote.remote-ssh"
-vscode "ms-vscode-remote.remote-ssh-edit"
-vscode "ms-vscode-remote.remote-wsl"
 vscode "ms-vscode.cmake-tools"
 vscode "ms-vscode.cpptools"
 vscode "ms-vscode.cpptools-extension-pack"
 vscode "ms-vscode.cpptools-themes"
 vscode "ms-vscode.makefile-tools"
-vscode "ms-vscode.remote-explorer"
-vscode "oderwat.indent-rainbow"
-vscode "pkief.material-icon-theme"
-vscode "twxs.cmake"
-vscode "usernamehw.errorlens"
