@@ -65,16 +65,19 @@ echo "Opening Sublime to automatically install packages"
 open_and_wait_sublime
 echo "Press Enter after Packages are all installed..."
 # read  TODO: uncomment this or think something else
-# waiting for 30 sec to install the packages
-sleep 30
+# waiting for 10 sec to install the packages
+sleep 10
+
+echo "time up ->"
 
 # Quit Sublime after packages are installed
 osascript -e 'quit app "Sublime Text"'
 
+echo "quit sublime text"
+
 # Copy custom settings, keymaps, and other configurations
 cp "settings/Preferences.sublime-settings" "${USER_PACKAGES_DIR}/Preferences.sublime-settings"
 cp "settings/SublimeLinter.sublime-settings" "${USER_PACKAGES_DIR}/SublimeLinter.sublime-settings"
-cp "settings/Python-3.sublime-build" "${USER_PACKAGES_DIR}/Python-3.sublime-build"
 
 echo "Custom Sublime Text settings and packages have been copied."
 

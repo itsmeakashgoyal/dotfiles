@@ -18,12 +18,7 @@ log() {
 DOTFILES_DIR="${HOME}/dotfiles-dev"
 CONFIG_DIR="${HOME}/.config"
 
-# List of folders to process
-FOLDERS=("zshrc" "git" "confrc")
-# List of files to symlink directly in home directory
-FILES=(".zshrc" ".zprofile" ".gitconfig" ".gitignore" ".gitattributes" ".curlrc" ".gdbinit" ".wgetrc")
-# List of folders to symlink in .config directory
-CONFIG_FOLDERS=("tmux" "nvim")
+log "-> pwd: ${pwd}"
 
 # Run setup scripts
 scripts=("_macOS" "_brew" "_sublime")
@@ -40,6 +35,7 @@ for script in "${scripts[@]}"; do
 done
 
 log "→ Initiating the symlinking process..."
+log "-> pwd: ${pwd}"
 
 # Change to the dotfiles directory
 log "→ Changing to the ${DOTFILES_DIR} directory"
@@ -47,6 +43,13 @@ cd "${DOTFILES_DIR}" || {
     log "Failed to change directory to ${DOTFILES_DIR}"
     exit 1
 }
+
+# List of folders to process
+FOLDERS=("zshrc" "git" "confrc")
+# List of files to symlink directly in home directory
+FILES=(".zshrc" ".zprofile" ".gitconfig" ".gitignore" ".gitattributes" ".curlrc" ".gdbinit" ".wgetrc")
+# List of folders to symlink in .config directory
+CONFIG_FOLDERS=("tmux" "nvim")
 
 # Create symlinks for each file within the specified folders
 for folder in "${FOLDERS[@]}"; do

@@ -59,7 +59,8 @@ fi
 
 # Set the Homebrew zsh as default shell
 echo "Changing default shell to Homebrew zsh..."
-chsh -s "$BREW_ZSH"
+# chsh -s "$BREW_ZSH"
+export SHELL="$BREW_ZSH"
 check_command "Changing default shell"
 
 # Setup Git config
