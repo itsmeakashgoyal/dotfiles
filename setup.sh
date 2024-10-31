@@ -24,9 +24,10 @@ function error_echo {
 }
 
 # This detection only works for mac and linux.
-if [ "$(uname)" == "Darwin" ]; then
+OS_TYPE=$(uname)
+if [ "$OS_TYPE" = "Darwin" ]; then
   special_echo "------> Setting up MACOS"
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+elif [ "$OS_TYPE" = "Linux" ]; then
   special_echo "------> Setting up LINUX"
 fi
 
