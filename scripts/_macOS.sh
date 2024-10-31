@@ -11,16 +11,16 @@ check_command() {
 }
 
 # Check if Xcode Command Line Tools are already installed
-if xcode-select -p &>/dev/null; then
-    echo "Xcode Command Line Tools are already installed."
-else
-    # Install Xcode Command Line Tools
-    xcode-select --install
-    check_command "Xcode Command Line Tools installation"
-fi
+# if xcode-select -p &>/dev/null; then
+#     echo "Xcode Command Line Tools are already installed."
+# else
+#     # Install Xcode Command Line Tools
+#     xcode-select --install
+#     check_command "Xcode Command Line Tools installation"
+# fi
 
-echo "Complete the installation of Xcode Command Line Tools before proceeding."
-read -p "Press enter to continue..."
+# echo "Complete the installation of Xcode Command Line Tools before proceeding."
+# read -p "Press enter to continue..."
 
 # macOS System Preferences
 echo "Configuring macOS system preferences..."

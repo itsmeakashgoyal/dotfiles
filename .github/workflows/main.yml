@@ -26,12 +26,15 @@ jobs:
 
       - name: Move repo to HOME directory
         run: |
-          cp -r . "$HOME/"
-          cd $HOME
+          mkdir -p "$HOME/dotfiles-dev"
+          cp -r . "$HOME/dotfiles-dev/"
+          cd "$HOME/dotfiles-dev"
 
       - name: Run setup dotfiles
-        working-directory: /Users/runner
+        working-directory: /Users/runner/dotfiles-dev
         run: |
           set -eo pipefail
           export CI=1
-          ./setup.sh # Test dotfile setup
+          chmod +x ./setup.sh
+          chmod +x ./scripts/*.sh
+          ./setup.sh
