@@ -10,6 +10,11 @@ check_command() {
     fi
 }
 
+# Skip osx config setup in CI environment
+if [ -n "$CI" ]; then
+    exit 0
+fi
+
 # Check if Xcode Command Line Tools are already installed
 if xcode-select -p &>/dev/null; then
     echo "Xcode Command Line Tools are already installed."
