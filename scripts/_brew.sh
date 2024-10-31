@@ -48,9 +48,10 @@ brew upgrade --cask
 brew cleanup
 
 # Install packages from Brewfile
-echo "Installing packages from Brewfile..."
-brew bundle install
-check_command "Brewfile installation"
+# TODO: Uncomment this also
+# echo "Installing packages from Brewfile..."
+# brew bundle install
+# check_command "Brewfile installation"
 
 # Add the Homebrew zsh to allowed shells
 echo "Adding Homebrew zsh to allowed shells..."
@@ -68,7 +69,6 @@ check_command "Changing default shell"
 
 # Setup Git config
 echo "Setting up Git config..."
-echo "-> pwd: $(pwd)"
 ## TODO: revert this comment
 # sh ${DOTFILES_DIR}/scripts/_git_config.sh
 # check_command "Git config setup"
@@ -77,11 +77,6 @@ echo "-> pwd: $(pwd)"
 echo "Installing Prettier..."
 npm install --global prettier
 check_command "Prettier installation"
-
-# Install wget with IRI support
-echo "Installing wget with IRI support..."
-brew install wget --with-iri
-check_command "wget installation"
 
 # Tap the Homebrew font cask repository if not already tapped
 if ! brew tap | grep -q "^homebrew/cask-fonts$"; then
