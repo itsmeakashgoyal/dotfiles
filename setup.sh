@@ -7,12 +7,28 @@
 ############################
 
 # Enable strict mode for better error handling
-set -o pipefail
+set -euo pipefail
 
 # Function to log messages
 log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
 }
+
+# Generates colored output.
+function special_echo {
+  echo -e '\E[0;32m'"$1\033[0m"
+}
+
+function error_echo {
+  echo -e '\E[0;31m'"$1\033[0m"
+}
+
+# This detection only works for mac and linux.
+if [ "$(uname)" == "Darwin" ]; then
+  special_echo "------> Setting up MACOS"
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+  special_echo "------> Setting up LINUX"
+fi
 
 # Define variables
 DOTFILES_DIR="${HOME}/dotfiles-dev"
