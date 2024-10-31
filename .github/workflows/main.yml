@@ -8,14 +8,6 @@ on:  # yamllint disable-line rule:truthy
       - ".github/workflows/main.yml"
       - "setup.sh"
       - "_*"
-      - "gradle.properties"
-  pull_request:
-    branches: ["master", "main"]
-    paths:
-      - ".github/workflows/main.yml"
-      - "setup.sh"
-      - "_*"
-      - "gradle.properties"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,9 +17,20 @@ jobs:
   build_and_test:
     runs-on: macos-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
     steps:
       - uses: actions/checkout@master
+        with:
+          fetch-depth: 0  # Ensure all files are checked out
+
+      - name: Move repo to HOME directory
+        run: |
+          cp -r . $HOME/
+          cd $HOME
+
       - name: Run setup dotfiles
+        working-directory: $HOME
         run: |
           set -eo pipefail
           export CI=1

@@ -68,7 +68,7 @@ check_command "Changing default shell"
 
 # Setup Git config
 echo "Setting up Git config..."
-echo "pwd: ${pwd}"
+echo "-> pwd: $(pwd)"
 sh ${DOTFILES_DIR}/scripts/_git_config.sh
 check_command "Git config setup"
 

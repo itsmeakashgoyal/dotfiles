@@ -18,7 +18,7 @@ log() {
 DOTFILES_DIR="${HOME}/dotfiles-dev"
 CONFIG_DIR="${HOME}/.config"
 
-log "-> pwd: ${pwd}"
+log "-> pwd: $(pwd)"
 
 # Run setup scripts
 # Uncomment below line to setup sublime also
@@ -37,7 +37,7 @@ for script in "${scripts[@]}"; do
 done
 
 log "→ Initiating the symlinking process..."
-log "-> pwd: ${pwd}"
+log "-> pwd: $(pwd)"
 
 # Change to the dotfiles directory
 log "→ Changing to the ${DOTFILES_DIR} directory"
