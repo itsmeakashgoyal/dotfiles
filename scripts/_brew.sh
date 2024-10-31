@@ -48,10 +48,9 @@ brew upgrade --cask
 brew cleanup
 
 # Install packages from Brewfile
-# TODO: Uncomment this also
-# echo "Installing packages from Brewfile..."
-# brew bundle install
-# check_command "Brewfile installation"
+echo "Installing packages from Brewfile..."
+brew bundle install
+check_command "Brewfile installation"
 
 # Add the Homebrew zsh to allowed shells
 echo "Adding Homebrew zsh to allowed shells..."
@@ -63,15 +62,20 @@ fi
 
 # Set the Homebrew zsh as default shell
 echo "Changing default shell to Homebrew zsh..."
-# chsh -s "$BREW_ZSH"
-export SHELL="$BREW_ZSH"
-check_command "Changing default shell"
+if [ -z "$CI" ]; then
+    chsh -s "$BREW_ZSH"
+    check_command "Changing default shell"
+else
+    export SHELL="$BREW_ZSH"
+fi
 
 # Setup Git config
 echo "Setting up Git config..."
-## TODO: revert this comment
-# sh ${DOTFILES_DIR}/scripts/_git_config.sh
-# check_command "Git config setup"
+# Skip branch checkout in CI environment
+if [ -z "$CI" ]; then
+    sh ${DOTFILES_DIR}/scripts/_git_config.sh
+    check_command "Git config setup"
+fi
 
 # Install Prettier
 echo "Installing Prettier..."
