@@ -5,7 +5,7 @@ on:  # yamllint disable-line rule:truthy
   push:
     branches: ["master", "main"]
     paths:
-      - ".github/workflows/main.yml"
+      - ".github/workflows/build_and_test.yml"
       - "setup.sh"
       - "_*"
 
