@@ -47,7 +47,7 @@ cd "${DOTFILES_DIR}" || {
 }
 
 # List of folders to process
-FOLDERS=("zshrc" "git" "confrc")
+FOLDERS=("zshrc" "confrc" "git")
 # List of files to symlink directly in home directory
 FILES=(".zshrc" ".zprofile" ".gitconfig" ".gitignore" ".gitattributes" ".curlrc" ".gdbinit" ".wgetrc")
 # List of folders to symlink in .config directory
@@ -56,7 +56,12 @@ CONFIG_FOLDERS=("tmux" "nvim")
 # Create symlinks for each file within the specified folders
 for folder in "${FOLDERS[@]}"; do
     log "→ Processing folder: ${folder}"
-    for file in "${DOTFILES_DIR}/${folder}"/{.,}*; do
+    # Enable dotglob to match hidden files
+    setopt dotglob
+    for file in "${DOTFILES_DIR}/${folder}"/*; do
+        # Skip if file doesn't exist
+        [[ -e "$file" ]] || continue
+
         # Skip if it's a '.' or '..' directory entry
         [[ $(basename "$file") == "." || $(basename "$file") == ".." ]] && continue
         filename=$(basename "${file}")
