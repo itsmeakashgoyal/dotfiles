@@ -26,11 +26,11 @@ jobs:
 
       - name: Move repo to HOME directory
         run: |
-          cp -r . $HOME/
+          cp -r . "$HOME/"
           cd $HOME
 
       - name: Run setup dotfiles
-        working-directory: $HOME
+        working-directory: /Users/runner
         run: |
           set -eo pipefail
           export CI=1
