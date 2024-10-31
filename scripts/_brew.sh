@@ -82,13 +82,6 @@ echo "Installing Prettier..."
 npm install --global prettier
 check_command "Prettier installation"
 
-# Tap the Homebrew font cask repository if not already tapped
-if ! brew tap | grep -q "^homebrew/cask-fonts$"; then
-    echo "Tapping homebrew/cask-fonts..."
-    brew tap homebrew/cask-fonts
-    check_command "Tapping homebrew/cask-fonts"
-fi
-
 # Final update and cleanup
 echo "Performing final update and cleanup..."
 brew update
