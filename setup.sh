@@ -16,19 +16,19 @@ log() {
 
 # Generates colored output.
 function special_echo {
-  echo -e '\E[0;32m'"$1\033[0m"
+    echo -e '\E[0;32m'"$1\033[0m"
 }
 
 function error_echo {
-  echo -e '\E[0;31m'"$1\033[0m"
+    echo -e '\E[0;31m'"$1\033[0m"
 }
 
 # This detection only works for mac and linux.
 OS_TYPE=$(uname)
 if [ "$OS_TYPE" = "Darwin" ]; then
-  special_echo "------> Setting up MACOS"
+    special_echo "------> Setting up MACOS"
 elif [ "$OS_TYPE" = "Linux" ]; then
-  special_echo "------> Setting up LINUX"
+    special_echo "------> Setting up LINUX"
 fi
 
 # Define variables
