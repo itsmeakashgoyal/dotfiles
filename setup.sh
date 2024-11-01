@@ -36,9 +36,7 @@ DOTFILES_DIR="${HOME}/dotfiles-dev"
 CONFIG_DIR="${HOME}/.config"
 
 # Run setup scripts
-# Uncomment below line to setup sublime also
-# scripts=("_macOS" "_brew" "_sublime")
-scripts=("_macOS" "_brew")
+scripts=("_macOS" "_brew" "_sublime")
 for script in "${scripts[@]}"; do
     script_path="./scripts/${script}.sh"
     if [ -f "${script_path}" ]; then

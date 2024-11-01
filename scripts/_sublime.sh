@@ -3,6 +3,11 @@
 # Added set -euo pipefail for better error handling and script termination on errors.
 set -eu pipefail
 
+# Skip osx config setup in CI environment
+if [ -n "$CI" ]; then
+    exit 0
+fi
+
 SUBLIME_APP="/Applications/Sublime Text.app"
 SUBLIME_BIN="${SUBLIME_APP}/Contents/SharedSupport/bin/subl"
 CONFIG_PATH="${HOME}/Library/Application Support/Sublime Text"
