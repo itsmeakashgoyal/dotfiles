@@ -25,6 +25,11 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Set TERM variable for non-interactive environments
+if [ -z "$CI" ]; then
+    export TERM=${TERM:-xterm}
+fi
+
 process "→ Bootstrap steps start here:\n------------------"
 
 # Update and upgrade system
@@ -35,7 +40,7 @@ process "→ Install git"
 sudo apt install -y git
 
 process "→ Setup git config"
-# Skip branch checkout in CI environment
+# Skip setting github in CI environment
 if [ -z "$CI" ]; then
     sh ${DOTFILES_DIR}/scripts/_git_config.sh
     check_command "Git config setup"
@@ -106,7 +111,13 @@ sh ~/dotfiles-dev/scripts/_install_nvim.sh
 process "→ Install Nix package manager"
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix >nix-installer.sh
 chmod +x nix-installer.sh
-./nix-installer.sh install
+
+# Setting --no-confirm option in CI environment to install nix
+if [ -z "$CI" ]; then
+    ./nix-installer.sh install --no-confirm
+else
+    ./nix-installer.sh install
+fi
 rm nix-installer.sh
 
 # Source Nix environment script if installation succeeded
