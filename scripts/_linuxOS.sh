@@ -1,29 +1,7 @@
 #!/usr/bin/env sh
 
-# Enable strict mode
-set -eu pipefail
-IFS=$'\n\t'
-
-# Get current user
-user=$(whoami)
-
-# Define log file
-LOG="/tmp/setup_log.txt"
-
-# Define variables
-DOTFILES_DIR="${HOME}/dotfiles"
-CONFIG_DIR="${HOME}/.config"
-
-# Function to log and display process steps
-process() {
-    echo "$(date) PROCESSING:  $@" >>"$LOG"
-    printf "$(tput setaf 6) [STEP ${STEP:-0}] %s...$(tput sgr0)\n" "$@"
-    STEP=$((STEP + 1))
-}
-
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
+# Source the common script
+source "${HOME}/dotfiles/scripts/common.sh"
 
 process "→ Bootstrap steps start here:\n------------------"
 
