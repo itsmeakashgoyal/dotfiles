@@ -41,19 +41,21 @@ cd "${CONFIG_DIR}/nix" || {
 # Restart nix-daemon to apply changes
 sudo systemctl restart nix-daemon.service
 
-# Install Home Manager if not installed
-# if ! command -v home-manager &>/dev/null; then
-#     log "→ Setting up Home Manager"
-#     nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-#     nix-channel --update
-#     nix-shell '<home-manager>' -A install
-# fi
+if [ -z "$CI" ]; then
+	# Install Home Manager if not installed
+	# if ! command -v home-manager &>/dev/null; then
+	#     log "→ Setting up Home Manager"
+	#     nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+	#     nix-channel --update
+	#     nix-shell '<home-manager>' -A install
+	# fi
 
-# This command does not set up Home Manager as a standalone package though
-# This command runs Home Manager as a temporary process in a nix shell.
-# It will initialize a Home Manager configuration and switch to it if the configuration files already exist.
-nix run home-manager -- init --switch .
+	# This command does not set up Home Manager as a standalone package though
+	# This command runs Home Manager as a temporary process in a nix shell.
+	# It will initialize a Home Manager configuration and switch to it if the configuration files already exist.
+	nix run home-manager -- init --switch .
 
-# Initialize and switch to the Home Manager configuration
-log "→ Switching Home Manager configuration"
-home-manager switch --flake .
+	# Initialize and switch to the Home Manager configuration
+	log "→ Switching Home Manager configuration"
+	home-manager switch --flake .
+fi
