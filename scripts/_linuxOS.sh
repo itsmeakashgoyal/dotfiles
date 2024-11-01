@@ -26,7 +26,7 @@ command_exists() {
 }
 
 # Set TERM variable for non-interactive environments
-if [ -z "$CI" ]; then
+if [ -n "$CI" ]; then
     export TERM=${TERM:-xterm}
 fi
 
@@ -113,7 +113,7 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 chmod +x nix-installer.sh
 
 # Setting --no-confirm option in CI environment to install nix
-if [ -z "$CI" ]; then
+if [ -n "$CI" ]; then
     ./nix-installer.sh install --no-confirm
 else
     ./nix-installer.sh install
