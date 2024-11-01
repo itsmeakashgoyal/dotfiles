@@ -4,7 +4,7 @@
 set -eu pipefail
 
 # Set the filename of the script containing the functions
-FILE="${HOME}/dotfiles-dev/zshrc/local/functions.zsh"
+FILE="${HOME}/dotfiles/zshrc/local/functions.zsh"
 
 # Check if the file exists
 if [[ ! -f "$FILE" ]]; then

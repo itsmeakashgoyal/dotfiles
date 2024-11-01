@@ -29,7 +29,7 @@ zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 zstyle ':omz:update' frequency 13
 
 # Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=$HOME/dotfiles-dev/zshrc
+# ZSH_CUSTOM=$HOME/dotfiles/zshrc
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -54,7 +54,7 @@ source $ZSH/oh-my-zsh.sh
 # Zsh Vi Mode configuration
 ZVM_INIT_MODE=sourcing
 
-export ZSHRCDIR="$HOME/dotfiles-dev/zshrc"
+export ZSHRCDIR="$HOME/dotfiles/zshrc"
 
 # https://github.com/jeffreytse/zsh-vi-mode
 function zvm_config() {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source error handling script
-source ~/dotfiles-dev/scripts/_trap.sh
+source ~/dotfiles/scripts/_trap.sh
 
 # Set the default number of commits to 10 if not provided
 num_commits="${1:-10}"

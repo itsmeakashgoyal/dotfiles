@@ -55,16 +55,16 @@ in
     # Home Manager is pretty good at managing dotfiles. The primary way to manage
     # plain files is through 'home.file'.
     file = {
-      # ".zshrc".source = ~/dotfiles-dev/zshrc/.zshrc;
-      # ".gitconfig".source = ~/dotfiles-dev/git/.gitconfig;
-      # ".gitattributes".source = ~/dotfiles-dev/git/.gitattributes;
-      # ".gitignore".source = ~/dotfiles-dev/git/.gitignore;
-      # ".curlrc".source = ~/dotfiles-dev/.curlrc;
-      # ".gdbinit".source = ~/dotfiles-dev/.gdbinit;
-      # ".wgetrc".source = ~/dotfiles-dev/.wgetrc;
-      # ".config/nix".source = ~/dotfiles-dev/nix;
-      # ".config/nvim".source = ~/dotfiles-dev/nvim;
-      # ".config/tmux".source = ~/dotfiles-dev/tmux;
+      # ".zshrc".source = ~/dotfiles/zshrc/.zshrc;
+      # ".gitconfig".source = ~/dotfiles/git/.gitconfig;
+      # ".gitattributes".source = ~/dotfiles/git/.gitattributes;
+      # ".gitignore".source = ~/dotfiles/git/.gitignore;
+      # ".curlrc".source = ~/dotfiles/.curlrc;
+      # ".gdbinit".source = ~/dotfiles/.gdbinit;
+      # ".wgetrc".source = ~/dotfiles/.wgetrc;
+      # ".config/nix".source = ~/dotfiles/nix;
+      # ".config/nvim".source = ~/dotfiles/nvim;
+      # ".config/tmux".source = ~/dotfiles/tmux;
     };
 
     sessionPath = [

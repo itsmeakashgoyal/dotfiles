@@ -29,12 +29,12 @@ jobs:
 
       - name: Move repo to HOME directory
         run: |
-          mkdir -p "$HOME/dotfiles-dev"
-          cp -r . "$HOME/dotfiles-dev/"
-          cd "$HOME/dotfiles-dev"
+          mkdir -p "$HOME/dotfiles"
+          cp -r . "$HOME/dotfiles/"
+          cd "$HOME/dotfiles"
 
       - name: Run setup dotfiles (MacOS)
-        working-directory: /Users/runner/dotfiles-dev
+        working-directory: /Users/runner/dotfiles
         if: matrix.os == 'macos-latest'
         run: |
           set -eo pipefail
@@ -51,7 +51,7 @@ jobs:
           sudo chsh -s $(which zsh) $USER
 
       - name: Run setup dotfiles (Ubuntu)
-        working-directory: /home/runner/dotfiles-dev
+        working-directory: /home/runner/dotfiles
         if: matrix.os == 'ubuntu-latest'
         run: |
           set -eo pipefail

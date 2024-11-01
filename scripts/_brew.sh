@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Define variables
-DOTFILES_DIR="${HOME}/dotfiles-dev"
+DOTFILES_DIR="${HOME}/dotfiles"
 
 # Function to check if a command was successful
 check_command() {

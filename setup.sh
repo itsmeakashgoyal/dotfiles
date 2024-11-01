@@ -15,7 +15,7 @@ log() {
 }
 
 # Define variables
-DOTFILES_DIR="${HOME}/dotfiles-dev"
+DOTFILES_DIR="${HOME}/dotfiles"
 CONFIG_DIR="${HOME}/.config"
 
 # This detection only works for mac and linux.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source generic error handling function
-source ~/dotfiles-dev/scripts/_trap.sh
+source ~/dotfiles/scripts/_trap.sh
 
 # The set -e option instructs bash to immediately exit if any command has a non-zero exit status
 # The set -u referencing a previously undefined variable - with the exceptions of $* and $@ - is an error

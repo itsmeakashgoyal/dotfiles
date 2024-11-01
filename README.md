@@ -1,6 +1,6 @@
 # Development Environment Setup [![](https://img.shields.io/badge/Quality-A%2B-brightgreen.svg)](https://img.shields.io/badge/Quality-A%2B-brightgreen.svg) [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
-[![Test Setup dotfiles](https://github.com/itsmeakashgoyal/dotfiles-dev/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles-dev/actions/workflows/build_and_test.yml)
+[![Test Setup dotfiles](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml)
 
 This repository contains scripts and configuration files to set up a development environment for macOS. It's tailored for software development, focusing on a clean, minimal, and efficient setup.
 
@@ -32,11 +32,11 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
 
 1. Clone the repository to your local machine:
    ```sh
-   git clone https://github.com/itsmeakashgoyal/dotfiles-dev.git ~/dotfiles-dev
+   git clone https://github.com/itsmeakashgoyal/dotfiles.git ~/dotfiles
    ```
-2. Navigate to the `dotfiles-dev` directory:
+2. Navigate to the `dotfiles` directory:
    ```sh
-   cd ~/dotfiles-dev
+   cd ~/dotfiles
    ```
 3. Checkout master branch as master branch is specific to macOS setup.
     ```sh

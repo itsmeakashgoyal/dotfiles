@@ -11,7 +11,7 @@ user=$(whoami)
 LOG="/tmp/setup_log.txt"
 
 # Define variables
-DOTFILES_DIR="${HOME}/dotfiles-dev"
+DOTFILES_DIR="${HOME}/dotfiles"
 CONFIG_DIR="${HOME}/.config"
 
 # Function to log and display process steps
@@ -103,6 +103,6 @@ sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-
 rm "go${GO_VERSION}.linux-amd64.tar.gz"
 
 process "→ Install neovim"
-sh ~/dotfiles-dev/scripts/_install_nvim.sh
+sh ~/dotfiles/scripts/_install_nvim.sh
 
 process "→ Installation complete"

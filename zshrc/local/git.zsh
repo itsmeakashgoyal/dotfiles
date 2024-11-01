@@ -26,7 +26,7 @@ alias glogNoDays="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%
 alias epoc="date +%s"                   # Get current epoch time
 alias gc="git clean -f"                 # Force clean untracked files
 alias ghcurrentbranch='gh repo view --branch $(git rev-parse --abbrev-ref HEAD) --web'  # Open current branch on GitHub
-alias ghc='~/dotfiles-dev/scripts/_gh_cli.sh'  # Custom GitHub CLI script
+alias ghc='~/dotfiles/scripts/_gh_cli.sh'  # Custom GitHub CLI script
 
 # Git checkout with fzf fuzzy search
 gco() {
@@ -226,7 +226,7 @@ function repo() {
 
 # Open file from git staged changes
 function open_file_git_staged() {
-    ~/dotfiles-dev/scripts/_open-file-git-staged.sh 
+    ~/dotfiles/scripts/_open-file-git-staged.sh 
 }
 # Binds Ctrl+Alt+O to open_file_git
 bindkey "^[^O" open_file_git_staged
@@ -234,7 +234,7 @@ zle -N open_file_git_staged
 
 # Open file from git changes
 function f_git_enter() {
-    BUFFER="~/dotfiles-dev/scripts/_open-file-git.sh"
+    BUFFER="~/dotfiles/scripts/_open-file-git.sh"
     zle accept-line
 }
 zle -N f_git_enter
