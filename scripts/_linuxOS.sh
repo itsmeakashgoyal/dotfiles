@@ -106,24 +106,4 @@ rm "go${GO_VERSION}.linux-amd64.tar.gz"
 process "→ Install neovim"
 sh ~/dotfiles-dev/scripts/_install_nvim.sh
 
-process "→ Install Nix package manager"
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix >nix-installer.sh
-chmod +x nix-installer.sh
-
-# Setting --no-confirm option in CI environment to install nix
-if [ -z "$CI" ]; then
-    ./nix-installer.sh install
-else
-    ./nix-installer.sh install --no-confirm
-fi
-rm nix-installer.sh
-
-# Source Nix environment script if installation succeeded
-if [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ]; then
-    . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
-else
-    process "Nix environment script not found. Exiting."
-    exit 1
-fi
-
 process "→ Installation complete"
