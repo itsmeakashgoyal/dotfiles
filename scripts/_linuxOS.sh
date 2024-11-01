@@ -108,10 +108,10 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 chmod +x nix-installer.sh
 
 # Setting --no-confirm option in CI environment to install nix
-if [ -n "$CI" ]; then
-    ./nix-installer.sh install --no-confirm
-else
+if [ -z "$CI" ]; then
     ./nix-installer.sh install
+else
+    ./nix-installer.sh install --no-confirm
 fi
 rm nix-installer.sh
 
