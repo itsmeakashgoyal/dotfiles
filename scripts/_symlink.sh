@@ -8,19 +8,17 @@ IFS=$'\n\t'
 DOTFILES_DIR="${HOME}/dotfiles"
 CONFIG_DIR="${HOME}/.config"
 
-# Function to log and display process steps
-process() {
-    echo "$(date) PROCESSING:  $@" >>"$LOG"
-    printf "$(tput setaf 6) [STEP ${STEP:-0}] %s...$(tput sgr0)\n" "$@"
-    STEP=$((STEP + 1))
+# Function to log messages
+log() {
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
 }
 
-process "→ Initiating the symlinking process..."
+log "→ Initiating the symlinking process..."
 
 # Change to the dotfiles directory
-process "→ Changing to the ${DOTFILES_DIR} directory"
+log "→ Changing to the ${DOTFILES_DIR} directory"
 cd "${DOTFILES_DIR}" || {
-    process "Failed to change directory to ${DOTFILES_DIR}"
+    log "Failed to change directory to ${DOTFILES_DIR}"
     exit 1
 }
 
@@ -33,7 +31,7 @@ CONFIG_FOLDERS=("tmux" "nvim" "nix")
 
 # Create symlinks for each file within the specified folders
 for folder in "${FOLDERS[@]}"; do
-    process "→ Processing folder: ${folder}"
+    log "→ Processing folder: ${folder}"
     # Enable dotglob to match hidden files
     setopt dotglob
     for file in "${DOTFILES_DIR}/${folder}"/*; do
@@ -54,10 +52,10 @@ for folder in "${FOLDERS[@]}"; do
         done
 
         if [[ "$match_found" == true ]]; then
-            process "→ Creating symlink to ${HOME} from ${DOTFILES_DIR}/${folder}/${file}"
+            log "→ Creating symlink to ${HOME} from ${DOTFILES_DIR}/${folder}/${file}"
             ln -svf "${DOTFILES_DIR}/${folder}/${file}" "${HOME}/${filename}"
         else
-            process "→ Skipping ${filename}, not in the list of files to symlink."
+            log "→ Skipping ${filename}, not in the list of files to symlink."
         fi
 
     done
@@ -65,7 +63,7 @@ done
 
 # Create symlinks for config folders
 for folder in "${CONFIG_FOLDERS[@]}"; do
-    process "→ Processing config folder: ${folder}"
+    log "→ Processing config folder: ${folder}"
     target_dir="${CONFIG_DIR}/${folder}"
 
     # Create .config directory if it doesn't exist
@@ -74,14 +72,14 @@ for folder in "${CONFIG_FOLDERS[@]}"; do
     # Remove existing symlink or directory
     if [ -e "${target_dir}" ]; then
         if [ -L "${target_dir}" ]; then
-            process "→ Removing existing symlink: ${target_dir}"
+            log "→ Removing existing symlink: ${target_dir}"
             rm "${target_dir}"
         else
-            process "→ Removing existing directory: ${target_dir}"
+            log "→ Removing existing directory: ${target_dir}"
             rm -rf "${target_dir}"
         fi
     fi
 
-    process "→ Creating symlink to ${folder} in ~/.config directory."
+    log "→ Creating symlink to ${folder} in ~/.config directory."
     ln -svf "${DOTFILES_DIR}/${folder}" "${target_dir}"
 done
