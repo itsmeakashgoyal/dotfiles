@@ -37,6 +37,9 @@
           # Specify your home configuration modules here, for example,
           # the path to your home.nix.
           modules = [ ./home.nix ];
+
+          # Provide the activation package
+          activationPackage = pkgs.home-manager.activationPackage;
         };
       };
     };
