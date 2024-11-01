@@ -42,7 +42,7 @@ if [ -z "$CI" ]; then
 fi
 
 process "→ Install essential packages"
-sudo apt install -y vim-gtk python3-setuptools tmux locate libgraph-easy-perl stow cowsay fd-find curl ripgrep wget curl fontconfig
+sudo apt install -y vim-gtk python3-setuptools tmux locate libgraph-easy-perl stow cowsay fd-find curl ripgrep wget curl fontconfig xclip python3-venv luarocks shellcheck
 
 process "→ Install pip"
 sudo apt install -y python3-pip
@@ -94,10 +94,10 @@ process "→ Install Node.js and npm"
 sudo apt install -y nodejs npm
 
 process "→ Install neovim"
-sh ~/dotfiles-dev/scripts/_install_nvim.sh
+sh ${DOTFILES_DIR}/scripts/_install_nvim.sh
 
 process "→ Install Go"
-GO_VERSION="1.23.0"  # Update this version as needed
+GO_VERSION="1.23.0" # Update this version as needed
 curl -LO "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
 rm "go${GO_VERSION}.linux-amd64.tar.gz"

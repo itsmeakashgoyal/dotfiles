@@ -8,6 +8,9 @@ on:  # yamllint disable-line rule:truthy
       - "setup.sh"
       - "_*"
 
+  # Enable manual trigger
+  workflow_dispatch:
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
