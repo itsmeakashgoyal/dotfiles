@@ -7,9 +7,7 @@ on:  # yamllint disable-line rule:truthy
       - ".github/workflows/build_and_test.yml"
       - "setup.sh"
       - "_*"
-
-  # Enable manual trigger
-  workflow_dispatch:
+  workflow_dispatch:  # Enable manual trigger
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
