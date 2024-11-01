@@ -1,8 +1,8 @@
 {
-  description = "My ubuntu nix flake";
+  description = "My Nix flake for Ubuntu";
 
   inputs = {
-    # Specify the source of Home Manager and Nixpkgs.
+    # Specify the source of Home Manager and Nixpkgs, and flake-utils.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     flake-utils = {
@@ -23,7 +23,6 @@
       ...
     }:
     let
-      # system = "aarch64-linux"; If you are running on ARM powered computer
       system = "x86_64-linux";
       user = "ir";
       pkgs = nixpkgs.legacyPackages.${system};
