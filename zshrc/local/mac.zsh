@@ -2,6 +2,12 @@
 # MacOS-specific aliases and functions
 # ------------------------------------------------------------------------------
 
+# Detect OS type
+OS_TYPE=$(uname)
+if [ "$OS_TYPE" = "Linux" ]; then
+    exit 0
+fi
+
 # System Updates
 # Update macOS software
 alias update_system='sudo softwareupdate -i -a'

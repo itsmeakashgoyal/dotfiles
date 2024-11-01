@@ -40,6 +40,9 @@ if ! command -v brew &>/dev/null; then
     exit 1
 fi
 
+# Turn off analytics
+brew analytics off
+
 # Update Homebrew and Upgrade any already-installed formulae
 echo "Updating Homebrew and upgrading formulae..."
 brew update

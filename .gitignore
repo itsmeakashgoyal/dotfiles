@@ -15,4 +15,6 @@ Thumbs.db
 zshrc/zsh_plugins.zsh
 
 # Private Information
+private/*
+zshrc/local/private.zsh
 zshrc/.zsh_history

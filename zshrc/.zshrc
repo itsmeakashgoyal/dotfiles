@@ -6,7 +6,6 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 # ZSH_THEME="robbyrussell"
-ZSH_THEME="robbyrussell"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -86,6 +85,9 @@ export LANG=en_US.UTF-8
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
@@ -148,20 +150,42 @@ zstyle :compinstall filename "$ZDOTDIR/.zshrc"
 ### Set location for compinit's dumpfile.
 autoload -Uz compinit && compinit -d "$cache_directory/compinit-dumpfile"
 
-# Prompt
-# eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
-eval "$(oh-my-posh init zsh --config /opt/homebrew/opt/oh-my-posh/themes/emodipt-extend.omp.json)"
-
 # FZF and Zoxide integration
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
 eval "$(zoxide init --cmd cd zsh)"
 
+# Detect OS type
+OS_TYPE=$(uname)
+if [ "$OS_TYPE" = "Darwin" ]; then
+    # macOS specific zsh configs
+    ZSH_THEME="robbyrussell"
+    # Prompt
+    # eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
+    eval "$(oh-my-posh init zsh --config /opt/homebrew/opt/oh-my-posh/themes/emodipt-extend.omp.json)"
+
+    export ANTIDOTE_DIR="/opt/homebrew/opt/antidote/share/antidote"
+
+elif [ "$OS_TYPE" = "Linux" ]; then
+    # Linux specific zsh configs
+    ZSH_THEME="powerlevel10k/powerlevel10k"
+    export NVM_DIR="${HOME}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+    # Nix
+    if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+    # . /etc/profile.d/nix.sh
+    fi
+    # End Nix
+    export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
+
+    export ANTIDOTE_DIR="${HOME}/.antidote"
+fi
+
 # ------------------------------------------------------------------
 ## Antidote plugin manager setup
 # ------------------------------------------------------------------
-
-export ANTIDOTE_DIR="/opt/homebrew/opt/antidote/share/antidote"
 
 # Set the root name of the plugins files (.txt and .zsh) antidote will use.
 zsh_plugins=${ZSHRCDIR}/.zsh_plugins
