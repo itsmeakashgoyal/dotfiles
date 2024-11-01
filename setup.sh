@@ -142,12 +142,6 @@ fi
 rm nix-installer.sh
 
 # Source Nix environment script if installation succeeded
-# if [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ]; then
-#     . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
-# else
-#     process "Nix environment script not found. Exiting."
-#     exit 1
-# fi
 . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
 
 log "→ Installing Nix packages"
@@ -160,57 +154,27 @@ cd "${CONFIG_DIR}/nix" || {
     exit 1
 }
 
-# Restart nix-daemon to apply changes
-sudo systemctl restart nix-daemon.service
+if [ "$OS_TYPE" = "Linux" ]; then
+    # Restart nix-daemon to apply changes
+    sudo systemctl restart nix-daemon.service
+fi
 
 # Install Home Manager if not installed
-if ! command -v home-manager &>/dev/null; then
-    log "→ Setting up Home Manager"
-    nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-    nix-channel --update
-    nix-shell '<home-manager>' -A install
-fi
+# if ! command -v home-manager &>/dev/null; then
+#     log "→ Setting up Home Manager"
+#     nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+#     nix-channel --update
+#     nix-shell '<home-manager>' -A install
+# fi
 
 # This command does not set up Home Manager as a standalone package though
 # This command runs Home Manager as a temporary process in a nix shell.
 # It will initialize a Home Manager configuration and switch to it if the configuration files already exist.
-# nix run home-manager -- init --switch .   # TODO: check if needed
+nix run home-manager -- init --switch .
 
 # Initialize and switch to the Home Manager configuration
 log "→ Switching Home Manager configuration"
 home-manager switch --flake .
-
-# if [ "$OS_TYPE" = "Linux" ]; then
-#     log "→ Installing Nix packages"
-#     # Change to the .config/nix directory
-#     # Define CONFIG_DIR if not set
-#     CONFIG_DIR="${CONFIG_DIR:-$HOME/.config}"
-#     log "→ Changing to the ${CONFIG_DIR}/nvim directory"
-#     cd "${CONFIG_DIR}/nix" || {
-#         log "Failed to change directory to ${CONFIG_DIR}/nix"
-#         exit 1
-#     }
-
-#     # Restart nix-daemon to apply changes
-#     sudo systemctl restart nix-daemon.service
-
-#     # Install Home Manager if not installed
-#     if ! command -v home-manager &>/dev/null; then
-#         log "→ Setting up Home Manager"
-#         nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-#         nix-channel --update
-#         nix-shell '<home-manager>' -A install
-#     fi
-
-#     # This command does not set up Home Manager as a standalone package though
-#     # This command runs Home Manager as a temporary process in a nix shell.
-#     # It will initialize a Home Manager configuration and switch to it if the configuration files already exist.
-#     # nix run home-manager -- init --switch .   # TODO: check if needed
-
-#     # Initialize and switch to the Home Manager configuration
-#     log "→ Switching Home Manager configuration"
-#     home-manager switch --flake .
-# fi
 
 log "→ Source Zsh configuration"
 exec zsh

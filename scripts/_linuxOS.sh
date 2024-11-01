@@ -89,13 +89,12 @@ sudo apt install -y eza
 process "→ Install antidote"
 git clone --depth=1 https://github.com/mattmc3/antidote.git "${ZDOTDIR:-$HOME}/.antidote"
 
-# TODO: Uncomment this once testing completes
-# process "→ Install development tools and package managers"
-# sudo apt install -y cargo
-# cargo install just onefetch
+process "→ Install development tools and package managers"
+sudo apt install -y cargo
+cargo install just onefetch
 
-# process "→ Install Node.js and npm"
-# sudo apt install -y nodejs npm
+process "→ Install Node.js and npm"
+sudo apt install -y nodejs npm
 
 process "→ Install Go"
 GO_VERSION="1.23.0" # Update this version as needed
