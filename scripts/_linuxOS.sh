@@ -86,21 +86,22 @@ sudo apt install -y eza
 process "→ Install antidote"
 git clone --depth=1 https://github.com/mattmc3/antidote.git "${ZDOTDIR:-$HOME}/.antidote"
 
-process "→ Install development tools and package managers"
-sudo apt install -y cargo
-cargo install just onefetch
+# TODO: Uncomment this once testing completes
+# process "→ Install development tools and package managers"
+# sudo apt install -y cargo
+# cargo install just onefetch
 
-process "→ Install Node.js and npm"
-sudo apt install -y nodejs npm
-
-process "→ Install neovim"
-sh ${DOTFILES_DIR}/scripts/_install_nvim.sh
+# process "→ Install Node.js and npm"
+# sudo apt install -y nodejs npm
 
 process "→ Install Go"
 GO_VERSION="1.23.0" # Update this version as needed
 curl -LO "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
 rm "go${GO_VERSION}.linux-amd64.tar.gz"
+
+process "→ Install neovim"
+sh ~/dotfiles-dev/scripts/_install_nvim.sh
 
 process "→ Install Nix package manager"
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix >nix-installer.sh
