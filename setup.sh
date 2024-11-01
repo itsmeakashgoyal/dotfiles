@@ -14,15 +14,6 @@ log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
 }
 
-# Generates colored output.
-function special_echo {
-    echo -e '\E[0;32m'"$1\033[0m"
-}
-
-function error_echo {
-    echo -e '\E[0;31m'"$1\033[0m"
-}
-
 # Define variables
 DOTFILES_DIR="${HOME}/dotfiles-dev"
 CONFIG_DIR="${HOME}/.config"
@@ -30,7 +21,7 @@ CONFIG_DIR="${HOME}/.config"
 # This detection only works for mac and linux.
 OS_TYPE=$(uname)
 if [ "$OS_TYPE" = "Darwin" ]; then
-    special_echo "------> Setting up MACOS"
+    log "------> Setting up MACOS"
     log "→ Running MacOS-specific setup script..."
     scripts=("_macOS" "_brew" "_sublime")
     for script in "${scripts[@]}"; do
@@ -45,7 +36,7 @@ if [ "$OS_TYPE" = "Darwin" ]; then
         fi
     done
 elif [ "$OS_TYPE" = "Linux" ]; then
-    special_echo "------> Setting up LINUX"
+    log "------> Setting up LINUX"
     # Run the setup script for the current OS
     log "→ Running LinuxOS-specific setup script..."
     if [ -f "${DOTFILES_DIR}/scripts/_linuxOS.sh" ]; then
