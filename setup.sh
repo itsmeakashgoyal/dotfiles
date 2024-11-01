@@ -23,31 +23,37 @@ function error_echo {
     echo -e '\E[0;31m'"$1\033[0m"
 }
 
-# This detection only works for mac and linux.
-OS_TYPE=$(uname)
-if [ "$OS_TYPE" = "Darwin" ]; then
-    special_echo "------> Setting up MACOS"
-elif [ "$OS_TYPE" = "Linux" ]; then
-    special_echo "------> Setting up LINUX"
-fi
-
 # Define variables
 DOTFILES_DIR="${HOME}/dotfiles-dev"
 CONFIG_DIR="${HOME}/.config"
 
-# Run setup scripts
-scripts=("_macOS" "_brew" "_sublime")
-for script in "${scripts[@]}"; do
-    script_path="./scripts/${script}.sh"
-    if [ -f "${script_path}" ]; then
-        echo "Running ${script_path} script..."
-        if ! "${script_path}"; then
-            echo "Error: ${script} script failed. Continuing..."
+# This detection only works for mac and linux.
+OS_TYPE=$(uname)
+if [ "$OS_TYPE" = "Darwin" ]; then
+    special_echo "------> Setting up MACOS"
+    log "→ Running MacOS-specific setup script..."
+    scripts=("_macOS" "_brew" "_sublime")
+    for script in "${scripts[@]}"; do
+        script_path="./scripts/${script}.sh"
+        if [ -f "${script_path}" ]; then
+            echo "Running ${script_path} script..."
+            if ! "${script_path}"; then
+                echo "Error: ${script} script failed. Continuing..."
+            fi
+        else
+            echo "Warning: ${script_path} not found. Skipping..."
         fi
+    done
+elif [ "$OS_TYPE" = "Linux" ]; then
+    special_echo "------> Setting up LINUX"
+    # Run the setup script for the current OS
+    log "→ Running LinuxOS-specific setup script..."
+    if [ -f "${DOTFILES_DIR}/scripts/_linuxOS.sh" ]; then
+        sh "${DOTFILES_DIR}/scripts/_linuxOS.sh"
     else
-        echo "Warning: ${script_path} not found. Skipping..."
+        log "→ Warning: OS-specific setup script not found."
     fi
-done
+fi
 
 log "→ Initiating the symlinking process..."
 
@@ -130,6 +136,38 @@ cd "${CONFIG_DIR}/nvim" || {
 if [ -z "$CI" ]; then
     BRANCH_NAME="akgoyal/nvim"
     git checkout "${BRANCH_NAME}"
+fi
+
+if [ "$OS_TYPE" = "Darwin" ]; then
+    log "→ Installing Nix packages"
+    # Change to the .config/nix directory
+    # Define CONFIG_DIR if not set
+    CONFIG_DIR="${CONFIG_DIR:-$HOME/.config}"
+    log "→ Changing to the ${CONFIG_DIR}/nvim directory"
+    cd "${CONFIG_DIR}/nix" || {
+        log "Failed to change directory to ${CONFIG_DIR}/nix"
+        exit 1
+    }
+
+    # Restart nix-daemon to apply changes
+    sudo systemctl restart nix-daemon.service
+
+    # Install Home Manager if not installed
+    if ! command -v home-manager &>/dev/null; then
+        log "→ Setting up Home Manager"
+        nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+        nix-channel --update
+        nix-shell '<home-manager>' -A install
+    fi
+
+    # This command does not set up Home Manager as a standalone package though
+    # This command runs Home Manager as a temporary process in a nix shell.
+    # It will initialize a Home Manager configuration and switch to it if the configuration files already exist.
+    # nix run home-manager -- init --switch .   # TODO: check if needed
+
+    # Initialize and switch to the Home Manager configuration
+    log "→ Switching Home Manager configuration"
+    home-manager switch --flake .
 fi
 
 log "→ Source Zsh configuration"
