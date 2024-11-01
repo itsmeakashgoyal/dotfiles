@@ -25,11 +25,6 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Set TERM variable for non-interactive environments
-if [ -n "$CI" ]; then
-    export TERM=${TERM:-xterm}
-fi
-
 process "→ Bootstrap steps start here:\n------------------"
 
 # Update and upgrade system
