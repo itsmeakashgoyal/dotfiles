@@ -27,10 +27,12 @@ command_exists() {
 
 process "→ Bootstrap steps start here:\n------------------"
 
-# Update and upgrade system
-# TODO: uncomment this later
-# sudo apt-get update
-# sudo apt-get -y upgrade
+# Dont run system upgrade on CI environment
+if [ -z "$CI" ]; then
+    # Update and upgrade system
+    sudo apt-get update
+    sudo apt-get -y upgrade
+fi
 
 process "→ Install git"
 sudo apt install -y git
