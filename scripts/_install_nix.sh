@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # Enable strict mode for better error handling
-set -euo pipefail
+set -eu pipefail
+IFS=$'\n\t'
 
 # Function to log messages
 log() {
