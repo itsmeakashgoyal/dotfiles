@@ -1,5 +1,4 @@
----
-name: Test Setup dotfiles on Mac OS
+name: Test Setup dotfiles
 
 on:  # yamllint disable-line rule:truthy
   push:
@@ -15,10 +14,13 @@ concurrency:
 
 jobs:
   build_and_test:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+
     steps:
       - uses: actions/checkout@master
         with:
@@ -30,8 +32,26 @@ jobs:
           cp -r . "$HOME/dotfiles-dev/"
           cd "$HOME/dotfiles-dev"
 
-      - name: Run setup dotfiles
+      - name: Run setup dotfiles (MacOS)
         working-directory: /Users/runner/dotfiles-dev
+        if: matrix.os == 'macos-latest'
+        run: |
+          set -eo pipefail
+          export CI=1
+          chmod +x ./setup.sh
+          chmod +x ./scripts/*.sh
+          ./setup.sh
+
+      - name: Install ZSH on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
+          sudo chsh -s $(which zsh) $USER
+
+      - name: Run setup dotfiles (Ubuntu)
+        working-directory: /home/runner/dotfiles-dev
+        if: matrix.os == 'ubuntu-latest'
         run: |
           set -eo pipefail
           export CI=1

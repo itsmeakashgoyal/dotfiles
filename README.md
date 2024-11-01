@@ -1,4 +1,6 @@
-# Development Environment Setup
+# Development Environment Setup [![](https://img.shields.io/badge/Quality-A%2B-brightgreen.svg)](https://img.shields.io/badge/Quality-A%2B-brightgreen.svg)
+
+[![Test Setup dotfiles](https://github.com/itsmeakashgoyal/dotfiles-dev/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles-dev/actions/workflows/build_and_test.yml)
 
 This repository contains scripts and configuration files to set up a development environment for macOS. It's tailored for software development, focusing on a clean, minimal, and efficient setup.
 

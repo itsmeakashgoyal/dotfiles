@@ -69,7 +69,7 @@ FOLDERS=("zshrc" "confrc" "git")
 # List of files to symlink directly in home directory
 FILES=(".zshrc" ".zprofile" ".gitconfig" ".gitignore" ".gitattributes" ".curlrc" ".gdbinit" ".wgetrc")
 # List of folders to symlink in .config directory
-CONFIG_FOLDERS=("tmux" "nvim")
+CONFIG_FOLDERS=("tmux" "nvim" "nix")
 
 # Create symlinks for each file within the specified folders
 for folder in "${FOLDERS[@]}"; do
@@ -138,7 +138,7 @@ if [ -z "$CI" ]; then
     git checkout "${BRANCH_NAME}"
 fi
 
-if [ "$OS_TYPE" = "Darwin" ]; then
+if [ "$OS_TYPE" = "Linux" ]; then
     log "→ Installing Nix packages"
     # Change to the .config/nix directory
     # Define CONFIG_DIR if not set
