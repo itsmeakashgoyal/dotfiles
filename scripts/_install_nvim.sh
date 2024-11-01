@@ -48,7 +48,8 @@ if [ -f /etc/os-release ]; then
 
     case "${ID_LIKE:-$ID}" in
     debian | ubuntu)
-        sudo apt install ripgrep fd-find $CLIPBOARD_PKG python3-venv luarocks golang-go shellcheck -y
+        # sudo apt install ripgrep fd-find $CLIPBOARD_PKG python3-venv luarocks golang-go shellcheck -y
+        sudo apt install ripgrep fd-find $CLIPBOARD_PKG python3-venv luarocks shellcheck -y
         ;;
     fedora)
         sudo dnf install ripgrep fzf $CLIPBOARD_PKG neovim python3-virtualenv luarocks golang ShellCheck -y
