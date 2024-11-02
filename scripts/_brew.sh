@@ -35,6 +35,8 @@ brewUpdateAndCleanup() {
 installingHomebrewAndPackages() {
     # Install Homebrew if it isn't already installed
     if command_exists brew; then
+        echo "${YELLOW}Homebrew is already installed.${RC}"
+    else
         echo "${YELLOW}Homebrew not installed. Installing Homebrew.${RC}"
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         check_command "Homebrew installation"
@@ -49,8 +51,6 @@ installingHomebrewAndPackages() {
             echo "${YELLOW}Configuring Homebrew in PATH for Intel Mac...${RC}"
             eval "$(/usr/local/bin/brew shellenv)"
         fi
-    else
-        echo "${YELLOW}Homebrew is already installed.${RC}"
     fi
 
     # Verify brew is now accessible

@@ -67,8 +67,19 @@ initiatingSymlink() {
     # List of folders to symlink in .config directory
     CONFIG_FOLDERS=("tmux" "nvim" "nix")
 
+    # Link files from homeConfig to HOME directory
     log "→ Processing homeConfig folder"
-    ln -svf "${DOTFILES_DIR}/homeConfig/*" "${HOME}/"
+    for file in "${DOTFILES_DIR}/homeConfig/"*; do
+        # Skip if file doesn't exist
+        [[ -e "$file" ]] || continue
+        
+        # Skip if it's a '.' or '..' directory entry
+        [[ $(basename "$file") == "." || $(basename "$file") == ".." ]] && continue
+        filename=$(basename "${file}")
+        
+        log "→ Creating symlink to ${HOME} from ${DOTFILES_DIR}/homeConfig/${file}"
+        ln -svf "${DOTFILES_DIR}/homeConfig/${file}" "${HOME}/${filename}"
+    done
 
     # Create symlinks for each file within the specified folders
     for folder in "${FOLDERS[@]}"; do
