@@ -61,11 +61,14 @@ initiatingSymlink() {
     }
 
     # List of folders to process
-    FOLDERS=("zshrc" "confrc" "git")
+    FOLDERS=("zshrc")
     # List of files to symlink directly in home directory
-    FILES=(".zshrc" ".zprofile" ".gitconfig" ".gitignore" ".gitattributes" ".curlrc" ".gdbinit" ".wgetrc")
+    FILES=(".zshrc" ".zprofile")
     # List of folders to symlink in .config directory
     CONFIG_FOLDERS=("tmux" "nvim" "nix")
+
+    log "→ Processing homeConfig folder"
+    ln -svf "${DOTFILES_DIR}/homeConfig/*" "${HOME}/"
 
     # Create symlinks for each file within the specified folders
     for folder in "${FOLDERS[@]}"; do
