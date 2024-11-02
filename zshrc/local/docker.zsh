@@ -9,7 +9,7 @@ alias dpa="docker ps -a"                                                    # Ge
 alias dstop='docker stop $(docker ps -a -q)'                                # Stop all containers
 alias drm='docker rm $(docker ps -a -q)'                                    # Remove all containers
 alias drmf='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)' # Stop and Remove all containers
-alias dclean="docker rm -v $(docker ps -a -q -f status=exited)"             # Remove all stopped/exited containers
+# alias dclean="docker rm -v $(docker ps -a -q -f status=exited)"             # Remove all stopped/exited containers
 
 # Image Management
 alias di="docker images"                   # List all images

@@ -1,7 +1,7 @@
 # Taps
 tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "homebrew/command-not-found"
+tap "jandedobbeleer/oh-my-posh"
 
 # Brew
 brew "antidote"
@@ -26,6 +26,7 @@ brew "gh"
 brew "git"
 brew "go"
 brew "htop"
+brew "jandedobbeleer/oh-my-posh/oh-my-posh"
 brew "jq"
 brew "llvm"
 brew "lua-language-server"
