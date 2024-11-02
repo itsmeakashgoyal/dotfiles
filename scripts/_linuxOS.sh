@@ -32,7 +32,7 @@ command_exists() {
 
 installDepend() {
     echo "${YELLOW}Installing dependencies...${RC}"
-    sudo apt install -y git zsh vim-gtk python3-setuptools tmux locate libgraph-easy-perl stow cowsay fd-find curl ripgrep wget fontconfig xclip python3-venv python3-pip luarocks shellcheck nodejs npm
+    sudo apt install -y build-essential procps file git zsh vim-gtk python3-setuptools tmux locate libgraph-easy-perl stow cowsay fd-find curl ripgrep wget fontconfig xclip python3-venv python3-pip luarocks shellcheck nodejs npm
 }
 
 setupOhMyZsh() {
