@@ -30,6 +30,12 @@ alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'" # Get con
 # Container Interaction
 alias dbash='docker exec -it $(docker ps -aqf "name=$1") bash' # Bash into a running container
 
+alias docker-clean=' \
+  docker container prune -f ; \
+  docker image prune -f ; \
+  docker network prune -f ; \
+  docker volume prune -f '
+
 # Stop specific container
 dsc() { docker stop $(docker ps -a | grep $1 | awk '{print $1}'); }
 

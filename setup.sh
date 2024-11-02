@@ -1,7 +1,8 @@
 #!/usr/bin/env zsh
 ############################
 # This script creates symlinks from the home directory to any desired dotfiles in $HOME/dotfiles
-# And also installs MacOS Software
+# This is used to setup both macOS and LinuxOS.
+# And also installs MacOS and Linux packages.
 # And also installs Homebrew Packages and Casks (Apps)
 # And also sets up Sublime Text
 ############################

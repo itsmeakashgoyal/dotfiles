@@ -153,3 +153,102 @@ function checkfetch() {
         echo $(onefetch)
     fi
 }
+
+# Show the current distribution
+distribution() {
+    local dtype="unknown" # Default to unknown
+
+    # Use /etc/os-release for modern distro identification
+    if [ -r /etc/os-release ]; then
+        source /etc/os-release
+        case $ID in
+        fedora | rhel | centos)
+            dtype="redhat"
+            ;;
+        sles | opensuse*)
+            dtype="suse"
+            ;;
+        ubuntu | debian)
+            dtype="debian"
+            ;;
+        gentoo)
+            dtype="gentoo"
+            ;;
+        arch | manjaro)
+            dtype="arch"
+            ;;
+        slackware)
+            dtype="slackware"
+            ;;
+        *)
+            # Check ID_LIKE only if dtype is still unknown
+            if [ -n "$ID_LIKE" ]; then
+                case $ID_LIKE in
+                *fedora* | *rhel* | *centos*)
+                    dtype="redhat"
+                    ;;
+                *sles* | *opensuse*)
+                    dtype="suse"
+                    ;;
+                *ubuntu* | *debian*)
+                    dtype="debian"
+                    ;;
+                *gentoo*)
+                    dtype="gentoo"
+                    ;;
+                *arch*)
+                    dtype="arch"
+                    ;;
+                *slackware*)
+                    dtype="slackware"
+                    ;;
+                esac
+            fi
+
+            # If ID or ID_LIKE is not recognized, keep dtype as unknown
+            ;;
+        esac
+    fi
+
+    echo $dtype
+}
+
+# Show the current version of the operating system
+ver() {
+    local dtype
+    dtype=$(distribution)
+
+    case $dtype in
+    "redhat")
+        if [ -s /etc/redhat-release ]; then
+            cat /etc/redhat-release
+        else
+            cat /etc/issue
+        fi
+        uname -a
+        ;;
+    "suse")
+        cat /etc/SuSE-release
+        ;;
+    "debian")
+        lsb_release -a
+        ;;
+    "gentoo")
+        cat /etc/gentoo-release
+        ;;
+    "arch")
+        cat /etc/os-release
+        ;;
+    "slackware")
+        cat /etc/slackware-version
+        ;;
+    *)
+        if [ -s /etc/issue ]; then
+            cat /etc/issue
+        else
+            echo "Error: Unknown distribution"
+            exit 1
+        fi
+        ;;
+    esac
+}

@@ -2,7 +2,7 @@
 
 [![Test Setup dotfiles](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml)
 
-This repository contains scripts and configuration files to set up a development environment for macOS. It's tailored for software development, focusing on a clean, minimal, and efficient setup.
+This repository contains scripts and configuration files to set up a development environment for macOS and LinuxOS. It's tailored for software development, focusing on a clean, minimal, and efficient setup.
 
 ## Overview
 
@@ -26,7 +26,9 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
 
 ### Prerequisites
 
-- macOS (The scripts are tailored for macOS but can be easily configured for linux as well)
+- macOS
+- LinuxOS
+This dotfiles setup are tailored for both macOS and LinuxOS.
 
 ### Installation
 
@@ -38,15 +40,11 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
    ```sh
    cd ~/dotfiles
    ```
-3. Checkout master branch as master branch is specific to macOS setup.
-    ```sh
-    git checkout master
-    ```
-4. Run the installation script:
+3. Run the installation script:
    ```sh
    ./setup.sh
    ```
-5. Update the nvim and mybash git submodule
+4. Update the nvim git submodule
    - If it's the first time you check-out a repo you need to use --init first
     ```sh
     git submodule update --init --recursive
@@ -59,9 +57,7 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
 This script will:
 
 - Create symlinks for dotfiles (`.gitconfig`, `.zshrc`, etc.)
-- Run macOS-specific configurations
-- Install Homebrew packages and casks
-- Configure Sublime Text and Visual Studio Code
+- Run macOS and LinuxOS specific configurations based on OS in which it is running.
 
 ## Configuration Files
 
@@ -70,8 +66,9 @@ This script will:
 - `tmux/`: Containing tmux config files
 - `git/`: Containing git config file
 - `zshrc/`: Containing Shell configuration files for Zsh.
-- `bashrc/`: Containing Shell configuration files for Bash.
+- `confrc/`: Containing other configurations.
 - `nvim/`: Another git submodule for my nvim config.
+- `nix/`: Nix configurations specific to LinuxOS.
 
 ### Customizing Your Setup
 
