@@ -65,7 +65,8 @@ This script will:
 - `scripts/`: Containing common scripts to run while setting up the dotfiles.
 - `tmux/`: Containing tmux config files
 - `zshrc/`: Containing Shell configuration files for Zsh.
-- `gomeConfig/`: Containing git and other configurations should be link to home dir.
+- `git/`: Containing git configuration.
+- `homeConfig/`: Containing configurations should be link to home dir.
 - `nvim/`: Another git submodule for my nvim config.
 - `nix/`: Nix configurations specific to LinuxOS.
 
