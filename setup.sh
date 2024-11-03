@@ -61,7 +61,7 @@ initiatingSymlink() {
     }
 
     # List of folders to process
-    FOLDERS=("zshrc" "homeConfig")
+    FOLDERS=("zshrc" "homeConfig" "git")
     # List of files to symlink directly in home directory
     FILES=(".zshrc" ".zprofile" ".gitconfig" ".curlrc" ".gdbinit" ".wgetrc")
     # List of folders to symlink in .config directory
