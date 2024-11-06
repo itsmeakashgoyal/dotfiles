@@ -65,7 +65,7 @@ initiatingSymlink() {
     # List of files to symlink directly in home directory
     FILES=(".zshrc" ".zprofile" ".gitconfig" ".curlrc" ".gdbinit" ".wgetrc")
     # List of folders to symlink in .config directory
-    CONFIG_FOLDERS=("tmux" "nvim" "nix")
+    CONFIG_FOLDERS=("tmux" "nvim")
 
     # Create symlinks for each file within the specified folders
     for folder in "${FOLDERS[@]}"; do

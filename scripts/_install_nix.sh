@@ -28,6 +28,9 @@ rm nix-installer.sh
 # Source Nix environment script if installation succeeded
 . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
 
+log "→ Copy nix folder into CONFIG_DIR dir"
+cp -rf "${DOTFILES_DIR}/nix" "${CONFIG_DIR}"
+
 log "→ Installing Nix packages"
 # Change to the .config/nix directory
 # Define CONFIG_DIR if not set

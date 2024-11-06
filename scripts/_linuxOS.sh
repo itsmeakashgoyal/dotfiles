@@ -32,7 +32,7 @@ command_exists() {
 
 installDepend() {
     echo "${YELLOW}Installing dependencies...${RC}"
-    sudo apt install -y build-essential procps file git zsh vim-gtk python3-setuptools tmux locate libgraph-easy-perl stow cowsay fd-find curl ripgrep wget fontconfig xclip python3-venv python3-pip luarocks shellcheck nodejs npm
+    sudo apt install -y build-essential libc++-15-dev clang-format-15 libkrb5-dev procps file git zsh vim-gtk python3-setuptools tmux locate libgraph-easy-perl stow cowsay fd-find curl ripgrep wget fontconfig xclip python3-venv python3-pip luarocks shellcheck nodejs npm
 }
 
 setupOhMyZsh() {
@@ -128,6 +128,18 @@ installNvim() {
     fi
 }
 
+installZoxide() {
+    if command_exists zoxide; then
+        echo "Zoxide already installed"
+        return
+    fi
+
+    if ! curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
+        echo "${RED}Something went wrong during zoxide install!${RC}"
+        exit 1
+    fi
+}
+
 echo "${YELLOW}Bootstrap steps start here...\n${RC}"
 
 # Dont run system upgrade on CI environment
@@ -145,5 +157,6 @@ installAntidote
 installLatestGo
 installCargoPackageManager
 installNvim
+installZoxide
 
 echo "${GREEN}Installation Completed...${RC}"

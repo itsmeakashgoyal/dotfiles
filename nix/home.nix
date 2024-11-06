@@ -49,7 +49,6 @@ in
       tree
       unzip
       zip
-      zoxide
     ];
 
     # Home Manager is pretty good at managing dotfiles. The primary way to manage
