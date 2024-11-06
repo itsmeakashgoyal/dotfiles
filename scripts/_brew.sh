@@ -57,7 +57,7 @@ installingHomebrewAndPackages() {
             fi
         else
             echo "${YELLOW}Configuring Homebrew in PATH for Linux...${RC}"
-            eval "$(${HOME}/linuxbrew/.linuxbrew/bin/brew shellenv)"
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         fi
     fi
 

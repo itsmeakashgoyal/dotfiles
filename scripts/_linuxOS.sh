@@ -156,7 +156,7 @@ installDepend
 # installAntidote
 # installLatestGo
 # installCargoPackageManager
-installNvim
+# installNvim
 # installZoxide
 
 echo "${GREEN}Installation Completed...${RC}"

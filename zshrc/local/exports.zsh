@@ -27,13 +27,17 @@ if [ "$OS_TYPE" = "Darwin" ]; then
 
 elif [ "$OS_TYPE" = "Linux" ]; then
     # Linux specific exports
+    HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+    HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
+    HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
+
     export PATH="$PATH:/usr/local/go/bin"
     export PATH="$PATH:/usr/local/bin/clang-15:/usr/local/compilers/clang15/bin"
     export PATH="$PATH:$HOME/.local/share/gem/ruby/3.0.0/bin"
     export PATH="$PATH:/snap/bin"
     export PATH="$PATH:$HOME/.cargo/bin"
-    export PATH="$PATH:$HOME/linuxbrew/.linuxbrew/bin"
-    export PATH="$PATH:$HOME/linuxbrew/.linuxbrew/Cellar"
+    export PATH="$PATH:/home/linuxbrew/.linuxbrew/bin"
+    export PATH="$PATH:/home/linuxbrew/.linuxbrew/Cellar"
 fi
 
 # ------------------------------------------------------------------------------

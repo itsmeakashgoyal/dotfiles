@@ -45,7 +45,7 @@ setupDotfiles() {
         log "------> Setting up LINUX"
         # Run the setup script for the current OS
         log "→ Running LinuxOS-specific setup script..."
-        scripts=("_brew" "_linuxOS")
+        scripts=("_linuxOS" "_brew")
         for script in "${scripts[@]}"; do
             script_path="./scripts/${script}.sh"
             if [ -f "${script_path}" ]; then
