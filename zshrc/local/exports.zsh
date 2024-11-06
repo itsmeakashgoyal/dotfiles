@@ -5,13 +5,21 @@
 # Detect OS type
 OS_TYPE=$(uname)
 
+# Optional Homebrew configurations
+export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_ANALYTICS=1       # Disable analytics
+export HOMEBREW_NO_INSTALL_CLEANUP=1 # Don't cleanup on install
+export HOMEBREW_NO_ENV_HINTS=1       # Disable environment hints
+export HOMEBREW_AUTOREMOVE=1         # Auto remove unused dependencies
+export HOMEBREW_BAT=1                # Use bat for brew cat
+export HOMEBREW_CURL_RETRIES=3       # Number of retries for downloads
+
 if [ "$OS_TYPE" = "Darwin" ]; then
     # macOS specific exports
-    HOMEBREW_NO_AUTO_UPDATE=1
     HOMEBREW_PREFIX="/opt/homebrew"
     HOMEBREW_CELLAR="/opt/homebrew/Cellar"
     HOMEBREW_REPOSITORY="/opt/homebrew"
-    
+
     # macOS specific paths
     export PATH="$PATH:/opt/homebrew/bin"
     export PATH="$PATH:/opt/homebrew/opt/llvm/bin"
@@ -23,6 +31,9 @@ elif [ "$OS_TYPE" = "Linux" ]; then
     export PATH="$PATH:/usr/local/bin/clang-15:/usr/local/compilers/clang15/bin"
     export PATH="$PATH:$HOME/.local/share/gem/ruby/3.0.0/bin"
     export PATH="$PATH:/snap/bin"
+    export PATH="$PATH:$HOME/.cargo/bin"
+    export PATH="$PATH:$HOME/linuxbrew/.linuxbrew/bin"
+    export PATH="$PATH:$HOME/linuxbrew/.linuxbrew/Cellar"
 fi
 
 # ------------------------------------------------------------------------------

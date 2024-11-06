@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 # Enable strict mode for better error handling
 set -euo pipefail
@@ -42,14 +42,19 @@ installingHomebrewAndPackages() {
         check_command "Homebrew installation"
 
         # Attempt to set up Homebrew PATH automatically for this session
-        if [ -x "/opt/homebrew/bin/brew" ]; then
-            # For Apple Silicon Macs
-            echo "${YELLOW}Configuring Homebrew in PATH for Apple Silicon Mac...${RC}"
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        elif [ -x "/usr/local/bin/brew" ]; then
-            # For Intel Macs
-            echo "${YELLOW}Configuring Homebrew in PATH for Intel Mac...${RC}"
-            eval "$(/usr/local/bin/brew shellenv)"
+        if [ "$OS_TYPE" = "Darwin" ]; then
+            if [ -x "/opt/homebrew/bin/brew" ]; then
+                # For Apple Silicon Macs
+                echo "${YELLOW}Configuring Homebrew in PATH for Apple Silicon Mac...${RC}"
+                eval "$(/opt/homebrew/bin/brew shellenv)"
+            elif [ -x "/usr/local/bin/brew" ]; then
+                # For Intel Macs
+                echo "${YELLOW}Configuring Homebrew in PATH for Intel Mac...${RC}"
+                eval "$(/usr/local/bin/brew shellenv)"
+            fi
+        else
+            echo "${YELLOW}Configuring Homebrew in PATH for Linux...${RC}"
+            eval "$(${HOME}/linuxbrew/.linuxbrew/bin/brew shellenv)"
         fi
     fi
 
@@ -68,7 +73,22 @@ installingHomebrewAndPackages() {
 
     # Install packages from Brewfile
     echo "${YELLOW}Installing packages from Brewfile...${RC}"
-    brew bundle install
+    local brewfile=""
+    case "$(uname)" in
+    "Linux") brewfile="Brewfile.linux" ;;
+    "Darwin") brewfile="Brewfile.mac" ;;
+    *)
+        echo "Unsupported OS"
+        exit 1
+        ;;
+    esac
+
+    if [ -f "${DOTFILES_DIR}/${brewfile}" ]; then
+        brew bundle --file="${DOTFILES_DIR}/${brewfile}"
+    else
+        echo "Warning: ${brewfile} not found"
+    fi
+
     check_command "Brewfile installation"
 
     # Add the Homebrew zsh to allowed shells

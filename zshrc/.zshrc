@@ -5,7 +5,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="robbyrussell"
+ZSH_THEME="robbyrussell"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -135,20 +135,24 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $real
 # Problems with insecure directories under macOS?
 # -> see https://stackoverflow.com/a/13785716/149220 for a solution
 cache_directory="$XDG_CACHE_HOME/zsh"
+mkdir -p "$cache_directory"
 
 ## Use cache
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "$cache_directory/completion-cache"
 
+# Initialize completion system with specific dump file location
+autoload -Uz compinit 
+if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+    compinit -d "$cache_directory/.zcompdump"
+else
+    compinit -C -d "$cache_directory/.zcompdump"
+fi
+
 ## These were created by `compinstall`
 zstyle ':completion:*' completer _complete _ignored _approximate
 zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]} r:|[._-]=* r:|=*' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}'
 zstyle ':completion:*' max-errors 2
-zstyle :compinstall filename "$ZDOTDIR/.zshrc"
-
-## Initialize completion system
-### Set location for compinit's dumpfile.
-autoload -Uz compinit && compinit -d "$cache_directory/compinit-dumpfile"
 
 # FZF and Zoxide integration
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -158,8 +162,6 @@ eval "$(zoxide init --cmd cd zsh)"
 # Detect OS type
 OS_TYPE=$(uname)
 if [ "$OS_TYPE" = "Darwin" ]; then
-    # macOS specific zsh configs
-    ZSH_THEME="robbyrussell"
     # Prompt
     # eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
     eval "$(oh-my-posh init zsh --config /opt/homebrew/opt/oh-my-posh/themes/emodipt-extend.omp.json)"
@@ -168,17 +170,16 @@ if [ "$OS_TYPE" = "Darwin" ]; then
 
 elif [ "$OS_TYPE" = "Linux" ]; then
     # Linux specific zsh configs
-    ZSH_THEME="powerlevel10k/powerlevel10k"
     export NVM_DIR="${HOME}/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
-    # Nix
-    if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-    # . /etc/profile.d/nix.sh
-    fi
-    # End Nix
-    export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
+    # # Nix
+    # if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+    # . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+    # # . /etc/profile.d/nix.sh
+    # fi
+    # # End Nix
+    # export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
 
     export ANTIDOTE_DIR="${HOME}/.antidote"
 fi

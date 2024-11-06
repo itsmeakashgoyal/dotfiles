@@ -32,7 +32,7 @@ command_exists() {
 
 installDepend() {
     echo "${YELLOW}Installing dependencies...${RC}"
-    sudo apt install -y build-essential libc++-15-dev clang-format-15 libkrb5-dev procps file git zsh vim-gtk python3-setuptools tmux locate libgraph-easy-perl stow cowsay fd-find curl ripgrep wget fontconfig xclip python3-venv python3-pip luarocks shellcheck nodejs npm
+    sudo apt install -y build-essential libc++-15-dev clang-format-15 libkrb5-dev procps file vim-gtk python3-setuptools tmux locate libgraph-easy-perl fd-find fontconfig python3-venv python3-pip luarocks shellcheck nodejs npm
 }
 
 setupOhMyZsh() {
@@ -150,13 +150,13 @@ if [ -z "$CI" ]; then
 fi
 
 installDepend
-setupOhMyZsh
-installFzf
-installEzaAndExa
-installAntidote
-installLatestGo
-installCargoPackageManager
+# setupOhMyZsh
+# installFzf
+# installEzaAndExa
+# installAntidote
+# installLatestGo
+# installCargoPackageManager
 installNvim
-installZoxide
+# installZoxide
 
 echo "${GREEN}Installation Completed...${RC}"

@@ -22,6 +22,9 @@ CONFIG_DIR="${HOME}/.config"
 # This detection only works for mac and linux.
 OS_TYPE=$(uname)
 
+# Set CI environment variable if not already set
+export CI="${CI:-}"
+
 setupDotfiles() {
     if [ "$OS_TYPE" = "Darwin" ]; then
         log "------> Setting up MACOS"
@@ -42,11 +45,18 @@ setupDotfiles() {
         log "------> Setting up LINUX"
         # Run the setup script for the current OS
         log "→ Running LinuxOS-specific setup script..."
-        if [ -f "${DOTFILES_DIR}/scripts/_linuxOS.sh" ]; then
-            sh "${DOTFILES_DIR}/scripts/_linuxOS.sh"
-        else
-            log "→ Warning: OS-specific setup script not found."
-        fi
+        scripts=("_brew" "_linuxOS")
+        for script in "${scripts[@]}"; do
+            script_path="./scripts/${script}.sh"
+            if [ -f "${script_path}" ]; then
+                echo "Running ${script_path} script..."
+                if ! "${script_path}"; then
+                    echo "Error: ${script} script failed. Continuing..."
+                fi
+            else
+                echo "Warning: ${script_path} not found. Skipping..."
+            fi
+        done
     fi
 }
 
@@ -63,7 +73,7 @@ initiatingSymlink() {
     # List of folders to process
     FOLDERS=("zshrc" "homeConfig" "git")
     # List of files to symlink directly in home directory
-    FILES=(".zshrc" ".zprofile" ".gitconfig" ".curlrc" ".gdbinit" ".wgetrc")
+    FILES=(".zshrc" ".zshenv" ".zprofile" ".gitconfig" ".curlrc" ".gdbinit" ".wgetrc")
     # List of folders to symlink in .config directory
     CONFIG_FOLDERS=("tmux" "nvim")
 
@@ -151,7 +161,7 @@ setupNix() {
 setupDotfiles
 initiatingSymlink
 setupNvim
-setupNix
+# setupNix
 
 log "→ Source Zsh configuration"
 exec zsh
