@@ -11,6 +11,9 @@ GREEN='\033[32m'
 # Define variables
 DOTFILES_DIR="${HOME}/dotfiles"
 
+# This detection only works for mac and linux.
+OS_TYPE=$(uname)
+
 # Function to check if a command was successful
 check_command() {
     if [ $? -ne 0 ]; then
