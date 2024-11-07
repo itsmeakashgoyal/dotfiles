@@ -25,6 +25,11 @@ OS_TYPE=$(uname)
 # Set CI environment variable if not already set
 export CI="${CI:-}"
 
+initGitSubmodules() {
+    log "→ Initializing and updating git submodules..."
+    git submodule update --init --recursive --remote
+}
+
 setupDotfiles() {
     if [ "$OS_TYPE" = "Darwin" ]; then
         log "------> Setting up MACOS"
@@ -158,10 +163,10 @@ setupNix() {
     fi
 }
 
+initGitSubmodules
 setupDotfiles
 initiatingSymlink
 setupNvim
-# setupNix
 
 log "→ Source Zsh configuration"
 exec zsh
