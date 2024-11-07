@@ -30,7 +30,9 @@ brewUpdateAndCleanup() {
     if command_exists brew; then
         brew update
         brew upgrade
-        brew upgrade --cask
+        if [ "$OS_TYPE" = "Darwin" ]; then
+            brew upgrade --cask
+        fi
         brew cleanup
     fi
 }
