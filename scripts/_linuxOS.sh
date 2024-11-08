@@ -35,34 +35,6 @@ installDepend() {
     sudo apt install -y build-essential libc++-15-dev clang-format-15 libkrb5-dev procps file vim-gtk python3-setuptools tmux locate libgraph-easy-perl fd-find fontconfig python3-venv python3-pip luarocks shellcheck nodejs npm
 }
 
-setupOhMyZsh() {
-    echo "${YELLOW}Installing Oh My Zsh...${RC}"
-    rm -rf ~/.oh-my-zsh
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-
-    echo "${YELLOW}Installing Oh My Zsh plugins...${RC}"
-    git clone https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
-    git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
-    git clone https://github.com/Aloxaf/fzf-tab "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-tab"
-    git clone https://github.com/jeffreytse/zsh-vi-mode "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-vi-mode"
-    git clone https://github.com/marlonrichert/zsh-autocomplete.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autocomplete"
-
-    echo "${YELLOW}Set Zsh as default shell...${RC}"
-    command -v zsh | sudo tee -a /etc/shells
-    sudo chsh -s "$(command -v zsh)" "$USER"
-}
-
-installFzf() {
-    if command_exists fzf; then
-        echo "Fzf already installed"
-    else
-        echo "${YELLOW}Installing fzf..${RC}"
-        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.config/.fzf
-        ~/.config/.fzf/install
-    fi
-}
-
 installEzaAndExa() {
     if command_exists exa; then
         echo "exa already installed"
