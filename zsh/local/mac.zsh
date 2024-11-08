@@ -4,8 +4,8 @@
 
 # Detect OS type
 OS_TYPE=$(uname)
-if [ "$OS_TYPE" = "Linux" ]; then
-    exit 0
+if [ "$OS_TYPE" != "Darwin" ]; then
+  return 0 # Exit the file without terminating the session
 fi
 
 # System Updates
