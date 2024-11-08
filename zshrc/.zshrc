@@ -162,11 +162,8 @@ eval "$(zoxide init --cmd cd zsh)"
 # Detect OS type
 OS_TYPE=$(uname)
 if [ "$OS_TYPE" = "Darwin" ]; then
-    # Prompt
-    # eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
-    eval "$(oh-my-posh init zsh --config /opt/homebrew/opt/oh-my-posh/themes/emodipt-extend.omp.json)"
-
     export ANTIDOTE_DIR="/opt/homebrew/opt/antidote/share/antidote"
+    export OHMYPOSH_THEMES_DIR="/opt/homebrew/opt/oh-my-posh/themes"
 
 elif [ "$OS_TYPE" = "Linux" ]; then
     # Linux specific zsh configs
@@ -181,8 +178,13 @@ elif [ "$OS_TYPE" = "Linux" ]; then
     # # End Nix
     # export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
 
-    export ANTIDOTE_DIR="${HOME}/.antidote"
+    export ANTIDOTE_DIR="/home/linuxbrew/.linuxbrew/opt/antidote/share/antidote"
+    export OHMYPOSH_THEMES_DIR="/home/linuxbrew/.linuxbrew/opt/oh-my-posh/themes"
 fi
+
+# Prompt
+# eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
+eval "$(oh-my-posh init zsh --config ${OHMYPOSH_THEMES_DIR}/emodipt-extend.omp.json)"
 
 # ------------------------------------------------------------------
 ## Antidote plugin manager setup

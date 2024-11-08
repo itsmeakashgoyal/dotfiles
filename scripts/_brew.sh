@@ -95,23 +95,6 @@ installingHomebrewAndPackages() {
     fi
 
     check_command "Brewfile installation"
-
-    # Add the Homebrew zsh to allowed shells
-    echo "${YELLOW}Adding Homebrew zsh to allowed shells...${RC}"
-    BREW_ZSH="$(brew --prefix)/bin/zsh"
-    if ! grep -q "$BREW_ZSH" /etc/shells; then
-        echo "$BREW_ZSH" | sudo tee -a /etc/shells >/dev/null
-        check_command "Adding Homebrew zsh to /etc/shells"
-    fi
-
-    # Set the Homebrew zsh as default shell
-    echo "${YELLOW}Changing default shell to Homebrew zsh...${RC}"
-    if [ -z "$CI" ]; then
-        chsh -s "$BREW_ZSH"
-        check_command "Changing default shell"
-    else
-        export SHELL="$BREW_ZSH"
-    fi
 }
 
 setupOhMyZsh() {
@@ -126,6 +109,10 @@ setupOhMyZsh() {
     git clone https://github.com/Aloxaf/fzf-tab "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-tab"
     git clone https://github.com/jeffreytse/zsh-vi-mode "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-vi-mode"
     git clone https://github.com/marlonrichert/zsh-autocomplete.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autocomplete"
+
+    echo "${YELLOW}Set Zsh as default shell...${RC}"
+    command -v zsh | sudo tee -a /etc/shells
+    sudo chsh -s "$(command -v zsh)" "$USER"
 }
 
 installFzf() {
@@ -148,7 +135,6 @@ installingHomebrewAndPackages
 setupOhMyZsh
 installFzf
 installPrettier
-echo "${YELLOW}Final homebrew update and cleanup...${RC}"
 brewUpdateAndCleanup
 
 echo "${GREEN}Installation setup complete!${RC}"
