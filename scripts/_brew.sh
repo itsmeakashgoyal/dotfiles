@@ -43,7 +43,7 @@ installingHomebrewAndPackages() {
         echo "${YELLOW}Homebrew is already installed.${RC}"
     else
         echo "${YELLOW}Homebrew not installed. Installing Homebrew.${RC}"
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         check_command "Homebrew installation"
 
         # Attempt to set up Homebrew PATH automatically for this session

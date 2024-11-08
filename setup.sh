@@ -75,13 +75,34 @@ initiatingSymlink() {
         exit 1
     }
 
-    # List of folders to process
-    FOLDERS=("homeConfig" "git")
-    # List of files to symlink directly in home directory
-    FILES=(".gitconfig" ".curlrc" ".gdbinit" ".wgetrc")
     # List of folders to symlink in .config directory
-    CONFIG_FOLDERS=("tmux" "nvim" "zsh")
+    CONFIG_FOLDERS=("tmux" "nvim" "ohmyposh" "zsh")
+    for folder in "${CONFIG_FOLDERS[@]}"; do
+        log "→ Processing config folder: ${folder}"
+        target_dir="${CONFIG_DIR}/${folder}"
 
+        # Create .config directory if it doesn't exist
+        mkdir -p "${CONFIG_DIR}"
+
+        # Remove existing symlink or directory
+        if [ -e "${target_dir}" ]; then
+            if [ -L "${target_dir}" ]; then
+                log "→ Removing existing symlink: ${target_dir}"
+                rm "${target_dir}"
+            else
+                log "→ Removing existing directory: ${target_dir}"
+                rm -rf "${target_dir}"
+            fi
+        fi
+
+        log "→ Creating symlink to ${folder} in ~/.config directory."
+        ln -svf "${DOTFILES_DIR}/${folder}" "${target_dir}"
+    done
+
+    # List of folders to process
+    FOLDERS=("homeConfig" "git" "zsh")
+    # List of files to symlink directly in home directory
+    FILES=(".gitconfig" ".curlrc" ".gdbinit" ".wgetrc" ".zshenv" ".zshrc")
     # Create symlinks for each file within the specified folders
     for folder in "${FOLDERS[@]}"; do
         log "→ Processing folder: ${folder}"
@@ -112,29 +133,6 @@ initiatingSymlink() {
             fi
 
         done
-    done
-
-    # Create symlinks for config folders
-    for folder in "${CONFIG_FOLDERS[@]}"; do
-        log "→ Processing config folder: ${folder}"
-        target_dir="${CONFIG_DIR}/${folder}"
-
-        # Create .config directory if it doesn't exist
-        mkdir -p "${CONFIG_DIR}"
-
-        # Remove existing symlink or directory
-        if [ -e "${target_dir}" ]; then
-            if [ -L "${target_dir}" ]; then
-                log "→ Removing existing symlink: ${target_dir}"
-                rm "${target_dir}"
-            else
-                log "→ Removing existing directory: ${target_dir}"
-                rm -rf "${target_dir}"
-            fi
-        fi
-
-        log "→ Creating symlink to ${folder} in ~/.config directory."
-        ln -svf "${DOTFILES_DIR}/${folder}" "${target_dir}"
     done
 }
 

@@ -87,7 +87,7 @@ installCargoPackageManager() {
     else
         echo "${YELLOW}Installing cargo package manager..${RC}"
         sudo apt install -y cargo
-        cargo install just onefetch
+        # cargo install just onefetch
     fi
 }
 
@@ -127,7 +127,7 @@ installDepend
 # installEzaAndExa
 # installAntidote
 # installLatestGo
-# installCargoPackageManager
+installCargoPackageManager
 # installNvim
 # installZoxide
 

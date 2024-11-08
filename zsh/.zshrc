@@ -1,11 +1,5 @@
-# Load XDG environment if not already loaded
-if [[ -f "${ZDOTDIR}/.zshenv" ]]; then
-    source "${ZDOTDIR}/.zshenv"
-fi
-
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-export ZSHRCDIR="${ZDOTDIR}"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
@@ -139,7 +133,6 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $real
 # Problems with insecure directories under macOS?
 # -> see https://stackoverflow.com/a/13785716/149220 for a solution
 cache_directory="$XDG_CACHE_HOME/zsh"
-mkdir -p "$cache_directory"
 
 ## Use cache
 zstyle ':completion:*' use-cache on
@@ -187,15 +180,15 @@ elif [ "$OS_TYPE" = "Linux" ]; then
 fi
 
 # Prompt
-# eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
-eval "$(oh-my-posh init zsh --config ${OHMYPOSH_THEMES_DIR}/emodipt-extend.omp.json)"
+eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/emodipt.json)"
+# eval "$(oh-my-posh init zsh --config ${OHMYPOSH_THEMES_DIR}/emodipt-extend.omp.json)"
 
 # ------------------------------------------------------------------
 ## Antidote plugin manager setup
 # ------------------------------------------------------------------
 
 # Set the root name of the plugins files (.txt and .zsh) antidote will use.
-zsh_plugins=${ZSHRCDIR}/.zsh_plugins
+zsh_plugins=${ZDOTDIR}/.zsh_plugins
 
 # Ensure the .zsh_plugins.txt file exists so you can add plugins.
 [[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
@@ -207,12 +200,12 @@ source ${ANTIDOTE_DIR}/antidote.zsh
 
 # Helper function to compile bundles and source zshrc
 function compile_antidote() {
-    sh ${ZSHRCDIR}/bundle_compile
+    sh ${ZDOTDIR}/bundle_compile
     exec zsh
     echo 'Sourced zshrc'
 }
 
-alias update_antidote='antidote bundle < ${ZSHRCDIR}/.zsh_plugins.txt >| ${ZSHRCDIR}/zsh_plugins.zsh'
+alias update_antidote='antidote bundle < ${ZDOTDIR}/.zsh_plugins.txt >| ${ZDOTDIR}/zsh_plugins.zsh'
 
 # Source compiled antidote bundles and configs
-[ -f ${ZSHRCDIR}/zsh_plugins.zsh ] && source ${ZSHRCDIR}/zsh_plugins.zsh
+[ -f ${ZDOTDIR}/zsh_plugins.zsh ] && source ${ZDOTDIR}/zsh_plugins.zsh
