@@ -76,11 +76,11 @@ initiatingSymlink() {
     }
 
     # List of folders to process
-    FOLDERS=("zshrc" "homeConfig" "git")
+    FOLDERS=("homeConfig" "git")
     # List of files to symlink directly in home directory
-    FILES=(".zshrc" ".zshenv" ".zprofile" ".gitconfig" ".curlrc" ".gdbinit" ".wgetrc")
+    FILES=(".gitconfig" ".curlrc" ".gdbinit" ".wgetrc")
     # List of folders to symlink in .config directory
-    CONFIG_FOLDERS=("tmux" "nvim")
+    CONFIG_FOLDERS=("tmux" "nvim" "zsh")
 
     # Create symlinks for each file within the specified folders
     for folder in "${FOLDERS[@]}"; do
@@ -164,8 +164,8 @@ setupNix() {
 }
 
 initGitSubmodules
-setupDotfiles
 initiatingSymlink
+setupDotfiles
 setupNvim
 
 log "→ Source Zsh configuration"

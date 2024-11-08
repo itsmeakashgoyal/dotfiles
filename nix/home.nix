@@ -54,7 +54,7 @@ in
     # Home Manager is pretty good at managing dotfiles. The primary way to manage
     # plain files is through 'home.file'.
     file = {
-      # ".zshrc".source = ~/dotfiles/zshrc/.zshrc;
+      # ".zshrc".source = ~/dotfiles/zsh/.zshrc;
       # ".gitconfig".source = ~/dotfiles/git/.gitconfig;
       # ".gitattributes".source = ~/dotfiles/git/.gitattributes;
       # ".gitignore".source = ~/dotfiles/git/.gitignore;

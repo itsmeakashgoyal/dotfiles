@@ -125,16 +125,9 @@ installFzf() {
     fi
 }
 
-installPrettier() {
-    echo "${YELLOW}Installing Prettier...${RC}"
-    npm install --global prettier
-    check_command "Prettier installation"
-}
-
-installingHomebrewAndPackages
 setupOhMyZsh
+installingHomebrewAndPackages
 installFzf
-installPrettier
 brewUpdateAndCleanup
 
 echo "${GREEN}Installation setup complete!${RC}"

@@ -12,9 +12,9 @@ Thumbs.db
 # Files that might appear on external disks
 .Spotlight-V100
 .Trashes
-zshrc/zsh_plugins.zsh
+zsh/zsh_plugins.zsh
 
 # Private Information
 private/*
-zshrc/local/private.zsh
-zshrc/.zsh_history
+zsh/local/private.zsh
+zsh/.zsh_history

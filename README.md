@@ -44,15 +44,7 @@ This dotfiles setup are tailored for both macOS and LinuxOS.
    ```sh
    ./setup.sh
    ```
-4. Update the nvim git submodule
-   - If it's the first time you check-out a repo you need to use --init first
-    ```sh
-    git submodule update --init --recursive
-    ```
-   - If its already checkout than, update the submodule
-    ```sh
-    git submodule update --recursive --remote
-    ```
+
 
 This script will:
 
@@ -64,7 +56,7 @@ This script will:
 - `settings/`: Directory containing editor settings and themes for Sublime Text, Visual Studio Code and iterm terminal.
 - `scripts/`: Containing common scripts to run while setting up the dotfiles.
 - `tmux/`: Containing tmux config files
-- `zshrc/`: Containing Shell configuration files for Zsh.
+- `zsh/`: Containing Shell configuration files for Zsh.
 - `git/`: Containing git configuration.
 - `homeConfig/`: Containing configurations should be link to home dir.
 - `nvim/`: Another git submodule for my nvim config.
