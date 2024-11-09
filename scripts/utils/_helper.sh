@@ -57,8 +57,3 @@ check_command() {
         exit 1
     fi
 }
-
-# Function to log messages
-log() {
-    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
-}

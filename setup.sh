@@ -34,14 +34,14 @@ set -euo pipefail
 export CI="${CI:-}"
 
 initGitSubmodules() {
-    log "→ Initializing and updating git submodules..."
+    log_message "→ Initializing and updating git submodules..."
     git submodule update --init --recursive --remote
 }
 
 setupDotfiles() {
     if [ "$OS_TYPE" = "Darwin" ]; then
-        log "------> Setting up MACOS"
-        log "→ Running MacOS-specific setup script..."
+        log_message "------> Setting up MACOS"
+        log_message "→ Running MacOS-specific setup script..."
         scripts=("_macOS" "_brew" "_sublime")
         for script in "${scripts[@]}"; do
             script_path="./scripts/setup/${script}.sh"
@@ -55,9 +55,9 @@ setupDotfiles() {
             fi
         done
     elif [ "$OS_TYPE" = "Linux" ]; then
-        log "------> Setting up LINUX"
+        log_message "------> Setting up LINUX"
         # Run the setup script for the current OS
-        log "→ Running LinuxOS-specific setup script..."
+        log_message "→ Running LinuxOS-specific setup script..."
         scripts=("_linuxOS" "_brew")
         for script in "${scripts[@]}"; do
             script_path="./scripts/setup/${script}.sh"
@@ -74,19 +74,19 @@ setupDotfiles() {
 }
 
 initiatingSymlink() {
-    log "→ Initiating the symlinking process..."
+    log_message "→ Initiating the symlinking process..."
 
     # Change to the dotfiles directory
-    log "→ Changing to the ${DOTFILES_DIR} directory"
+    log_message "→ Changing to the ${DOTFILES_DIR} directory"
     cd "${DOTFILES_DIR}" || {
-        log "Failed to change directory to ${DOTFILES_DIR}"
+        log_message "Failed to change directory to ${DOTFILES_DIR}"
         exit 1
     }
 
     # List of folders to symlink in .config directory
     CONFIG_FOLDERS=("tmux" "nvim" "ohmyposh" "zsh")
     for folder in "${CONFIG_FOLDERS[@]}"; do
-        log "→ Processing config folder: ${folder}"
+        log_message "→ Processing config folder: ${folder}"
         target_dir="${CONFIG_DIR}/${folder}"
 
         # Create .config directory if it doesn't exist
@@ -95,15 +95,15 @@ initiatingSymlink() {
         # Remove existing symlink or directory
         if [ -e "${target_dir}" ]; then
             if [ -L "${target_dir}" ]; then
-                log "→ Removing existing symlink: ${target_dir}"
+                log_message "→ Removing existing symlink: ${target_dir}"
                 rm "${target_dir}"
             else
-                log "→ Removing existing directory: ${target_dir}"
+                log_message "→ Removing existing directory: ${target_dir}"
                 rm -rf "${target_dir}"
             fi
         fi
 
-        log "→ Creating symlink to ${folder} in ~/.config directory."
+        log_message "→ Creating symlink to ${folder} in ~/.config directory."
         ln -svf "${DOTFILES_DIR}/${folder}" "${target_dir}"
     done
 
@@ -113,9 +113,9 @@ initiatingSymlink() {
     FILES=(".gitconfig" ".curlrc" ".gdbinit" ".wgetrc" ".zshenv" ".zshrc")
     # Create symlinks for each file within the specified folders
     for folder in "${FOLDERS[@]}"; do
-        log "→ Processing folder: ${folder}"
+        log_message "→ Processing folder: ${folder}"
         # Enable dotglob to match hidden files
-        shopt -s dotglob  # bash equivalent for handling dot files
+        shopt -s dotglob # bash equivalent for handling dot files
         for file in "${DOTFILES_DIR}/${folder}"/*; do
             # Skip if file doesn't exist
             [[ -e "$file" ]] || continue
@@ -134,10 +134,10 @@ initiatingSymlink() {
             done
 
             if [[ "$match_found" == true ]]; then
-                log "→ Creating symlink to ${HOME} from ${DOTFILES_DIR}/${folder}/${file}"
+                log_message "→ Creating symlink to ${HOME} from ${DOTFILES_DIR}/${folder}/${file}"
                 ln -svf "${DOTFILES_DIR}/${folder}/${file}" "${HOME}/${filename}"
             else
-                log "→ Skipping ${filename}, not in the list of files to symlink."
+                log_message "→ Skipping ${filename}, not in the list of files to symlink."
             fi
 
         done
@@ -146,9 +146,9 @@ initiatingSymlink() {
 
 setupNvim() {
     # Change to the .config/nvim directory and checkout the running branch
-    log "→ Changing to the ${CONFIG_DIR}/nvim directory"
+    log_message "→ Changing to the ${CONFIG_DIR}/nvim directory"
     cd "${CONFIG_DIR}/nvim" || {
-        log "Failed to change directory to ${CONFIG_DIR}/nvim"
+        log_message "Failed to change directory to ${CONFIG_DIR}/nvim"
         exit 1
     }
     # Skip branch checkout in CI environment
@@ -160,21 +160,65 @@ setupNvim() {
 
 setupNix() {
     if [ "$OS_TYPE" = "Linux" ]; then
-        log "→ Running nix installer..."
+        log_message "→ Running nix installer..."
         if [ -f "${DOTFILES_DIR}/scripts/utils/_install_nix.sh" ]; then
             sh "${DOTFILES_DIR}/scripts/utils/_install_nix.sh"
         else
-            log "→ Warning: _install_nix.sh setup script not found."
+            log_message "→ Warning: _install_nix.sh setup script not found."
         fi
     fi
 }
 
-initGitSubmodules
-initiatingSymlink
-setupDotfiles
-setupNvim
+# Set up error handling
+trap 'handle_error $LINENO' ERR
 
-log "→ Source Zsh configuration"
-exec zsh
+# Main function
+main() {
+    log_message "Script started"
+    print_message "$BLUE" "
+You're running ${OS_TYPE}.
+##############################################
+#      We will begin applying updates,       #
+#      and securing the system.              #
+##############################################
+#      You will be prompted for your         #
+#      sudo password.                        #
+##############################################
+"
 
-log "→ Installation Complete!"
+    if [ "$OS_TYPE" = "Darwin" ]; then
+        print_message "$GREEN" "
+##############################################
+#      MacOS system detected.                #
+#      Proceeding with setup...              #
+##############################################
+"
+        log_message "MacOS system detected. Proceeding with setup."
+    else
+        print_message "$GREEN" "
+##############################################
+#      Ubuntu-based system detected.         #
+#      Proceeding with setup...              #
+##############################################
+"
+        log_message "Ubuntu-based system detected. Proceeding with setup."
+    fi
+
+    initGitSubmodules
+    initiatingSymlink
+    setupDotfiles
+    setupNvim
+
+    log_message "→ Source Zsh configuration"
+    exec zsh
+
+    print_message "$GREEN" "
+##############################################
+#      Installation Completed                #
+##############################################
+"
+    log_message "Installation Completed!"
+}
+
+# Run the main function
+main

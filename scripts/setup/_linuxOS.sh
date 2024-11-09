@@ -206,9 +206,9 @@ You're running ${OS_NAME}.
     # installZoxide
 
     print_message "$GREEN" "
-##############################################
-#      Installation Completed                #
-##############################################
+###################################################
+#      Installation Completed for _linuxOS.sh     #
+###################################################
 "
     log_message "Installation Completed for Ubuntu-based system detected. Proceeding with other steps"
 }

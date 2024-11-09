@@ -38,9 +38,9 @@ brewUpdateAndCleanup() {
 installingHomebrewAndPackages() {
     # Install Homebrew if it isn't already installed
     if command_exists brew; then
-        echo "${YELLOW}Homebrew is already installed.${RC}"
+        print_message "$GREEN" "Homebrew is already installed"
     else
-        echo "${YELLOW}Homebrew not installed. Installing Homebrew.${RC}"
+        print_message "$YELLOW" "Homebrew not installed. Installing Homebrew."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         check_command "Homebrew installation"
 
@@ -48,22 +48,22 @@ installingHomebrewAndPackages() {
         if [ "$OS_TYPE" = "Darwin" ]; then
             if [ -x "/opt/homebrew/bin/brew" ]; then
                 # For Apple Silicon Macs
-                echo "${YELLOW}Configuring Homebrew in PATH for Apple Silicon Mac...${RC}"
+                print_message "$YELLOW" "Configuring Homebrew in PATH for Apple Silicon Mac..."
                 eval "$(/opt/homebrew/bin/brew shellenv)"
             elif [ -x "/usr/local/bin/brew" ]; then
                 # For Intel Macs
-                echo "${YELLOW}Configuring Homebrew in PATH for Intel Mac...${RC}"
+                print_message "$YELLOW" "Configuring Homebrew in PATH for Intel Mac..."
                 eval "$(/usr/local/bin/brew shellenv)"
             fi
         else
-            echo "${YELLOW}Configuring Homebrew in PATH for Linux...${RC}"
+            print_message "$YELLOW" "Configuring Homebrew in PATH for Linux..."
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         fi
     fi
 
     # Verify brew is now accessible
     if ! command -v brew &>/dev/null; then
-        echo "${RED}Failed to configure Homebrew in PATH. Please add Homebrew to your PATH manually.${RC}"
+        print_message "$RED" "Failed to configure Homebrew in PATH. Please add Homebrew to your PATH manually."
         exit 1
     fi
 
@@ -71,17 +71,17 @@ installingHomebrewAndPackages() {
     brew analytics off
 
     # Update Homebrew and Upgrade any already-installed formulae
-    echo "${YELLOW}Updating Homebrew and upgrading formulae...${RC}"
+    print_message "$YELLOW" "Updating Homebrew and upgrading formulae..."
     brewUpdateAndCleanup
 
     # Install packages from Brewfile
-    echo "${YELLOW}Installing packages from Brewfile...${RC}"
+    print_message "$YELLOW" "Installing packages from Brewfile..."
     local brewfile=""
     case "$(uname)" in
     "Linux") brewfile="Brewfile.linux" ;;
     "Darwin") brewfile="Brewfile.mac" ;;
     *)
-        echo "Unsupported OS"
+        print_message "$RED" "Unsupported OS"
         exit 1
         ;;
     esac
@@ -89,18 +89,18 @@ installingHomebrewAndPackages() {
     if [ -f "${DOTFILES_DIR}/${brewfile}" ]; then
         brew bundle --file="${DOTFILES_DIR}/${brewfile}"
     else
-        echo "Warning: ${brewfile} not found"
+        print_message "$RED" "Warning: ${brewfile} not found"
     fi
 
     check_command "Brewfile installation"
 }
 
 setupOhMyZsh() {
-    echo "${YELLOW}Installing Oh My Zsh...${RC}"
+    print_message "$YELLOW" "Installing Oh My Zsh..."
     rm -rf ~/.oh-my-zsh
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-    echo "${YELLOW}Installing Oh My Zsh plugins...${RC}"
+    print_message "$YELLOW" "Installing Oh My Zsh plugins..."
     git clone https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
     git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
@@ -108,24 +108,38 @@ setupOhMyZsh() {
     git clone https://github.com/jeffreytse/zsh-vi-mode "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-vi-mode"
     git clone https://github.com/marlonrichert/zsh-autocomplete.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autocomplete"
 
-    echo "${YELLOW}Set Zsh as default shell...${RC}"
+    print_message "$YELLOW" "Set Zsh as default shell..."
     command -v zsh | sudo tee -a /etc/shells
     sudo chsh -s "$(command -v zsh)" "$USER"
 }
 
 installFzf() {
     if command_exists fzf; then
-        echo "Fzf already installed"
+        print_message "$YELLOW" "Fzf already installed"
     else
-        echo "${YELLOW}Installing fzf..${RC}"
+        print_message "$YELLOW" "Installing fzf.."
         git clone --depth 1 https://github.com/junegunn/fzf.git ~/.config/.fzf
         ~/.config/.fzf/install
     fi
 }
 
-setupOhMyZsh
-installingHomebrewAndPackages
-installFzf
-brewUpdateAndCleanup
+# Set up error handling
+trap 'handle_error $LINENO' ERR
 
-echo "${GREEN}Installation setup complete!${RC}"
+# Main function
+main() {
+    setupOhMyZsh
+    installingHomebrewAndPackages
+    installFzf
+    brewUpdateAndCleanup
+
+    print_message "$GREEN" "
+##############################################
+#      Installation Completed for _brew.sh   #
+##############################################
+"
+    log_message "Installation Completed. Proceeding with other steps"
+}
+
+# Run the main function
+main

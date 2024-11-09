@@ -6,6 +6,21 @@
 #      Status: Development                      #
 #################################################
 
+# ------------------------------
+#          INITIALIZE
+# ------------------------------
+# Load Helper functions persistently
+SCRIPT_DIR="${HOME}/dotfiles/scripts"
+HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+# Check if helper file exists and source it
+if [[ ! -f "$HELPER_FILE" ]]; then
+    echo "Error: Helper file not found at $HELPER_FILE" >&2
+    exit 1
+fi
+
+# Source the helper file
+source "$HELPER_FILE"
+
 # Added set -euo pipefail for better error handling and script termination on errors.
 set -eu pipefail
 
@@ -27,16 +42,16 @@ fi
 
 # Create symlink for 'subl' command if not available
 if ! command -v subl &>/dev/null; then
-    echo "'subl' command not found. Creating symlink for Sublime Text."
+    log_message "'subl' command not found. Creating symlink for Sublime Text."
     if [ -e "${SUBLIME_BIN}" ]; then
         sudo ln -sf "${SUBLIME_BIN}" /usr/local/bin/subl
-        echo "Symlink created successfully."
+        log_message "Symlink created successfully."
     else
-        echo "Error: Sublime Text application not found in the expected location." >&2
+        log_message "Error: Sublime Text application not found in the expected location." >&2
         exit 1
     fi
 else
-    echo "'subl' command is already available."
+    log_message "'subl' command is already available."
 fi
 
 # Function to open Sublime Text and wait for initialization
@@ -44,15 +59,15 @@ open_and_wait_sublime() {
     subl .
     waited=0
     until [[ -d "${CONFIG_PATH}/Installed Packages" ]] || ((waited >= MAX_WAIT)); do
-        echo "Waiting for Sublime Text to initialize..."
+        log_message "Waiting for Sublime Text to initialize..."
         sleep 1
         ((waited++))
     done
 
     if [[ -d "${CONFIG_PATH}/Installed Packages" ]]; then
-        echo "Sublime Text initialized."
+        log_message "Sublime Text initialized."
     else
-        echo "Error: Sublime Text did not initialize within ${MAX_WAIT} seconds." >&2
+        log_message "Error: Sublime Text did not initialize within ${MAX_WAIT} seconds." >&2
         exit 1
     fi
 }
@@ -72,9 +87,9 @@ mkdir -p "${USER_PACKAGES_DIR}"
 cp "settings/Package Control.sublime-settings" "${USER_PACKAGES_DIR}/Package Control.sublime-settings"
 
 # Open Sublime Text to install packages
-echo "Opening Sublime to automatically install packages"
+log_message "Opening Sublime to automatically install packages"
 open_and_wait_sublime
-echo "Press Enter after Packages are all installed..."
+log_message "Press Enter after Packages are all installed..."
 read
 
 # Quit Sublime after packages are installed
@@ -84,11 +99,11 @@ osascript -e 'quit app "Sublime Text"'
 cp "settings/Preferences.sublime-settings" "${USER_PACKAGES_DIR}/Preferences.sublime-settings"
 cp "settings/SublimeLinter.sublime-settings" "${USER_PACKAGES_DIR}/SublimeLinter.sublime-settings"
 
-echo "Custom Sublime Text settings and packages have been copied."
+log_message "Custom Sublime Text settings and packages have been copied."
 
 # Open Sublime Text to check for errors and to enter your license key
 subl .
-echo "You can view potential Sublime Text errors by pressing Ctrl + backtick"
-echo "If there are no errors, activate your Sublime license."
-echo "Press enter to continue..."
+log_message "You can view potential Sublime Text errors by pressing Ctrl + backtick"
+log_message "If there are no errors, activate your Sublime license."
+log_message "Press enter to continue..."
 read
