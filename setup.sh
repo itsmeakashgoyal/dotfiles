@@ -115,7 +115,7 @@ initiatingSymlink() {
     for folder in "${FOLDERS[@]}"; do
         log "→ Processing folder: ${folder}"
         # Enable dotglob to match hidden files
-        setopt dotglob
+        shopt -s dotglob  # bash equivalent for handling dot files
         for file in "${DOTFILES_DIR}/${folder}"/*; do
             # Skip if file doesn't exist
             [[ -e "$file" ]] || continue
