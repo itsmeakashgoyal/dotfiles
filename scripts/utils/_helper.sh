@@ -23,6 +23,9 @@ user=$(whoami)
 DOTFILES_DIR="${HOME}/dotfiles"
 CONFIG_DIR="${HOME}/.config"
 
+# Check if the home directory and linuxtoolbox folder exist, create them if they don't
+LINUXTOOLBOXDIR="$HOME/linuxtoolbox"
+
 # Define log file
 LOG_FILE="/tmp/setup_log.txt"
 
@@ -73,3 +76,21 @@ print_error() {
 
     exit 1
 }
+
+linkUnderHome() {
+    cp "${HOME}/${2}" "$LINUXTOOLBOXDIR" 2>/dev/null
+    # Force create/replace the symlink.
+    ln -svf "${DOTFILES_DIR}/${1}" "${HOME}/${2}"
+}
+
+linkUnderConfig() {
+    cp "${HOME}/${2}" "$LINUXTOOLBOXDIR" 2>/dev/null
+    # Force create/replace the symlink.
+    ln -svf "${DOTFILES_DIR}/${1}" "${CONFIG_DIR}/${2}"
+}
+
+if [ ! -d "$LINUXTOOLBOXDIR" ]; then
+    print_message "$YELLOW" "→ Creating linuxtoolbox directory: $LINUXTOOLBOXDIR"
+    mkdir -p "$LINUXTOOLBOXDIR"
+    print_message "$GREEN" "→ linuxtoolbox directory created: $LINUXTOOLBOXDIR"
+fi
