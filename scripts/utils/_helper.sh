@@ -23,6 +23,9 @@ user=$(whoami)
 DOTFILES_DIR="${HOME}/dotfiles"
 CONFIG_DIR="${HOME}/.config"
 
+# Define log file
+LOG="/tmp/setup_log.txt"
+
 # Function to print colored messages
 print_message() {
     local color=$1
@@ -33,7 +36,8 @@ print_message() {
 # Function to log messages
 log_message() {
     local message=$1
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message" >>setup.log
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message" >>"$LOG"
 }
 
 # Error handling function
