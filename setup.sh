@@ -1,26 +1,34 @@
-#!/usr/bin/env zsh
-############################
+#!/usr/bin/env bash
+
+#################################################
+#      File: _linuxOS.sh                        #
+#      Author: Akash Goyal                      #
+#      Status: Development                      #
+#################################################
 # This script creates symlinks from the home directory to any desired dotfiles in $HOME/dotfiles
 # This is used to setup both macOS and LinuxOS.
 # And also installs MacOS and Linux packages.
 # And also installs Homebrew Packages and Casks (Apps)
 # And also sets up Sublime Text
-############################
+#################################################
+
+# ------------------------------
+#          INITIALIZE
+# ------------------------------
+# Load Helper functions persistently
+SCRIPT_DIR="${HOME}/dotfiles/scripts"
+HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+# Check if helper file exists and source it
+if [[ ! -f "$HELPER_FILE" ]]; then
+    echo "Error: Helper file not found at $HELPER_FILE" >&2
+    exit 1
+fi
+
+# Source the helper file
+source "$HELPER_FILE"
 
 # Enable strict mode for better error handling
 set -euo pipefail
-
-# Function to log messages
-log() {
-    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
-}
-
-# Define variables
-DOTFILES_DIR="${HOME}/dotfiles"
-CONFIG_DIR="${HOME}/.config"
-
-# This detection only works for mac and linux.
-OS_TYPE=$(uname)
 
 # Set CI environment variable if not already set
 export CI="${CI:-}"
@@ -36,7 +44,7 @@ setupDotfiles() {
         log "→ Running MacOS-specific setup script..."
         scripts=("_macOS" "_brew" "_sublime")
         for script in "${scripts[@]}"; do
-            script_path="./scripts/${script}.sh"
+            script_path="./scripts/setup/${script}.sh"
             if [ -f "${script_path}" ]; then
                 echo "Running ${script_path} script..."
                 if ! "${script_path}"; then
@@ -52,7 +60,7 @@ setupDotfiles() {
         log "→ Running LinuxOS-specific setup script..."
         scripts=("_linuxOS" "_brew")
         for script in "${scripts[@]}"; do
-            script_path="./scripts/${script}.sh"
+            script_path="./scripts/setup/${script}.sh"
             if [ -f "${script_path}" ]; then
                 echo "Running ${script_path} script..."
                 if ! "${script_path}"; then
@@ -153,8 +161,8 @@ setupNvim() {
 setupNix() {
     if [ "$OS_TYPE" = "Linux" ]; then
         log "→ Running nix installer..."
-        if [ -f "${DOTFILES_DIR}/scripts/_install_nix.sh" ]; then
-            sh "${DOTFILES_DIR}/scripts/_install_nix.sh"
+        if [ -f "${DOTFILES_DIR}/scripts/utils/_install_nix.sh" ]; then
+            sh "${DOTFILES_DIR}/scripts/utils/_install_nix.sh"
         else
             log "→ Warning: _install_nix.sh setup script not found."
         fi

@@ -1,30 +1,28 @@
 #!/usr/bin/env bash
 
+#################################################
+#      File: _brew.sh                           #
+#      Author: Akash Goyal                      #
+#      Status: Development                      #
+#################################################
+
+# ------------------------------
+#          INITIALIZE
+# ------------------------------
+# Load Helper functions persistently
+SCRIPT_DIR="${HOME}/dotfiles/scripts"
+HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+# Check if helper file exists and source it
+if [[ ! -f "$HELPER_FILE" ]]; then
+    echo "Error: Helper file not found at $HELPER_FILE" >&2
+    exit 1
+fi
+
+# Source the helper file
+source "$HELPER_FILE"
+
 # Enable strict mode for better error handling
 set -euo pipefail
-
-RC='\033[0m'
-RED='\033[31m'
-YELLOW='\033[33m'
-GREEN='\033[32m'
-
-# Define variables
-DOTFILES_DIR="${HOME}/dotfiles"
-
-# This detection only works for mac and linux.
-OS_TYPE=$(uname)
-
-# Function to check if a command was successful
-check_command() {
-    if [ $? -ne 0 ]; then
-        echo "${RED}Error: $1 failed${RC}" >&2
-        exit 1
-    fi
-}
-
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
 
 brewUpdateAndCleanup() {
     if command_exists brew; then

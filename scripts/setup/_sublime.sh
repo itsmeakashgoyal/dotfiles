@@ -1,5 +1,11 @@
 #!/usr/bin/env zsh
 
+#################################################
+#      File: _sublime.sh                        #
+#      Author: Akash Goyal                      #
+#      Status: Development                      #
+#################################################
+
 # Added set -euo pipefail for better error handling and script termination on errors.
 set -eu pipefail
 

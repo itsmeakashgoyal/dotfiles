@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
-# Source generic error handling function
-source ~/dotfiles/scripts/_trap.sh
+# ------------------------------
+#          INITIALIZE
+# ------------------------------
+# Load Helper functions persistently
+TRAP_FILE="${HOME}/dotfiles/scripts/utils/_trap.sh"
+# Check if trap file exists and source it
+if [[ ! -f "$TRAP_FILE" ]]; then
+    echo "Error: trap file not found at $TRAP_FILE" >&2
+    exit 1
+fi
+
+# Source the trap file
+source "$TRAP_FILE"
 
 # The set -e option instructs bash to immediately exit if any command has a non-zero exit status
 # The set -u referencing a previously undefined variable - with the exceptions of $* and $@ - is an error
@@ -10,7 +21,7 @@ source ~/dotfiles/scripts/_trap.sh
 set -eu pipefail
 
 help_function() {
-	echo "Usage: __open-file-git.sh [-h|--help]"
+	echo "Usage: _open-file-git.sh [-h|--help]"
 	echo ""
 	echo "This script opens files from the Git repository using fzf-tmux for selection and the configured editor (default: nvim) for viewing."
 	echo "It lists the files from the Git log, allows multi-selection, and opens them in different layouts depending on the number of files selected."
@@ -47,37 +58,23 @@ handle_fzf_error() {
 
 # Add source and line number when running in debug mode: __run_with_xtrace.sh __open-file.sh
 
-# Get the repository root path and change to the repo root directory
+# Get the repository root path
 repo_root=$(git rev-parse --show-toplevel)
-cd "$repo_root" || {
-	echo "Failed to change to repository root directory"
-	exit 1
-}
 
-# Generate the file list and verify each file path
-file_list=$(git ls-tree -r HEAD --name-only)
-existing_files=$(echo "$file_list" | while IFS= read -r file; do
-	if [ -f "$file" ]; then
-		echo "$repo_root/$file"
-	fi
-done)
+IFS=$'\n' files=($(git status -s | awk '{print $2}' | grep -v '^$' | fzf-tmux --preview "bat --color=always {}" --reverse --multi --select-1 --exit-0 || handle_fzf_error))
 
-# Sort and list files
-sorted_files=$(echo "$existing_files" | xargs -d '\n' ls -lt)
-
-# Use fzf-tmux to select from the sorted list
-IFS=$'\n' files=($(echo "$sorted_files" | awk '{print $9}' | awk '!seen[$0]++' | grep -v '^$' | fzf-tmux --preview "bat --color=always {}" --reverse --multi --select-1 --exit-0 || handle_fzf_error))
-
-# Check if any files were selected, and exit if not
+# Check if any files were selected, and exit if not test
 if [ ${#files[@]} -eq 0 ]; then
-	echo "No files were selected. Exiting."
 	exit 0
 fi
 
-# Directly use the full paths in the case statement
+for i in "${!files[@]}"; do
+	files[i]=$(realpath "$repo_root/${files[i]}")
+done
+
 case "${#files[@]}" in
 2)
-	${EDITOR:-nvim} -O +'normal g;' "${files[@]}"
+	${EDITOR:-nvim} -O "${files[@]}"
 	;;
 3)
 	${EDITOR:-nvim} -O "${files[0]}" -c 'wincmd j' -c "vsplit ${files[1]}" -c "split ${files[2]}"

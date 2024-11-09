@@ -6,42 +6,24 @@
 #      Status: Development                      #
 #################################################
 
+# ------------------------------
+#          INITIALIZE
+# ------------------------------
+# Load Helper functions persistently
+SCRIPT_DIR="${HOME}/dotfiles/scripts"
+HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+# Check if helper file exists and source it
+if [[ ! -f "$HELPER_FILE" ]]; then
+    echo "Error: Helper file not found at $HELPER_FILE" >&2
+    exit 1
+fi
+
+# Source the helper file
+source "$HELPER_FILE"
+
 # Enable strict mode
 set -euo pipefail
 IFS=$'nt'
-
-# Define colors for text output
-readonly RED='\033[31m'
-readonly YELLOW='\033[33m'
-readonly GREEN='\033[32m'
-readonly BLUE='\033[34m'
-readonly NC='\033[0m' # No Color
-
-# Get OS name
-readonly OS_NAME=$(grep ^NAME /etc/*os-release | cut -d '"' -f 2)
-
-# Get current user
-user=$(whoami)
-
-# Define log file
-LOG="/tmp/setup_log.txt"
-
-# Define variables
-DOTFILES_DIR="${HOME}/dotfiles"
-CONFIG_DIR="${HOME}/.config"
-
-# Function to print colored messages
-print_message() {
-    local color=$1
-    local message=$2
-    echo -e "${color}${message}${NC}"
-}
-
-# Function to log messages
-log_message() {
-    local message=$1
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message" >>setup.log
-}
 
 # Check if we are on ubuntu
 check_ubuntu() {
@@ -57,17 +39,6 @@ check_ubuntu() {
         fi
     fi
     return 1 # It's not Ubuntu or Ubuntu-based
-}
-
-# Error handling function
-handle_error() {
-    print_message "$RED" "An error occurred on line $1"
-    log_message "ERROR: Script failed on line $1"
-    exit 1
-}
-
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
 }
 
 # Clean up
@@ -173,7 +144,7 @@ installNvim() {
         print_message "$YELLOW" "nvim already installed"
     else
         print_message "$YELLOW" "Installing nvim.."
-        sh ~/dotfiles/scripts/_install_nvim.sh
+        sh ~/dotfiles/scripts/utils/_install_nvim.sh
     fi
 }
 
@@ -188,6 +159,9 @@ installZoxide() {
         exit 1
     fi
 }
+
+# Set up error handling
+trap 'handle_error $LINENO' ERR
 
 # Main function
 main() {
@@ -231,7 +205,6 @@ You're running ${OS_NAME}.
     # installNvim
     # installZoxide
 
-    echo "${GREEN}Installation Completed...${RC}"
     print_message "$GREEN" "
 ##############################################
 #      Installation Completed                #

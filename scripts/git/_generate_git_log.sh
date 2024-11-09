@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
-# Source error handling script
-source ~/dotfiles/scripts/_trap.sh
+# ------------------------------
+#          INITIALIZE
+# ------------------------------
+# Load Helper functions persistently
+TRAP_FILE="${HOME}/dotfiles/scripts/utils/_trap.sh"
+# Check if trap file exists and source it
+if [[ ! -f "$TRAP_FILE" ]]; then
+    echo "Error: trap file not found at $TRAP_FILE" >&2
+    exit 1
+fi
+
+# Source the trap file
+source "$TRAP_FILE"
 
 # Set the default number of commits to 10 if not provided
 num_commits="${1:-10}"

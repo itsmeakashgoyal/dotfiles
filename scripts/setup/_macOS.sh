@@ -1,14 +1,27 @@
 #!/usr/bin/env zsh
 
-set -eu pipefail
+#################################################
+#      File: _macOS.sh                          #
+#      Author: Akash Goyal                      #
+#      Status: Development                      #
+#################################################
 
-# Function to check if a command was successful
-check_command() {
-    if [ $? -ne 0 ]; then
-        echo "Error: $1 failed" >&2
-        exit 1
-    fi
-}
+# ------------------------------
+#          INITIALIZE
+# ------------------------------
+# Load Helper functions persistently
+SCRIPT_DIR="${HOME}/dotfiles/scripts"
+HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+# Check if helper file exists and source it
+if [[ ! -f "$HELPER_FILE" ]]; then
+    echo "Error: Helper file not found at $HELPER_FILE" >&2
+    exit 1
+fi
+
+# Source the helper file
+source "$HELPER_FILE"
+
+set -eu pipefail
 
 # Skip osx config setup in CI environment
 if [ -n "$CI" ]; then
