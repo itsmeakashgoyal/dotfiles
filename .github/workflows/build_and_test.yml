@@ -58,5 +58,6 @@ jobs:
           set -eo pipefail
           export CI=1
           chmod +x ./setup.sh
-          chmod +x ./scripts/*.sh
+          chmod +x ./scripts/setup/*.sh
+          chmod +x ./scripts/utils/*.sh
           ./setup.sh
