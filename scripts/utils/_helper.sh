@@ -24,7 +24,7 @@ DOTFILES_DIR="${HOME}/dotfiles"
 CONFIG_DIR="${HOME}/.config"
 
 # Define log file
-LOG="/tmp/setup_log.txt"
+LOG_FILE="/tmp/setup_log.txt"
 
 # Function to print colored messages
 print_message() {
@@ -35,9 +35,12 @@ print_message() {
 
 # Function to log messages
 log_message() {
-    local message=$1
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message" >>"$LOG"
+    local message="$1"
+    local timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+    local log_line="[$timestamp] $message"
+
+    echo "$log_line"
+    echo "$log_line" >>"$LOG_FILE"
 }
 
 command_exists() {
