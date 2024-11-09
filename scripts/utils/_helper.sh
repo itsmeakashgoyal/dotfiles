@@ -13,9 +13,6 @@ readonly GREEN='\033[32m'
 readonly BLUE='\033[34m'
 readonly NC='\033[0m' # No Color
 
-# Get OS name
-readonly OS_NAME=$(grep ^NAME /etc/*os-release | cut -d '"' -f 2)
-
 # This detection only works for mac and linux.
 OS_TYPE=$(uname)
 

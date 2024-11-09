@@ -25,6 +25,9 @@ source "$HELPER_FILE"
 set -euo pipefail
 IFS=$'nt'
 
+# Get OS name
+readonly OS_NAME=$(grep ^NAME /etc/*os-release | cut -d '"' -f 2)
+
 # Check if we are on ubuntu
 check_ubuntu() {
     if [ -f /etc/os-release ]; then
