@@ -209,15 +209,18 @@ You're running ${OS_TYPE}.
     setupDotfiles
     setupNvim
 
-    log_message "→ Source Zsh configuration"
-    exec zsh
-
     print_message "$GREEN" "
 ##############################################
 #      Installation Completed                #
 ##############################################
 "
     log_message "Installation Completed!"
+
+    print_message "$GREEN" "
+############################################################################
+#      At last, do source your zsh configuration using 'exec zsh'          #
+############################################################################
+"
 }
 
 # Run the main function
