@@ -40,13 +40,6 @@ log_message() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message" >>"$LOG"
 }
 
-# Error handling function
-handle_error() {
-    print_message "$RED" "An error occurred on line $1"
-    log_message "ERROR: Script failed on line $1"
-    exit 1
-}
-
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
@@ -57,4 +50,23 @@ check_command() {
         echo "${RED}Error: $1 failed${RC}" >&2
         exit 1
     fi
+}
+
+# Define a function to print the error message and exit with a non-zero status
+print_error() {
+    local line_number="$1"
+    local command="$2"
+    local exit_code="$3"
+
+    echo "ERROR: An error occurred in the script \"$0\" on line $line_number" >&2
+    echo "Command: $command" >&2
+    echo "Exit Code: $exit_code" >&2
+
+    # Print stack trace
+    echo "Stack Trace:" >&2
+    for i in "${!FUNCNAME[@]}"; do
+        echo "  ${FUNCNAME[$i]}() called at line ${BASH_LINENO[$i - 1]} in ${BASH_SOURCE[$i]}" >&2
+    done
+
+    exit 1
 }

@@ -169,8 +169,8 @@ setupNix() {
     fi
 }
 
-# Set up error handling
-trap 'handle_error $LINENO' ERR
+# Set the error trap
+trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 
 # Main function
 main() {

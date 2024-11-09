@@ -1,19 +1,34 @@
 #!/usr/bin/env bash
 
+#################################################
+#      File: _install_nix.sh                    #
+#      Author: Akash Goyal                      #
+#      Status: Development                      #
+#################################################
+
+# ------------------------------
+#          INITIALIZE
+# ------------------------------
+# Load Helper functions persistently
+SCRIPT_DIR="${HOME}/dotfiles/scripts"
+HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+# Check if helper file exists and source it
+if [[ ! -f "$HELPER_FILE" ]]; then
+	echo "Error: Helper file not found at $HELPER_FILE" >&2
+	exit 1
+fi
+
+# Source the helper file
+source "$HELPER_FILE"
+
 # Enable strict mode for better error handling
 set -eu pipefail
 IFS=$'\n\t'
 
-# Function to log messages
-log() {
-	echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
-}
+# Set the error trap
+trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 
-# Define variables
-DOTFILES_DIR="${HOME}/dotfiles"
-CONFIG_DIR="${HOME}/.config"
-
-log "→ Install Nix package manager"
+print_message "$YELLOW" "→ Install Nix package manager"
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix >nix-installer.sh
 chmod +x nix-installer.sh
 
@@ -28,16 +43,16 @@ rm nix-installer.sh
 # Source Nix environment script if installation succeeded
 . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
 
-log "→ Copy nix folder into CONFIG_DIR dir"
+print_message "$YELLOW" "→ Copy nix folder into CONFIG_DIR dir"
 cp -rf "${DOTFILES_DIR}/nix" "${CONFIG_DIR}"
 
-log "→ Installing Nix packages"
+print_message "$YELLOW" "→ Installing Nix packages"
 # Change to the .config/nix directory
 # Define CONFIG_DIR if not set
 CONFIG_DIR="${CONFIG_DIR:-$HOME/.config}"
-log "→ Changing to the ${CONFIG_DIR}/nvim directory"
+print_message "$YELLOW" "→ Changing to the ${CONFIG_DIR}/nvim directory"
 cd "${CONFIG_DIR}/nix" || {
-	log "Failed to change directory to ${CONFIG_DIR}/nix"
+	print_message "$YELLOW" "→ Failed to change directory to ${CONFIG_DIR}/nix"
 	exit 1
 }
 
@@ -59,6 +74,6 @@ if [ -z "$CI" ]; then
 	nix run home-manager -- init --switch .
 
 	# Initialize and switch to the Home Manager configuration
-	log "→ Switching Home Manager configuration"
+	print_message "$YELLOW" "→ Switching Home Manager configuration"
 	home-manager switch --flake .
 fi
