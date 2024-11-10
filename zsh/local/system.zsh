@@ -9,6 +9,9 @@ alias whereami='npx @rafaelrinaldi/whereami -f json' # Get location info in JSON
 # System utilities
 alias diskusage='du -sh * | sort -h --reverse' # Show disk usage, sorted
 
+# Update/upgrade Homebrew and installed packages
+alias ubrew='brew update; brew upgrade; brew cleanup'
+
 # Determine size of a file or total size of a directory
 function fs() {
     if du -b /dev/null >/dev/null 2>&1; then

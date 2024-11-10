@@ -83,3 +83,17 @@ trim() {
     var="${var%"${var##*[![:space:]]}"}" # remove trailing whitespace characters
     echo -n "$var"
 }
+
+# upgrade fzf
+update-fzf() {
+    echo "Updating fzf..."
+    if [ -d ~/.config/.fzf ]; then
+        (cd ~/.config/.fzf &&
+            git pull &&
+            ./install --all &&
+            echo "fzf updated successfully!") ||
+            echo "Failed to update fzf"
+    else
+        echo "fzf directory not found at ~/.config/.fzf"
+    fi
+}
