@@ -26,9 +26,7 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
 
 ### Prerequisites
 
-- macOS
-- LinuxOS
-This dotfiles setup are tailored for both macOS and LinuxOS.
+- This dotfiles setup are tailored for both macOS and LinuxOS.
 
 ### Installation
 

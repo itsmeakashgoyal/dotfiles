@@ -46,7 +46,7 @@ plugins=(
     fzf-tab
     zsh-syntax-highlighting
     zsh-autosuggestions
-    zsh-autocomplete
+    # zsh-autocomplete
 )
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
 source $ZSH/oh-my-zsh.sh
