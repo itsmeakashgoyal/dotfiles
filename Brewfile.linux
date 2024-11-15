@@ -35,7 +35,6 @@ brew "rust"
 brew "shellcheck"
 brew "stylua" # lua code formatter
 brew "tldr"
-brew "trash" # rm, but put in the trash rather than completely delete
 brew "tree"
 brew "wdiff" # word differences in text files
 brew "wget"
