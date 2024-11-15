@@ -89,6 +89,47 @@ linkUnderConfig() {
     ln -svf "${DOTFILES_DIR}/${1}" "${CONFIG_DIR}/${2}"
 }
 
+# Function to create symlinks with backup
+symlink() {
+    local source="$1"
+    local destination="$2"
+    local source_path="${DOTFILES_DIR}/${source}"
+    local dest_path="${HOME}/${destination}"
+    local backup_path="${LINUXTOOLBOXDIR}/${destination}"
+
+    # Check if source exists
+    if [[ ! -e "$source_path" ]]; then
+        print_message "$RED" "Error: Source '$source_path' does not exist"
+        return 1
+    fi
+
+    # Create backup directory if it doesn't exist
+    mkdir -p "$(dirname "$backup_path")"
+
+    # If destination exists or is a symlink
+    if [[ -e "$dest_path" ]] || [[ -L "$dest_path" ]]; then
+        # If it's a symlink, unlink it first
+        if [[ -L "$dest_path" ]]; then
+            print_message "$YELLOW" "Unlinking existing symlink '$dest_path'"
+            unlink "$dest_path"
+        fi
+        
+        # If it's a regular file/directory, back it up
+        if [[ -e "$dest_path" ]]; then
+            print_message "$YELLOW" "Backing up existing '$dest_path' to '$backup_path'"
+            mv "$dest_path" "$backup_path"
+        fi
+    fi
+
+    # Create parent directory if it doesn't exist
+    mkdir -p "$(dirname "$dest_path")"
+
+    # Create the symlink
+    ln -svf "$source_path" "$dest_path"
+    print_message "$GREEN" "Created symlink: '$dest_path' -> '$source_path'"
+    log_message "Created symlink: '$dest_path' -> '$source_path'"
+}
+
 if [ ! -d "$LINUXTOOLBOXDIR" ]; then
     print_message "$YELLOW" "→ Creating linuxtoolbox directory: $LINUXTOOLBOXDIR"
     mkdir -p "$LINUXTOOLBOXDIR"

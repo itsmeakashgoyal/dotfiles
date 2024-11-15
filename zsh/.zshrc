@@ -173,7 +173,7 @@ elif [ "$OS_TYPE" = "Linux" ]; then
 fi
 
 # Prompt
-eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/emodipt.json)"
+eval "$(oh-my-posh init zsh --config '${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json')"
 # eval "$(oh-my-posh init zsh --config ${OHMYPOSH_THEMES_DIR}/emodipt-extend.omp.json)"
 
 # ------------------------------------------------------------------
@@ -181,7 +181,7 @@ eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/emodipt.json)"
 # ------------------------------------------------------------------
 
 # Set the root name of the plugins files (.txt and .zsh) antidote will use.
-zsh_plugins=${ZDOTDIR}/.zsh_plugins
+zsh_plugins="${ZDOTDIR}/.zsh_plugins"
 
 # Ensure the .zsh_plugins.txt file exists so you can add plugins.
 [[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
