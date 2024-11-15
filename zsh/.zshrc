@@ -112,13 +112,13 @@ fi
 eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
 
 # Key Bindings
-[[ -f "$HOME/dotfiles/zshrc/config/keybindings.zsh" ]] && builtin source "$HOME/dotfiles/zshrc/config/keybindings.zsh"
+[[ -f "$HOME/dotfiles/zsh/config/keybindings.zsh" ]] && builtin source "$HOME/dotfiles/zsh/config/keybindings.zsh"
 
 # GitHub CLI completion
-[[ -f "$HOME/dotfiles/zshrc/config/gh_completion.zsh" ]] && builtin source "$HOME/dotfiles/zshrc/config/gh_completion.zsh"
+[[ -f "$HOME/dotfiles/zsh/config/gh_completion.zsh" ]] && builtin source "$HOME/dotfiles/zsh/config/gh_completion.zsh"
 
 # Completion Configuration
-[[ -f "$HOME/dotfiles/zshrc/config/completion.zsh" ]] && builtin source "$HOME/dotfiles/zshrc/config/completion.zsh"
+[[ -f "$HOME/dotfiles/zsh/config/completion.zsh" ]] && builtin source "$HOME/dotfiles/zsh/config/completion.zsh"
 
 # Antidote Plugin Manager
-[[ -f "$HOME/dotfiles/zshrc/config/antidote.zsh" ]] && builtin source "$HOME/dotfiles/zshrc/config/antidote.zsh"
+[[ -f "$HOME/dotfiles/zsh/config/antidote.zsh" ]] && builtin source "$HOME/dotfiles/zsh/config/antidote.zsh"
