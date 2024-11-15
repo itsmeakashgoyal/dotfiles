@@ -9,9 +9,25 @@ local fzf_default_opts=(
     '--color "prompt:green,header:grey,spinner:grey,info:grey,hl:blue,hl+:blue,pointer:red"'
 )
 
-export FZF_DEFAULT_OPTS="${fzf_default_opts[*]}"
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
-export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
+# export FZF_DEFAULT_OPTS="${fzf_default_opts[*]}"
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --strip-cwd-prefix'
+
+# Define preview command with proper file type handling
+export FZF_PREVIEW_COMMAND="([[ -f {} ]] && (bat --style=numbers --color=always {} || cat {}) || ([[ -d {} ]] && tree -C {} || echo {} 2> /dev/null) || echo {} 2> /dev/null)"
+
+# Set FZF default options
+export FZF_DEFAULT_OPTS=" \
+--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+--color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+--color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
+--color=selected-bg:#45475a \
+--multi \
+--preview '${FZF_PREVIEW_COMMAND}'"
+
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# Directory search command
+export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
 
 # ------------------------------------------------------------------------------
 # Installer generated config completion, keybindings, etc.

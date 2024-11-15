@@ -77,72 +77,8 @@ setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
 setopt extended_glob
 
-# Key bindings
-bindkey '^w' autosuggest-execute
-bindkey '^e' autosuggest-accept
-bindkey '^u' autosuggest-toggle
-bindkey '^L' vi-forward-word
-bindkey '^k' up-line-or-search
-bindkey '^j' down-line-or-search
-
-# autocompletion using arrow keys (based on history)
-bindkey "^[[A" history-beginning-search-backward
-bindkey "^[[B" history-beginning-search-forward
-
 zle -N menu-search
 zle -N recent-paths
-
-# pasting with tabs doesn't perform completion
-zstyle ':completion:*' insert-tab pending
-
-# Completion styles
-zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
-
-# disable sort when completing `git checkout`
-zstyle ':completion:*:git-checkout:*' sort false
-# set descriptions format to enable group support
-# NOTE: don't use escape sequences here, fzf-tab will ignore them
-zstyle ':completion:*:descriptions' format '[%d]'
-# set list-colors to enable filename colorizing
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
-zstyle ':completion:*' menu no
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*' list-max-items 20
-zstyle ':completion:*:messages' format '%d'
-zstyle ':completion:*:warnings' format 'No matches for: %d'
-zstyle ':completion:*' group-name ''
-
-# preview directory's content with eza when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-
-# switch group using `<` and `>`
-zstyle ':fzf-tab:*' switch-group '<' '>'
-zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-
-# Set Up Completion
-# ------------------------------------------------------------------------------
-# Problems with insecure directories under macOS?
-# -> see https://stackoverflow.com/a/13785716/149220 for a solution
-cache_directory="$XDG_CACHE_HOME/zsh"
-
-## Use cache
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path "$cache_directory/completion-cache"
-
-# Initialize completion system with specific dump file location
-autoload -Uz compinit 
-if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-    compinit -d "$cache_directory/.zcompdump"
-else
-    compinit -C -d "$cache_directory/.zcompdump"
-fi
-
-## These were created by `compinstall`
-zstyle ':completion:*' completer _complete _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'm:{[:lower:]}={[:upper:]} r:|[._-]=* r:|=*' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}'
-zstyle ':completion:*' max-errors 2
 
 # FZF and Zoxide integration
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -174,31 +110,15 @@ fi
 
 # Prompt
 eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
-# eval "$(oh-my-posh init zsh --config ${OHMYPOSH_THEMES_DIR}/emodipt-extend.omp.json)"
 
-# ------------------------------------------------------------------
-## Antidote plugin manager setup
-# ------------------------------------------------------------------
+# Key Bindings
+[[ -f "$HOME/dotfiles/zshrc/config/keybindings.zsh" ]] && builtin source "$HOME/dotfiles/zshrc/config/keybindings.zsh"
 
-# Set the root name of the plugins files (.txt and .zsh) antidote will use.
-zsh_plugins="${ZDOTDIR}/.zsh_plugins"
+# GitHub CLI completion
+[[ -f "$HOME/dotfiles/zshrc/config/gh_completion.zsh" ]] && builtin source "$HOME/dotfiles/zshrc/config/gh_completion.zsh"
 
-# Ensure the .zsh_plugins.txt file exists so you can add plugins.
-[[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
+# Completion Configuration
+[[ -f "$HOME/dotfiles/zshrc/config/completion.zsh" ]] && builtin source "$HOME/dotfiles/zshrc/config/completion.zsh"
 
-# Lazy-load antidote from its functions directory.
-fpath=(${ANTIDOTE_DIR}/functions $fpath)
-autoload -Uz antidote
-source ${ANTIDOTE_DIR}/antidote.zsh
-
-# Helper function to compile bundles and source zshrc
-function compile_antidote() {
-    sh ${ZDOTDIR}/bundle_compile
-    exec zsh
-    echo 'Sourced zshrc'
-}
-
-alias update_antidote='antidote bundle < ${ZDOTDIR}/.zsh_plugins.txt >| ${ZDOTDIR}/zsh_plugins.zsh'
-
-# Source compiled antidote bundles and configs
-[ -f ${ZDOTDIR}/zsh_plugins.zsh ] && source ${ZDOTDIR}/zsh_plugins.zsh
+# Antidote Plugin Manager
+[[ -f "$HOME/dotfiles/zshrc/config/antidote.zsh" ]] && builtin source "$HOME/dotfiles/zshrc/config/antidote.zsh"
