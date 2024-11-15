@@ -173,7 +173,7 @@ elif [ "$OS_TYPE" = "Linux" ]; then
 fi
 
 # Prompt
-eval "$(oh-my-posh init zsh --config '${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json')"
+eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
 # eval "$(oh-my-posh init zsh --config ${OHMYPOSH_THEMES_DIR}/emodipt-extend.omp.json)"
 
 # ------------------------------------------------------------------
