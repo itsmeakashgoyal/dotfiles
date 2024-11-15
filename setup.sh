@@ -38,40 +38,55 @@ initGitSubmodules() {
     git submodule update --init --recursive --remote
 }
 
+show_targets() {
+    echo "Available targets:"
+    echo "  all      - Install everything"
+    echo "  macos    - Setup macOS specific configurations"
+    echo "  linux    - Setup Linux specific configurations"
+    echo "  brew     - Install Homebrew and packages"
+    echo "  sublime  - Setup Sublime Text configuration"
+}
+
 setupDotfiles() {
-    if [ "$OS_TYPE" = "Darwin" ]; then
-        log_message "------> Setting up MACOS"
-        log_message "→ Running MacOS-specific setup script..."
-        # scripts=("_macOS" "_brew" "_sublime")
-        scripts=("_brew")
-        for script in "${scripts[@]}"; do
-            script_path="./scripts/setup/${script}.sh"
-            if [ -f "${script_path}" ]; then
-                echo "Running ${script_path} script..."
-                if ! "${script_path}"; then
-                    echo "Error: ${script} script failed. Continuing..."
-                fi
-            else
-                echo "Warning: ${script_path} not found. Skipping..."
-            fi
-        done
-    elif [ "$OS_TYPE" = "Linux" ]; then
-        log_message "------> Setting up LINUX"
-        # Run the setup script for the current OS
-        log_message "→ Running LinuxOS-specific setup script..."
-        scripts=("_linuxOS" "_brew")
-        for script in "${scripts[@]}"; do
-            script_path="./scripts/setup/${script}.sh"
-            if [ -f "${script_path}" ]; then
-                echo "Running ${script_path} script..."
-                if ! "${script_path}"; then
-                    echo "Error: ${script} script failed. Continuing..."
-                fi
-            else
-                echo "Warning: ${script_path} not found. Skipping..."
-            fi
-        done
+    local targets=("$@")
+
+    # If no targets specified, show help
+    if [ ${#targets[@]} -eq 0 ]; then
+        show_targets
+        return 1
     fi
+
+    for target in "${targets[@]}"; do
+        case "$target" in
+        "all")
+            if [ "$OS_TYPE" = "Darwin" ]; then
+                run_script "_brew"
+                # run_script "_macOS"
+                # run_script "_sublime"
+            elif [ "$OS_TYPE" = "Linux" ]; then
+                run_script "_linuxOS"
+                run_script "_brew"
+            fi
+            ;;
+        "macos")
+            [ "$OS_TYPE" = "Darwin" ] && run_script "_brew" || print_message "$RED" "Not on macOS"
+            ;;
+        "linux")
+            [ "$OS_TYPE" = "Linux" ] && run_script "_linuxOS" && run_script "_brew" || print_message "$RED" "Not on Linux"
+            ;;
+        "brew")
+            run_script "_brew"
+            ;;
+        "sublime")
+            run_script "_sublime"
+            ;;
+        *)
+            print_message "$RED" "Unknown target: $target"
+            show_targets
+            return 1
+            ;;
+        esac
+    done
 }
 
 setupNvim() {
@@ -138,7 +153,12 @@ You're running ${OS_TYPE}.
     symlink "nvim" ".config/nvim"
     symlink "tmux" ".config/tmux"
 
-    setupDotfiles
+    if [ $# -eq 0 ]; then
+        setupDotfiles "all"
+    else
+        setupDotfiles "$@"
+    fi
+
     setupNvim
 
     print_message "$GREEN" "
@@ -156,4 +176,4 @@ You're running ${OS_TYPE}.
 }
 
 # Run the main function
-main
+main "$@"

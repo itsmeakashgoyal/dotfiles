@@ -130,6 +130,26 @@ symlink() {
     log_message "Created symlink: '$dest_path' -> '$source_path'"
 }
 
+# Add this to your helper.sh
+run_script() {
+    local script_name="$1"
+    local script_path="./scripts/setup/${script_name}.sh"
+
+    if [ -f "${script_path}" ]; then
+        print_message "$YELLOW" "Running ${script_name} setup..."
+        if ! "${script_path}"; then
+            print_message "$RED" "Error: ${script_name} setup failed. Continuing..."
+            log_message "Error: ${script_name} setup failed"
+            return 1
+        fi
+        log_message "${script_name} setup completed successfully"
+    else
+        print_message "$RED" "Warning: ${script_path} not found. Skipping..."
+        log_message "Warning: ${script_path} not found"
+        return 1
+    fi
+}
+
 if [ ! -d "$LINUXTOOLBOXDIR" ]; then
     print_message "$YELLOW" "→ Creating linuxtoolbox directory: $LINUXTOOLBOXDIR"
     mkdir -p "$LINUXTOOLBOXDIR"
