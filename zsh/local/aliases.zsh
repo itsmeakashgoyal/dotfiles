@@ -12,10 +12,13 @@ alias lh='eza -dl .* --group-directories-first'           # lists only hidden fi
 alias ll='eza -al --group-directories-first'              # lists everything with directories first
 alias ls='eza -lF --color=always --sort=size | grep -v /' # lists only files sorted by size
 
+# bat alias
+alias cat='bat'
+alias catn='bat --style=plain'
+
 # System and Navigation
 alias c='clear'
 alias sshp="sshpass -p welcome ssh "
-alias vi='nvim'
 alias reload="exec ${SHELL} -l"     # Reload the shell (i.e. invoke as a login shell)
 alias path='echo -e ${PATH//:/\\n}' # Print each PATH entry on a separate line
 

@@ -19,10 +19,10 @@ alias dri='docker rmi $(docker images -q)' # Remove all images
 alias dn='docker network ls' # List Docker networks
 
 # Volume Management
-alias dvp='docker volume prune' # Remove unused Volumes
+alias dvp='docker volume prune -f' # Remove unused Volumes
 
 # System Prune
-alias dsp='docker system prune' # Remove unused Containers, Images, Network, etc.
+alias dsp='docker system prune -af' # Remove unused Containers, Images, Network, etc.
 
 # Container Inspection
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'" # Get container IP

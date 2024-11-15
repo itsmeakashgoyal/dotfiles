@@ -56,7 +56,7 @@ This script will:
 - `tmux/`: Containing tmux config files
 - `zsh/`: Containing Shell configuration files for Zsh.
 - `git/`: Containing git configuration.
-- `homeConfig/`: Containing configurations should be link to home dir.
+- `config/`: Containing configurations should be link to home dir.
 - `nvim/`: Another git submodule for my nvim config.
 - `nix/`: Nix configurations specific to LinuxOS.
 

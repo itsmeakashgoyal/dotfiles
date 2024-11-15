@@ -72,20 +72,6 @@ export MANPATH="/usr/local/man:$MANPATH"
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
@@ -106,6 +92,9 @@ bindkey "^[[B" history-beginning-search-forward
 zle -N menu-search
 zle -N recent-paths
 
+# pasting with tabs doesn't perform completion
+zstyle ':completion:*' insert-tab pending
+
 # Completion styles
 zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
 
@@ -118,15 +107,19 @@ zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
 zstyle ':completion:*' menu no
+zstyle ':completion:*' verbose yes
 zstyle ':completion:*' list-max-items 20
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*' group-name ''
 
 # preview directory's content with eza when completing cd
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
 
 # switch group using `<` and `>`
-# zstyle ':fzf-tab:*' switch-group '<' '>'
-# zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+zstyle ':fzf-tab:*' switch-group '<' '>'
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 
 # Set Up Completion
 # ------------------------------------------------------------------------------
@@ -148,7 +141,7 @@ fi
 
 ## These were created by `compinstall`
 zstyle ':completion:*' completer _complete _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]} r:|[._-]=* r:|=*' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}'
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'm:{[:lower:]}={[:upper:]} r:|[._-]=* r:|=*' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}'
 zstyle ':completion:*' max-errors 2
 
 # FZF and Zoxide integration

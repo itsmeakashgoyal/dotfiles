@@ -84,7 +84,7 @@ initiatingSymlink() {
     }
 
     # List of folders to symlink in .config directory
-    CONFIG_FOLDERS=("tmux" "nvim" "ohmyposh" "zsh")
+    CONFIG_FOLDERS=("tmux" "nvim" "ohmyposh")
     for folder in "${CONFIG_FOLDERS[@]}"; do
         log_message "→ Processing config folder: ${folder}"
         target_dir="${CONFIG_DIR}/${folder}"
@@ -108,9 +108,9 @@ initiatingSymlink() {
     done
 
     # List of folders to process
-    FOLDERS=("homeConfig" "git" "zsh")
+    FOLDERS=("zsh")
     # List of files to symlink directly in home directory
-    FILES=(".gitconfig" ".curlrc" ".gdbinit" ".wgetrc" ".zshenv" ".zshrc")
+    FILES=(".zshenv")
     # Create symlinks for each file within the specified folders
     for folder in "${FOLDERS[@]}"; do
         log_message "→ Processing folder: ${folder}"

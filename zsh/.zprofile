@@ -1,4 +1,6 @@
 #!/usr/bin/env zsh
+# .zprofile is sourced on login shells and before .zshrc. As a general rule, it should not change the
+# shell environment at all.
 
 # Detect OS type
 OS_TYPE=$(uname)

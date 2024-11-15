@@ -1,4 +1,10 @@
+[init]
+	defaultBranch = main
+
 [alias]
+	# list all aliases
+    la = "!git config -l | grep alias | cut -c 7-"
+
 	# View abbreviated SHA, description, and history graph of the latest 20 commits.
 	l = log --pretty=oneline -n 20 --graph --abbrev-commit
 
@@ -29,13 +35,15 @@
 	# Switch to a branch, creating it if necessary.
 	go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
 
+	# rebase the current branch with changes from upstream remote
+    update = !git fetch upstream && git rebase upstream/`git rev-parse --abbrev-ref HEAD`
+
+	dg = "!sh -c 'git ls-files -m | grep $1 | xargs git diff' -"
+
 	# Show verbose output about tags, branches or remotes
 	tags = tag -l
 	branches = branch --all
 	remotes = remote --verbose
-
-	# List aliases.
-	aliases = config --get-regexp alias
 
 	# Amend the currently staged files to the latest commit.
 	amend = commit --amend --reuse-message=HEAD
@@ -73,7 +81,7 @@
 
 [user]
     name = Akash Goyal
-    email = ag.akgoyal@gmail.com
+    email = akashgoyal2309@gmail.com
 
 [apply]
 	# Detect whitespace errors when applying a patch.
@@ -83,10 +91,34 @@
 	# Show most recently changed branches first.
 	sort = -committerdate
 
+[color]
+	diff = auto
+    status = auto
+    branch = auto
+    interactive = auto
+    ui = auto
+
+[color "branch"]
+	current = green bold
+    local = green
+    remote = red bold
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold # line info
+	old = red # deletions
+	new = green # additions
+
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = red
+
+[color "sh"]
+    branch = yellow
+
 [core]
-	# Use custom `.gitignore` and `.gitattributes`.
-	excludesfile = ~/.gitignore
-	attributesfile = ~/.gitattributes
+	pager = delta --line-numbers --dark
 
 	# Treat spaces before tabs and all kinds of trailing whitespace as an error.
 	# [default] trailing-space: looks for spaces at the end of a line
@@ -108,42 +140,39 @@
     # default editor for git
     editor = nvim
 
-[color]
-	# Use colors in Git commands that are capable of colored output when
-	# outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
-	ui = auto
+[delta]
+    features = unobtrusive-line-numbers decorations
+    whitespace-error-style = 22 reverse
+    syntax-theme = base16-256
+	side-by-side = true
+	navigate = true  # use n and N to move between diff sections
+    dark = true      # or light = true, or omit for auto-detection
 
-[color "branch"]
-	current = yellow reverse
-	local = yellow
-	remote = green
+[delta "unobtrusive-line-numbers"]
+    line-numbers = true
+    # line-numbers-minus-style = "#444444"
+    # line-numbers-zero-style = "#444444"
+    # line-numbers-plus-style = "#444444"
+    line-numbers-left-format = "{nm:>4}┊"
+    line-numbers-right-format = "{np:>4}│"
+    line-numbers-left-style = blue
+    line-numbers-right-style = blue
 
-[color "diff"]
-	meta = yellow bold
-	frag = magenta bold # line info
-	old = red # deletions
-	new = green # additions
+[delta "decorations"]
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
+    hunk-header-decoration-style = yellow box
 
-[color "status"]
-	added = yellow
-	changed = green
-	untracked = cyan
+[interactive]
+    diffFilter = delta --color-only
 
-[commit]
-	# https://help.github.com/articles/signing-commits-using-gpg/
-	gpgsign = false
+[rerere]
+    enabled = true
 
-[diff]
-	# Detect copies as well as renames.
-	renames = copies
-    tool = vimdiff3
-
-[difftool "vimdiff3"]
-    path = nvim
-
-[diff "bin"]
-	# Use `hexdump` to diff binary files.
-	textconv = hexdump -v -C
+[grep]
+    extendRegexp = true
+    lineNumber = true
 
 [help]
 	# Automatically correct and execute mistyped commands.
@@ -162,34 +191,32 @@
 
 [push]
 	# https://git-scm.com/docs/git-config#git-config-pushdefault
-	default = simple
+	default = current
 	# Make `git push` push relevant annotated tags when pushing branches out.
 	followTags = true
+
+[diff]
+    renames = copies
+    mnemonicprefix = true
+    compactionHeuristic = true
+[difftool]
+    prompt = false
 
 # URL shorthands
 [url "git@github.com:"]
 	insteadOf = "gh:"
 	pushInsteadOf = "github:"
 	pushInsteadOf = "git://github.com/"
-
 [url "git://github.com/"]
 	insteadOf = "github:"
-
 [url "git@gist.github.com:"]
 	insteadOf = "gst:"
 	pushInsteadOf = "gist:"
 	pushInsteadOf = "git://gist.github.com/"
-
 [url "git://gist.github.com/"]
 	insteadOf = "gist:"
-
-[init]
-	defaultBranch = main
 
 [credential "https://github.com"]
         helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
         helper = !/usr/bin/gh auth git-credential
-
-
-

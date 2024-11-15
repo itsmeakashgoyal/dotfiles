@@ -2,8 +2,10 @@
 # Vim Configuration: Aliases and Functions
 # ------------------------------------------------------------------------------
 
-# Set default editor to Neovim
-export EDITOR='nvim'
+# use nvim, but don't make me think about it
+if [[ -n "$(command -v nvim)" ]]; then
+    alias vi="nvim"
+fi
 
 # Function to open Vim with zoxide integration
 v() {

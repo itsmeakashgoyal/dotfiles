@@ -63,22 +63,3 @@ export LESS_TERMCAP_se=$'\e[0m'
 export LESS_TERMCAP_so=$'\e[01;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;32m'
-
-# History Configuration
-# the detailed meaning of the below three variable can be found in `man zshparam`.
-export HISTSIZE=1000000 # Number of items for the internal history list
-export HISTFILE=~/.zsh_history
-export SAVEHIST=$HISTSIZE # Maximum number of items for the history file
-
-# History Options
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups # Don't put duplicated command into history list
-setopt hist_save_no_dups    # Don't save duplicated command
-setopt hist_ignore_dups
-setopt hist_find_no_dups
-# setopt EXTENDED_HISTORY   # Record command start time (uncomment if needed)
-
-# Other Options
-export HISTDUP=erase
