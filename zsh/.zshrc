@@ -114,9 +114,6 @@ eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
 # Key Bindings
 [[ -f "$HOME/dotfiles/zsh/config/keybindings.zsh" ]] && builtin source "$HOME/dotfiles/zsh/config/keybindings.zsh"
 
-# GitHub CLI completion
-[[ -f "$HOME/dotfiles/zsh/config/gh_completion.zsh" ]] && builtin source "$HOME/dotfiles/zsh/config/gh_completion.zsh"
-
 # Completion Configuration
 [[ -f "$HOME/dotfiles/zsh/config/completion.zsh" ]] && builtin source "$HOME/dotfiles/zsh/config/completion.zsh"
 
