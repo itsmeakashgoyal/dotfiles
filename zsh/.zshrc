@@ -23,7 +23,7 @@ ZSH_THEME="robbyrussell"
 # Uncomment one of the following lines to change the auto-update behavior
 # zstyle ':omz:update' mode disabled  # disable automatic updates
 # zstyle ':omz:update' mode auto      # update automatically without asking
-zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+zstyle ':omz:update' mode reminder # just remind me to update when it's time
 
 # Uncomment the following line to change how often to auto-update (in days).
 zstyle ':omz:update' frequency 13
@@ -73,8 +73,8 @@ export MANPATH="/usr/local/man:$MANPATH"
 export LANG=en_US.UTF-8
 
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
-setopt glob_dots     # no special treatment for file names with a leading dot
-setopt no_auto_menu  # require an extra TAB press to open the completion menu
+setopt glob_dots    # no special treatment for file names with a leading dot
+setopt no_auto_menu # require an extra TAB press to open the completion menu
 setopt extended_glob
 
 zle -N menu-search
@@ -94,7 +94,7 @@ if [ "$OS_TYPE" = "Darwin" ]; then
 elif [ "$OS_TYPE" = "Linux" ]; then
     # Linux specific zsh configs
     export NVM_DIR="${HOME}/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
 
     # # Nix
     # if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then

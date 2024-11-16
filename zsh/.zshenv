@@ -35,21 +35,25 @@ export VISUAL="nvim"
 
 # History Configuration
 # the detailed meaning of the below three variable can be found in `man zshparam`.
-export HISTSIZE=1000000 # Number of items for the internal history list
-export HISTFILE="${HOME}/.zsh_history"
+export HISTSIZE=1000000   # Number of items for the internal history list
 export SAVEHIST=$HISTSIZE # Maximum number of items for the history file
 
 # History Options
 setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
+setopt sharehistory         # share hist between sessions
+setopt hist_reduce_blanks   # trim blanks
+setopt hist_ignore_space    # ignore space prefixed commands
 setopt hist_ignore_all_dups # Don't put duplicated command into history list
 setopt hist_save_no_dups    # Don't save duplicated command
 setopt hist_ignore_dups
 setopt hist_find_no_dups
+setopt hist_verify        # show before executing history commands
+setopt inc_append_history # add commands as they are typed, don't wait until shell exit
+setopt bang_hist          # !keyword
 # setopt EXTENDED_HISTORY   # Record command start time (uncomment if needed)
 
 # Other Options
+export HISTFILE="${HOME}/.zsh_history"
 export HISTDUP=erase
 
 setopt NO_HUP # don't kill background jobs when the shell exits

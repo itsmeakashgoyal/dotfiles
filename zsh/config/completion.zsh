@@ -43,8 +43,12 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $real
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 
+# Load Git completion
+zstyle ':completion:*:*:git:*' script '${ZDOTDIR}/config/git-completion.zsh'
+fpath=('${ZDOTDIR}/config' $fpath)
+
 # Initialize completion system with specific dump file location
-autoload -Uz compinit 
+autoload -Uz compinit && compinit
 if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
     compinit -d "$cache_directory/.zcompdump"
 else
