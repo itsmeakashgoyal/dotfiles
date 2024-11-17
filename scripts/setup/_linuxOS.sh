@@ -28,7 +28,9 @@ IFS=$'nt'
 # Get OS name
 readonly OS_NAME=$(grep ^NAME /etc/*os-release | cut -d '"' -f 2)
 
-# Check if we are on ubuntu
+# ------------------------------------------------------------------------------
+# System Detection
+# ------------------------------------------------------------------------------
 check_ubuntu() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
@@ -74,18 +76,38 @@ update_and_install() {
         sudo apt-get -y upgrade
     fi
 
+    # Core packages
     local packages=(
-        build-essential libc++-15-dev clang-format-15 libkrb5-dev procps file vim-gtk python3-setuptools
-        tmux locate libgraph-easy-perl fd-find fontconfig python3-venv python3-pip luarocks shellcheck strace numfmt lsb-release
+        build-essential
+        libc++-15-dev
+        clang-format-15
+        libkrb5-dev
+        procps
+        file
+        vim-gtk
+        python3-setuptools
+        tmux
+        locate
+        libgraph-easy-perl
+        fd-find
+        fontconfig
+        python3-venv
+        python3-pip
+        luarocks
+        shellcheck
+        strace
+        lsb-release
     )
 
     sudo apt-get -y install "${packages[@]}"
-
-    print_message "$GREEN" "Completed Updates & Installs."
+    print_message "$GREEN" "Package installation complete"
     log_message "Completed system update and package installation"
     sleep 2
 }
 
+# ------------------------------------------------------------------------------
+# Tool Installation Functions
+# ------------------------------------------------------------------------------
 installEzaAndExa() {
     if command_exists exa; then
         print_message "$YELLOW" "exa already installed"
@@ -127,7 +149,8 @@ installLatestGo() {
         print_message "$YELLOW" "Installing go.."
         GO_VERSION="1.23.0" # Update this version as needed
         curl -LO "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
-        sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
+        sudo rm -rf /usr/local/go
+        sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
         rm "go${GO_VERSION}.linux-amd64.tar.gz"
     fi
 }
@@ -159,14 +182,13 @@ installZoxide() {
 
     if ! curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
         print_message "$RED" "Something went wrong during zoxide install!"
-        exit 1
+        return 1
     fi
 }
 
-# Set the error trap
-trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
-
-# Main function
+# ------------------------------------------------------------------------------
+# Main Function
+# ------------------------------------------------------------------------------
 main() {
     log_message "Script started"
     print_message "$BLUE" "
@@ -200,6 +222,7 @@ You're running ${OS_NAME}.
         exit 1
     fi
 
+    # Install components
     update_and_install
     # installEzaAndExa
     # installAntidote
@@ -216,5 +239,8 @@ You're running ${OS_NAME}.
     log_message "Installation Completed for Ubuntu-based system detected. Proceeding with other steps"
 }
 
-# Run the main function
+# Set error trap
+trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
+
+# Run main
 main
