@@ -1,58 +1,100 @@
 #!/usr/bin/env bash
 
-# Enable strict mode for better error handling
+#################################################
+#      File: _print-functions.sh                  #
+#      Description: Print zsh functions list      #
+#      Status: Development                       #
+#################################################
+
+# ------------------------------------------------------------------------------
+# Initialization
+# ------------------------------------------------------------------------------
 set -eu pipefail
 
-# Set the filename of the script containing the functions
-FILE="${HOME}/dotfiles/zsh/local/functions.zsh"
+# Constants
+readonly FUNCTIONS_FILE="${HOME}/dotfiles/zsh/local/functions.zsh"
+readonly TABLE_FORMAT="%-20s %s\n"
+readonly HEADER_LINE="%-20s %s\n"
 
-# Check if the file exists
-if [[ ! -f "$FILE" ]]; then
-    echo "Error: Function file not found at $FILE" >&2
+# Check if functions file exists
+if [[ ! -f "$FUNCTIONS_FILE" ]]; then
+    echo "Error: Function file not found at $FUNCTIONS_FILE" >&2
     exit 1
 fi
 
-# Function to extract function name and comment
+# ------------------------------------------------------------------------------
+# Function Parser
+# ------------------------------------------------------------------------------
 extract_function_info() {
     local line="$1"
     local next_line="$2"
     local comment=""
-    local f_name=""
+    local func_name=""
 
-    # Extract comment (if present)
-    if [[ $line =~ ^#[[:space:]]*(.*) ]]; then
+    # Debug output (uncomment to debug)
+    # echo "Processing line: $line"
+    # echo "Next line: $next_line"
+
+    # Extract comment if line starts with #
+    if [[ $line =~ ^[[:space:]]*#[[:space:]]*(.*) ]]; then
         comment="${BASH_REMATCH[1]}"
     fi
 
-    # Extract function name from the next line
-    if [[ $next_line =~ ^function[[:space:]]+([a-zA-Z0-9_-]+) || $next_line =~ ^([a-zA-Z0-9_-]+)\(\) ]]; then
-        f_name="${BASH_REMATCH[1]}"
+    # Extract function name (more flexible pattern matching)
+    if [[ $next_line =~ ^[[:space:]]*(function[[:space:]]+)?([a-zA-Z0-9_-]+)[[:space:]]*\(\) ]]; then
+        func_name="${BASH_REMATCH[2]}"
     fi
 
-    # Only return if both comment and function name are present
-    if [[ -n "$comment" && -n "$f_name" ]]; then
-        echo "$f_name|$comment"
+    # Output only if both comment and function name exist
+    if [[ -n "$comment" && -n "$func_name" ]]; then
+        echo "$func_name|$comment"
     fi
 }
 
-# Parse the file for function names and comments
-declare -a functions=()
-while IFS= read -r line; do
-    IFS= read -r next_line
-    result=$(extract_function_info "$line" "$next_line")
-    if [[ -n "$result" ]]; then
-        functions+=("$result")
+# ------------------------------------------------------------------------------
+# Main Function
+# ------------------------------------------------------------------------------
+main() {
+    # Parse file and store functions
+    local -a functions=()
+    local line=""
+    local next_line=""
+
+    # Read file line by line
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        # Read next line
+        IFS= read -r next_line || true
+
+        # Skip empty lines
+        [[ -z "$line" ]] && continue
+
+        # Extract function info
+        local result=$(extract_function_info "$line" "$next_line")
+        if [[ -n "$result" ]]; then
+            functions+=("$result")
+        fi
+    done <"$FUNCTIONS_FILE"
+
+    # Check if any functions were found
+    if [[ ${#functions[@]} -eq 0 ]]; then
+        echo "No functions found in $FUNCTIONS_FILE"
+        exit 0
     fi
-done <"$FILE"
 
-# Sort the functions alphabetically by name
-IFS=$'\n' sorted=($(sort <<<"${functions[*]}"))
-unset IFS
+    # Sort functions alphabetically
+    IFS=$'\n' sorted=($(sort <<<"${functions[*]}"))
+    unset IFS
 
-# Print out the sorted functions
-printf "%-20s %s\n" "Function" "Description"
-printf "%-20s %s\n" "--------" "-----------"
-for f in "${sorted[@]}"; do
-    IFS='|' read -r f_name com <<<"$f"
-    printf "%-20s %s\n" "$f_name" "$com"
-done
+    # Print header
+    printf "$HEADER_LINE" "Function" "Description"
+    printf "$HEADER_LINE" "--------" "-----------"
+
+    # Print sorted functions
+    for func in "${sorted[@]}"; do
+        IFS='|' read -r name description <<<"$func"
+        printf "$TABLE_FORMAT" "$name" "$description"
+    done
+}
+
+# Run main function
+main

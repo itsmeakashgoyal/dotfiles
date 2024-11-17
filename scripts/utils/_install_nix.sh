@@ -1,65 +1,93 @@
 #!/usr/bin/env bash
 
 #################################################
-#      File: _install_nix.sh                    #
-#      Author: Akash Goyal                      #
-#      Status: Development                      #
+#      File: _install_nix.sh                     #
+#      Author: Akash Goyal                       #
+#      Status: Development                       #
 #################################################
 
-# ------------------------------
-#          INITIALIZE
-# ------------------------------
-# Load Helper functions persistently
+# ------------------------------------------------------------------------------
+# Initialization
+# ------------------------------------------------------------------------------
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
 HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
-# Check if helper file exists and source it
+
+# Source helper functions
 if [[ ! -f "$HELPER_FILE" ]]; then
 	echo "Error: Helper file not found at $HELPER_FILE" >&2
 	exit 1
 fi
-
-# Source the helper file
 source "$HELPER_FILE"
 
-# Enable strict mode for better error handling
+# Enable strict mode
 set -eu pipefail
 IFS=$'\n\t'
 
-# Set the error trap
-trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+readonly NIX_INSTALLER_URL="https://install.determinate.systems/nix"
+readonly NIX_INSTALLER_FILE="/tmp/nix-installer.sh"
+readonly NIX_ENV_FILE="/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
 
-print_message "$YELLOW" "→ Install Nix package manager"
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix >nix-installer.sh
-chmod +x nix-installer.sh
+# ------------------------------------------------------------------------------
+# Installation Functions
+# ------------------------------------------------------------------------------
+install_nix() {
+	print_message "$YELLOW" "Installing Nix package manager..."
 
-# Setting --no-confirm option in CI environment to install nix
-if [ -z "$CI" ]; then
-	./nix-installer.sh install
-else
-	./nix-installer.sh install --no-confirm
-fi
-rm nix-installer.sh
+	# Download installer
+	if ! curl --proto '=https' --tlsv1.2 -sSf -L "$NIX_INSTALLER_URL" -o "$NIX_INSTALLER_FILE"; then
+		print_message "$RED" "Failed to download Nix installer"
+		return 1
+	fi
 
-# Source Nix environment script if installation succeeded
-. "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
+	# Make installer executable
+	chmod +x "$NIX_INSTALLER_FILE"
 
-print_message "$YELLOW" "→ Copy nix folder into CONFIG_DIR dir"
-cp -rf "${DOTFILES_DIR}/nix" "${CONFIG_DIR}"
+	# Run installer
+	if [ -z "${CI:-}" ]; then
+		"$NIX_INSTALLER_FILE" install
+	else
+		"$NIX_INSTALLER_FILE" install --no-confirm
+	fi
 
-print_message "$YELLOW" "→ Installing Nix packages"
-# Change to the .config/nix directory
-# Define CONFIG_DIR if not set
-CONFIG_DIR="${CONFIG_DIR:-$HOME/.config}"
-print_message "$YELLOW" "→ Changing to the ${CONFIG_DIR}/nvim directory"
-cd "${CONFIG_DIR}/nix" || {
-	print_message "$YELLOW" "→ Failed to change directory to ${CONFIG_DIR}/nix"
-	exit 1
+	# Cleanup installer
+	rm -f "$NIX_INSTALLER_FILE"
+
+	# Source Nix environment
+	if [[ -f "$NIX_ENV_FILE" ]]; then
+		source "$NIX_ENV_FILE"
+	else
+		print_message "$RED" "Nix environment file not found"
+		return 1
+	fi
 }
 
-# Restart nix-daemon to apply changes
-sudo systemctl restart nix-daemon.service
+setup_nix_config() {
+	print_message "$YELLOW" "Setting up Nix configuration..."
 
-if [ -z "$CI" ]; then
+	# Copy nix configuration
+	if ! cp -rf "${DOTFILES_DIR}/nix" "$CONFIG_DIR"; then
+		print_message "$RED" "Failed to copy Nix configuration"
+		return 1
+	fi
+
+	# Change to nix config directory
+	if ! cd "${CONFIG_DIR}/nix"; then
+		print_message "$RED" "Failed to change to Nix config directory"
+		return 1
+	fi
+}
+
+setup_home_manager() {
+	print_message "$YELLOW" "Setting up Home Manager..."
+
+	# Restart nix-daemon
+	if command -v systemctl &>/dev/null; then
+		sudo systemctl restart nix-daemon.service
+	fi
+
 	# Install Home Manager if not installed
 	# if ! command -v home-manager &>/dev/null; then
 	#     log "→ Setting up Home Manager"
@@ -68,12 +96,37 @@ if [ -z "$CI" ]; then
 	#     nix-shell '<home-manager>' -A install
 	# fi
 
-	# This command does not set up Home Manager as a standalone package though
-	# This command runs Home Manager as a temporary process in a nix shell.
-	# It will initialize a Home Manager configuration and switch to it if the configuration files already exist.
-	nix run home-manager -- init --switch .
+	# Skip Home Manager setup in CI
+	if [ -z "${CI:-}" ]; then
+		# This command does not set up Home Manager as a standalone package though
+		# This command runs Home Manager as a temporary process in a nix shell.
+		# It will initialize a Home Manager configuration and switch to it if the configuration files already exist.
+		if ! nix run home-manager -- init --switch .; then
+			print_message "$RED" "Failed to initialize Home Manager"
+			return 1
+		fi
 
-	# Initialize and switch to the Home Manager configuration
-	print_message "$YELLOW" "→ Switching Home Manager configuration"
-	home-manager switch --flake .
-fi
+		# Switch to Home Manager configuration
+		if ! home-manager switch --flake .; then
+			print_message "$RED" "Failed to switch Home Manager configuration"
+			return 1
+		fi
+	fi
+}
+
+# ------------------------------------------------------------------------------
+# Main Function
+# ------------------------------------------------------------------------------
+main() {
+	install_nix
+	setup_nix_config
+	setup_home_manager
+
+	print_message "$GREEN" "Nix installation and setup completed successfully!"
+}
+
+# Set error trap
+trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
+
+# Run main
+main

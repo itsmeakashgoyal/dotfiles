@@ -68,6 +68,7 @@ if OS.mac?
     # Core Tools
     brew "coreutils"        # GNU core utilities
     brew "curl"             # Better URL transfers
+    brew "entr"
     brew "openssh"          # OpenSSH client
     brew "ssh-copy-id"      # SSH key installer
     brew "stow"             # Symlink farm manager

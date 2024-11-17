@@ -1,54 +1,148 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Function to select a file using fzf
-select_file() {
-    find .. -type f -name "*.mdx" | fzf --height 40% --reverse --prompt="Select $1 file: "
-}
+#################################################
+#      File: _diff_files_interactive.sh          #
+#      Description: Interactive file diff tool    #
+#      Status: Development                       #
+#################################################
 
-# Select the first file
-FILE1=$(select_file "first")
+# ------------------------------------------------------------------------------
+# Initialization
+# ------------------------------------------------------------------------------
+set -eu pipefail
 
-# If no file was selected, exit
-if [ -z "$FILE1" ]; then
-    echo "No file selected. Exiting."
-    exit 1
-fi
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+readonly PROJECT_DIR="${HOME}/dotfiles"  # Adjust this to your project root
 
-# Select the second file
-FILE2=$(select_file "second")
+# ------------------------------------------------------------------------------
+# Dependency Check
+# ------------------------------------------------------------------------------
+check_dependencies() {
+    local missing_deps=()
+    
+    for cmd in fzf diff diff-so-fancy entr; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            missing_deps+=("$cmd")
+        fi
+    done
 
-# If no file was selected, exit
-if [ -z "$FILE2" ]; then
-    echo "No file selected. Exiting."
-    exit 1
-fi
-
-# Debug: Print selected files
-echo "Selected files:"
-echo "File 1: $FILE1"
-echo "File 2: $FILE2"
-
-# Function to perform diff
-perform_diff() {
-    local file1="$1"
-    local file2="$2"
-    echo "Performing diff between:"
-    echo "$file1"
-    echo "$file2"
-    if [ -f "$file1" ] && [ -f "$file2" ]; then
-        diff --unified=0 "$file1" "$file2" | diff-so-fancy
-    else
-        echo "Error: One or both files do not exist."
-        [ ! -f "$file1" ] && echo "File does not exist: $file1"
-        [ ! -f "$file2" ] && echo "File does not exist: $file2"
+    if [[ ${#missing_deps[@]} -gt 0 ]]; then
+        echo "Error: Missing required dependencies: ${missing_deps[*]}"
+        echo -e "\nInstallation instructions:"
+        
+        if [[ "$(uname)" == "Darwin" ]]; then
+            echo "Using Homebrew:"
+            echo "  brew install ${missing_deps[*]}"
+        elif [[ "$(uname)" == "Linux" ]]; then
+            if command -v apt-get >/dev/null 2>&1; then
+                echo "Using apt:"
+                echo "  sudo apt-get install ${missing_deps[*]}"
+            elif command -v dnf >/dev/null 2>&1; then
+                echo "Using dnf:"
+                echo "  sudo dnf install ${missing_deps[*]}"
+            elif command -v pacman >/dev/null 2>&1; then
+                echo "Using pacman:"
+                echo "  sudo pacman -S ${missing_deps[*]}"
+            fi
+        fi
+        
+        exit 1
     fi
 }
 
-# Use entr to watch for changes and perform diff
-(
-    echo "$FILE1"
-    echo "$FILE2"
-) | entr -s "$(declare -f perform_diff); perform_diff '$FILE1' '$FILE2'"
+# ------------------------------------------------------------------------------
+# Functions
+# ------------------------------------------------------------------------------
+select_file() {
+    local prompt="$1"
+    
+    # Change to project directory
+    cd "$PROJECT_DIR" || exit 1
+    
+    # Find files, excluding common directories to ignore
+    find . \
+        -type f \
+        -not -path "*/\.*" \
+        -not -path "*/node_modules/*" \
+        -not -path "*/vendor/*" \
+        2>/dev/null | \
+        sed 's|^./||' | \
+        fzf --height 40% \
+            --reverse \
+            --prompt="Select $prompt file: " || echo ""
+}
 
-# Optionally, you can add a prompt to press any key to exit
-read -n 1 -s -r -p "Press any key to exit..."
+perform_diff() {
+    local file1="$1"
+    local file2="$2"
+
+    # Construct full paths
+    local full_path1="${PROJECT_DIR}/${file1}"
+    local full_path2="${PROJECT_DIR}/${file2}"
+
+    # Debug output
+    echo "Checking paths:"
+    echo "File 1: $full_path1"
+    echo "File 2: $full_path2"
+
+    # Verify files exist
+    if [[ ! -f "$full_path1" || ! -f "$full_path2" ]]; then
+        echo "Error: One or both files do not exist:"
+        [[ ! -f "$full_path1" ]] && echo "Missing: $full_path1"
+        [[ ! -f "$full_path2" ]] && echo "Missing: $full_path2"
+        return 1
+    fi
+
+    # Perform diff with fancy output
+    echo -e "\nComparing files:"
+    echo "1: $full_path1"
+    echo "2: $full_path2"
+    echo -e "\nDifferences:\n"
+    diff --unified=0 "$full_path1" "$full_path2" | diff-so-fancy
+}
+
+# ------------------------------------------------------------------------------
+# Main Function
+# ------------------------------------------------------------------------------
+main() {
+    # Check dependencies first
+    check_dependencies
+
+    # Ensure we're in the project directory
+    cd "$PROJECT_DIR" || exit 1
+
+    # Select files
+    local file1
+    local file2
+    
+    # Select first file
+    file1=$(select_file "first")
+    if [[ -z "$file1" ]]; then
+        echo "No file selected. Exiting."
+        exit 1
+    fi
+
+    # Select second file
+    file2=$(select_file "second")
+    if [[ -z "$file2" ]]; then
+        echo "No file selected. Exiting."
+        exit 1
+    fi
+
+    # Debug output
+    echo "Selected files:"
+    echo "File 1: $file1"
+    echo "File 2: $file2"
+
+    # Watch files for changes and perform diff
+    echo -e "\nWatching files for changes. Press Ctrl+C to exit.\n"
+    (
+        echo "$full_path1"
+        echo "$full_path2"
+    ) | entr -s "$(declare -f perform_diff); perform_diff '$file1' '$file2'"
+}
+
+# Run main function
+main

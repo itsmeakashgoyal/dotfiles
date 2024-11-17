@@ -97,6 +97,7 @@ update_and_install() {
         shellcheck
         strace
         lsb-release
+        entr
     )
 
     sudo apt-get -y install "${packages[@]}"
