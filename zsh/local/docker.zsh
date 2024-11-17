@@ -1,43 +1,104 @@
+#!/usr/bin/env zsh
+
 # ------------------------------------------------------------------------------
-# Docker Aliases
+# Docker Aliases and Functions
 # ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
 # Container Management
-alias dl="docker ps -l -q"                                                  # Get the latest container ID
-alias dps="docker ps"                                                       # Get list of all running containers
-alias dpa="docker ps -a"                                                    # Get list of all containers, even the ones not running
+# ------------------------------------------------------------------------------
+alias dl="docker ps -l -q" # Get the latest container ID
+alias dps="docker ps"      # Get list of all running containers
+alias dpa="docker ps -a"   # Get list of all containers, even the ones not running
+
+# Stop containers
 alias dstop='docker stop $(docker ps -a -q)'                                # Stop all containers
 alias drm='docker rm $(docker ps -a -q)'                                    # Remove all containers
 alias drmf='docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)' # Stop and Remove all containers
-# alias dclean="docker rm -v $(docker ps -a -q -f status=exited)"             # Remove all stopped/exited containers
 
+# ------------------------------------------------------------------------------
 # Image Management
+# ------------------------------------------------------------------------------
 alias di="docker images"                   # List all images
 alias dri='docker rmi $(docker images -q)' # Remove all images
+alias dpull="docker pull"                  # Pull an image
+alias dbuild="docker build"                # Build an image
 
-# Network Management
-alias dn='docker network ls' # List Docker networks
+# ------------------------------------------------------------------------------
+# System Management
+# ------------------------------------------------------------------------------
+# Remove unused data (containers, networks, images, volumes)
+alias docker-clean='docker system prune --volumes -af'
 
-# Volume Management
-alias dvp='docker volume prune -f' # Remove unused Volumes
+# Individual prune commands
+alias dcp='docker container prune -f' # Remove stopped containers
+alias dip='docker image prune -af'    # Remove unused images
+alias dnp='docker network prune -f'   # Remove unused networks
+alias dsp='docker system prune -af'   # Remove all unused objects
 
-# System Prune
-alias dsp='docker system prune -af' # Remove unused Containers, Images, Network, etc.
+# ------------------------------------------------------------------------------
+# Container Inspection and Interaction
+# ------------------------------------------------------------------------------
+# Get container IP
+dcip() {
+  local container_name="$1"
+  if [[ -z "$container_name" ]]; then
+    echo "Usage: dip CONTAINER_NAME"
+    return 1
+  fi
+  docker inspect --format '{{ .NetworkSettings.IPAddress }}' "$container_name"
+}
 
-# Container Inspection
-alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'" # Get container IP
+# Execute bash in container
+dbash() {
+  local container_name="$1"
+  if [[ -z "$container_name" ]]; then
+    echo "Usage: dbash CONTAINER_NAME"
+    return 1
+  fi
+  docker exec -it "$container_name" bash || docker exec -it "$container_name" sh
+}
 
-# Container Interaction
-alias dbash='docker exec -it $(docker ps -aqf "name=$1") bash' # Bash into a running container
+# Stop containers by partial name match
+dsc() {
+  local container_pattern="$1"
+  if [[ -z "$container_pattern" ]]; then
+    echo "Usage: dsc CONTAINER_PATTERN"
+    return 1
+  fi
+  docker stop $(docker ps -a | grep "$container_pattern" | awk '{print $1}')
+}
 
-alias docker-clean=' \
-  docker container prune -f ; \
-  docker image prune -f ; \
-  docker network prune -f ; \
-  docker volume prune -f '
+# Remove containers by partial name match
+drmc() {
+  local container_pattern="$1"
+  if [[ -z "$container_pattern" ]]; then
+    echo "Usage: drmc CONTAINER_PATTERN"
+    return 1
+  fi
+  docker rm $(docker ps -a | grep "$container_pattern" | awk '{print $1}')
+}
 
-# Stop specific container
-dsc() { docker stop $(docker ps -a | grep $1 | awk '{print $1}'); }
+# Show docker disk usage
+dsize() {
+  docker system df -v
+}
 
-# Show all aliases related to docker
-dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/" | sed "s/['|\']//g" | sort; }
+# List all Docker aliases and functions
+dalias() {
+  echo "Docker Aliases and Functions:"
+  echo "----------------------------"
+  alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/" | sed "s/['|\']//g" | sort
+  echo "\nCustom Functions:"
+  echo "---------------"
+  declare -f | grep '^[a-z][a-zA-Z0-9_]* () {$' | grep 'd[a-zA-Z0-9_]*' | sed 's/ () {$//'
+}
+
+# Check if Docker daemon is running
+docker_running() {
+  if ! docker info >/dev/null 2>&1; then
+    echo "Error: Docker daemon is not running"
+    return 1
+  fi
+  return 0
+}

@@ -1,101 +1,139 @@
+#!/usr/bin/env zsh
+
 # ------------------------------------------------------------------------------
 # Git Configuration: Aliases and Functions
 # ------------------------------------------------------------------------------
 
-# Unalias oh-my-zsh aliases, in favour of my own custom config
-unalias gco
-unalias gbd
-unalias gcmsg
-unalias gcam
-unalias gpr
-unalias gp
-unalias gstp
+# Unalias conflicting oh-my-zsh git aliases
+unalias gco gcmsg gcam gpr gp gstp gbd 2>/dev/null
 
-# Git config aliases
-alias gcg="git config --edit --global"  # Edit global Git config
-alias gcl="git config --edit --local"   # Edit local Git config
+# ------------------------------------------------------------------------------
+# Basic Git Aliases
+# ------------------------------------------------------------------------------
+alias gs="git status"                  # Git status
+alias gc="git clean -f"                # Force clean untracked files
+alias gcg="git config --edit --global" # Edit global Git config
+alias gcl="git config --edit --local"  # Edit local Git config
 
-# Git status with fzf preview
-alias gs="git status"
-
-# Git log aliases
+# ------------------------------------------------------------------------------
+# Git Log Aliases
+# ------------------------------------------------------------------------------
+# Pretty git log with graph
 alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
-alias glogNoDays="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit"
+alias glogn="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit"
 
-# Miscellaneous aliases
-alias epoc="date +%s"                   # Get current epoch time
-alias gc="git clean -f"                 # Force clean untracked files
-alias ghcurrentbranch='gh repo view --branch $(git rev-parse --abbrev-ref HEAD) --web'  # Open current branch on GitHub
-alias ghc='~/dotfiles/scripts/_gh_cli.sh'  # Custom GitHub CLI script
+# ------------------------------------------------------------------------------
+# GitHub CLI Aliases
+# ------------------------------------------------------------------------------
+alias ghcb='gh repo view --branch $(git rev-parse --abbrev-ref HEAD) --web' # Open current branch on GitHub
 
-# Git checkout with fzf fuzzy search
+# ------------------------------------------------------------------------------
+# Branch Management Functions
+# ------------------------------------------------------------------------------
+# Fuzzy checkout local branch
 gco() {
-    if [ -n "$1" ]; then git checkout $1; return; fi
+    if [ -n "$1" ]; then
+        git checkout "$1"
+        return
+    fi
     git branch -vv | fzf | awk '{print $1}' | xargs git checkout
 }
 
-# Git checkout remote branch with fzf fuzzy search
+# Fuzzy checkout remote branch
 gcr() {
     git fetch
-    if [ -n "$1" ]; then git checkout $1; return; fi
+    if [ -n "$1" ]; then
+        git checkout "$1"
+        return
+    fi
     git branch --all | fzf | sed "s#remotes/[^/]*/##" | xargs git checkout
 }
 
-# Git checkout history with fzf fuzzy search
+# Fuzzy checkout from branch history
 gch() {
-    local branches branch
-    branches=$(git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep checkout | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n 11 | tail -n 10 | awk -F' ~ HEAD@{' '{printf("%s: %s\n", substr($2, 1, length($2)-1), $1)}')
+    local branches selection branch
+    branches=$(git reflog show --pretty=format:'%gs ~ %gd' --date=relative |
+        grep 'checkout' |
+        grep -oE '[^ ]+ ~ .*' |
+        awk -F~ '!seen[$1]++' |
+        head -n 10 |
+        awk -F' ~ HEAD@{' '{printf("%s: %s\n", substr($2, 1, length($2)-1), $1)}')
     selection=$(echo "$branches" | fzf +m)
     branch=$(echo "$selection" | awk '{print $NF}')
-    git checkout $branch
+    [ -n "$branch" ] && git checkout "$branch"
 }
 
-# Git checkout a PR with fzf fuzzy search
+# Fuzzy checkout PR
 gpr() {
-    if [ -n "$1" ]; then gh pr checkout $1; return; fi
+    if [ -n "$1" ]; then
+        gh pr checkout "$1"
+        return
+    fi
     gh pr list | fzf | awk '{print $1}' | xargs gh pr checkout
 }
 
-# Git checkout tag with fzf fuzzy search
+# Fuzzy checkout tag
 gct() {
-    if [ -n "$1" ]; then git checkout $1; return; fi
+    if [ -n "$1" ]; then
+        git checkout "$1"
+        return
+    fi
     git tag | fzf | xargs git checkout
 }
 
-# Git delete branch with fzf fuzzy search
+# Fuzzy delete branch with confirmation
 gbd() {
-    if [ -n "$1" ]; then git branch -d $1; return; fi
-    local selected=$(git branch -vv | fzf | awk '{print $1}' | sed "s/.* //")
-    if [ -z "$selected" ]; then return; fi
-    echo "Are you sure you would like to delete branch [\e[0;31m$selected\e[0m]? (Type 'delete' to confirm)"
-    read confirmation
-    if [[ "$confirmation" == "delete" ]]; then
-        git branch -D $selected
+    if [ -n "$1" ]; then
+        git branch -d "$1"
+        return
+    fi
+    local selected=$(git branch -vv | fzf | awk '{print $1}')
+    if [ -n "$selected" ]; then
+        echo "Delete branch [\e[0;31m$selected\e[0m]? (Type 'delete' to confirm)"
+        read -r confirmation
+        [[ "$confirmation" == "delete" ]] && git branch -D "$selected"
     fi
 }
 
+# ------------------------------------------------------------------------------
+# Commit Functions
+# ------------------------------------------------------------------------------
 # Commit with message
-# Note: Oh-my-zsh has this alias already, but this function removes the need to wrap the message in quotes
 gcmsg() {
     git commit -m "$*"
 }
 
-# Add all and commit with message
-# Note: Oh-my-zsh has this alias already, but it doesn't add untracked files
+# Add all and commit
 gcam() {
     git add --all && git commit -m "$*"
 }
 
+# Add all, commit, and push
+gac() {
+    git add . && git commit -m "$1" && git push
+}
+
+# Add all, commit with sign-off, and push
+gacs() {
+    git add . && git commit -s -m "$1" && git push
+}
+
+# ------------------------------------------------------------------------------
+# Stash Functions
+# ------------------------------------------------------------------------------
 # Add all and stash with message
 gstam() {
     git add --all && git stash push -m "$*"
 }
 
-# Add all and backup to stash with message
+# Add all and backup to stash
 gstab() {
     git add --all && git stash push -m "$*" && git stash apply
 }
 
+# ------------------------------------------------------------------------------
+# Undo/Reset Functions
+# ------------------------------------------------------------------------------
 # Undo last commit and tip of branch
 # Optionally pass param to specify number of commits to undo (ie. `gundo 3`)
 gundo() {
@@ -120,122 +158,126 @@ nah() {
     fi
 }
 
-# FZF completion for git commands
-_fzf_complete_git() {
-	_fzf_complete -- "$@" < <(
-		git --help -a | grep -E '^\s+' | awk '{print $1}'
-	)
-}
-
-# Delete local branches interactively
-function delete-branches() {
-	git branch |
-		grep --invert-match '\*' |
-		cut -c 3- |
-		fzf --multi --preview="git log {} --" |
-		xargs --no-run-if-empty git branch --delete --force
-}
-
-# Delete remote branches interactively
-function delete-remote-branches() {
-	git branch -r |
-		grep 'akgoyal' |
-		grep --invert-match '\*' |
-		cut -c 3- |
-		fzf --multi --preview="git log {} --" |
-		xargs --no-run-if-empty git branch --delete --force
-}
-
-# Checkout GitHub PR interactively
-function pr-checkout() {
-	local jq_template pr_number
-
-	jq_template='"'\
-	'#\(.number) - \(.title)'\
-	'\t'\
-	'Author: \(.user.login)\n'\
-	'Created: \(.created_at)\n'\
-	'Updated: \(.updated_at)\n\n'\
-	'\(.body)'\
-	'"'
-
-	pr_number=$(
-		gh api 'repos/:owner/:repo/pulls' |
-		jq ".[] | $jq_template" |
-		sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
-		fzf \
-		--with-nth=1 \
-		--delimiter='\t' \
-		--preview='echo -e {2}' \
-		--preview-window=top:wrap |
-		sed 's/^#\([0-9]\+\).*/\1/'
-	)
-
-	if [ -n "$pr_number" ]; then
-		gh pr checkout "$pr_number"
-	fi
-}
-
-# Use Git’s colored diff when available
-hash git &>/dev/null;
-if [ $? -eq 0 ]; then
-	function diff() {
-		git diff --no-index --color-words "$@";
-	}
-fi;
-
+# ------------------------------------------------------------------------------
+# Interactive Functions
+# ------------------------------------------------------------------------------
 # Interactive git log viewer
-function logg() {
+logg() {
     git lg | fzf --ansi --no-sort \
         --preview 'echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % git show % --color=always' \
-        --preview-window=right:50%:wrap --height 100% \
-        --bind 'enter:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % sh -c "git show % | nvim -c \"setlocal buftype=nofile bufhidden=wipe noswapfile nowrap\" -c \"nnoremap <buffer> q :q!<CR>\" -")' \
-        --bind 'ctrl-e:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % sh -c "gh browse %")' \
+        --preview-window=right:50%:wrap \
+        --bind 'enter:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % sh -c "git show % | nvim -")' \
+        --bind 'ctrl-e:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % sh -c "gh browse %")'
 }
 
-# Add all changes to git, commit with given message, and push
-function gac() {
-    git add .
-    git commit -m "$1"
-    git push
+# FZF completion for git commands
+_fzf_complete_git() {
+    _fzf_complete -- "$@" < <(
+        git --help -a | grep -E '^\s+' | awk '{print $1}'
+    )
 }
 
-# Add all changes to git, commit with given message and signed-off-by line, and push
-function gacs() {
-    git add .
-    git commit -m "$1" -s
-    git push
+# ------------------------------------------------------------------------------
+# Advanced Git Functions
+# ------------------------------------------------------------------------------
+
+# Interactive branch deletion with preview
+delete-branches() {
+    echo "Selecting branches to delete (use TAB for multi-select)..."
+    git branch |
+        grep --invert-match '\*' |
+        cut -c 3- |
+        fzf --multi \
+            --preview="git log {} --" \
+            --preview-window=right:60% \
+            --bind='ctrl-/:toggle-preview' |
+        xargs --no-run-if-empty git branch --delete --force
 }
 
-# Find a repo for authenticated user with gh CLI and cd into it, clone and cd if not found on disk
-function repo() {
-    export repo=$(fd . ${HOME}/dev --type=directory --max-depth=1 --color always| awk -F "/" '{print $5}' | fzf --ansi --preview 'onefetch /home/decoder/dev/{1}' --preview-window up)
-    if [[ -z "$repo" ]]; then
-        echo "Repository not found"
-    else
-        echo "Repository found locally, entering"
-        cd ${HOME}/dev/$repo
-        if [[ -d .git ]]; then
-            echo "Fetching origin"
-            git fetch origin
-            onefetch
-        fi
-            create_tmux_session "${HOME}/dev/$repo"
+# Interactive remote branch deletion
+delete-remote-branches() {
+    echo "Selecting remote branches to delete (use TAB for multi-select)..."
+    local remote=${1:-origin} # Default to 'origin' if no remote specified
+    git branch -r |
+        grep "$remote/" |
+        grep --invert-match '\*' |
+        cut -c 3- |
+        fzf --multi \
+            --preview="git log {} --" \
+            --preview-window=right:60% \
+            --bind='ctrl-/:toggle-preview' |
+        xargs --no-run-if-empty git push "$remote" --delete
+}
+
+# Enhanced PR checkout with preview
+pr-checkout() {
+    local jq_template pr_number
+
+    # Template for PR information display
+    jq_template='"' \
+        '#\(.number) - \(.title)' \
+        '\t' \
+        'Author: \(.user.login)\n' \
+        'Created: \(.created_at)\n' \
+        'Updated: \(.updated_at)\n\n' \
+        '\(.body)' \
+        '"'
+
+    pr_number=$(
+        gh api 'repos/:owner/:repo/pulls' |
+            jq ".[] | $jq_template" |
+            sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
+            fzf \
+                --with-nth=1 \
+                --delimiter='\t' \
+                --preview='echo -e {2}' \
+                --preview-window=top:wrap |
+            sed 's/^#\([0-9]\+\).*/\1/'
+    )
+
+    if [ -n "$pr_number" ]; then
+        gh pr checkout "$pr_number"
     fi
 }
 
-# Open file from git staged changes
-function open_file_git_staged() {
-    ~/dotfiles/scripts/_open-file-git-staged.sh 
-}
-# Binds Ctrl+Alt+O to open_file_git
-bindkey "^[^O" open_file_git_staged
-zle -N open_file_git_staged
+# Enhanced diff function using Git's colored output
+if hash git &>/dev/null; then
+    diff() {
+        git diff --no-index --color-words "$@"
+    }
+fi
 
-# Open file from git changes
-function f_git_enter() {
-    BUFFER="~/dotfiles/scripts/_open-file-git.sh"
-    zle accept-line
+# Repository management with FZF and tmux integration
+repo() {
+    local dev_path="${HOME}/dev"
+    local selected_repo
+
+    # Find and select repository
+    selected_repo=$(fd . "$dev_path" \
+        --type=directory \
+        --max-depth=1 \
+        --color always |
+        fzf --ansi \
+            --preview "onefetch ${dev_path}/{1}" \
+            --preview-window up)
+
+    if [[ -z "$selected_repo" ]]; then
+        echo "No repository selected"
+        return 1
+    fi
+
+    echo "Repository found locally, entering"
+    cd "$selected_repo" || return 1
+
+    # Update repository if it's a git repo
+    if [[ -d .git ]]; then
+        echo "Fetching origin"
+        git fetch origin
+        onefetch
+    fi
+
+    # Create tmux session if function exists
+    if type create_tmux_session >/dev/null 2>&1; then
+        create_tmux_session "$selected_repo"
+    fi
 }
-zle -N f_git_enter
-bindkey '^o' f_git_enter

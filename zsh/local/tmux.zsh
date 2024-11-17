@@ -1,92 +1,119 @@
+#!/usr/bin/env zsh
+
 # ------------------------------------------------------------------------------
-# Aliases and functions for tmux
+# Tmux Configuration: Aliases and Functions
 # ------------------------------------------------------------------------------
 
-# Function to attach to an existing tmux session or create a new one
+# ------------------------------------------------------------------------------
+# Basic Tmux Aliases
+# ------------------------------------------------------------------------------
+alias tn='tmux new-session -s'         # Create new session
+alias tk='tmux kill-session -t'        # Kill session
+alias tl='tmux list-sessions'          # List sessions
+alias td='tmux detach'                 # Detach from session
+alias tc='clear && tmux clear-history' # Clear tmux history
+
+# ------------------------------------------------------------------------------
+# Session Management Functions
+# ------------------------------------------------------------------------------
+# Attach to existing session or create new one
 ta() {
-    if [ -n "$1" ]; then
-        # If a session name is provided, attach to it
+    if [[ -n "$1" ]]; then
         tmux attach -t "$1"
         return
     fi
 
-    # If no session name is provided, list sessions and prompt for selection
-    tmux ls && read "tmux_session?Enter session name or number: " && tmux attach -t "${tmux_session:-misc}" || tmux new -s "${tmux_session:-misc}"
+    # Interactive session selection
+    tmux ls 2>/dev/null &&
+        read "tmux_session?Session name/number (default: misc): " &&
+        tmux attach -t "${tmux_session:-misc}" ||
+        tmux new -s "${tmux_session:-misc}"
 }
 
-# Open or create tmux session with z argument
+# Smart session creation/attachment using zoxide
 t() {
-    if [ -z "$1" ]; then
-        # If no argument is provided, call the 'ta' function
+    if [[ -z "$1" ]]; then
         ta
         return
     fi
 
-    # Use zoxide to get the directory and create a session name
-    local sesh=$(basename $(z -e $1) | tr . _)
+    # Generate session name from directory
+    local dir_path=$(z -e "$1")
+    local sesh=$(basename "$dir_path" | tr '. ' '_')
 
-    if [ -z $TMUX ]; then
-        # If not in a tmux session, create a new one
-        (z $1 && tmux new -A -s $sesh)
-    elif tmux has-session -t=$sesh 2>/dev/null; then
-        # If the session exists, switch to it
-        (tmux switch -t $sesh)
+    if [[ -z "$TMUX" ]]; then
+        # Outside tmux: create/attach to session
+        (cd "$dir_path" && tmux new -A -s "$sesh")
+    elif tmux has-session -t="$sesh" 2>/dev/null; then
+        # Inside tmux: switch to existing session
+        tmux switch -t "$sesh"
     else
-        # If the session does not exist, create it and switch to it
-        (z $1 && tmux new -A -s $sesh -d && tmux switch -t $sesh)
+        # Inside tmux: create and switch to new session
+        (cd "$dir_path" &&
+            tmux new -A -s "$sesh" -d &&
+            tmux switch -t "$sesh")
     fi
 }
 
-# Tmux session management aliases
-alias tn='tmux new-session -s '             # Create a new session
-alias tk='tmux kill-session -t '            # Kill a session
-alias tl='tmux list-sessions'               # List all ongoing sessions
-alias td='tmux detach'                      # Detach from current session
-alias tc='clear; tmux clear-history; clear' # Clear tmux pane and history
+# Create enhanced tmux session with git branch info
+create_tmux_session() {
+    local dir_path="$1"
+    [[ -z "$dir_path" ]] && {
+        echo "Error: No directory specified"
+        return 1
+    }
 
-# Function to change to the current tmux session's directory
-function cds() {
+    # Add to zoxide database
+    zoxide add "$dir_path" &>/dev/null
+
+    # Generate session name
+    local folder=$(basename "$dir_path")
+    local session_name=$(echo "$folder" | tr ' .:' '_')
+
+    # Append git branch if available
+    if [[ -d "$dir_path/.git" ]]; then
+        local branch=$(git -C "$dir_path" symbolic-ref --short HEAD 2>/dev/null)
+        [[ -n "$branch" ]] && session_name+="_${branch}"
+    fi
+
+    # Create or attach to session
+    if ! tmux has-session -t "$session_name" 2>/dev/null; then
+        tmux new-session -d -s "$session_name" -c "$dir_path"
+    fi
+
+    # Attach or switch to session
+    if [[ -z "$TMUX" ]]; then
+        tmux attach -t "$session_name"
+    else
+        tmux switch-client -t "$session_name"
+    fi
+}
+
+# Change to current tmux session directory
+cds() {
     local session_path=$(tmux display-message -p '#{session_path}')
-    cd "$session_path"
-}
-
-# Function to create a new tmux session with enhanced naming
-function create_tmux_session() {
-    local RESULT="$1"
-    zoxide add "$RESULT" &>/dev/null
-    local FOLDER=$(basename "$RESULT")
-    local SESSION_NAME=$(echo "$FOLDER" | tr ' .:' '_')
-
-    # Append git branch name to session name if it's a git repository
-    if [ -d "$RESULT/.git" ]; then
-        SESSION_NAME+="_$(git -C "$RESULT" symbolic-ref --short HEAD 2>/dev/null)"
-    fi
-
-    # Create a new session if it doesn't exist
-    if ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-        tmux new-session -d -s "$SESSION_NAME" -c "$RESULT"
-    fi
-
-    # Attach to the session or switch to it if already in tmux
-    if [ -z "$TMUX" ]; then
-        tmux attach -t "$SESSION_NAME"
-    else
-        tmux switch-client -t "$SESSION_NAME"
-    fi
+    [[ -n "$session_path" ]] && cd "$session_path"
 }
 
 # ------------------------------------------------------------------------------
-# Additional tmux-related configurations (if needed)
+# Enhanced Session Management
 # ------------------------------------------------------------------------------
+# Interactive session selection with preview
+tls() {
+    local session=$(tmux list-sessions -F "#{session_name}" |
+        fzf --preview 'tmux list-windows -t {}' \
+            --preview-window=right:50% \
+            --prompt="Select session: ")
 
-# Add any other tmux-specific configurations, functions, or aliases here
-# For example:
-# - Custom tmux key bindings
-# - Tmux plugin configurations
-# - Additional tmux-related utility functions
+    [[ -n "$session" ]] && tmux switch-client -t "$session"
+}
 
-# Example: Function to list tmux sessions with a preview
-# function tls() {
-#     tmux list-sessions -F "#{session_name}" |
-#     fzf --preview 'tmux list-windows -t {}'
-# }
+# Kill selected session interactively
+tks() {
+    local session=$(tmux list-sessions -F "#{session_name}" |
+        fzf --preview 'tmux list-windows -t {}' \
+            --preview-window=right:50% \
+            --prompt="Select session to kill: ")
+
+    [[ -n "$session" ]] && tmux kill-session -t "$session"
+}

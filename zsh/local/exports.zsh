@@ -1,65 +1,112 @@
-# ------------------------------------------------------------------------------
-# General Exports
-# ------------------------------------------------------------------------------
+#!/usr/bin/env zsh
 
-# Detect OS type
+# ------------------------------------------------------------------------------
+# Environment Detection and Base Configuration
+# ------------------------------------------------------------------------------
 OS_TYPE=$(uname)
+ARCH_TYPE=$(uname -m)
 
-# Optional Homebrew configurations
-export HOMEBREW_NO_AUTO_UPDATE=1
-export HOMEBREW_NO_ANALYTICS=1       # Disable analytics
-export HOMEBREW_NO_INSTALL_CLEANUP=1 # Don't cleanup on install
+# ------------------------------------------------------------------------------
+# Homebrew Configuration
+# ------------------------------------------------------------------------------
+# Core Homebrew settings
+export HOMEBREW_NO_AUTO_UPDATE=1     # Prevent automatic updates
+export HOMEBREW_NO_ANALYTICS=1       # Disable analytics collection
+export HOMEBREW_NO_INSTALL_CLEANUP=1 # Skip cleanup during installation
 export HOMEBREW_NO_ENV_HINTS=1       # Disable environment hints
-export HOMEBREW_AUTOREMOVE=1         # Auto remove unused dependencies
-export HOMEBREW_BAT=1                # Use bat for brew cat
-export HOMEBREW_CURL_RETRIES=3       # Number of retries for downloads
+export HOMEBREW_AUTOREMOVE=1         # Automatically remove unused dependencies
+export HOMEBREW_BAT=1                # Use bat for brew cat command
+export HOMEBREW_CURL_RETRIES=3       # Number of download retry attempts
 
-if [ "$OS_TYPE" = "Darwin" ]; then
-    # macOS specific exports
-    HOMEBREW_PREFIX="/opt/homebrew"
-    HOMEBREW_CELLAR="/opt/homebrew/Cellar"
-    HOMEBREW_REPOSITORY="/opt/homebrew"
+# OS-specific Homebrew configuration
+case "$OS_TYPE" in
+"Darwin")
+    # macOS Homebrew paths
+    export HOMEBREW_PREFIX="/opt/homebrew"
+    export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+    export HOMEBREW_REPOSITORY="/opt/homebrew"
 
     # macOS specific paths
-    export PATH="$PATH:/opt/homebrew/bin"
-    export PATH="$PATH:/opt/homebrew/opt/llvm/bin"
-    export PATH="$PATH:/usr/local/opt/ruby/bin"
+    typeset -U path # Ensure PATH elements are unique
+    path=(
+        "/opt/homebrew/bin"
+        "/opt/homebrew/opt/llvm/bin"
+        "/usr/local/opt/ruby/bin"
+        $path
+    )
+    ;;
+"Linux")
+    # Linux Homebrew paths
+    export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+    export HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
+    export HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
 
-elif [ "$OS_TYPE" = "Linux" ]; then
-    # Linux specific exports
-    HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-    HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
-    HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
-
-    export PATH="$PATH:/usr/local/go/bin"
-    export PATH="$PATH:/usr/local/bin/clang-15:/usr/local/compilers/clang15/bin"
-    export PATH="$PATH:$HOME/.local/share/gem/ruby/3.0.0/bin"
-    export PATH="$PATH:/snap/bin"
-    export PATH="$PATH:$HOME/.cargo/bin"
-    export PATH="$PATH:/home/linuxbrew/.linuxbrew/bin"
-    export PATH="$PATH:/home/linuxbrew/.linuxbrew/Cellar"
-fi
+    # Linux specific paths
+    typeset -U path # Ensure PATH elements are unique
+    path=(
+        "/usr/local/go/bin"
+        "/usr/local/bin/clang-15"
+        "/usr/local/compilers/clang15/bin"
+        "$HOME/.local/share/gem/ruby/3.0.0/bin"
+        "/snap/bin"
+        "$HOME/.cargo/bin"
+        "/home/linuxbrew/.linuxbrew/bin"
+        "/home/linuxbrew/.linuxbrew/sbin"
+        $path
+    )
+    ;;
+esac
 
 # ------------------------------------------------------------------------------
-# Common Exports (for both OS)
+# Common Path Configuration
 # ------------------------------------------------------------------------------
+# Add common paths (for both OS types)
+typeset -U path # Ensure PATH elements are unique
+path=(
+    "$HOME/bin"
+    "$HOME/.local/bin"
+    "/usr/local/bin"
+    "/usr/local/sbin"
+    "/usr/bin"
+    "/usr/sbin"
+    "/bin"
+    "/sbin"
+    "$HOME/.fzf/bin"
+    "/usr/local/lib/node_modules"
+    "$HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin"
+    $path
+)
+export PATH # Export the final PATH
 
-# Locale Settings
-export LANG='en_US.UTF-8'
-export LC_ALL='en_US.UTF-8'
+# ------------------------------------------------------------------------------
+# Language and Locale Settings
+# ------------------------------------------------------------------------------
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+export LC_CTYPE="en_US.UTF-8"
 
-# Common Path Exports
-export PATH="$HOME/bin:$HOME/.local/bin:/usr/local:/usr/local/bin:$PATH"
-export PATH="$PATH:~/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin"
-export PATH="$PATH:$HOME/.fzf/bin"
-export PATH="$PATH:/usr/local/lib/node_modules"
-export PATH="$PATH:$HOME/.config/tmux/plugins/t-smart-tmux-session-manager/bin"
+# ------------------------------------------------------------------------------
+# Terminal and Editor Settings
+# ------------------------------------------------------------------------------
+# Set default editor
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+# Configure less
+export LESS="-R --quit-if-one-screen"
+export LESSHISTFILE="-" # Prevent creation of ~/.lesshst file
 
 # Colorful man pages
-export LESS_TERMCAP_mb=$'\e[1;31m'
-export LESS_TERMCAP_md=$'\e[1;31m'
-export LESS_TERMCAP_me=$'\e[0m'
-export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[01;33m'
-export LESS_TERMCAP_ue=$'\e[0m'
-export LESS_TERMCAP_us=$'\e[1;4;32m'
+export LESS_TERMCAP_mb=$'\e[1;31m'   # begin bold
+export LESS_TERMCAP_md=$'\e[1;31m'   # begin double-bright mode
+export LESS_TERMCAP_me=$'\e[0m'      # end all mode
+export LESS_TERMCAP_se=$'\e[0m'      # end standout-mode
+export LESS_TERMCAP_so=$'\e[01;33m'  # begin standout-mode
+export LESS_TERMCAP_ue=$'\e[0m'      # end underline
+export LESS_TERMCAP_us=$'\e[1;4;32m' # begin underline
+
+# ------------------------------------------------------------------------------
+# Performance Optimization
+# ------------------------------------------------------------------------------
+# Compilation flags
+export MAKEFLAGS="-j$(nproc)" # Use all CPU cores for compilation

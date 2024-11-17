@@ -1,7 +1,35 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
-# Generate a new static file whenever .zsh_plugins.txt is updated.
-if [[ ! ${ZSHRCDIR}/zsh_plugins.zsh -nt ${ZSHRCDIR}/.zsh_plugins.txt ]]; then
-    antidote bundle <${ZSHRCDIR}/.zsh_plugins.txt >|${ZSHRCDIR}/zsh_plugins.zsh
-    echo "Compiled antibody bundles file"
+# ------------------------------------------------------------------------------
+# Antidote Plugin Bundle Compiler
+# ------------------------------------------------------------------------------
+
+# Check if ZDOTDIR is set
+if [[ -z "$ZDOTDIR" ]]; then
+    echo "Error: ZDOTDIR environment variable is not set"
+    exit 1
+fi
+
+# Define paths
+PLUGINS_SOURCE="${ZDOTDIR}/.zsh_plugins.txt"
+PLUGINS_COMPILED="${ZDOTDIR}/zsh_plugins.zsh"
+
+# Check if source file exists
+if [[ ! -f "$PLUGINS_SOURCE" ]]; then
+    echo "Error: Plugin source file not found: $PLUGINS_SOURCE"
+    exit 1
+fi
+
+# Check if antidote is installed
+if ! command -v antidote >/dev/null 2>&1; then
+    echo "Error: antidote is not installed"
+    exit 1
+fi
+
+# Compile plugins if source file is newer than compiled file
+if [[ ! "$PLUGINS_COMPILED" -nt "$PLUGINS_SOURCE" ]]; then
+    echo "Compiling antidote bundles..."
+    antidote bundle <"$PLUGINS_SOURCE" >|"$PLUGINS_COMPILED" &&
+        echo "✅ Successfully compiled antidote bundles" ||
+        echo "❌ Failed to compile antidote bundles"
 fi

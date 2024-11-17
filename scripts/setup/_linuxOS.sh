@@ -76,7 +76,7 @@ update_and_install() {
 
     local packages=(
         build-essential libc++-15-dev clang-format-15 libkrb5-dev procps file vim-gtk python3-setuptools
-        tmux locate libgraph-easy-perl fd-find fontconfig python3-venv python3-pip luarocks shellcheck
+        tmux locate libgraph-easy-perl fd-find fontconfig python3-venv python3-pip luarocks shellcheck strace numfmt lsb-release
     )
 
     sudo apt-get -y install "${packages[@]}"

@@ -1,26 +1,52 @@
-# ------------------------------------------------------------------
-## Antidote plugin manager setup
-# ------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Antidote Plugin Manager Configuration
+# ------------------------------------------------------------------------------
 
-# Set the root name of the plugins files (.txt and .zsh) antidote will use.
+# Define plugin files
 zsh_plugins="${ZDOTDIR}/.zsh_plugins"
+zsh_plugins_txt="${zsh_plugins}.txt"
+zsh_plugins_compiled="${ZDOTDIR}/zsh_plugins.zsh"
 
-# Ensure the .zsh_plugins.txt file exists so you can add plugins.
-[[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
-
-# Lazy-load antidote from its functions directory.
-fpath=(${ANTIDOTE_DIR}/functions $fpath)
-autoload -Uz antidote
-source ${ANTIDOTE_DIR}/antidote.zsh
-
-# Helper function to compile bundles and source zshrc
-function compile_antidote() {
-    sh ${ZDOTDIR}/bundle_compile
-    exec zsh
-    echo 'Sourced zshrc'
+# Ensure required directories and files exist
+[[ ! -f "$zsh_plugins_txt" ]] && touch "$zsh_plugins_txt"
+[[ ! -d "$ANTIDOTE_DIR" ]] && {
+    echo "Error: ANTIDOTE_DIR not found: $ANTIDOTE_DIR"
+    return 1
 }
 
-alias update_antidote='antidote bundle < ${ZDOTDIR}/.zsh_plugins.txt >| ${ZDOTDIR}/zsh_plugins.zsh'
+# Initialize antidote
+fpath=("${ANTIDOTE_DIR}/functions" $fpath)
+autoload -Uz antidote
+source "${ANTIDOTE_DIR}/antidote.zsh"
 
-# Source compiled antidote bundles and configs
-[ -f ${ZDOTDIR}/zsh_plugins.zsh ] && source ${ZDOTDIR}/zsh_plugins.zsh
+# ------------------------------------------------------------------------------
+# Helper Functions
+# ------------------------------------------------------------------------------
+# Compile bundles and restart shell
+compile_antidote() {
+    if [[ -x "${ZDOTDIR}/bundle_compile" ]]; then
+        "${ZDOTDIR}/bundle_compile" &&
+            echo "✅ Bundles compiled successfully" &&
+            exec zsh
+    else
+        echo "❌ Error: bundle_compile script not found or not executable"
+        return 1
+    fi
+}
+
+# Update antidote bundles
+update_antidote() {
+    if [[ -f "$zsh_plugins_txt" ]]; then
+        antidote bundle <"$zsh_plugins_txt" >|"$zsh_plugins_compiled" &&
+            echo "✅ Antidote bundles updated successfully"
+    else
+        echo "❌ Error: Plugin source file not found"
+        return 1
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Load Plugins
+# ------------------------------------------------------------------------------
+# Source compiled plugins if they exist
+[[ -f "$zsh_plugins_compiled" ]] && source "$zsh_plugins_compiled"

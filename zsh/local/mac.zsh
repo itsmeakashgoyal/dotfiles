@@ -1,91 +1,95 @@
+#!/usr/bin/env zsh
+
 # ------------------------------------------------------------------------------
-# MacOS-specific aliases and functions
+# MacOS-specific Configuration
 # ------------------------------------------------------------------------------
 
-# Detect OS type
-OS_TYPE=$(uname)
-if [ "$OS_TYPE" != "Darwin" ]; then
-  return 0 # Exit the file without terminating the session
-fi
+# Exit if not running on macOS
+[[ "$(uname)" != "Darwin" ]] && return 0
 
+# ------------------------------------------------------------------------------
 # System Updates
-# Update macOS software
-alias update_system='sudo softwareupdate -i -a'
+# ------------------------------------------------------------------------------
+# Update macOS and all package managers
+alias update='sudo softwareupdate -i -a && \  # System updates
+              brew update && \                 # Update Homebrew
+              brew upgrade && \                # Upgrade formulae
+              brew cleanup && \                # Clean up Homebrew
+              npm update -g && \               # Update global npm packages
+              gem update --system && \         # Update RubyGems
+              gem update' # Update gems
 
-# Update/upgrade Homebrew and installed packages
-alias update_brew='brew update; brew upgrade; brew upgrade --cask; brew cleanup'
+# Individual update commands
+alias update_system='sudo softwareupdate -i -a' # Only system updates
+alias update_brew='brew update && brew upgrade && \
+                  brew upgrade --cask && brew cleanup' # Only Homebrew updates
 
-# Comprehensive update: macOS, Homebrew, npm, and Ruby gems
-alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
+# ------------------------------------------------------------------------------
+# Finder Configuration
+# ------------------------------------------------------------------------------
+# Toggle hidden files in Finder (Cmd + Shift + . also works in Finder)
+alias show_hidden="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+alias hide_hidden="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
 
-# Finder and Desktop
-# Toggle hidden files visibility in Finder
-# Note: As of macOS Sierra (10.12) and later, you can use Cmd + Shift + . in Finder
-alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
-alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+# Toggle desktop icons
+alias hide_desktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
+alias show_desktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
 
-# Toggle desktop icons visibility
-alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
-alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
-
-# Applications
-# Open Google Chrome from terminal
-alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
-
-# Lock the screen (when going AFK - Away From Keyboard)
-alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+# ------------------------------------------------------------------------------
+# System Commands
+# ------------------------------------------------------------------------------
+# Lock screen
+alias afk="pmset displaysleepnow" # Put display to sleep
+alias lock="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
 # Network
-# Display local IP address
-alias localip="ipconfig getifaddr en0"
+alias localip="ipconfig getifaddr en0"                                                                    # Show local IP address
+alias wifi="/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I" # WiFi info
 
-# File Management
-# Recursively delete .DS_Store files
-alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
+# Cleanup
+alias cleanup="find . -type f -name '*.DS_Store' -ls -delete" # Remove .DS_Store files
 
-# Finder Hidden Files Toggle
-# Functions to show/hide all files in Finder
-hiddenOn() { defaults write com.apple.Finder AppleShowAllFiles YES; }
-hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO; }
+# caffeinate: Prevent the system from sleeping
+alias ch='caffeinate -u -t 3600'
 
+# ------------------------------------------------------------------------------
+# Finder Integration
+# ------------------------------------------------------------------------------
 # Change to Finder's current directory
-cdf() { # short for `cdfinder`
-  cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')"
+cdf() {
+  local finder_path
+  finder_path=$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)' 2>/dev/null)
+  if [[ -n "$finder_path" ]]; then
+    cd "$finder_path" || return 1
+    echo "Changed to: $finder_path"
+  else
+    echo "Failed to get Finder path"
+    return 1
+  fi
 }
 
 # ------------------------------------------------------------------------------
 # Homebrew Configuration
 # ------------------------------------------------------------------------------
+# Initialize Homebrew
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Initialize Homebrew environment
-eval "$(/opt/homebrew/bin/brew shellenv)"
+  # Set up Homebrew completions (only once)
+  if [[ -d "$(brew --prefix)/share/zsh/site-functions" ]]; then
+    FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
-## Brew completions
-if type brew &>/dev/null; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-  autoload -Uz compinit
-  compinit -d "$cache_directory/compinit-dumpfile"
-fi
-
-# Set up Homebrew completions
-if type brew &>/dev/null; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-  autoload -Uz compinit
-  compinit
+    # Load completions if not already loaded
+    if [[ ! -f "$XDG_CACHE_HOME/zsh/compinit-dumpfile" ]]; then
+      autoload -Uz compinit
+      compinit -d "$XDG_CACHE_HOME/zsh/compinit-dumpfile"
+    fi
+  fi
 fi
 
 # ------------------------------------------------------------------------------
-# Additional MacOS-specific configurations
+# Application Shortcuts
 # ------------------------------------------------------------------------------
-
-# Add any other MacOS-specific configurations, functions, or aliases here
-# For example:
-# - Custom PATH modifications
-# - macOS-specific environment variables
-# - Additional application-specific aliases or functions
-
-# Example: Set JAVA_HOME for macOS
-# export JAVA_HOME=$(/usr/libexec/java_home)
-
-# Example: Add a custom directory to PATH
-# export PATH=$HOME/custom/bin:$PATH
+# Only create aliases for installed applications
+[[ -d "/Applications/Google Chrome.app" ]] &&
+  alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
