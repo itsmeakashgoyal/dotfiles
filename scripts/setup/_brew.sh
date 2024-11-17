@@ -76,15 +76,15 @@ installingHomebrewAndPackages() {
 
     # Install packages from Brewfile
     print_message "$YELLOW" "Installing packages from Brewfile..."
-    local brewfile=""
-    case "$(uname)" in
-    "Linux") brewfile="Brewfile.linux" ;;
-    "Darwin") brewfile="Brewfile.mac" ;;
-    *)
-        print_message "$RED" "Unsupported OS"
-        exit 1
-        ;;
-    esac
+    local brewfile="Brewfile"
+    # case "$(uname)" in
+    # "Linux") brewfile="Brewfile.linux" ;;
+    # "Darwin") brewfile="Brewfile.mac" ;;
+    # *)
+    #     print_message "$RED" "Unsupported OS"
+    #     exit 1
+    #     ;;
+    # esac
 
     if [ -f "${DOTFILES_DIR}/${brewfile}" ]; then
         brew bundle --file="${DOTFILES_DIR}/${brewfile}"
