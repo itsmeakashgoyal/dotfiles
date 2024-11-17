@@ -42,7 +42,7 @@ cpp() {
     if [[ ! -f "$source" ]]; then
         echo "Error: Source file '$source' not found"
         return 1
-    }
+    fi
 
     # Get file size
     local total_size=$(stat -c '%s' "${source}")
