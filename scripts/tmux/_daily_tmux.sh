@@ -1,27 +1,61 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+#################################################
+#      File: _daily_tmux.sh                      #
+#      Description: Daily tmux session setup      #
+#      Status: Development                       #
+#################################################
+
+# ------------------------------------------------------------------------------
+# Configuration
+# ------------------------------------------------------------------------------
 SESSION="Daily"
+WINDOW_NAME="daily"
 
-# C-m = carrage return
+# ------------------------------------------------------------------------------
+# Helper Functions
+# ------------------------------------------------------------------------------
+create_session() {
+    # Create new session in detached state with 256 color support
+    tmux -2 new-session -d -s "$SESSION"
+}
 
-# creates new session remain detached
-tmux -2 new-session -d -s $SESSION
+setup_layout() {
+    # Rename the default window
+    tmux rename-window -t "$SESSION:0" "$WINDOW_NAME"
 
-# create window called daily
-tmux rename-window -t daily
+    # Create horizontal split
+    tmux split-window -h
 
-# split window horizontally
-tmux split-window -h
-tmux select-pane -t 0
-tmux send-keys "echo pane 0" C-m
-tmux split-window -v
-tmux select-pane -t 1
-tmux send-keys "echo pane 1" C-m
+    # Configure left pane
+    tmux select-pane -t 0
+    tmux send-keys "echo 'Left pane initialized'" Enter
 
-# create new window for irc
-#tmux new-window -t irc
+    # Create and configure bottom-right pane
+    tmux split-window -v
+    tmux select-pane -t 1
+    tmux send-keys "echo 'Right pane initialized'" Enter
+}
 
-# Set default window
-tmux select-window -t $SESSION:1
+# ------------------------------------------------------------------------------
+# Main Function
+# ------------------------------------------------------------------------------
+main() {
+    # Check if session already exists
+    if tmux has-session -t "$SESSION" 2>/dev/null; then
+        echo "Session '$SESSION' already exists. Attaching..."
+        tmux -2 attach-session -t "$SESSION"
+        exit 0
+    fi
 
-# Attach to session
-tmux -2 attach-session -t $SESSION
+    # Create and configure new session
+    create_session
+    setup_layout
+
+    # Select default window and attach to session
+    tmux select-window -t "$SESSION:0"
+    tmux -2 attach-session -t "$SESSION"
+}
+
+# Run main function
+main

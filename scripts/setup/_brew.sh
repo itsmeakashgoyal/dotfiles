@@ -43,7 +43,7 @@ install_homebrew() {
     # Install Homebrew if it isn't already installed
     if command_exists brew; then
         print_message "$GREEN" "Homebrew is already installed"
-    fi
+    else
         print_message "$YELLOW" "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         check_command "Homebrew installation"
