@@ -54,7 +54,7 @@ fi
 # History Configuration
 # ------------------------------------------------------------------------------
 # History file location and size
-export HISTFILE="${XDG_STATE_HOME}/zsh_history"
+export HISTFILE="${HOME}/.zsh_history"
 export HISTSIZE=1000000   # Internal history list size
 export SAVEHIST=$HISTSIZE # History file size
 export HISTDUP=erase      # Erase duplicates in history
