@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
 #################################################
-#      File: _linuxOS.sh                        #
+#      File: setup.sh                        #
 #      Author: Akash Goyal                      #
 #      Status: Development                      #
 #################################################
 # This script creates symlinks from the home directory to any desired dotfiles in $HOME/dotfiles
-# This is used to setup both macOS and LinuxOS.
-# And also installs MacOS and Linux packages.
-# And also installs Homebrew Packages and Casks (Apps)
-# And also sets up Sublime Text
+# It sets up both macOS and Linux configurations.
+# Install necessary pacakges for both MacOS and Linux.
+# Configures Sublime Text
 #################################################
 
 # ------------------------------
@@ -33,11 +32,13 @@ set -euo pipefail
 # Set CI environment variable if not already set
 export CI="${CI:-}"
 
+# Initialize Git submodules
 initGitSubmodules() {
     log_message "→ Initializing and updating git submodules..."
     git submodule update --init --recursive --remote
 }
 
+# Show available setup targets
 show_targets() {
     echo "Available targets:"
     echo "  all      - Install everything"
@@ -47,6 +48,7 @@ show_targets() {
     echo "  sublime  - Setup Sublime Text configuration"
 }
 
+# Setup dotfiles based on specified targets
 setupDotfiles() {
     local targets=("$@")
 
@@ -61,6 +63,7 @@ setupDotfiles() {
         "all")
             if [ "$OS_TYPE" = "Darwin" ]; then
                 run_script "_brew"
+                # Uncomment if you have a macOS and Sublime setup script
                 # run_script "_macOS"
                 # run_script "_sublime"
             elif [ "$OS_TYPE" = "Linux" ]; then
@@ -148,9 +151,14 @@ You're running ${OS_TYPE}.
 
     initGitSubmodules
 
-    # initiate symlink
+    # Backup and initiate symlinks
+    backup_existing_files "zsh/.zshenv" ".zshenv"
     symlink "zsh/.zshenv" ".zshenv"
+    
+    backup_existing_files "nvim" ".config/nvim"
     symlink "nvim" ".config/nvim"
+    
+    backup_existing_files "tmux" ".config/tmux"
     symlink "tmux" ".config/tmux"
 
     if [ $# -eq 0 ]; then

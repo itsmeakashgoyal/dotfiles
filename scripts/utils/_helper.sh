@@ -110,6 +110,24 @@ symlink() {
     log_message "Created symlink: $dest_path → $source_path"
 }
 
+# Backup existing dotfiles
+backup_existing_files() {
+    local source="$1"
+    local destination="$2"
+    local dest_path="${HOME}/${destination}"
+    local backup_path="${BACKUP_DIR}/${destination}"
+
+    if [[ -e "$dest_path" || -L "$dest_path" ]]; then
+        if [[ -L "$dest_path" ]]; then
+            print_message "$YELLOW" "Removing existing symlink: $dest_path"
+            unlink "$dest_path"
+        elif [[ -e "$dest_path" ]]; then
+            print_message "$YELLOW" "Backing up: $dest_path → $backup_path"
+            mv "$dest_path" "$backup_path"
+        fi
+    fi
+}
+
 # ------------------------------------------------------------------------------
 # Script Management
 # ------------------------------------------------------------------------------

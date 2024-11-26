@@ -2,17 +2,17 @@
 
 [![Test Setup dotfiles](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml)
 
-This repository contains scripts and configuration files to set up a development environment for macOS and LinuxOS. It's tailored for software development, focusing on a clean, minimal, and efficient setup.
+This repository contains scripts and configuration files to set up a development environment for macOS and Linux. It is tailored for software development, focusing on a clean, minimal, and efficient setup.
 
 ## Overview
 
-The setup includes automated scripts for installing essential software, configuring Bash and Zsh shells, and setting up Sublime Text and Visual Studio Code editors. This guide will help you replicate my development environment on your machine if you desire to do so.
+The setup includes automated scripts for installing essential software, configuring Bash and Zsh shells, and setting up Sublime Text and Visual Studio Code editors. This guide will help you replicate my development environment on your machine.
 
 ## Important Note Before Installation
 
 **WARNING:** The configurations and scripts in this repository are **HIGHLY PERSONALIZED** to my own preferences and workflows. If you decide to use them, please be aware that they will **MODIFY** your current system, potentially making some changes that are **IRREVERSIBLE** without a fresh installation of your operating system.
 
-Furthermore, while I strive to backup files wherever possible, I cannot guarantee that all files are backed up. The backup mechanism is designed to backup SOME files **ONCE**. If the script is run more than once, the initial backups will be **OVERWRITTEN**, potentially resulting in loss of data. While I could implement timestamped backups to preserve multiple versions, this setup is optimized for my personal use, and a single backup suffices for me.
+While I strive to back up files wherever possible, I cannot guarantee that all files are backed up. The backup mechanism is designed to back up SOME files **ONCE**. If the script is run more than once, the initial backups will be **OVERWRITTEN**, potentially resulting in data loss. 
 
 If you would like a development environment similar to mine, I highly encourage you to fork this repository and make your own personalized changes to these scripts instead of running them exactly as I have them written for myself.
 
@@ -26,7 +26,7 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
 
 ### Prerequisites
 
-- This dotfiles setup are tailored for both macOS and LinuxOS.
+- This dotfiles setup is tailored for both macOS and Linux.
 
 ### Installation
 
@@ -43,22 +43,20 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
    ./setup.sh
    ```
 
-
 This script will:
-
-- Create symlinks for dotfiles (`.gitconfig`, `.zshrc`, etc.)
-- Run macOS and LinuxOS specific configurations based on OS in which it is running.
+- Create symlinks for dotfiles (e.g., `.gitconfig`, `.zshrc`, etc.)
+- Run macOS and Linux-specific configurations based on the operating system.
 
 ## Configuration Files
 
-- `settings/`: Directory containing editor settings and themes for Sublime Text, Visual Studio Code and iterm terminal.
-- `scripts/`: Containing common scripts to run while setting up the dotfiles.
-- `tmux/`: Containing tmux config files
-- `zsh/`: Containing Shell configuration files for Zsh.
-- `git/`: Containing git configuration.
-- `config/`: Containing configurations should be link to home dir.
-- `nvim/`: Another git submodule for my nvim config.
-- `nix/`: Nix configurations specific to LinuxOS.
+- **`settings/`**: Contains editor settings and themes for Sublime Text, Visual Studio Code, and iTerm terminal.
+- **`scripts/`**: Contains common scripts to run while setting up the dotfiles.
+- **`tmux/`**: Contains tmux configuration files.
+- **`zsh/`**: Contains shell configuration files for Zsh.
+- **`git/`**: Contains Git configuration files.
+- **`config/`**: Contains configurations that should be linked to the home directory.
+- **`nvim/`**: Contains configurations for Neovim, managed as a Git submodule.
+- **`nix/`**: Contains Nix configurations specific to Linux.
 
 ### Customizing Your Setup
 
