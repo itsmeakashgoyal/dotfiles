@@ -12,7 +12,9 @@ Thumbs.db
 # Files that might appear on external disks
 .Spotlight-V100
 .Trashes
+tmux/plugins/*
 zsh/zsh_plugins.zsh
+zsh/.zcompdump*
 
 # Private Information
 private/*

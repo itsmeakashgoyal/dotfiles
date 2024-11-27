@@ -42,10 +42,25 @@ install_oh_my_zsh() {
     git clone https://github.com/jeffreytse/zsh-vi-mode "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-vi-mode"
     git clone https://github.com/marlonrichert/zsh-autocomplete.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autocomplete"
 
-    # Set Zsh as default shell
+    # Check if zsh is installed and set it as the default shell if desired
     info "Set Zsh as default shell..."
-    command -v zsh | sudo tee -a /etc/shells
-    sudo chsh -s "$(command -v zsh)" "$USER"
+    if command -v zsh &>/dev/null; then
+        if ! grep -q "$(command -v zsh)" /etc/shells; then
+            substep_info "Adding zsh to available shells..."
+            sudo sh -c "echo $(command -v zsh) >> /etc/shells"
+        fi
+
+        if [ -n "$CI" ]; then
+            REPLY="y"
+        else
+            read -p "Do you want to set zsh as your default shell? (y/N): " -n 1 -r
+        fi
+
+        echo # Move to a new line
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            chsh -s "$(command -v zsh)"
+        fi
+    fi
 }
 
 install_fzf() {
@@ -53,7 +68,7 @@ install_fzf() {
         info "Fzf already installed"
         return 0
     fi
-    
+
     info "Installing fzf.."
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.config/.fzf
     ~/.config/.fzf/install

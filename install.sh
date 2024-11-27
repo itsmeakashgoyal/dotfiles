@@ -34,6 +34,31 @@ set -euo pipefail
 # Set CI environment variable if not already set
 export CI="${CI:-}"
 
+poster() {
+    echo ""
+    echo -e "${BLUE}*************************************************${NC}"
+    echo -e "${BLUE}*                                               *${NC}"
+    echo -e "${BLUE}*               Dotfiles Setup                  *${NC}"
+    echo -e "${BLUE}*                                               *${NC}"
+    echo -e "${BLUE}*************************************************${NC}"
+    echo ""
+    echo -e "${GREEN}This script will install and setup the following:${NC}"
+    echo -e " - Xcode Command Line Tools"
+    echo -e " - Homebrew"
+    echo -e " - Git"
+    echo -e " - oh-my-zsh and set to zsh shell"
+    echo -e " - Config files for various applications"
+    echo -e " - Set default applications for file types"
+    echo -e " - Configure macOS/linuxOS settings"
+    echo ""
+    read -p "$(echo -e '${YELLOW}Do you want to continue? (y/n): ${NC}')" -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        echo -e "${RED}Installation cancelled.${NC}"
+        exit 1
+    fi
+}
+
 # Initialize Git submodules
 initGitSubmodules() {
     log_message "→ Initializing and updating git submodules..."
@@ -85,6 +110,7 @@ trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 
 # Main function
 main() {
+    poster
     log_message "Script started"
     info "
 You're running ${OS_TYPE}.
@@ -146,6 +172,7 @@ You're running ${OS_TYPE}.
     bash ${DOTFILES_DIR}/packages/install.sh
 
     # Install Stow packages
+    substep_info "Stowing packages."
     declare -a stow_dirs=("dots" "nvim" "ohmyposh")
     for dir in "${stow_dirs[@]}"; do
         stow "$dir"
@@ -153,19 +180,6 @@ You're running ${OS_TYPE}.
 
     # installing oh-my-zsh and its packages
     install_oh_my_zsh
-
-    # Check if zsh is installed and set it as the default shell if desired
-    if command -v zsh &>/dev/null; then
-        if ! grep -q "$(command -v fish)" /etc/shells; then
-            substep_info "Adding zsh to available shells..."
-            sudo sh -c "echo $(command -v zsh) >> /etc/shells"
-        fi
-        read -p "Do you want to set zsh as your default shell? (y/N): " -n 1 -r
-        echo # Move to a new line
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            chsh -s "$(command -v zsh)"
-        fi
-    fi
 
     # installing fzf
     install_fzf
