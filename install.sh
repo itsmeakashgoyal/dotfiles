@@ -145,13 +145,6 @@ You're running ${OS_TYPE}.
     # install homebrew and packages
     bash ${DOTFILES_DIR}/packages/install.sh
 
-    # Install Stow packages
-    substep_info "Stowing packages."
-    declare -a stow_dirs=("dots" "nvim" "ohmyposh")
-    for dir in "${stow_dirs[@]}"; do
-        stow "$dir"
-    done
-
     # installing oh-my-zsh and its packages
     install_oh_my_zsh
 
@@ -164,6 +157,13 @@ You're running ${OS_TYPE}.
     elif [ "$OS_TYPE" = "Linux" ]; then
         setupDotfiles "linux"
     fi
+
+    # Install Stow packages
+    substep_info "Stowing packages."
+    declare -a stow_dirs=("dots" "nvim" "ohmyposh")
+    for dir in "${stow_dirs[@]}"; do
+        stow "$dir"
+    done
 
     success "
 ##############################################
