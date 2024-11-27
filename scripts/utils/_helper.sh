@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 #################################################
 #      File: _helper.sh                          #
@@ -32,12 +32,6 @@ readonly LOG_FILE="/tmp/setup_log.txt"
 # ------------------------------------------------------------------------------
 # Logging Functions
 # ------------------------------------------------------------------------------
-print_message() {
-    local color=$1
-    local message=$2
-    echo -e "${color}${message}${NC}"
-}
-
 log_message() {
     local timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
     local message="[$timestamp] $1"

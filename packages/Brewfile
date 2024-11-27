@@ -35,15 +35,12 @@ end
 # zsh plugins
 brew "zsh-syntax-highlighting"                      # Syntax highlighting for zsh
 brew "zsh-autopair"                                 # Auto-pairing for zsh
-brew "olets/tap/zsh-abbr"                           # Abbreviations for zsh
 
 # CLI Essentials
 brew "gh"                                           # Interact with GitHub PRs, issues, repos
 brew "git-delta"                                    # Git diff viewer - Rust
 brew "git-extras"                                   # Extra git commands for common tasks
 brew "git-lfs"                                      # Git Large File Storage
-brew "gitkraken"                                    # Git client GUI
-brew "gitkraken-cli"                                # GitKraken CLI
 brew "neovim"                                       # Text editor
 brew "helix"                                        # Text editor
 brew "topgrade"                                     # Upgrade all the things - Rust
@@ -93,7 +90,7 @@ brew "pipx"                                         # Python package installer
 brew "rbenv"                                        # Ruby version manager
 brew "ruby-build"                                   # Ruby build plugin for rbenv
 brew "rust"                                         # Rust language
-brew "rustup-init"                                  # Rust version manager
+brew "rustup"                                       # Rust version manager
 
 # Shell Tools
 brew "diff-so-fancy"                                # Better git diff
@@ -132,12 +129,10 @@ brew "s3cmd"                                        # S3 command line tool
 if OS.mac?
     # Menu Bar Hacks
     brew "sketchybar"                               # Status bar replacement for MacOS
-    brew "jordanbaird-ice"                          # Ice bar - Using Sketchybar currently
 
     # Window Management & Tiling
     cask "alt-tab"                                  # Windows like alt-tab
     cask "nikitabobko/tap/aerospace"                # Tiling window manager
-    brew "border"                                   # Window borders for MacOS - FelixKratz/formulae tap
 
     # Core Tools
     brew "coreutils"                                # GNU core utilities (those that come with macOS are outdated)
@@ -174,17 +169,6 @@ if OS.mac?
     cask "rar"                                      # RAR file archiver
     cask "rectangle"                                # Window management utility
     cask "sublime-text"                             # Sublime Text editor
-
-    # VS Code Extensions
-    vscode "freecodecamp.freecodecamp-dark-vscode-theme"    # FreeCodeCamp Dark Theme
-    vscode "github.github-vscode-theme"             # GitHub Theme for VS Code
-    vscode "ms-vscode-remote.remote-containers"     # Remote Containers extension
-    vscode "ms-vscode-remote.remote-ssh"            # Remote SSH extension
-    vscode "ms-vscode.cmake-tools"                  # CMake Tools extension
-    vscode "ms-vscode.cpptools"                     # C/C++ extension
-    vscode "ms-vscode.cpptools-extension-pack"      # C/C++ extension pack
-    vscode "ms-vscode.cpptools-themes"              # C/C++ themes
-    vscode "ms-vscode.makefile-tools"               # Makefile Tools extension
 end
 
 #############################################################

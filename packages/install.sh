@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 #################################################
 #      File: install.sh                         #
@@ -27,7 +27,7 @@ set -eu pipefail
 readonly PACKAGES_DIR="${DOTFILES_DIR}/packages"
 
 # Define variables for each package manager and include the corresponding package lists
-brew_packages="${PACKAGES_DIR}/Brewfile"
+brewfile="${PACKAGES_DIR}/Brewfile"
 node_packages="${PACKAGES_DIR}/node_packages.txt"
 python_packages="${PACKAGES_DIR}/pipx_packages.txt"
 ruby_packages="${PACKAGES_DIR}/ruby_packages.txt"
@@ -91,7 +91,6 @@ install_homebrew() {
 
 install_packages() {
     info "Installing Homebrew packages..."
-    local brewfile="${brew_packages}"
 
     if [[ ! -f "$brewfile" ]]; then
         error "Error: Brewfile not found at $brewfile"
