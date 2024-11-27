@@ -24,8 +24,6 @@ source "$HELPER_FILE"
 # Enable strict mode for better error handling
 set -euo pipefail
 
-sudo -v
-
 # Define variables for each package manager and include the corresponding package lists
 brew_packages="Brewfile"
 node_packages="node_packages.txt"

@@ -45,17 +45,12 @@ jobs:
           chmod +x ./packages/install.sh
           echo "y" | ./install.sh
 
-      # - name: Install ZSH on Ubuntu
-      #   if: matrix.os == 'ubuntu-latest'
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y zsh
-      #     sudo chsh -s $(which zsh) $USER
-      - name: Install bash on Ubuntu
+      - name: Install ZSH on Ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y bash
+          sudo apt-get install -y zsh
+          sudo chsh -s $(which zsh) $USER
 
       - name: Run setup dotfiles (Ubuntu)
         working-directory: /home/runner/dotfiles
@@ -67,4 +62,4 @@ jobs:
           chmod +x ./scripts/setup/*.sh
           chmod +x ./scripts/utils/*.sh
           chmod +x ./packages/install.sh
-          echo "y" | bash install.sh
+          echo "y" | ./install.sh
