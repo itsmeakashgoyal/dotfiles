@@ -19,7 +19,7 @@ SCRIPT_DIR="${HOME}/dotfiles/scripts"
 HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
 PACKAGES_FILE="${SCRIPT_DIR}/setup/packages.sh"
 # Check if helper and packages file exists and source it
-if [[ ! -f "$HELPER_FILE" && ! -f "$PACKAGES_FILE" ]]; then
+if [ ! -f "$HELPER_FILE" && ! -f "$PACKAGES_FILE" ]; then
     echo "Error: Helper files not found" >&2
     exit 1
 fi

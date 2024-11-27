@@ -13,23 +13,25 @@
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
 HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
 # Check if helper file exists and source it
-if [[ ! -f "$HELPER_FILE" ]]; then
+if [ ! -f "$HELPER_FILE" ]; then
     echo "Error: Helper file not found at $HELPER_FILE" >&2
     exit 1
 fi
 
 # Source the helper file
-source "$HELPER_FILE"
+. "$HELPER_FILE"
 
 # Enable strict mode for better error handling
-set -euo pipefail
+set -eu pipefail
+
+readonly PACKAGES_DIR="${DOTFILES_DIR}/packages"
 
 # Define variables for each package manager and include the corresponding package lists
-brew_packages="Brewfile"
-node_packages="node_packages.txt"
-python_packages="pipx_packages.txt"
-ruby_packages="ruby_packages.txt"
-rust_packages="rust_packages.txt"
+brew_packages="${PACKAGES_DIR}/Brewfile"
+node_packages="${PACKAGES_DIR}/node_packages.txt"
+python_packages="${PACKAGES_DIR}/pipx_packages.txt"
+ruby_packages="${PACKAGES_DIR}/ruby_packages.txt"
+rust_packages="${PACKAGES_DIR}/rust_packages.txt"
 
 # ------------------------------------------------------------------------------
 # Homebrew Functions
