@@ -213,7 +213,7 @@ run_script() {
 
 # Function to check for required commands
 check_required_commands() {
-  local required_commands=("curl" "git" "stow")
+  local required_commands=("curl" "git")
   for cmd in "${required_commands[@]}"; do
     if ! command -v "$cmd" &>/dev/null; then
       echo "Error: $cmd is not installed." >&2
