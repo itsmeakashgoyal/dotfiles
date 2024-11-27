@@ -146,7 +146,7 @@ You're running ${OS_TYPE}.
     sh ${DOTFILES_DIR}/packages/install.sh
 
     # Install Stow packages
-    declare -a stow_dirs=("dots" "nvim" "config" "ohmyposh")
+    declare -a stow_dirs=("dots" "nvim" "ohmyposh")
     for dir in "${stow_dirs[@]}"; do
         stow "$dir"
     done

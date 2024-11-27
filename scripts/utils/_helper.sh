@@ -1,4 +1,4 @@
-#! /usr/bin/env sh
+#!/bin/bash
 
 #################################################
 #      File: _helper.sh                          #
@@ -91,7 +91,10 @@ substep_error() {
 }
 
 sudo_keep_alive() {
-  while true; do sudo -n true; sleep 60; done
+    while true; do
+        sudo -n true
+        sleep 60
+    done
 }
 
 print_error() {
@@ -207,13 +210,13 @@ run_script() {
 
 # Function to check for required commands
 check_required_commands() {
-  local required_commands=("curl" "git")
-  for cmd in "${required_commands[@]}"; do
-    if ! command -v "$cmd" &>/dev/null; then
-      echo "Error: $cmd is not installed." >&2
-      exit 1
-    fi
-  done
+    required_commands="curl git" # Space-separated list of required commands
+    for cmd in $required_commands; do
+        if ! command -v "$cmd" &>/dev/null; then
+            echo "Error: $cmd is not installed." >&2
+            exit 1
+        fi
+    done
 }
 
 # ------------------------------------------------------------------------------
