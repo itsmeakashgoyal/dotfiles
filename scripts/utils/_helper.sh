@@ -223,7 +223,7 @@ check_required_commands() {
 # Initialization
 # ------------------------------------------------------------------------------
 # Create backup directory if it doesn't exist
-if [[ ! -d "$BACKUP_DIR" ]]; then
+if [ ! -d "$BACKUP_DIR" ]; then
     print_message "$YELLOW" "Creating backup directory: $BACKUP_DIR"
     mkdir -p "$BACKUP_DIR"
     print_message "$GREEN" "Backup directory created: $BACKUP_DIR"

@@ -44,7 +44,7 @@ update_brew() {
     info "Updating Homebrew..."
     brew update
     brew upgrade
-    [[ "$OS_TYPE" = "Darwin" ]] && brew upgrade --cask
+    [ "$OS_TYPE" = "Darwin" ] && brew upgrade --cask
     brew cleanup
 }
 
@@ -60,10 +60,10 @@ install_homebrew() {
         # Configure Homebrew PATH
         case "$OS_TYPE" in
             "Darwin")
-                if [[ -x "/opt/homebrew/bin/brew" ]]; then
+                if [ -x "/opt/homebrew/bin/brew" ]; then
                     info "Configuring Homebrew in PATH for Apple Silicon Mac..."
                     eval "$(/opt/homebrew/bin/brew shellenv)"  # Apple Silicon
-                elif [[ -x "/usr/local/bin/brew" ]]; then
+                elif [ -x "/usr/local/bin/brew" ]; then
                     info "Configuring Homebrew in PATH for Intel Mac..."
                     eval "$(/usr/local/bin/brew shellenv)"     # Intel Mac
                 fi
@@ -92,7 +92,7 @@ install_homebrew() {
 install_packages() {
     info "Installing Homebrew packages..."
 
-    if [[ ! -f "$brewfile" ]]; then
+    if [ ! -f "$brewfile" ]; then
         error "Error: Brewfile not found at $brewfile"
         return 1
     fi
