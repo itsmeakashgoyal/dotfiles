@@ -51,10 +51,10 @@ poster() {
     echo -e " - Set default applications for file types"
     echo -e " - Configure macOS/linuxOS settings"
     echo ""
-    read -p "$(echo -e '${YELLOW}Do you want to continue? (y/n): ${NC}')" -n 1 -r
+    read -p "$(echo -e '${YELLOW}Do you want to continue? (y/n): ${NC}')" confirm
     echo ""
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        echo -e "${RED}Installation cancelled.${NC}"
+    if [[ "$confirm" != "y" ]]; then
+        error "${RED}Installation cancelled."
         exit 1
     fi
 }
