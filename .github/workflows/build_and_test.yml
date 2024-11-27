@@ -42,7 +42,7 @@ jobs:
           chmod +x ./install.sh
           chmod +x ./scripts/setup/*.sh
           chmod +x ./scripts/utils/*.sh
-          ./install.sh
+          echo "y" | ./install.sh
 
       - name: Install ZSH on Ubuntu
         if: matrix.os == 'ubuntu-latest'
@@ -60,4 +60,4 @@ jobs:
           chmod +x ./install.sh
           chmod +x ./scripts/setup/*.sh
           chmod +x ./scripts/utils/*.sh
-          ./install.sh
+          echo "y" | ./install.sh
