@@ -143,7 +143,7 @@ You're running ${OS_TYPE}.
     initGitSubmodules
 
     # install homebrew and packages
-    sh ${DOTFILES_DIR}/packages/install.sh
+    bash ${DOTFILES_DIR}/packages/install.sh
 
     # Install Stow packages
     declare -a stow_dirs=("dots" "nvim" "ohmyposh")
