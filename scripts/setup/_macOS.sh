@@ -1,5 +1,15 @@
 #!/usr/bin/env zsh
-
+##############################################################################
+# Initiates the applying of MacOS-specific settings and preferences          #
+# IMPORTANT: Be sure to read files through thoughouly before executing       #
+#                                                                            #
+# CAUTION: This script will apply changes to your MacOS system configuration #
+# Be sure to read it through carefully, and remove anything you don't want.  #
+#                                                                            #
+# Close any open System Preferences panes, to prevent them from overriding   #
+# settings we’re about to change                                             #
+#                                                                            #
+##############################################################################
 #################################################
 #      File: _macOS.sh                          #
 #      Author: Akash Goyal                      #
@@ -25,6 +35,9 @@ set -eu pipefail
 
 # Skip in CI environment
 [[ -n "${CI:-}" ]] && exit 0
+
+# Ask for the administrator password upfront
+sudo -v
 
 # ------------------------------------------------------------------------------
 # Xcode Setup

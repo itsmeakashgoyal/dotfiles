@@ -124,7 +124,7 @@ command_exists() {
 
 check_command() {
     if [ $? -ne 0 ]; then
-        print_message "$RED" "Error: $1 failed"
+        error "Error: $1 failed"
         return 1
     fi
 }
@@ -141,7 +141,7 @@ symlink() {
 
     # Validate source
     if [[ ! -e "$source_path" ]]; then
-        print_message "$RED" "Error: Source '$source_path' does not exist"
+        error "Error: Source '$source_path' does not exist"
         return 1
     fi
 
@@ -151,10 +151,10 @@ symlink() {
     # Handle existing destination
     if [[ -e "$dest_path" ]] || [[ -L "$dest_path" ]]; then
         if [[ -L "$dest_path" ]]; then
-            print_message "$YELLOW" "Removing existing symlink: $dest_path"
+            warning "Removing existing symlink: $dest_path"
             unlink "$dest_path"
         elif [[ -e "$dest_path" ]]; then
-            print_message "$YELLOW" "Backing up: $dest_path → $backup_path"
+            warning "Backing up: $dest_path → $backup_path"
             mv "$dest_path" "$backup_path"
         fi
     fi
@@ -164,7 +164,7 @@ symlink() {
 
     # Create symlink
     ln -sf "$source_path" "$dest_path"
-    print_message "$GREEN" "Created symlink: $dest_path → $source_path"
+    success "Created symlink: $dest_path → $source_path"
     log_message "Created symlink: $dest_path → $source_path"
 }
 
@@ -177,10 +177,10 @@ backup_existing_files() {
 
     if [[ -e "$dest_path" || -L "$dest_path" ]]; then
         if [[ -L "$dest_path" ]]; then
-            print_message "$YELLOW" "Removing existing symlink: $dest_path"
+            warning "Removing existing symlink: $dest_path"
             unlink "$dest_path"
         elif [[ -e "$dest_path" ]]; then
-            print_message "$YELLOW" "Backing up: $dest_path → $backup_path"
+            warning "Backing up: $dest_path → $backup_path"
             mv "$dest_path" "$backup_path"
         fi
     fi
@@ -194,15 +194,15 @@ run_script() {
     local script_path="./scripts/setup/${script_name}.sh"
 
     if [[ -f "$script_path" ]]; then
-        print_message "$YELLOW" "Running ${script_name} setup..."
+        warning "Running ${script_name} setup..."
         if ! "$script_path"; then
-            print_message "$RED" "Error: ${script_name} setup failed"
+            error "Error: ${script_name} setup failed"
             log_message "Error: ${script_name} setup failed"
             return 1
         fi
         log_message "${script_name} setup completed"
     else
-        print_message "$RED" "Warning: ${script_path} not found"
+        error "Warning: ${script_path} not found"
         log_message "Warning: ${script_path} not found"
         return 1
     fi
@@ -224,7 +224,7 @@ check_required_commands() {
 # ------------------------------------------------------------------------------
 # Create backup directory if it doesn't exist
 if [ ! -d "$BACKUP_DIR" ]; then
-    print_message "$YELLOW" "Creating backup directory: $BACKUP_DIR"
+    warning "Creating backup directory: $BACKUP_DIR"
     mkdir -p "$BACKUP_DIR"
-    print_message "$GREEN" "Backup directory created: $BACKUP_DIR"
+    success "Backup directory created: $BACKUP_DIR"
 fi
