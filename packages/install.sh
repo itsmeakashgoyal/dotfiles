@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #################################################
-#      File: packages.sh                           #
+#      File: install.sh                         #
 #      Author: Akash Goyal                      #
 #      Status: Development                      #
 #################################################

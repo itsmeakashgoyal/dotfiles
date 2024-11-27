@@ -126,8 +126,8 @@ You're running ${OS_TYPE}.
         exit 0
     fi
 
-    # Check for sudo password and keep alive
     if [ -z "$CI" ]; then
+        # Check for sudo password and keep alive
         if sudo --validate; then
             sudo_keep_alive &
             SUDO_PID=$!
