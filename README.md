@@ -38,9 +38,17 @@ By using these scripts, you acknowledge and accept the risk of potential data lo
    ```sh
    cd ~/dotfiles
    ```
-3. Run the installation script:
+3. Generate a new SSH key and add to GitHub
    ```sh
-   ./setup.sh
+   ./scripts/utils/_setup_ssh.sh -h
+   ```
+4. Use the Makefile to initiate the dotfiles installation
+   ```sh
+   make install
+   ```
+   Alternatively, run install script
+   ```sh
+   ./install.sh
    ```
 
 This script will:
@@ -54,9 +62,10 @@ This script will:
 - **`tmux/`**: Contains tmux configuration files.
 - **`zsh/`**: Contains shell configuration files for Zsh.
 - **`git/`**: Contains Git configuration files.
-- **`config/`**: Contains configurations that should be linked to the home directory.
+- **`dots/`**: Contains configurations that should be linked to the home directory.
 - **`nvim/`**: Contains configurations for Neovim, managed as a Git submodule.
 - **`nix/`**: Contains Nix configurations specific to Linux.
+- **`packages/`**: Contains Homebrew installation scripts and other packages installation.
 
 ### Customizing Your Setup
 
