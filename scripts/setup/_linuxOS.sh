@@ -98,6 +98,7 @@ update_and_install() {
         strace
         lsb-release
         entr
+        stow
     )
 
     sudo apt-get -y install "${packages[@]}"
