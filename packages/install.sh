@@ -196,10 +196,12 @@ main() {
     install_homebrew
     install_packages
     update_brew
-    # install_node_packages
     install_python_packages
+
+    ## Uncomment if you need to install below packages
+    # install_node_packages
     # install_ruby_packages
-    install_rust_packages
+    # install_rust_packages
 
     success "Packages installation completed successfully"
     log_message "Packages installation completed successfully"

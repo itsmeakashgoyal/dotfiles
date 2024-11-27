@@ -49,17 +49,7 @@ install_oh_my_zsh() {
             substep_info "Adding zsh to available shells..."
             sudo sh -c "echo $(command -v zsh) >> /etc/shells"
         fi
-
-        if [ -n "$CI" ]; then
-            REPLY="y"
-        else
-            read -p "Do you want to set zsh as your default shell? (y/N): " -n 1 -r
-        fi
-
-        echo # Move to a new line
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            chsh -s "$(command -v zsh)"
-        fi
+        sudo chsh -s "$(command -v zsh)" "$USER"
     fi
 }
 
