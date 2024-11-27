@@ -198,7 +198,7 @@ main() {
     update_brew
     install_node_packages
     install_python_packages
-    install_ruby_packages
+    # install_ruby_packages
     install_rust_packages
 
     success "Packages installation completed successfully"
