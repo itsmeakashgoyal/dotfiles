@@ -42,6 +42,7 @@ jobs:
           chmod +x ./install.sh
           chmod +x ./scripts/setup/*.sh
           chmod +x ./scripts/utils/*.sh
+          chmod +x ./packages/install.sh
           echo "y" | ./install.sh
 
       - name: Install ZSH on Ubuntu
@@ -60,4 +61,5 @@ jobs:
           chmod +x ./install.sh
           chmod +x ./scripts/setup/*.sh
           chmod +x ./scripts/utils/*.sh
+          chmod +x ./packages/install.sh
           echo "y" | ./install.sh

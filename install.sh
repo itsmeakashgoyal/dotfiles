@@ -127,14 +127,16 @@ You're running ${OS_TYPE}.
     fi
 
     # Check for sudo password and keep alive
-    if sudo --validate; then
-        sudo_keep_alive &
-        SUDO_PID=$!
-        trap 'kill "$SUDO_PID"' EXIT
-        substep_info "Sudo password saved. Continuing with script."
-    else
-        substep_error "Incorrect sudo password. Exiting script."
-        exit 1
+    if [ -z "$CI" ]; then
+        if sudo --validate; then
+            sudo_keep_alive &
+            SUDO_PID=$!
+            trap 'kill "$SUDO_PID"' EXIT
+            substep_info "Sudo password saved. Continuing with script."
+        else
+            substep_error "Incorrect sudo password. Exiting script."
+            exit 1
+        fi
     fi
 
     # update and fetch git submodules latest updates
@@ -146,7 +148,7 @@ You're running ${OS_TYPE}.
     # Install Stow packages
     declare -a stow_dirs=("dots" "nvim" "config" "ohmyposh")
     for dir in "${stow_dirs[@]}"; do
-      stow "$dir"
+        stow "$dir"
     done
 
     # installing oh-my-zsh and its packages
@@ -154,15 +156,15 @@ You're running ${OS_TYPE}.
 
     # Check if zsh is installed and set it as the default shell if desired
     if command -v zsh &>/dev/null; then
-      if ! grep -q "$(command -v fish)" /etc/shells; then
-        substep_info "Adding zsh to available shells..."
-        sudo sh -c "echo $(command -v zsh) >> /etc/shells"
-      fi
-      read -p "Do you want to set zsh as your default shell? (y/N): " -n 1 -r
-      echo # Move to a new line
-      if [[ $REPLY =~ ^[Yy]$ ]]; then
-        chsh -s "$(command -v zsh)"
-      fi
+        if ! grep -q "$(command -v fish)" /etc/shells; then
+            substep_info "Adding zsh to available shells..."
+            sudo sh -c "echo $(command -v zsh) >> /etc/shells"
+        fi
+        read -p "Do you want to set zsh as your default shell? (y/N): " -n 1 -r
+        echo # Move to a new line
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            chsh -s "$(command -v zsh)"
+        fi
     fi
 
     # installing fzf
