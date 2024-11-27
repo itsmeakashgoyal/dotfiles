@@ -1,0 +1,197 @@
+###############################################################
+# Brewfile - Software Installs for MacOS and LinuxOS          #
+#                                                             #
+# List of packages to be installed / updated via Homebrew     #
+# Apps are sorted by category, and arranged alphabetically    #
+# Be sure to delete / comment out anything you do not need    #
+# See brew docs for more info: https://docs.brew.sh/Manpage   #
+#                                                             #
+# 1. Command Line                                             #
+# 2. Software Dev                                             #
+# 3. Desktop Apps                                             #
+# 4. MacOS Specific packages                                  #
+# 5. LinuxOS Specific packages                                #
+#                                                             #
+###############################################################
+
+#############################################################
+# 1. Taps                                                   #
+#############################################################
+tap "homebrew/bundle"
+tap "jandedobbeleer/oh-my-posh"
+tap "github/gh"                                     # Interact with GitHub PRs, issues, repos
+tap "kyoh86/tap"                                    # for "sd" - RegEx find and replace (better sed) - Rust
+tap "teamookla/speedtest"                           # Command line speed test utility
+
+if OS.mac?
+    tap "homebrew/command-not-found"
+    tap "FelixKratz/formulae"                       # JankyBorders/Sketchybar - MacOS utilities
+    tap "buo/cask-upgrade"                          # Upgrade casks
+end
+
+#############################################################
+# 2. Software / Web Development                             #
+#############################################################
+# zsh plugins
+brew "zsh-syntax-highlighting"                      # Syntax highlighting for zsh
+brew "zsh-autopair"                                 # Auto-pairing for zsh
+brew "olets/tap/zsh-abbr"                           # Abbreviations for zsh
+
+# CLI Essentials
+brew "gh"                                           # Interact with GitHub PRs, issues, repos
+brew "git-delta"                                    # Git diff viewer - Rust
+brew "git-extras"                                   # Extra git commands for common tasks
+brew "git-lfs"                                      # Git Large File Storage
+brew "gitkraken"                                    # Git client GUI
+brew "gitkraken-cli"                                # GitKraken CLI
+brew "neovim"                                       # Text editor
+brew "helix"                                        # Text editor
+brew "topgrade"                                     # Upgrade all the things - Rust
+
+# CLI Basics
+brew "ack"                                          # Search tool like grep, but faster
+brew "bat"                                          # Output highlighting (better cat) - Rust
+brew "eza"                                          # Listing files with info (better ls) replaces exa - Rust
+brew "fd"                                           # Find files - Rust
+brew "fzf"                                          # Fuzzy file finder and filtering - Go
+brew "grc"                                          # Colorize terminal output
+brew "hexyl"                                        # Hex viewer - Rust
+brew "jq"                                           # JSON parser, output and query files
+brew "most"                                         # Multi-window scroll pager (better less)
+brew "poppler"                                      # PDF rendering library
+brew "ripgrep"                                      # Searching within files (better grep) - Rust
+brew "rsync"                                        # Fast incremental file transfer
+brew "sd"                                           # RegEx find and replace (better sed) - Rust
+brew "sevenzip"                                     # 7-Zip file archiver
+brew "zoxide"                                       # Auto-learning navigation (better cd/jump) - Rust
+
+# CLI Monitoring and Performance Apps
+brew "bmon"                                         # Bandwidth utilization monitor
+brew "btop"                                         # Resource monitor
+brew "ctop"                                         # Docker Container metrics and monitoring - Go
+brew "dua-cli"                                      # Disk usage analyzer and monitor (better du)
+brew "duf"                                          # Get info on mounted disks (better df) - Go
+brew "procs"                                        # Advanced process viewer (better ps) - Rust
+
+# CLI Development Tools
+brew "lazygit"                                      # TUI for git - Go
+
+# CLI Docs and Cheatsheets
+brew "tealdeer"                                     # Read cheat sheets (better tldr) - Rust
+
+# Development Tools
+brew "antidote"                                     # Plugin manager for zsh
+brew "automake"                                     # Build automation tool
+brew "cmake"                                        # Build system
+brew "gcc"                                          # GNU compiler collection
+brew "go"                                           # Go programming language
+brew "node"                                         # Node.js
+brew "python3"                                      # Python programming language
+brew "ruby"                                         # Ruby programming language
+brew "rust"                                         # Rust programming language
+brew "pipx"                                         # Python package installer
+brew "rbenv"                                        # Ruby version manager
+brew "ruby-build"                                   # Ruby build plugin for rbenv
+brew "rust"                                         # Rust language
+brew "rustup-init"                                  # Rust version manager
+
+# Shell Tools
+brew "diff-so-fancy"                                # Better git diff
+brew "htop"                                         # Process viewer
+brew "shellcheck"                                   # Shell script analysis
+brew "shfmt"                                        # Shell formatter
+brew "tldr"                                         # Simplified man pages
+brew "tree"                                         # Directory listings
+brew "wget"                                         # File downloader
+
+# Python Tools
+brew "black"                                        # Python formatter
+brew "pyenv"                                        # Python version manager
+brew "pylint"                                       # Python linter
+
+# Lua Tools
+brew "lua"                                          # Lua interpreter
+brew "lua-language-server"                          # Lua language server
+brew "luajit"                                       # Lua JIT compiler
+brew "luarocks"                                     # Lua package manager
+brew "luv"                                          # Lua bindings for libuv
+brew "stylua"                                       # Lua formatter
+
+# System Monitoring
+brew "bpytop"                                       # Resource monitor
+
+# Oh My Posh
+brew "jandedobbeleer/oh-my-posh/oh-my-posh"         # Prompt theme engine
+
+# DevOps SCMs and CI/CD Tools
+brew "s3cmd"                                        # S3 command line tool
+
+#############################################################
+# 3. MacOS Specific Stuff                                   #
+#############################################################
+if OS.mac?
+    # Menu Bar Hacks
+    brew "sketchybar"                               # Status bar replacement for MacOS
+    brew "jordanbaird-ice"                          # Ice bar - Using Sketchybar currently
+
+    # Window Management & Tiling
+    cask "alt-tab"                                  # Windows like alt-tab
+    cask "nikitabobko/tap/aerospace"                # Tiling window manager
+    brew "border"                                   # Window borders for MacOS - FelixKratz/formulae tap
+
+    # Core Tools
+    brew "coreutils"                                # GNU core utilities (those that come with macOS are outdated)
+    brew "curl"                                     # Better URL transfers
+    brew "entr"                                     # Run commands when files change
+    brew "stow"                                     # Dotfile manager
+    brew "trash"                                    # Safe rm alternative
+    brew "zstd"                                     # Data compression
+    brew "mas"                                      # Mac App Store CLI
+
+    # Security Utilities
+    brew "openssh"                                  # OpenSSH client
+    brew "openssl"                                  # Cryptography and SSL/TLS Toolkit
+    brew "ssh-copy-id"                              # Copy SSH keys to remote hosts
+    brew "sshs"                                     # Terminal user interface for SSH - Rust
+
+    # Development
+    brew "brew-cask-completion"                     # Cask completion for brew
+    brew "brew-gem"                                 # Ruby gem manager for Homebrew
+    brew "clang-format"                             # C/C++ formatter
+    brew "editorconfig"                             # Editor config
+
+    # Casks (macOS only)
+    cask "font-symbols-only-nerd-font"              # Nerd Font Symbols Only
+    cask "font-3270-nerd-font"                      # 3270 Nerd Font
+    cask "font-fira-code-nerd-font"                 # Dev Font - Quaternary (4th)
+    cask "font-jetbrains-mono-nerd-font"            # JetBrains Mono Nerd Font
+    cask "font-meslo-lg-nerd-font"                  # Meslo LG Nerd Font
+    cask "font-source-code-pro"                     # Source Code Pro Font
+    cask "font-ubuntu-mono-nerd-font"               # Ubuntu Mono Nerd Font
+    cask "google-chrome"                            # Google Chrome browser
+    cask "google-drive"                             # Google Drive client
+    cask "iterm2"                                   # iTerm2 terminal emulator
+    cask "rar"                                      # RAR file archiver
+    cask "rectangle"                                # Window management utility
+    cask "sublime-text"                             # Sublime Text editor
+
+    # VS Code Extensions
+    vscode "freecodecamp.freecodecamp-dark-vscode-theme"    # FreeCodeCamp Dark Theme
+    vscode "github.github-vscode-theme"             # GitHub Theme for VS Code
+    vscode "ms-vscode-remote.remote-containers"     # Remote Containers extension
+    vscode "ms-vscode-remote.remote-ssh"            # Remote SSH extension
+    vscode "ms-vscode.cmake-tools"                  # CMake Tools extension
+    vscode "ms-vscode.cpptools"                     # C/C++ extension
+    vscode "ms-vscode.cpptools-extension-pack"      # C/C++ extension pack
+    vscode "ms-vscode.cpptools-themes"              # C/C++ themes
+    vscode "ms-vscode.makefile-tools"               # Makefile Tools extension
+end
+
+#############################################################
+# 4. Linux Specific                                         #
+#############################################################
+if OS.linux?
+    brew "gettext"                                      # GNU internationalization
+    brew "xclip"                                        # X11 clipboard tool
+end
+

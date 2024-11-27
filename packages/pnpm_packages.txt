@@ -1,0 +1,11 @@
+@antfu/ni
+@bitwarden/cli
+@vscode/vsce
+cspell
+easy-sharing
+intelephense
+lighthouse
+neovim
+typescript
+typescript-language-server
+wrangler

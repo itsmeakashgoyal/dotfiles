@@ -31,10 +31,10 @@ set -eu pipefail
 # ------------------------------------------------------------------------------
 setup_xcode() {
     if ! xcode-select -p &>/dev/null; then
-        print_message "$YELLOW" "Installing Xcode Command Line Tools..."
+        info "Installing Xcode Command Line Tools..."
         xcode-select --install
         check_command "Xcode Command Line Tools installation"
-        print_message "$GREEN" "Please complete the Xcode installation before continuing."
+        success "Please complete the Xcode installation before continuing."
         read -r "?Press enter to continue..."
     fi
 }
@@ -43,7 +43,7 @@ setup_xcode() {
 # System Preferences
 # ------------------------------------------------------------------------------
 configure_system_preferences() {
-    print_message "$YELLOW" "Configuring system preferences..."
+    info "Configuring system preferences..."
 
     # Set scroll as traditional instead of natural
     defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
@@ -60,7 +60,7 @@ configure_system_preferences() {
     check_command "Disabling automatic capitalization"
 
     # Energy settings
-    print_message "$YELLOW" "Configuring energy saving settings..."
+    info "Configuring energy saving settings..."
     # Enable lid wakeup
     sudo pmset -a lidwake 1
 
@@ -78,7 +78,7 @@ configure_system_preferences() {
 # Screen Settings
 # ------------------------------------------------------------------------------
 configure_screen_settings() {
-    print_message "$YELLOW" "Configuring screen settings..."
+    info "Configuring screen settings..."
 
     # Require password immediately after sleep or screen saver begins
     defaults write com.apple.screensaver askForPassword -int 1
@@ -99,7 +99,7 @@ configure_screen_settings() {
 # Finder Settings
 # ------------------------------------------------------------------------------
 configure_finder() {
-    print_message "$YELLOW" "Configuring Finder..."
+    info "Configuring Finder..."
 
     # Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
     defaults write com.apple.finder QuitMenuItem -bool true
@@ -156,7 +156,7 @@ configure_finder() {
 # Dock Settings
 # ------------------------------------------------------------------------------
 configure_dock() {
-    print_message "$YELLOW" "Configuring Dock..."
+    info "Configuring Dock..."
 
     # Minimize windows into their application's icon
     defaults write com.apple.dock minimize-to-application -bool true
@@ -174,7 +174,7 @@ configure_dock() {
 # Application Settings
 # ------------------------------------------------------------------------------
 configure_applications() {
-    print_message "$YELLOW" "Configuring applications..."
+    info "Configuring applications..."
 
     # Privacy: don't send search queries to Apple
     defaults write com.apple.Safari UniversalSearchEnabled -bool false
@@ -201,7 +201,7 @@ configure_applications() {
 
     check_command "Setting Safari preferences"
 
-    print_message "$YELLOW" "Configuring Activity Monitor settings..."
+    info "Configuring Activity Monitor settings..."
 
     # Show the main window when launching Activity Monitor
     defaults write com.apple.ActivityMonitor OpenMainWindow -bool true
@@ -218,7 +218,7 @@ configure_applications() {
 
     check_command "Setting Activity Monitor preferences"
 
-    print_message "$YELLOW" "Configuring Mac App Store settings..."
+    info "Configuring Mac App Store settings..."
 
     # Enable the automatic update check
     defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
@@ -242,7 +242,7 @@ configure_applications() {
 # Restart Applications
 # ------------------------------------------------------------------------------
 restart_applications() {
-    print_message "$YELLOW" "Restarting affected applications..."
+    info "Restarting affected applications..."
 
     local apps=(
         "Activity Monitor" "Dock" "Finder" "Mail" "Photos"
@@ -258,7 +258,7 @@ restart_applications() {
 # Main Function
 # ------------------------------------------------------------------------------
 main() {
-    print_message "$BLUE" "Starting macOS configuration..."
+    info "Starting macOS configuration..."
 
     setup_xcode
     configure_system_preferences
@@ -268,7 +268,7 @@ main() {
     configure_applications
     restart_applications
 
-    print_message "$GREEN" "macOS configuration complete. Some changes require a logout/restart."
+    success "macOS configuration complete. Some changes require a logout/restart."
 }
 
 # Set error trap

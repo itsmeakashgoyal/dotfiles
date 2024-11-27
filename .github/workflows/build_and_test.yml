@@ -5,7 +5,7 @@ on:  # yamllint disable-line rule:truthy
     branches: ["master", "main"]
     paths:
       - ".github/workflows/build_and_test.yml"
-      - "setup.sh"
+      - "install.sh"
       - "_*"
   workflow_dispatch:  # Enable manual trigger
 
@@ -39,10 +39,10 @@ jobs:
         run: |
           set -eo pipefail
           export CI=1
-          chmod +x ./setup.sh
+          chmod +x ./install.sh
           chmod +x ./scripts/setup/*.sh
           chmod +x ./scripts/utils/*.sh
-          ./setup.sh
+          ./install.sh
 
       - name: Install ZSH on Ubuntu
         if: matrix.os == 'ubuntu-latest'
@@ -57,7 +57,7 @@ jobs:
         run: |
           set -eo pipefail
           export CI=1
-          chmod +x ./setup.sh
+          chmod +x ./install.sh
           chmod +x ./scripts/setup/*.sh
           chmod +x ./scripts/utils/*.sh
-          ./setup.sh
+          ./install.sh

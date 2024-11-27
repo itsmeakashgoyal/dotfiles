@@ -39,7 +39,7 @@ NVIM_INSTALL_DIR="/opt/nvim"
 # Backup Function
 # ------------------------------------------------------------------------------
 backup_nvim_config() {
-    print_message "$YELLOW" "Backing up existing Neovim configuration..."
+    info "Backing up existing Neovim configuration..."
 
     # Create backup directory
     mkdir -p "$BACKUP_DIR"
@@ -58,7 +58,7 @@ backup_nvim_config() {
 # Cleanup Function
 # ------------------------------------------------------------------------------
 cleanup_nvim() {
-    print_message "$YELLOW" "Cleaning up existing Neovim installation..."
+    info "Cleaning up existing Neovim installation..."
 
     # Remove existing directories
     for dir in "${NVIM_DIRS[@]}"; do
@@ -74,24 +74,24 @@ cleanup_nvim() {
 # Install Function
 # ------------------------------------------------------------------------------
 install_nvim() {
-    print_message "$YELLOW" "Installing Neovim..."
+    info "Installing Neovim..."
 
     # Download latest Neovim
     if ! curl -LO "$NVIM_DOWNLOAD_URL"; then
-        print_message "$RED" "Failed to download Neovim"
+        error "Failed to download Neovim"
         return 1
     fi
 
     # Install Neovim
     if ! sudo tar -C /opt -xzf nvim-linux64.tar.gz; then
-        print_message "$RED" "Failed to extract Neovim"
+        error "Failed to extract Neovim"
         return 1
     fi
 
     # Cleanup downloaded file
     rm nvim-linux64.tar.gz
 
-    print_message "$GREEN" "Neovim installation completed successfully"
+    success "Neovim installation completed successfully"
     log_message "Neovim installation completed"
 }
 

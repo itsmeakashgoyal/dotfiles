@@ -52,7 +52,7 @@ EOF
 # Cleanup Functions
 # ------------------------------------------------------------------------------
 cleanup_dotfiles() {
-    print_message "$YELLOW" "Removing dotfile symlinks..."
+    info "Removing dotfile symlinks..."
 
     local symlinks=(
         "${HOME}/.zshenv"
@@ -71,7 +71,7 @@ cleanup_dotfiles() {
 }
 
 cleanup_homebrew() {
-    print_message "$YELLOW" "Cleaning up Homebrew..."
+    info "Cleaning up Homebrew..."
     if command_exists brew; then
         # Uninstall all packages
         brew remove --force $(brew list --formula)
@@ -89,7 +89,7 @@ cleanup_homebrew() {
 }
 
 cleanup_nvim() {
-    print_message "$YELLOW" "Cleaning up Neovim..."
+    info "Cleaning up Neovim..."
     rm -rf "${HOME}/.config/nvim"
     rm -rf "${HOME}/.local/share/nvim"
     rm -rf "${HOME}/.cache/nvim"
@@ -97,14 +97,14 @@ cleanup_nvim() {
 }
 
 cleanup_tmux() {
-    print_message "$YELLOW" "Cleaning up tmux..."
+    info "Cleaning up tmux..."
     rm -rf "${HOME}/.config/tmux"
     rm -rf "${HOME}/.tmux"
     log_message "Tmux configuration cleaned"
 }
 
 cleanup_zsh() {
-    print_message "$YELLOW" "Cleaning up Zsh configuration..."
+    info "Cleaning up Zsh configuration..."
 
     # Remove Oh My Zsh
     if [[ -d "${HOME}/.oh-my-zsh" ]]; then
@@ -155,7 +155,7 @@ main() {
 
     # Interactive mode if no components specified
     if [[ ${#components[@]} -eq 0 ]]; then
-        print_message "$BLUE" "Select components to clean:"
+        info "Select components to clean:"
         select comp in "dotfiles" "homebrew" "nvim" "tmux" "zsh" "all" "quit"; do
             case $comp in
             "all")
@@ -177,7 +177,7 @@ main() {
 
     # Confirm cleanup
     if ! $auto_confirm; then
-        print_message "$YELLOW" "The following components will be cleaned:"
+        info "The following components will be cleaned:"
         printf '%s\n' "${components[@]}"
         read -p "Continue? [y/N] " -n 1 -r
         echo
@@ -192,11 +192,11 @@ main() {
         nvim) cleanup_nvim ;;
         tmux) cleanup_tmux ;;
         zsh) cleanup_zsh ;;
-        *) print_message "$RED" "Unknown component: $component" ;;
+        *) error "Unknown component: $component" ;;
         esac
     done
 
-    print_message "$GREEN" "Cleanup completed!"
+    success "Cleanup completed!"
     log_message "Cleanup completed successfully"
 }
 

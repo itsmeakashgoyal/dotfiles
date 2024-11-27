@@ -30,18 +30,18 @@ generate_ssh_key() {
 
     # If key exists, prompt for a new name
     while [[ -f "${key_path}" ]]; do
-        print_message "$YELLOW" "SSH key already exists at ${key_path}"
+        info "SSH key already exists at ${key_path}"
         read -p "Enter a new name for the key (without .pub extension): " new_name
 
         # Validate the new name
         if [[ -z "$new_name" ]]; then
-            print_message "$RED" "Key name cannot be empty"
+            error "Key name cannot be empty"
             continue
         fi
 
         key_path="$HOME/.ssh/${new_name}"
         if [[ -f "${key_path}" ]]; then
-            print_message "$RED" "A key with name ${new_name} already exists"
+            error "A key with name ${new_name} already exists"
             continue
         fi
         break
@@ -52,7 +52,7 @@ generate_ssh_key() {
     chmod 700 "$HOME/.ssh"
 
     # Generate new SSH key
-    print_message "$BLUE" "Generating new SSH key..."
+    info "Generating new SSH key..."
     ssh-keygen -t "$key_type" -C "$email" -f "$key_path" -N ""
 
     # Add key to ssh-agent
@@ -64,17 +64,17 @@ generate_ssh_key() {
     chmod 644 "${key_path}.pub"
 
     # Display public key
-    print_message "$GREEN" "SSH key generated successfully!"
-    print_message "$YELLOW" "Your public SSH key:"
+    success "SSH key generated successfully!"
+    info "Your public SSH key:"
     cat "${key_path}.pub"
 
     # Copy to clipboard based on OS
     if [ "$OS_TYPE" = "Darwin" ]; then # macOS
         cat "${key_path}.pub" | pbcopy
-        print_message "$GREEN" "Public key copied to clipboard!"
+        success "Public key copied to clipboard!"
     elif command_exists xclip; then # Linux with xclip
         cat "${key_path}.pub" | xclip -selection clipboard
-        print_message "$GREEN" "Public key copied to clipboard!"
+        success "Public key copied to clipboard!"
     fi
 
     log_message "SSH key generated for $email at $key_path"
@@ -119,7 +119,7 @@ done
 
 # Check if email is provided
 if [[ -z "${email:-}" ]]; then
-    print_message "$RED" "Error: Email address is required"
+    error "Error: Email address is required"
     show_help
     exit 1
 fi

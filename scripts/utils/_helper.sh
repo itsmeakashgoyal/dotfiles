@@ -9,11 +9,17 @@
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
+readonly REPO_NAME="${REPO_NAME:-}"
+
 # Colors
 readonly RED='\033[31m'
 readonly YELLOW='\033[33m'
 readonly GREEN='\033[32m'
 readonly BLUE='\033[34m'
+readonly MAGENTA='\033[35m'
+readonly CYAN='\033[36m'
+readonly WHITE='\033[37m'
+readonly BLACK='\033[30m'
 readonly NC='\033[0m' # No Color
 
 # Paths
@@ -37,6 +43,61 @@ log_message() {
     local message="[$timestamp] $1"
     echo "$message"
     echo "$message" >>"$LOG_FILE"
+}
+
+error() {
+    local message="$1"
+    echo -e "${RED}====================================================${NC}"
+    echo -e "${RED} ERROR: $message${NC}"
+    echo -e "${RED}====================================================${NC}"
+}
+
+info() {
+    local message="$1"
+    echo -e "${BLUE}====================================================${NC}"
+    echo -e "${BLUE} INFO: $message${NC}"
+    echo -e "${BLUE}====================================================${NC}"
+}
+
+warning() {
+    local message="$1"
+    local padded_message=" WARNING: $message"
+    local line=$(printf "%${#padded_message}s" | tr " " "=")
+    echo -e "${YELLOW}$line${NC}"
+    echo -e "${YELLOW} WARNING:${NC} $message${NC}"
+    echo -e "${YELLOW}$line${NC}"
+}
+
+success() {
+    local message="$1"
+    echo -e "${GREEN}====================================================${NC}"
+    echo -e "${GREEN} SUCCESS: $message${NC}"
+    echo -e "${GREEN}====================================================${NC}"
+}
+
+substep_info() {
+    local message="$1"
+    echo -e "${YELLOW}====================================================${NC}"
+    echo -e "${YELLOW} INFO: $message${NC}"
+    echo -e "${YELLOW}====================================================${NC}"
+}
+
+substep_success() {
+    local message="$1"
+    echo -e "${CYAN}====================================================${NC}"
+    echo -e "${CYAN} SUCCESS: $message${NC}"
+    echo -e "${CYAN}====================================================${NC}"
+}
+
+substep_error() {
+    local message="$1"
+    echo -e "${MAGENTA}====================================================${NC}"
+    echo -e "${MAGENTA} ERROR: $message${NC}"
+    echo -e "${MAGENTA}====================================================${NC}"
+}
+
+sudo_keep_alive() {
+  while true; do sudo -n true; sleep 60; done
 }
 
 print_error() {
@@ -148,6 +209,17 @@ run_script() {
         log_message "Warning: ${script_path} not found"
         return 1
     fi
+}
+
+# Function to check for required commands
+check_required_commands() {
+  local required_commands=("curl" "git" "stow")
+  for cmd in "${required_commands[@]}"; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo "Error: $cmd is not installed." >&2
+      exit 1
+    fi
+  done
 }
 
 # ------------------------------------------------------------------------------

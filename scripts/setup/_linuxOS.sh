@@ -48,7 +48,7 @@ check_ubuntu() {
 
 # Clean up
 cleanup() {
-    print_message "$YELLOW" "
+    info "
 ##############################################
 #              Cleanup Section               #
 ##############################################
@@ -56,14 +56,14 @@ cleanup() {
     log_message "Starting cleanup process"
     sudo apt-get -y autoclean
     sudo apt-get -y clean
-    print_message "$GREEN" "Cleaned!"
+    info "Cleaned!"
     log_message "Cleanup completed"
     sleep 2
 }
 
 # Update and install packages
 update_and_install() {
-    print_message "$YELLOW" "
+    info "
 ##############################################
 #      Update, Install, & Secure Section     #
 ##############################################
@@ -101,7 +101,7 @@ update_and_install() {
     )
 
     sudo apt-get -y install "${packages[@]}"
-    print_message "$GREEN" "Package installation complete"
+    success "Package installation complete"
     log_message "Completed system update and package installation"
     sleep 2
 }
@@ -111,9 +111,9 @@ update_and_install() {
 # ------------------------------------------------------------------------------
 installEzaAndExa() {
     if command_exists exa; then
-        print_message "$YELLOW" "exa already installed"
+        info "exa already installed"
     else
-        print_message "$YELLOW" "Installing exa.."
+        info "Installing exa.."
         EXA_VERSION=$(curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
         curl -Lo exa.zip "https://github.com/ogham/exa/releases/latest/download/exa-linux-x86_64-v${EXA_VERSION}.zip"
         sudo unzip -q exa.zip bin/exa -d /usr/local
@@ -121,9 +121,9 @@ installEzaAndExa() {
     fi
 
     if command_exists eza; then
-        print_message "$YELLOW" "eza already installed"
+        info "eza already installed"
     else
-        print_message "$YELLOW" "Installing eza.."
+        info "Installing eza.."
         sudo apt install -y gpg
         sudo mkdir -p /etc/apt/keyrings
         wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
@@ -136,18 +136,18 @@ installEzaAndExa() {
 
 installAntidote() {
     if command_exists antidote; then
-        print_message "$YELLOW" "antidote already installed"
+        info "antidote already installed"
     else
-        print_message "$YELLOW" "Installing antidote.."
+        info "Installing antidote.."
         git clone --depth=1 https://github.com/mattmc3/antidote.git "${ZDOTDIR:-$HOME}/.antidote"
     fi
 }
 
 installLatestGo() {
     if command_exists go; then
-        print_message "$YELLOW" "go already installed"
+        info "go already installed"
     else
-        print_message "$YELLOW" "Installing go.."
+        info "Installing go.."
         GO_VERSION="1.23.0" # Update this version as needed
         curl -LO "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
         sudo rm -rf /usr/local/go
@@ -158,9 +158,9 @@ installLatestGo() {
 
 installCargoPackageManager() {
     if command_exists cargo; then
-        print_message "$YELLOW" "cargo already installed"
+        info "cargo already installed"
     else
-        print_message "$YELLOW" "Installing cargo package manager."
+        info "Installing cargo package manager."
         sudo apt install -y cargo
         # cargo install just onefetch
     fi
@@ -168,21 +168,21 @@ installCargoPackageManager() {
 
 installNvim() {
     if command_exists nvim; then
-        print_message "$YELLOW" "nvim already installed"
+        info "nvim already installed"
     else
-        print_message "$YELLOW" "Installing nvim.."
+        info "Installing nvim.."
         sh ~/dotfiles/scripts/utils/_install_nvim.sh
     fi
 }
 
 installZoxide() {
     if command_exists zoxide; then
-        print_message "$YELLOW" "Zoxide already installed"
+        info "Zoxide already installed"
         return
     fi
 
     if ! curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
-        print_message "$RED" "Something went wrong during zoxide install!"
+        error "Something went wrong during zoxide install!"
         return 1
     fi
 }
@@ -192,7 +192,7 @@ installZoxide() {
 # ------------------------------------------------------------------------------
 main() {
     log_message "Script started"
-    print_message "$BLUE" "
+    info "
 You're running ${OS_NAME}.
 ##############################################
 #      We will begin applying updates,       #
@@ -204,7 +204,7 @@ You're running ${OS_NAME}.
 "
 
     if check_ubuntu; then
-        print_message "$GREEN" "
+        success "
 ##############################################
 #      Ubuntu-based system detected.         #
 #      Proceeding with setup...              #
@@ -212,7 +212,7 @@ You're running ${OS_NAME}.
 "
         log_message "Ubuntu-based system detected. Proceeding with setup."
     else
-        print_message "$RED" "
+        error "
 ##############################################
 #      This script is intended for           #
 #      Ubuntu-based systems only.            #
@@ -232,7 +232,7 @@ You're running ${OS_NAME}.
     # installNvim
     # installZoxide
 
-    print_message "$GREEN" "
+    success "
 ###################################################
 #      Installation Completed for _linuxOS.sh     #
 ###################################################

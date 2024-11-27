@@ -109,15 +109,15 @@ main() {
     # Install packages
     log_message "Installing Sublime Text packages..."
     subl .
-    print_message "$YELLOW" "Press Enter after packages are installed..."
+    info "Press Enter after packages are installed..."
     read
 
     # Final setup
     osascript -e 'quit app "Sublime Text"'
     subl .
     
-    print_message "$GREEN" "Sublime Text setup complete!"
-    print_message "$YELLOW" "Remember to activate your Sublime Text license"
+    success "Sublime Text setup complete!"
+    info "Remember to activate your Sublime Text license"
 }
 
 # Set error trap
