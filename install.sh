@@ -34,31 +34,6 @@ set -euo pipefail
 # Set CI environment variable if not already set
 export CI="${CI:-}"
 
-poster() {
-    echo ""
-    echo -e "${BLUE}*************************************************${NC}"
-    echo -e "${BLUE}*                                               *${NC}"
-    echo -e "${BLUE}*               Dotfiles Setup                  *${NC}"
-    echo -e "${BLUE}*                                               *${NC}"
-    echo -e "${BLUE}*************************************************${NC}"
-    echo ""
-    echo -e "${GREEN}This script will install and setup the following:${NC}"
-    echo -e " - Xcode Command Line Tools"
-    echo -e " - Homebrew"
-    echo -e " - Git"
-    echo -e " - oh-my-zsh and set to zsh shell"
-    echo -e " - Config files for various applications"
-    echo -e " - Set default applications for file types"
-    echo -e " - Configure macOS/linuxOS settings"
-    echo ""
-    read -p "$(echo -e '${YELLOW}Do you want to continue? (y/n): ${NC}')" confirm
-    echo ""
-    if [[ "$confirm" != "y" ]]; then
-        error "${RED}Installation cancelled."
-        exit 1
-    fi
-}
-
 # Initialize Git submodules
 initGitSubmodules() {
     log_message "→ Initializing and updating git submodules..."
@@ -110,7 +85,6 @@ trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 
 # Main function
 main() {
-    poster
     log_message "Script started"
     info "
 You're running ${OS_TYPE}.
