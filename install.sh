@@ -1,10 +1,20 @@
 #!/bin/bash
-
-#################################################
-#      File: install.sh                         #
-#      Author: Akash Goyal                      #
-#      Status: Development                      #
-#################################################
+#   ███                      █████              ████  ████
+#  ░░░                      ░░███              ░░███ ░░███
+#  ████  ████████    █████  ███████    ██████   ░███  ░███
+# ░░███ ░░███░░███  ███░░  ░░░███░    ░░░░░███  ░███  ░███
+#  ░███  ░███ ░███ ░░█████   ░███      ███████  ░███  ░███
+#  ░███  ░███ ░███  ░░░░███  ░███ ███ ███░░███  ░███  ░███
+#  █████ ████ █████ ██████   ░░█████ ░░████████ █████ █████
+# ░░░░░ ░░░░ ░░░░░ ░░░░░░     ░░░░░   ░░░░░░░░ ░░░░░ ░░░░░
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ install.sh
+# ░▓▓▓▓▓▓▓▓▓▓
+# ░░░░░░░░░░
+#
+#█▓▒░
 # This script creates symlinks from the home directory to any desired dotfiles in $HOME/dotfiles
 # It sets up both macOS and Linux configurations.
 # Install necessary pacakges for both MacOS and Linux.

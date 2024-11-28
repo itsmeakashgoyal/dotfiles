@@ -1,4 +1,20 @@
 #!/usr/bin/env bash
+#   █████
+#  ░░███
+#  ███████   █████████████   █████ ████ █████ █████
+# ░░░███░   ░░███░░███░░███ ░░███ ░███ ░░███ ░░███
+#   ░███     ░███ ░███ ░███  ░███ ░███  ░░░█████░
+#   ░███ ███ ░███ ░███ ░███  ░███ ░███   ███░░░███
+#   ░░█████  █████░███ █████ ░░████████ █████ █████
+#    ░░░░░  ░░░░░ ░░░ ░░░░░   ░░░░░░░░ ░░░░░ ░░░░░
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ scripts/tmux/_open-file.sh
+# ░▓▓▓▓▓▓▓▓▓▓
+# ░░░░░░░░░░
+#
+#█▓▒░
 
 # The set -e option instructs bash to immediately exit if any command has a non-zero exit status
 # The set -u referencing a previously undefined variable - with the exceptions of $* and $@ - is an error
