@@ -95,7 +95,6 @@ brew "lazygit"                                      # TUI for git - Go
 brew "tealdeer"                                     # Read cheat sheets (better tldr) - Rust
 
 # Development Tools
-brew "antidote"                                     # Plugin manager for zsh
 brew "automake"                                     # Build automation tool
 brew "cmake"                                        # Build system
 brew "gcc"                                          # GNU compiler collection

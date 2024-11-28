@@ -148,15 +148,6 @@ installEzaAndExa() {
     fi
 }
 
-installAntidote() {
-    if command_exists antidote; then
-        info "antidote already installed"
-    else
-        info "Installing antidote.."
-        git clone --depth=1 https://github.com/mattmc3/antidote.git "${ZDOTDIR:-$HOME}/.antidote"
-    fi
-}
-
 installLatestGo() {
     if command_exists go; then
         info "go already installed"
@@ -240,7 +231,6 @@ You're running ${OS_NAME}.
     # Install components
     update_and_install
     # installEzaAndExa
-    # installAntidote
     # installLatestGo
     installCargoPackageManager
     # installNvim

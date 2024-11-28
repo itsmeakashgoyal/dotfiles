@@ -69,7 +69,6 @@ cleanup_dotfiles() {
         "${HOME}/.config/nvim"
         "${HOME}/.config/tmux"
         "${HOME}/.oh-my-zsh"
-        "${HOME}/.antidote"
     )
 
     for link in "${symlinks[@]}"; do
@@ -119,11 +118,6 @@ cleanup_zsh() {
     # Remove Oh My Zsh
     if [[ -d "${HOME}/.oh-my-zsh" ]]; then
         rm -rf "${HOME}/.oh-my-zsh"
-    fi
-
-    # Remove Antidote
-    if [[ -d "${HOME}/.antidote" ]]; then
-        rm -rf "${HOME}/.antidote"
     fi
 
     # Remove Zsh configuration files

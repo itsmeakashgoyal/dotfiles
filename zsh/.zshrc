@@ -76,16 +76,10 @@ export MANPATH="/usr/local/man:$MANPATH"
 # ------------------------------------------------------------------------------
 case "$(uname)" in
 "Darwin")
-    export ANTIDOTE_DIR="/opt/homebrew/opt/antidote/share/antidote"
     export OHMYPOSH_THEMES_DIR="/opt/homebrew/opt/oh-my-posh/themes"
     ;;
 "Linux")
-    export ANTIDOTE_DIR="/home/linuxbrew/.linuxbrew/opt/antidote/share/antidote"
     export OHMYPOSH_THEMES_DIR="/home/linuxbrew/.linuxbrew/opt/oh-my-posh/themes"
-
-    # NVM setup
-    export NVM_DIR="${HOME}/.nvm"
-    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
 
     # # Nix
     # if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
@@ -108,11 +102,16 @@ eval "$(zoxide init --cmd cd zsh)"
 # Oh My Posh prompt
 eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
 
+#█▓▒░ load configs
+for config in "$HOME/dotfiles/zsh/local/"*.zsh; do
+    [[ -f "$config" ]] && source "$config"
+done
+
 # ------------------------------------------------------------------------------
 # Local Configuration
 # ------------------------------------------------------------------------------
 # Source additional configurations
-for config in keybindings completion antidote; do
+for config in keybindings completion; do
     config_file="$HOME/dotfiles/zsh/config/${config}.zsh"
     [[ -f "$config_file" ]] && builtin source "$config_file"
 done

@@ -1,5 +1,0 @@
-# Source Local Configs
-~/dotfiles/zsh/local
-
-# Source Fzf (This needs to happen after vi-mode bindings to give precedence to fzf bindings)
-~/dotfiles/zsh/local/fzf.zsh
