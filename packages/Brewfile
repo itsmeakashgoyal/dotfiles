@@ -130,6 +130,7 @@ brew "s3cmd"                                        # S3 command line tool
 if OS.mac?
     # Menu Bar Hacks
     brew "sketchybar"                               # Status bar replacement for MacOS
+    brew "borders"                                  # borders used in aerospace
 
     # Window Management & Tiling
     cask "alt-tab"                                  # Windows like alt-tab
