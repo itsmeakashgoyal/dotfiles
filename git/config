@@ -138,6 +138,8 @@
     branch = yellow
 
 [core]
+	attributesFile = ~/dotfiles/git/gitattributes
+
 	pager = delta --line-numbers --dark
 
 	# Treat spaces before tabs and all kinds of trailing whitespace as an error.

@@ -21,20 +21,20 @@
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
-zstyle ':omz:update' mode reminder  # Update reminders
-zstyle ':omz:update' frequency 13   # Check every 13 days
+zstyle ':omz:update' mode reminder # Update reminders
+zstyle ':omz:update' frequency 13  # Check every 13 days
 
 # Core plugins
 plugins=(
-    git                         # Git integration
-    sudo                        # Sudo support
-    history-substring-search    # Better history search
-    colored-man-pages          # Colored man pages
-    zsh-vi-mode                # Vi mode
-    ruby                       # Ruby support
-    fzf-tab                    # FZF tab completion
-    zsh-syntax-highlighting    # Syntax highlighting
-    zsh-autosuggestions        # Command suggestions
+    git                      # Git integration
+    sudo                     # Sudo support
+    history-substring-search # Better history search
+    colored-man-pages        # Colored man pages
+    zsh-vi-mode              # Vi mode
+    ruby                     # Ruby support
+    fzf-tab                  # FZF tab completion
+    zsh-syntax-highlighting  # Syntax highlighting
+    zsh-autosuggestions      # Command suggestions
     # zsh-autocomplete
 )
 
@@ -63,9 +63,9 @@ function zvm_after_init() {
 # Core Configuration
 # ------------------------------------------------------------------------------
 # Set shell options
-setopt glob_dots         # Include dotfiles in globbing
-setopt no_auto_menu     # Require extra TAB for menu
-setopt extended_glob    # Extended globbing capabilities
+setopt glob_dots     # Include dotfiles in globbing
+setopt no_auto_menu  # Require extra TAB for menu
+setopt extended_glob # Extended globbing capabilities
 
 # Environment setup
 export LANG=en_US.UTF-8
@@ -102,16 +102,10 @@ eval "$(zoxide init --cmd cd zsh)"
 # Oh My Posh prompt
 eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
 
-#█▓▒░ load configs
-for config in "$HOME/dotfiles/zsh/local/"*.zsh; do
-    [[ -f "$config" ]] && source "$config"
-done
-
 # ------------------------------------------------------------------------------
 # Local Configuration
 # ------------------------------------------------------------------------------
 # Source additional configurations
-for config in keybindings completion; do
-    config_file="$HOME/dotfiles/zsh/config/${config}.zsh"
-    [[ -f "$config_file" ]] && builtin source "$config_file"
+for config in "$HOME/dotfiles/zsh/local/"*.zsh; do
+    [[ -f "$config" ]] && source "$config"
 done

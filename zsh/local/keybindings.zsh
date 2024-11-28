@@ -10,7 +10,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/config/keybindings.zsh
+# ░▓ file   ▓ zsh/local/keybindings.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #

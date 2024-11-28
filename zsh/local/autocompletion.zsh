@@ -10,7 +10,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/config/completion.zsh
+# ░▓ file   ▓ zsh/local/autocompletion.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #
@@ -18,26 +18,33 @@
 # ------------------------------------------------------------------------------
 # Zsh Completion Configuration
 # ------------------------------------------------------------------------------
+# autocompletion systems
+loc=${ZDOTDIR:-"${HOME}/dotfiles/zsh"}
+fpath=($loc/completion $fpath)
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit && compinit -d "$XDG_CACHE_HOME"/zsh/zcompdump-"$ZSH_VERSION"
 
-# Set up cache directory
-cache_directory="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
-[[ ! -d "$cache_directory" ]] && mkdir -p "$cache_directory"
+# sources
+[[ $commands[gh] ]] && source <(gh completion -s zsh)
 
 # ------------------------------------------------------------------------------
 # Basic Completion Settings
 # ------------------------------------------------------------------------------
 # Enable caching
 zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path "$cache_directory/completion-cache"
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME"
 
 # Prevent tab completion on paste
 zstyle ':completion:*' insert-tab pending
 
 # Set completion display limits
 zstyle ':completion:*' list-max-items 20
-zstyle ':completion:*' menu no          # Disable menu for fzf-tab
+zstyle ':completion:*' menu select=long
 zstyle ':completion:*' verbose yes      # Verbose output
 zstyle ':completion:*' group-name ''    # Group by categories
+zstyle ':completion:*' use-compctl false
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # ------------------------------------------------------------------------------
 # Completion Formatting
@@ -46,16 +53,17 @@ zstyle ':completion:*' group-name ''    # Group by categories
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 
 # Colors and styling
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
 
 # ------------------------------------------------------------------------------
 # Matching Configuration
 # ------------------------------------------------------------------------------
 # Completion matching rules
-zstyle ':completion:*' completer _complete _ignored _approximate
+zstyle ':completion:*' completer _expand _complete _correct _approximate
 zstyle ':completion:*' matcher-list \
     'm:{a-z}={A-Z}' \
     'm:{[:lower:]}={[:upper:]} r:|[._-]=* r:|=*' \
@@ -85,11 +93,11 @@ zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 # ------------------------------------------------------------------------------
 # Initialize Completion System
 # ------------------------------------------------------------------------------
-autoload -Uz compinit
+# autoload -Uz compinit
 
 # Only regenerate completion dump if needed (older than 24 hours)
-if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-    compinit -d "$cache_directory/.zcompdump"
-else
-    compinit -C -d "$cache_directory/.zcompdump"
-fi
+# if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+#     compinit -d "$cache_directory/.zcompdump"
+# else
+#     compinit -C -d "$cache_directory/.zcompdump"
+# fi

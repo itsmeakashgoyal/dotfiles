@@ -74,7 +74,16 @@ export FZF_DEFAULT_OPTS="
     --multi
     --height=80%
     --layout=reverse
-    --border=rounded
+    --border=block
+    --border-label-pos=0
+    --preview-window=border-bold
+    --padding=0
+    --margin=1
+    --prompt=❯ 
+    --marker=❯ 
+    --pointer=◈
+    --separator=~
+    --scrollbar=▌
     --cycle
     --scroll-off=4
     --bind='ctrl-/:toggle-preview'
