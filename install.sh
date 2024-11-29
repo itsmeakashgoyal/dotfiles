@@ -168,12 +168,15 @@ You're running ${OS_TYPE}.
         setupDotfiles "linux"
     fi
 
-    # Install Stow packages
-    substep_info "Stowing packages."
-    declare -a stow_dirs=("dots" "nvim" "ohmyposh")
-    for dir in "${stow_dirs[@]}"; do
-        stow "$dir"
-    done
+    # Backup and initiate symlinks
+    backup_existing_files "zsh/.zshenv" ".zshenv"
+    symlink "zsh/.zshenv" ".zshenv"
+    
+    backup_existing_files "nvim" ".config/nvim"
+    symlink "nvim" ".config/nvim"
+    
+    backup_existing_files "tmux" ".config/tmux"
+    symlink "tmux" ".config/tmux"
 
     ### Hostname
     ###########################################################
@@ -187,17 +190,12 @@ You're running ${OS_TYPE}.
         echo "$(hostname)"
     fi
 
-    success "
-##############################################
-#      Installation Completed                #
-##############################################
-"
     log_message "Installation Completed!"
 
     success "
-############################################################################
-#      At last, do source your zsh configuration using 'exec zsh'          #
-############################################################################
+################################################################################################
+#      At last, do source your zsh configuration using 'exec zsh' and restart terminal         #
+################################################################################################
 "
 }
 

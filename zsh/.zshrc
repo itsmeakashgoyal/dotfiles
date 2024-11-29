@@ -38,10 +38,6 @@ plugins=(
     # zsh-autocomplete
 )
 
-# ------------------------------------------------------------------------------
-# Plugin Configuration
-# ------------------------------------------------------------------------------
-# FZF-tab
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
 source $ZSH/oh-my-zsh.sh
 
@@ -58,49 +54,6 @@ function zvm_config() {
 function zvm_after_init() {
     zvm_bindkey viins '^Q' push-line
 }
-
-# ------------------------------------------------------------------------------
-# Core Configuration
-# ------------------------------------------------------------------------------
-# Set shell options
-setopt glob_dots     # Include dotfiles in globbing
-setopt no_auto_menu  # Require extra TAB for menu
-setopt extended_glob # Extended globbing capabilities
-
-# Environment setup
-export LANG=en_US.UTF-8
-export MANPATH="/usr/local/man:$MANPATH"
-
-# ------------------------------------------------------------------------------
-# OS-Specific Configuration
-# ------------------------------------------------------------------------------
-case "$(uname)" in
-"Darwin")
-    export OHMYPOSH_THEMES_DIR="/opt/homebrew/opt/oh-my-posh/themes"
-    ;;
-"Linux")
-    export OHMYPOSH_THEMES_DIR="/home/linuxbrew/.linuxbrew/opt/oh-my-posh/themes"
-
-    # # Nix
-    # if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-    # . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-    # # . /etc/profile.d/nix.sh
-    # fi
-    # # End Nix
-    # export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
-    ;;
-esac
-
-# ------------------------------------------------------------------------------
-# Tool Integration
-# ------------------------------------------------------------------------------
-# FZF and Zoxide
-[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
-zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
-eval "$(zoxide init --cmd cd zsh)"
-
-# Oh My Posh prompt
-eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
 
 # ------------------------------------------------------------------------------
 # Local Configuration

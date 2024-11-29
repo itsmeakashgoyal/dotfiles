@@ -19,6 +19,9 @@
 # FZF Configuration
 # https://github.com/junegunn/fzf
 # ------------------------------------------------------------------------------
+[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
+eval "$(zoxide init --cmd cd zsh)"
 
 # ------------------------------------------------------------------------------
 # Color Scheme (Catppuccin Mocha)

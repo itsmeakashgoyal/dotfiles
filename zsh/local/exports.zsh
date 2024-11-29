@@ -57,6 +57,14 @@ case "$OS_TYPE" in
         "/home/linuxbrew/.linuxbrew/sbin"
         $path
     )
+
+    # # Nix
+    # if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+    # . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+    # # . /etc/profile.d/nix.sh
+    # fi
+    # # End Nix
+    # export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
     ;;
 esac
 
@@ -86,3 +94,7 @@ export PATH # Export the final PATH
 # ------------------------------------------------------------------------------
 # Compilation flags
 export MAKEFLAGS="-j$(nproc)" # Use all CPU cores for compilation
+
+# Oh My Posh prompt
+export OHMYPOSH_THEMES_DIR="${HOMEBREW_PREFIX}/opt/oh-my-posh/themes"
+eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"

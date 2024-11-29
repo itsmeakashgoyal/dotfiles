@@ -16,6 +16,11 @@
 #
 #█▓▒░
 
+# Set shell options
+setopt glob_dots     # Include dotfiles in globbing
+setopt no_auto_menu  # Require extra TAB for menu
+setopt extended_glob # Extended globbing capabilities
+
 export LESS="${less_options[*]}"
 export PAGER='less'
 
@@ -66,6 +71,8 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 export LESSCHARSET=utf-8
+
+export MANPATH="/usr/local/man:$MANPATH"
 
 # ------------------------------------------------------------------------------
 # Terminal and Editor Settings
