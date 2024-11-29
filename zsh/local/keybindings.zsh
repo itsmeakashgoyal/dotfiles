@@ -19,34 +19,26 @@
 # Zsh Keybindings Configuration
 # ------------------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
-# Auto-suggestions
-# ------------------------------------------------------------------------------
-bindkey '^w' autosuggest-execute # Execute suggestion
-bindkey '^e' autosuggest-accept  # Accept suggestion
-bindkey '^u' autosuggest-toggle  # Toggle suggestions
+# Key bindings
+#
+# List all keybindings:
+#   bindkey
+#
+# Find escape sequences:
+#   cat
 
-# ------------------------------------------------------------------------------
-# Navigation
-# ------------------------------------------------------------------------------
-bindkey '^L' vi-forward-word     # Move forward one word
-bindkey '^k' up-line-or-search   # Search history up
-bindkey '^j' down-line-or-search # Search history down
+# Delete: https://blog.pilif.me/2004/10/21/delete-key-in-zsh/
+bindkey '^[[3~' delete-char
+bindkey '^[3;5~' delete-char
 
-# ------------------------------------------------------------------------------
-# History Search
-# ------------------------------------------------------------------------------
-bindkey "^[[A" history-beginning-search-backward # Up arrow
-bindkey "^[[B" history-beginning-search-forward  # Down arrow
+# Home/end: https://stackoverflow.com/a/8645267/1973105
+bindkey "^[[H" beginning-of-line
+bindkey "^[[F" end-of-line
 
-# ------------------------------------------------------------------------------
-# Key Reference
-# ------------------------------------------------------------------------------
-# ^w = Ctrl + w
-# ^e = Ctrl + e
-# ^u = Ctrl + u
-# ^L = Ctrl + l
-# ^k = Ctrl + k
-# ^j = Ctrl + j
-# ^[[A = Up Arrow
-# ^[[B = Down Arrow
+# History search with arrow keys: https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
+autoload -U up-line-or-beginning-search
+zle -N up-line-or-beginning-search
+bindkey "^[[A" up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey "^[[B" down-line-or-beginning-search

@@ -175,6 +175,18 @@ You're running ${OS_TYPE}.
         stow "$dir"
     done
 
+    ### Hostname
+    ###########################################################
+    if [ -x "$(command -v figlet)" ]; then
+        if [ -x "$(command -v lolcat)" ]; then
+            figlet $(hostname) | lolcat -f
+        else
+            figlet $(hostname)
+        fi
+    else
+        echo "$(hostname)"
+    fi
+
     success "
 ##############################################
 #      Installation Completed                #

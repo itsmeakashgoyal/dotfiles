@@ -45,6 +45,8 @@ zstyle ':completion:*' group-name ''    # Group by categories
 zstyle ':completion:*' use-compctl false
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+# hide parents
+zstyle ':completion:*' ignored-patterns '.|..|.DS_Store|**/.|**/..|**/.DS_Store|**/.git'
 
 # ------------------------------------------------------------------------------
 # Completion Formatting
@@ -86,18 +88,12 @@ zstyle ':completion:*:git-checkout:*' sort false
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
 
-# Navigation and display
-zstyle ':fzf-tab:*' switch-group '<' '>'
+# switch groups using `[` and `]`
+zstyle ':fzf-tab:*' switch-group '[' ']'
+
+# use the same layout as others and respect my default
+local fzf_flags
+zstyle -a ':fzf-tab:*' fzf-flags fzf_flags
+fzf_flags=( "${fzf_flags[@]}" '--layout=reverse-list' )
+zstyle ':fzf-tab:*' fzf-flags $fzf_flags
 zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-
-# ------------------------------------------------------------------------------
-# Initialize Completion System
-# ------------------------------------------------------------------------------
-# autoload -Uz compinit
-
-# Only regenerate completion dump if needed (older than 24 hours)
-# if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-#     compinit -d "$cache_directory/.zcompdump"
-# else
-#     compinit -C -d "$cache_directory/.zcompdump"
-# fi

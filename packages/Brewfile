@@ -159,6 +159,8 @@ if OS.mac?
     brew "trash"                                    # Safe rm alternative
     brew "mas"                                      # Mac App Store CLI
     brew "stow"                                     # Dotfile manager
+    brew "figlet"
+    brew "lolcat"
 
     # Security Utilities
     brew "openssh"                                  # OpenSSH client

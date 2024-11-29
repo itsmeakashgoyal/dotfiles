@@ -47,13 +47,6 @@ export FZF_PREVIEW_COMMAND="([[ -f {} ]] && (bat --style=numbers --color=always 
                            ([[ -d {} ]] && tree -C {} || echo {} 2> /dev/null) || \
                            echo {} 2> /dev/null)"
 
-# Default preview window configuration
-local preview_opts=(
-    # '--preview-window=right:50%:noborder:hidden'
-    # '--preview=${FZF_PREVIEW_COMMAND}'
-    # '--bind=alt-p:toggle-preview'
-)
-
 local fzf_default_opts=(
     '--preview-window right:50%:noborder:hidden'
     '--color "preview-bg:234"'
@@ -70,22 +63,22 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --strip
 # Default options combining color scheme, preview, and behavior
 export FZF_DEFAULT_OPTS="
     ${color_scheme[*]}
-    ${preview_opts[*]}
     --multi
     --height=80%
     --layout=reverse
     --border=block
     --border-label-pos=0
-    --preview-window=border-bold
+    --preview-window=border-sharp
     --padding=0
     --margin=1
-    --prompt=❯ 
-    --marker=❯ 
-    --pointer=◈
-    --separator=~
-    --scrollbar=▌
+    --prompt='∷ ' 
+    --pointer='▶ '
+    --marker='✔ '
+    --separator='~'
+    --scrollbar='▌ '
     --cycle
     --scroll-off=4
+    --info=right
     --bind='ctrl-/:toggle-preview'
     --bind='ctrl-y:execute-silent(echo {} | pbcopy)'
     --bind='ctrl-space:toggle+down'
@@ -122,16 +115,29 @@ fi
 # Load key bindings
 source "${HOME}/.config/.fzf/shell/key-bindings.zsh"
 
-# Custom completion function
+# Use fd to respect .gitignore, include hidden files and exclude `.git` folders
+# - The first argument to the function ($1) is the base path to start traversal
+_fzf_compgen_path() {
+    fd --hidden --exclude ".git" . "$1"
+}
+
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+    fd --type d --hidden --exclude ".git" . "$1"
+}
+
+# Advanced customization of fzf options via _fzf_comprun function
+# - The first argument to the function is the name of the command.
+# - Make sure to pass the rest of the arguments to fzf.
 _fzf_comprun() {
     local command=$1
     shift
 
     case "$command" in
-    cd) fzf --preview 'tree -C {} | head -200' "$@" ;;
+    cd) fzf --preview 'eza --tree --color=always {} | head -200' "$@" ;;
     tree) fzf --preview 'tree -C {}' "$@" ;;
     nvim) fzf --preview 'bat --style=numbers --color=always {}' "$@" ;;
-    *) fzf "$@" ;;
+    *) fzf --preview 'bat -n --color=always {}' "$@" ;;
     esac
 }
 

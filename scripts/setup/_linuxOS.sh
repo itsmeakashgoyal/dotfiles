@@ -112,6 +112,8 @@ update_and_install() {
         lsb-release
         entr
         stow
+        figlet
+        lolcat
     )
 
     sudo apt-get -y install "${packages[@]}"

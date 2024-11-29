@@ -2,6 +2,17 @@
 
 [![Test Setup dotfiles](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml)
 
+```
+     █████           █████       ██████   ███  ████
+    ░░███           ░░███       ███░░███ ░░░  ░░███
+  ███████   ██████  ███████    ░███ ░░░  ████  ░███   ██████   █████
+ ███░░███  ███░░███░░░███░    ███████   ░░███  ░███  ███░░███ ███░░
+░███ ░███ ░███ ░███  ░███    ░░░███░     ░███  ░███ ░███████ ░░█████
+░███ ░███ ░███ ░███  ░███ ███  ░███      ░███  ░███ ░███░░░   ░░░░███
+░░████████░░██████   ░░█████   █████     █████ █████░░██████  ██████
+ ░░░░░░░░  ░░░░░░     ░░░░░   ░░░░░     ░░░░░ ░░░░░  ░░░░░░  ░░░░░░
+```
+
 This repository contains scripts and configuration files to set up a development environment for macOS and Linux. It is tailored for software development, focusing on a clean, minimal, and efficient setup.
 
 ## Overview
