@@ -27,8 +27,8 @@
 # ------------------------------------------------------------------------------
 # Update and upgrade system packages
 alias apt_update='sudo apt-get update && \
-                 sudo apt-get -y upgrade && \
-                 echo "✅ System updated successfully"'
+                sudo apt-get -y upgrade && \
+                echo "✅ System updated successfully"'
 
 # Clean up system packages
 alias apt_clean='sudo apt-get clean && \
@@ -65,7 +65,7 @@ cpp() {
     echo "Copying ${source} to ${dest}"
     echo "Total size: $(numfmt --to=iec-i --suffix=B ${total_size})"
 
-    strace -q -ewrite cp -- "${source}" "${dest}" 2>&1 | \
+    strace -q -ewrite cp -- "${source}" "${dest}" 2>&1 |
         awk -v total_size="$total_size" '
         {
             count += $NF

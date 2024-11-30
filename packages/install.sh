@@ -72,19 +72,19 @@ install_homebrew() {
 
         # Configure Homebrew PATH
         case "$OS_TYPE" in
-            "Darwin")
-                if [ -x "/opt/homebrew/bin/brew" ]; then
-                    info "Configuring Homebrew in PATH for Apple Silicon Mac..."
-                    eval "$(/opt/homebrew/bin/brew shellenv)"  # Apple Silicon
-                elif [ -x "/usr/local/bin/brew" ]; then
-                    info "Configuring Homebrew in PATH for Intel Mac..."
-                    eval "$(/usr/local/bin/brew shellenv)"     # Intel Mac
-                fi
-                ;;
-            "Linux")
-                info "Configuring Homebrew in PATH for Linux..."
-                eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-                ;;
+        "Darwin")
+            if [ -x "/opt/homebrew/bin/brew" ]; then
+                info "Configuring Homebrew in PATH for Apple Silicon Mac..."
+                eval "$(/opt/homebrew/bin/brew shellenv)" # Apple Silicon
+            elif [ -x "/usr/local/bin/brew" ]; then
+                info "Configuring Homebrew in PATH for Intel Mac..."
+                eval "$(/usr/local/bin/brew shellenv)" # Intel Mac
+            fi
+            ;;
+        "Linux")
+            info "Configuring Homebrew in PATH for Linux..."
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+            ;;
         esac
     fi
 
@@ -116,87 +116,87 @@ install_packages() {
 
 # Install Node with FNM and set latest LTS as default, then install npm packages
 install_node_packages() {
-  # Install FNM
-  if ! command -v fnm &>/dev/null; then
-    substep_info "Installing FNM..."
-    curl -fsSL https://fnm.vercel.app/install | bash
-    eval "$(fnm env --use-on-cd)" # needed to install npm packages - already set for Fish
-    substep_success "FNM installed."
-  fi
+    # Install FNM
+    if ! command -v fnm &>/dev/null; then
+        substep_info "Installing FNM..."
+        curl -fsSL https://fnm.vercel.app/install | bash
+        eval "$(fnm env --use-on-cd)" # needed to install npm packages - already set for Fish
+        substep_success "FNM installed."
+    fi
 
-  # Install latest LTS version of Node with FNM and set as default
-  if ! fnm use --lts &>/dev/null; then
-    info "Installing latest LTS version of Node..."
-    fnm install --lts
-    fnm alias lts-latest default
-    fnm use default
-    substep_success "Node LTS installed and set as default for FNM."
-  fi
+    # Install latest LTS version of Node with FNM and set as default
+    if ! fnm use --lts &>/dev/null; then
+        info "Installing latest LTS version of Node..."
+        fnm install --lts
+        fnm alias lts-latest default
+        fnm use default
+        substep_success "Node LTS installed and set as default for FNM."
+    fi
 
-  # Install NPM packages
-  info "Installing NPM packages..."
-  npm install -g $(cat $node_packages)
-  corepack enable
-  success "All NPM global packages installed."
+    # Install NPM packages
+    info "Installing NPM packages..."
+    npm install -g $(cat $node_packages)
+    corepack enable
+    success "All NPM global packages installed."
 }
 
 # Define a function for installing packages with Python
 install_python_packages() {
-  if ! command -v $(which python) &>/dev/null; then
-    substep_info "Python not found. Installing..."
-    brew install python
     if ! command -v $(which python) &>/dev/null; then
-      error "Failed to install Python. Exiting."
-      exit 1
+        substep_info "Python not found. Installing..."
+        brew install python
+        if ! command -v $(which python) &>/dev/null; then
+            error "Failed to install Python. Exiting."
+            exit 1
+        fi
+        substep_success "Python installed."
     fi
-    substep_success "Python installed."
-  fi
-  info "Installing Python packages..."
-  pip install $(cat "$python_packages")
-  success "Finished installing Python packages."
+    info "Installing Python packages..."
+    pip install $(cat "$python_packages")
+    success "Finished installing Python packages."
 }
 
 # Install Ruby with rbenv, set 3.1.3 as default, then install gems
 install_ruby_packages() {
-  # Install rbenv
-  if ! command -v rbenv &>/dev/null; then
-    substep_info "Installing rbenv..."
-    brew install rbenv ruby-build
-    eval "$(rbenv init - zsh)" # needed to install gems - already set for Fish
-    substep_success "rbenv installed."
-  fi
+    # Install rbenv
+    if ! command -v rbenv &>/dev/null; then
+        substep_info "Installing rbenv..."
+        brew install rbenv ruby-build
+        eval "$(rbenv init - zsh)" # needed to install gems - already set for Fish
+        substep_success "rbenv installed."
+    fi
 
-  # Install Ruby 3.1.3 with rbenv and set as default
-  if ! rbenv versions | grep -q 3.1.3; then
-    substep_info "Installing Ruby 3.1.3..."
-    rbenv install 3.1.3
-    rbenv global 3.1.3
-    rbenv rehash
-    substep_success "Ruby 3.1.3 installed and set as default for rbenv."
-  fi
+    # Install Ruby 3.1.3 with rbenv and set as default
+    if ! rbenv versions | grep -q 3.1.3; then
+        substep_info "Installing Ruby 3.1.3..."
+        rbenv install 3.1.3
+        rbenv global 3.1.3
+        rbenv rehash
+        substep_success "Ruby 3.1.3 installed and set as default for rbenv."
+    fi
 
-  # Install gems
-  info "Installing Ruby gems..."
-  gem install $(cat ruby_packages.txt)
-  success "Ruby gems installed."
+    # Install gems
+    info "Installing Ruby gems..."
+    gem install $(cat ruby_packages.txt)
+    success "Ruby gems installed."
 }
 
 # Define a function for installing packages with Rust
 install_rust_packages() {
-  if ! command -v $(which rustc) &>/dev/null; then
-    substep_info "Rust not found. Installing..."
-    brew install rust rustup-init
-    rustup-init
     if ! command -v $(which rustc) &>/dev/null; then
-      error "Failed to install Rust. Exiting."
-      exit 1
+        substep_info "Rust not found. Installing..."
+        brew install rust rustup-init
+        rustup-init
+        if ! command -v $(which rustc) &>/dev/null; then
+            error "Failed to install Rust. Exiting."
+            exit 1
+        fi
+        substep_success "Rust installed."
     fi
-    substep_success "Rust installed."
-  fi
-  info "Installing Rust packages..."
-  rustup update
-  cargo install $(cat "$rust_packages")
-  success "Finished installing Rust packages."
+    info "Installing Rust packages..."
+    rustup update
+    cargo install $(cat "$rust_packages")
+    success "Finished installing Rust packages."
 }
 
 # ------------------------------------------------------------------------------
@@ -209,12 +209,6 @@ main() {
     install_homebrew
     install_packages
     update_brew
-    install_python_packages
-
-    ## Uncomment if you need to install below packages
-    # install_node_packages
-    # install_ruby_packages
-    # install_rust_packages
 
     success "Packages installation completed successfully"
     log_message "Packages installation completed successfully"

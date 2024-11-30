@@ -39,11 +39,11 @@ export XDG_DOTFILES_DIR="${HOME}/dotfiles"
 
 # Create XDG directories if they don't exist
 for dir in "$XDG_CONFIG_HOME" \
-  "$XDG_CACHE_HOME" \
-  "$XDG_DATA_HOME" \
-  "$XDG_STATE_HOME" \
-  "$XDG_RUNTIME_DIR"; do
-  [[ ! -d "$dir" ]] && mkdir -p "$dir"
+    "$XDG_CACHE_HOME" \
+    "$XDG_DATA_HOME" \
+    "$XDG_STATE_HOME" \
+    "$XDG_RUNTIME_DIR"; do
+    [[ ! -d "$dir" ]] && mkdir -p "$dir"
 done
 
 # ------------------------------------------------------------------------------
@@ -51,33 +51,3 @@ done
 # ------------------------------------------------------------------------------
 export ZDOTDIR="${XDG_DOTFILES_DIR}/zsh"                  # Zsh config directory
 export GIT_CONFIG_GLOBAL="${XDG_DOTFILES_DIR}/git/config" # Git config
-
-# add a config file for wget
-# export WGET_CONFIG_PATH="${XDG_DOTFILES_DIR}/config/.wgetrc"
-
-# ------------------------------------------------------------------------------
-# Editor Configuration
-# ------------------------------------------------------------------------------
-if command -v nvim >/dev/null 2>&1; then
-  export EDITOR="nvim"
-  export VISUAL="nvim"
-else
-  export EDITOR="vim"
-  export VISUAL="vim"
-fi
-
-# ------------------------------------------------------------------------------
-# Shell Options
-# ------------------------------------------------------------------------------
-setopt NO_HUP # Don't kill background jobs on exit
-
-# ------------------------------------------------------------------------------
-# Performance Optimizations
-# ------------------------------------------------------------------------------
-# Disable glob patterns for faster command execution
-alias find='noglob find'
-alias fd='noglob fd'
-alias fzf='noglob fzf'
-
-# Disable flow control (ctrl-s/ctrl-q)
-setopt noflowcontrol

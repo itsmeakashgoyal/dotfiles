@@ -16,16 +16,25 @@
 #
 #█▓▒░
 
-# Set shell options
+# ------------------------------------------------------------------------------
+# Shell Options
+# ------------------------------------------------------------------------------
 setopt glob_dots     # Include dotfiles in globbing
 setopt no_auto_menu  # Require extra TAB for menu
 setopt extended_glob # Extended globbing capabilities
+setopt NO_HUP        # Don't kill background jobs on exit
+setopt noflowcontrol # Disable flow control (ctrl-s/ctrl-q)
+
+# ------------------------------------------------------------------------------
+# Performance Optimizations
+# ------------------------------------------------------------------------------
+# Disable glob patterns for faster command execution
+alias find='noglob find'
+alias fd='noglob fd'
+alias fzf='noglob fzf'
 
 export LESS="${less_options[*]}"
 export PAGER='less'
-
-# Bat: https://github.com/sharkdp/bat
-# export BAT_THEME="Squirrelsong Dark"
 
 # Eza colors: https://github.com/eza-community/eza/blob/main/man/eza_colors.5.md
 EZA_COLORS="reset:$LS_COLORS"                      # Reset default colors, like making everything yellow
@@ -77,9 +86,13 @@ export MANPATH="/usr/local/man:$MANPATH"
 # ------------------------------------------------------------------------------
 # Terminal and Editor Settings
 # ------------------------------------------------------------------------------
-# Set default editor
-export EDITOR="nvim"
-export VISUAL="nvim"
+if command -v nvim >/dev/null 2>&1; then
+    export EDITOR="nvim"
+    export VISUAL="nvim"
+else
+    export EDITOR="vim"
+    export VISUAL="vim"
+fi
 
 # Configure less
 export LESS="-R --quit-if-one-screen"
@@ -94,5 +107,11 @@ export LESS_TERMCAP_so=$'\e[01;33m'  # begin standout-mode
 export LESS_TERMCAP_ue=$'\e[0m'      # end underline
 export LESS_TERMCAP_us=$'\e[1;4;32m' # begin underline
 
+# Bat: https://github.com/sharkdp/bat
+# export BAT_THEME="Squirrelsong Dark"
+
 # Ripgrep config file location
 # export RIPGREP_CONFIG_PATH="$XDG_DOTFILES_DIR/dots/.ripgreprc"
+
+# Config file for wget
+# export WGET_CONFIG_PATH="${XDG_DOTFILES_DIR}/dots/.wgetrc"

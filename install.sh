@@ -171,10 +171,10 @@ You're running ${OS_TYPE}.
     # Backup and initiate symlinks
     backup_existing_files "zsh/.zshenv" ".zshenv"
     symlink "zsh/.zshenv" ".zshenv"
-    
+
     backup_existing_files "nvim" ".config/nvim"
     symlink "nvim" ".config/nvim"
-    
+
     backup_existing_files "tmux" ".config/tmux"
     symlink "tmux" ".config/tmux"
 
