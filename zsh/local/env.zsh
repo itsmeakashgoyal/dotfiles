@@ -95,4 +95,4 @@ export LESS_TERMCAP_ue=$'\e[0m'      # end underline
 export LESS_TERMCAP_us=$'\e[1;4;32m' # begin underline
 
 # Ripgrep config file location
-export RIPGREP_CONFIG_PATH="$XDG_DOTFILES_DIR/dots/.wgetrc"
+# export RIPGREP_CONFIG_PATH="$XDG_DOTFILES_DIR/dots/.ripgreprc"

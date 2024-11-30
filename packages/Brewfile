@@ -161,6 +161,9 @@ if OS.mac?
     brew "stow"                                     # Dotfile manager
     brew "figlet"
     brew "lolcat"
+    brew "lld"
+    brew "cmake-docs"
+    brew "universal-ctags"
 
     # Security Utilities
     brew "openssh"                                  # OpenSSH client

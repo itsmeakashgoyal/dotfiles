@@ -1,1 +1,12 @@
-djlint
+pyfiglet
+pynvim
+pylint
+vim-vint
+
+# Install python-lsp-server with all extras
+python-lsp-server[all]
+
+# Other related packages
+pylsp-mypy
+python-lsp-isort
+python-lsp-black

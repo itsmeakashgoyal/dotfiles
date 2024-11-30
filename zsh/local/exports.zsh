@@ -37,6 +37,10 @@ case "$OS_TYPE" in
         "/usr/local/opt/ruby/bin"
         $path
     )
+
+    export LDFLAGS="-L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind"
+    export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
     ;;
 "Linux")
     # Linux Homebrew paths

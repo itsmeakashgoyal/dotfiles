@@ -74,42 +74,67 @@ cleanup_dotfiles() {
     for link in "${symlinks[@]}"; do
         if [[ -L "$link" ]]; then
             rm -f "$link"
-            log_message "Removed symlink: $link"
+            success "Removed symlink: $link"
         fi
     done
 }
 
 cleanup_homebrew() {
     info "Cleaning up Homebrew..."
-    if command_exists brew; then
-        # Uninstall all packages
-        brew remove --force $(brew list --formula)
-        brew remove --cask --force $(brew list --cask)
 
-        # Uninstall Homebrew
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+    if command_exists brew; then
+        info "This will uninstall Homebrew and all of the packages installed with brew."
+        while true; do
+            read -p "Uninstall Homebrew and all packages installed with brew ? (y/n) " yn
+            case $yn in
+            [Yy]*)
+                break
+                ;;
+            [Nn]*)
+                printf "\nExiting.\n"
+                exit 0
+                ;;
+            *)
+                echo "Please answer yes or no."
+                ;;
+            esac
+        done
+
+        brew remove --force $(brew list --formula)
+
+        platform=$(uname -s)
+        if [ "${platform}" == "Darwin" ]; then
+            brew remove --cask --force $(brew list)
+        else
+            brew remove --force $(brew list)
+        fi
+
+        NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
 
         # Remove Homebrew cache and directories
         rm -rf "$(brew --cache)"
         rm -rf "$(brew --prefix)/Caskroom/"
+        [ -d /home/linuxbrew/.linuxbrew ] && sudo rm -rf /home/linuxbrew/.linuxbrew
 
-        log_message "Homebrew uninstalled successfully"
+        success "Homebrew uninstalled successfully"
     fi
 }
 
 cleanup_nvim() {
     info "Cleaning up Neovim..."
-    rm -rf "${HOME}/.config/nvim"
-    rm -rf "${HOME}/.local/share/nvim"
-    rm -rf "${HOME}/.cache/nvim"
-    log_message "Neovim configuration cleaned"
+    DESTDIR="${HOME}"/.config/nvim
+    rm -rf "${DESTDIR}"
+    rm -rf "${HOME}"/.local/share/nvim
+    rm -rf "${HOME}"/.local/state/nvim
+    rm -rf "${HOME}"/.cache/nvim
+    success "Neovim configuration cleaned"
 }
 
 cleanup_tmux() {
     info "Cleaning up tmux..."
     rm -rf "${HOME}/.config/tmux"
     rm -rf "${HOME}/.tmux"
-    log_message "Tmux configuration cleaned"
+    success "Tmux configuration cleaned"
 }
 
 cleanup_zsh() {
@@ -125,7 +150,7 @@ cleanup_zsh() {
     rm -f "${HOME}/.zshrc"
     rm -rf "${HOME}/.zsh"
 
-    log_message "Zsh configuration cleaned"
+    success "Zsh configuration cleaned"
 }
 
 # ------------------------------------------------------------------------------

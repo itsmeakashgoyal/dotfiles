@@ -5,6 +5,7 @@
 # Folder view configuration files
 .DS_Store
 *.swp
+.vscode
 
 # Thumbnail cache files
 ._*
