@@ -191,10 +191,18 @@ if utils.executable("clangd") then
     lspconfig.clangd.setup {
         on_attach = on_attach,
         capabilities = capabilities,
-        filetypes = {"c", "cpp", "cc"},
+        cmd = {"clangd", "--offset-encoding=utf-16"},
+        filetypes = {"c", "cpp", "hpp", "h", "objc", "objcpp", "cuda", "proto"},
         flags = {
             debounce_text_changes = 500
-        }
+        },
+        settings = {
+            ["clangd"] = {
+                ["compilationDatabasePath"] = "build",
+                ["fallbackFlags"] = {"-std=c++17"}
+            }
+        },
+        single_file_support = true
     }
 end
 

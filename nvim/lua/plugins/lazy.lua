@@ -466,7 +466,37 @@ require('lazy').setup({
                 desc = "Replace Buffer"
             }
         }
-    }, -- Autotags
+    },
+    {
+        "sbdchd/neoformat",
+        config = function()
+            -- vim.api.nvim_create_autocmd({ "BufWritePre", "TextChanged" }, {
+            vim.api.nvim_create_autocmd(
+                {"BufWritePre"},
+                {
+                    pattern = {
+                        "*.json",
+                        "*.yml",
+                        "*.yaml",
+                        "*.js",
+                        "*.ts",
+                        "*.lua",
+                        "*.cpp",
+                        "*.hpp",
+                        "*.cxx",
+                        "*.hxx",
+                        "*.cc",
+                        "*.c",
+                        "*.h",
+                        "*.rs",
+                        "*.py"
+                    },
+                    command = "Neoformat"
+                }
+            )
+        end
+    },
+    -- Autotags
     {"windwp/nvim-ts-autotag", opts = {}}, {
         "goolord/alpha-nvim",
         -- dependencies = { 'echasnovski/mini.icons' },
