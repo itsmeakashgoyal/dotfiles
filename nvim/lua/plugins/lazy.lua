@@ -209,14 +209,9 @@ require('lazy').setup({
         -- Autocompletion
         "hrsh7th/nvim-cmp",
         event = "InsertEnter",
-        dependencies = {
-            -- Snippet Engine & its associated nvim-cmp source
-            "L3MON4D3/LuaSnip", "saadparwaiz1/cmp_luasnip",
-
-            -- Adds LSP completion capabilities
-            "hrsh7th/cmp-nvim-lsp", "hrsh7th/cmp-path", "hrsh7th/cmp-cmdline",
-
-            -- Adds a number of user-friendly snippets
+        dependencies = { -- Snippet Engine & its associated nvim-cmp source
+            "L3MON4D3/LuaSnip", "saadparwaiz1/cmp_luasnip", -- Adds LSP completion capabilities
+            "hrsh7th/cmp-nvim-lsp", "hrsh7th/cmp-path", "hrsh7th/cmp-cmdline", -- Adds a number of user-friendly snippets
             "rafamadriz/friendly-snippets", -- Adds vscode-like pictograms
             "onsails/lspkind.nvim"
         },
@@ -297,10 +292,10 @@ require('lazy').setup({
                     documentation = cmp.config.window.bordered()
                 },
                 sources = {
-                    {name = "nvim_lsp"}, {name = "nvim_lua"},
-                    {name = "luasnip"}, {name = "buffer"}, {name = "path"},
-                    {name = "calc"}, {name = "emoji"}, {name = "treesitter"},
-                    {name = "crates"}, {name = "tmux"}
+                    {name = "copilot"}, {name = "nvim_lsp"},
+                    {name = "nvim_lua"}, {name = "luasnip"}, {name = "buffer"},
+                    {name = "path"}, {name = "calc"}, {name = "emoji"},
+                    {name = "treesitter"}, {name = "crates"}, {name = "tmux"}
                 },
                 formatting = {
                     format = function(entry, vim_item)
@@ -313,6 +308,7 @@ require('lazy').setup({
                                               vim_item.kind)
                             -- Source
                             vim_item.menu = ({
+                                copilot = "[Copilot]",
                                 nvim_lsp = "[LSP]",
                                 nvim_lua = "[Lua]",
                                 luasnip = "[LuaSnip]",
@@ -466,37 +462,57 @@ require('lazy').setup({
                 desc = "Replace Buffer"
             }
         }
-    },
-    {
+    }, {
         "sbdchd/neoformat",
         config = function()
             -- vim.api.nvim_create_autocmd({ "BufWritePre", "TextChanged" }, {
-            vim.api.nvim_create_autocmd(
-                {"BufWritePre"},
-                {
-                    pattern = {
-                        "*.json",
-                        "*.yml",
-                        "*.yaml",
-                        "*.js",
-                        "*.ts",
-                        "*.lua",
-                        "*.cpp",
-                        "*.hpp",
-                        "*.cxx",
-                        "*.hxx",
-                        "*.cc",
-                        "*.c",
-                        "*.h",
-                        "*.rs",
-                        "*.py"
-                    },
-                    command = "Neoformat"
-                }
-            )
+            vim.api.nvim_create_autocmd({"BufWritePre"}, {
+                pattern = {
+                    "*.json", "*.yml", "*.yaml", "*.js", "*.ts", "*.lua",
+                    "*.cpp", "*.hpp", "*.cxx", "*.hxx", "*.cc", "*.c", "*.h",
+                    "*.rs", "*.py"
+                },
+                command = "Neoformat"
+            })
         end
-    },
-    -- Autotags
+    }, {
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        build = ":Copilot auth",
+        event = "InsertEnter",
+        config = function()
+            require("copilot").setup({
+                panel = {
+                    enabled = true,
+                    auto_refresh = true,
+                    keymap = {
+                        jump_next = "<c-j>",
+                        jump_prev = "<c-k>",
+                        accept = "<c-a>",
+                        refresh = "r",
+                        open = "<M-CR>"
+                    },
+                    layout = {
+                        position = "bottom", -- | top | left | right
+                        ratio = 0.4
+                    }
+                },
+                suggestion = {
+                    enabled = true,
+                    auto_trigger = true,
+                    debounce = 75,
+                    keymap = {
+                        accept = "<c-a>",
+                        accept_word = false,
+                        accept_line = false,
+                        next = "<c-j>",
+                        prev = "<c-k>",
+                        dismiss = "<C-e>"
+                    }
+                }
+            })
+        end
+    }, -- Autotags
     {"windwp/nvim-ts-autotag", opts = {}}, {
         "goolord/alpha-nvim",
         -- dependencies = { 'echasnovski/mini.icons' },
