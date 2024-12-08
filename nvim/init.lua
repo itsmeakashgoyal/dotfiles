@@ -2,7 +2,7 @@
 vim.loader.enable()
 
 require("keymaps")
-require("plugins.lazy")
+require("plugin_specs")
 require("plugins.misc")
 require("plugins.lualine")
 require("plugins.dressing")
