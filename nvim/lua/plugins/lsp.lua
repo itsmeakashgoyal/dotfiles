@@ -1,4 +1,4 @@
-local utils = require("utils")
+local utils = require("config.utils")
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)

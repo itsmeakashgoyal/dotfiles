@@ -1,13 +1,14 @@
 --Enable the new |lua-loader| that byte-compiles and caches lua files.
 vim.loader.enable()
 
-require("keymaps")
-require("plugin_specs")
+require("config.keymaps")
+require("config.utils")
+require("config.plugin_specs")
+require("config.options")
+require("config.misc")
 require("plugins.misc")
 require("plugins.lualine")
 require("plugins.dressing")
-require("options")
-require("misc")
 require("plugins.dap")
 require("plugins.gitsigns")
 require("plugins.telescope")

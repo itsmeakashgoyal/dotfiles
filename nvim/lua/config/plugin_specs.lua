@@ -220,7 +220,11 @@ local plugin_specs = {
         {
             "nvim-telescope/telescope.nvim",
             branch = "0.1.x",
-            dependencies = { "nvim-lua/plenary.nvim" },
+            dependencies = {
+                "nvim-lua/plenary.nvim",
+                "nvim-tree/nvim-web-devicons",
+                { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+            },
         },
         "nvim-telescope/telescope-symbols.nvim",
         -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
@@ -380,7 +384,7 @@ local plugin_specs = {
             -- order to load the plugin when the command is run for the first time
             keys = {
                 {
-                    "<leader>lg",
+                    "<leader>gg",
                     "<cmd>LazyGit<cr>",
                     desc = "LazyGit",
                 },
@@ -395,7 +399,7 @@ local plugin_specs = {
             end,
             keys = {
                 {
-                    "<leader>?",
+                    "<leader>wk",
                     function()
                         require("which-key").show({ global = false })
                     end,
