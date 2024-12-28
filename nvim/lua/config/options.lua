@@ -1,6 +1,3 @@
-vim.g.mapleader = " " -- change leader to a space
-vim.g.maplocalleader = " " -- change localleader to a space
-
 vim.g.loaded_netrw = 1 -- disable netrw
 vim.g.loaded_netrwPlugin = 1
 
@@ -8,7 +5,7 @@ local options = {
     backup = false, -- creates a backup file
     clipboard = "unnamedplus", -- allows neovim to access the system clipboard
     cmdheight = 2, -- more space in the neovim command line for displaying messages
-    completeopt = { "menuone", "noselect", "noinsert" }, -- mostly just for cmp
+    completeopt = {"menuone", "noselect", "noinsert"}, -- mostly just for cmp
     conceallevel = 0, -- so that `` is visible in markdown files
     encoding = "utf-8",
     fileencoding = "utf-8", -- the encoding written to a file
@@ -61,8 +58,8 @@ local options = {
         tab = [[→→]],
         trail = "•",
         extends = "»",
-        precedes = "«",
-    },
+        precedes = "«"
+    }
 }
 
 for k, v in pairs(options) do
@@ -72,7 +69,7 @@ end
 -- vim.opt.shortmess = "ilmnrx"                        -- flags to shorten vim messages, see :help 'shortmess'
 vim.opt.shortmess:append("c") -- don't give |ins-completion-menu| messages
 vim.opt.iskeyword:append("-") -- hyphenated words recognized by searches
-vim.opt.formatoptions:remove({ "c", "r", "o" }) -- don't insert the current comment leader automatically for auto-wrapping comments using 'textwidth', hitting <Enter> in insert mode, or hitting 'o' or 'O' in normal mode.
+vim.opt.formatoptions:remove({"c", "r", "o"}) -- don't insert the current comment leader automatically for auto-wrapping comments using 'textwidth', hitting <Enter> in insert mode, or hitting 'o' or 'O' in normal mode.
 vim.opt.runtimepath:remove("/usr/share/vim/vimfiles") -- separate vim plugins from neovim in case vim still in use
 
 vim.cmd([[
