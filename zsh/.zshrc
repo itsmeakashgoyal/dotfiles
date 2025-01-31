@@ -29,6 +29,7 @@ zmodload zsh/zprof
 
 # Disable unnecessary security checks
 ZSH_DISABLE_COMPFIX=true
+DISABLE_MAGIC_FUNCTIONS=true
 
 # Core plugins
 plugins=(
@@ -39,13 +40,6 @@ plugins=(
 
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
 source $ZSH/oh-my-zsh.sh
-
-DISABLE_MAGIC_FUNCTIONS=true
-
-# Now, compaudit is available - Run it safely
-if command -v compaudit &>/dev/null; then
-    compaudit | xargs chmod g-w,o-w
-fi
 
 # ------------------------------------------------------------------------------
 # Local Configuration

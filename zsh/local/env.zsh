@@ -141,7 +141,7 @@ loc=${ZDOTDIR:-"${HOME}/dotfiles/zsh"}
 fpath=($loc/completion $fpath)
 
 # Load completion system efficiently
-autoload -Uz compinit
+autoload -Uz compinit && compinit -u
 if [[ -f "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION" ]]; then
     compinit -C -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
 else
