@@ -25,6 +25,7 @@ zstyle ':omz:update' frequency 13  # Check every 13 days
 
 # Load profiling tool
 zmodload zsh/zprof
+# zmodload zsh/mapfile # Bring mapfile functionality similar to bash
 
 # Disable unnecessary security checks
 ZSH_DISABLE_COMPFIX=true
@@ -38,6 +39,8 @@ plugins=(
 
 source $ZSH/custom/plugins/fzf-tab/fzf-tab.plugin.zsh
 source $ZSH/oh-my-zsh.sh
+
+DISABLE_MAGIC_FUNCTIONS=true
 
 # Now, compaudit is available - Run it safely
 if command -v compaudit &>/dev/null; then

@@ -26,6 +26,8 @@
 # - Other important environment settings
 # Note: Avoid commands that produce output or assume tty attachment
 
+skip_global_compinit=1
+
 # ------------------------------------------------------------------------------
 # XDG Base Directory Specification
 # ------------------------------------------------------------------------------

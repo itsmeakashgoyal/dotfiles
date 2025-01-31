@@ -182,9 +182,10 @@ zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 
-# Colors and styling
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
+# disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+# set list-colors to enable filename colorizing
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # ------------------------------------------------------------------------------
 # FZF-tab Configuration
@@ -195,6 +196,8 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $real
 
 # Switch groups using `[` and `]`
 zstyle ':fzf-tab:*' switch-group '[' ']'
+
+zstyle ':fzf-tab:*' popup-min-size 75 20
 
 # Use the same layout as others and respect default settings
 local fzf_flags
