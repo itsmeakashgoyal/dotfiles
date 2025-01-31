@@ -33,9 +33,6 @@ alias find='noglob find'
 alias fd='noglob fd'
 alias fzf='noglob fzf'
 
-export LESS="${less_options[*]}"
-export PAGER='less'
-
 # Eza colors: https://github.com/eza-community/eza/blob/main/man/eza_colors.5.md
 EZA_COLORS="reset:$LS_COLORS"                      # Reset default colors, like making everything yellow
 EZA_COLORS+="da=36:"                               # Timestamps
@@ -58,14 +55,11 @@ export EZA_COLORS
 # Homebrew Configuration
 # ------------------------------------------------------------------------------
 # Core Homebrew settings
-export HOMEBREW_INSTALL_BADGE='☕'    # Homebrew install badge: beer sucks, coffee rules
-export HOMEBREW_NO_AUTO_UPDATE=1     # Prevent automatic updates
-export HOMEBREW_NO_ANALYTICS=1       # Disable analytics collection
-export HOMEBREW_NO_INSTALL_CLEANUP=1 # Skip cleanup during installation
-export HOMEBREW_NO_ENV_HINTS=1       # Disable environment hints
-export HOMEBREW_AUTOREMOVE=1         # Automatically remove unused dependencies
-export HOMEBREW_BAT=1                # Use bat for brew cat command
-export HOMEBREW_CURL_RETRIES=3       # Number of download retry attempts
+if command -v brew &> /dev/null; then
+    export HOMEBREW_INSTALL_BADGE='☕'    # Homebrew install badge: beer sucks, coffee rules
+    export HOMEBREW_NO_ANALYTICS=1       # Disable analytics collection
+    export HOMEBREW_AUTOREMOVE=1         # Automatically remove unused dependencies
+fi
 
 # ------------------------------------------------------------------------------
 # Language and Locale Settings
@@ -89,14 +83,11 @@ export MANPATH="/usr/local/man:$MANPATH"
 if command -v nvim >/dev/null 2>&1; then
     export EDITOR="nvim"
     export VISUAL="nvim"
+    alias vi="nvim"
 else
     export EDITOR="vim"
     export VISUAL="vim"
 fi
-
-# Configure less
-export LESS="-R --quit-if-one-screen"
-export LESSHISTFILE="-" # Prevent creation of ~/.lesshst file
 
 # Colorful man pages
 export LESS_TERMCAP_mb=$'\e[1;31m'   # begin bold
@@ -115,3 +106,98 @@ export LESS_TERMCAP_us=$'\e[1;4;32m' # begin underline
 
 # Config file for wget
 # export WGET_CONFIG_PATH="${XDG_DOTFILES_DIR}/dots/.wgetrc"
+
+# ------------------------------------------------------------------------------
+# History Configuration
+# ------------------------------------------------------------------------------
+# History file location and size
+export HISTFILE="${HOME}/.zsh_history"
+export HISTSIZE=130000 # Internal history list size
+export SAVEHIST=100000 # History file size
+export HISTDUP=erase   # Erase duplicates in history
+export LESSHISTFILE=-
+# HIST_STAMPS=yyyy/mm/dd
+
+# History Options
+setopt append_history # Append to history file
+setopt extended_history
+setopt hist_expire_dups_first
+setopt share_history        # Share history between sessions
+setopt hist_reduce_blanks   # Remove unnecessary blanks
+setopt hist_ignore_space    # Ignore space-prefixed commands
+setopt hist_ignore_all_dups # Remove older duplicate entries
+setopt hist_save_no_dups    # Don't save duplicates
+setopt hist_ignore_dups     # Don't record duplicates
+setopt hist_find_no_dups    # Skip duplicates when searching
+setopt hist_verify          # Show command before executing from history
+setopt inc_append_history   # Add commands immediately
+setopt bang_hist            # Enable history expansion
+
+# ------------------------------------------------------------------------------
+# Zsh Completion Configuration
+# ------------------------------------------------------------------------------
+# Set up completion system
+loc=${ZDOTDIR:-"${HOME}/dotfiles/zsh"}
+fpath=($loc/completion $fpath)
+
+# Load completion system efficiently
+autoload -Uz compinit
+if [[ -f "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION" ]]; then
+    compinit -C -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
+else
+    compinit -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
+fi
+
+# Load bash completion only if needed
+if [[ -n "$BASH_COMPLETION" ]]; then
+    autoload -Uz bashcompinit && bashcompinit
+fi
+
+# ------------------------------------------------------------------------------
+# Basic Completion Settings
+# ------------------------------------------------------------------------------
+# Enable caching
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME"
+
+## These were created by `compinstall`
+zstyle ':completion:*' completer _complete _ignored _approximate
+zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]} r:|[._-]=* r:|=*' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}'
+zstyle ':completion:*' max-errors 2
+zstyle :compinstall filename "$ZDOTDIR/.zshrc"
+
+## Initialize completion system
+### Set location for compinit's dumpfile.
+autoload -Uz compinit && compinit -d "$XDG_CACHE_HOME/zsh/compinit-dumpfile"
+
+# Hide unnecessary files
+zstyle ':completion:*' ignored-patterns '.|..|.DS_Store|**/.|**/..|**/.DS_Store|**/.git'
+
+# ------------------------------------------------------------------------------
+# Completion Formatting
+# ------------------------------------------------------------------------------
+# Set descriptions and messages
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+
+# Colors and styling
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
+
+# ------------------------------------------------------------------------------
+# FZF-tab Configuration
+# ------------------------------------------------------------------------------
+# Directory preview
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
+
+# Switch groups using `[` and `]`
+zstyle ':fzf-tab:*' switch-group '[' ']'
+
+# Use the same layout as others and respect default settings
+local fzf_flags
+fzf_flags=( "${fzf_flags[@]}" '--layout=reverse-list' )
+zstyle ':fzf-tab:*' fzf-flags $fzf_flags
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup

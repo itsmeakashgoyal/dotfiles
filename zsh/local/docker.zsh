@@ -56,64 +56,25 @@ alias dsp='docker system prune -af'   # Remove all unused objects
 # ------------------------------------------------------------------------------
 # Get container IP
 dcip() {
-  local container_name="$1"
-  if [[ -z "$container_name" ]]; then
-    echo "Usage: dip CONTAINER_NAME"
-    return 1
-  fi
-  docker inspect --format '{{ .NetworkSettings.IPAddress }}' "$container_name"
+    local container_name="$1"
+    if [[ -z "$container_name" ]]; then
+        echo "Usage: dip CONTAINER_NAME"
+        return 1
+    fi
+    docker inspect --format '{{ .NetworkSettings.IPAddress }}' "$container_name"
 }
 
 # Execute bash in container
 dbash() {
-  local container_name="$1"
-  if [[ -z "$container_name" ]]; then
-    echo "Usage: dbash CONTAINER_NAME"
-    return 1
-  fi
-  docker exec -it "$container_name" bash || docker exec -it "$container_name" sh
-}
-
-# Stop containers by partial name match
-dsc() {
-  local container_pattern="$1"
-  if [[ -z "$container_pattern" ]]; then
-    echo "Usage: dsc CONTAINER_PATTERN"
-    return 1
-  fi
-  docker stop $(docker ps -a | grep "$container_pattern" | awk '{print $1}')
-}
-
-# Remove containers by partial name match
-drmc() {
-  local container_pattern="$1"
-  if [[ -z "$container_pattern" ]]; then
-    echo "Usage: drmc CONTAINER_PATTERN"
-    return 1
-  fi
-  docker rm $(docker ps -a | grep "$container_pattern" | awk '{print $1}')
+    local container_name="$1"
+    if [[ -z "$container_name" ]]; then
+        echo "Usage: dbash CONTAINER_NAME"
+        return 1
+    fi
+    docker exec -it "$container_name" bash || docker exec -it "$container_name" sh
 }
 
 # Show docker disk usage
 dsize() {
-  docker system df -v
-}
-
-# List all Docker aliases and functions
-dalias() {
-  echo "Docker Aliases and Functions:"
-  echo "----------------------------"
-  alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/" | sed "s/['|\']//g" | sort
-  echo "\nCustom Functions:"
-  echo "---------------"
-  declare -f | grep '^[a-z][a-zA-Z0-9_]* () {$' | grep 'd[a-zA-Z0-9_]*' | sed 's/ () {$//'
-}
-
-# Check if Docker daemon is running
-docker_running() {
-  if ! docker info >/dev/null 2>&1; then
-    echo "Error: Docker daemon is not running"
-    return 1
-  fi
-  return 0
+    docker system df -v
 }

@@ -106,6 +106,7 @@ update_and_install() {
         fontconfig
         python3-venv
         python3-pip
+        python3-pylsp
         luarocks
         shellcheck
         strace

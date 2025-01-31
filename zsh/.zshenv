@@ -37,13 +37,12 @@ export XDG_STATE_HOME="${HOME}/.local/state"
 export XDG_RUNTIME_DIR="${HOME}/.runtime"
 export XDG_DOTFILES_DIR="${HOME}/dotfiles"
 
-# Create XDG directories if they don't exist
-for dir in "$XDG_CONFIG_HOME" \
-    "$XDG_CACHE_HOME" \
-    "$XDG_DATA_HOME" \
-    "$XDG_STATE_HOME" \
-    "$XDG_RUNTIME_DIR"; do
-    [[ ! -d "$dir" ]] && mkdir -p "$dir"
+## Make sure directories actually exist
+xdg_dirs=("$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_RUNTIME_DIR")
+for dir in "${xdg_dirs[@]}"; do
+    if [[ ! -d "$dir" ]]; then
+        mkdir -p "$dir"
+    fi
 done
 
 # ------------------------------------------------------------------------------

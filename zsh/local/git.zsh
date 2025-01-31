@@ -38,11 +38,6 @@ alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset
 alias glogn="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit"
 
 # ------------------------------------------------------------------------------
-# GitHub CLI Aliases
-# ------------------------------------------------------------------------------
-alias ghcb='gh repo view --branch $(git rev-parse --abbrev-ref HEAD) --web' # Open current branch on GitHub
-
-# ------------------------------------------------------------------------------
 # Branch Management Functions
 # ------------------------------------------------------------------------------
 # Fuzzy checkout local branch

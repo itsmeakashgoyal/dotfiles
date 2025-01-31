@@ -149,9 +149,6 @@ You're running ${OS_TYPE}.
         fi
     fi
 
-    # update and fetch git submodules latest updates
-    initGitSubmodules
-
     # install homebrew and packages
     bash ${DOTFILES_DIR}/packages/install.sh
 

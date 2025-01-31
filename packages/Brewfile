@@ -126,6 +126,7 @@ brew "pylint"                                       # Python linter
 # Lua Tools
 brew "lua"                                          # Lua interpreter
 brew "lua-language-server"                          # Lua language server
+brew "python-lsp-server"                            # Python language server
 brew "luajit"                                       # Lua JIT compiler
 brew "luarocks"                                     # Lua package manager
 brew "luv"                                          # Lua bindings for libuv
@@ -149,8 +150,8 @@ if OS.mac?
     brew "borders"                                  # borders used in aerospace
 
     # Window Management & Tiling
-    cask "alt-tab"                                  # Windows like alt-tab
-    cask "nikitabobko/tap/aerospace"                # Tiling window manager
+    # cask "alt-tab"                                  # Windows like alt-tab
+    # cask "nikitabobko/tap/aerospace"                # Tiling window manager
 
     # Core Tools
     brew "coreutils"                                # GNU core utilities (those that come with macOS are outdated)
@@ -185,7 +186,7 @@ if OS.mac?
     cask "font-meslo-lg-nerd-font"                  # Meslo LG Nerd Font
     cask "font-source-code-pro"                     # Source Code Pro Font
     cask "font-ubuntu-mono-nerd-font"               # Ubuntu Mono Nerd Font
-    cask "google-chrome"                            # Google Chrome browser
+    # cask "google-chrome"                            # Google Chrome browser
     cask "google-drive"                             # Google Drive client
     cask "iterm2"                                   # iTerm2 terminal emulator
     cask "rar"                                      # RAR file archiver

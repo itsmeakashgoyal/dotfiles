@@ -67,12 +67,10 @@ function mkvenv() {
     fi
 
     # Activate the virtual environment
-    if [ -f "$env_dir/bin/activate" ]; then
-        source "$env_dir/bin/activate"
-    else
+    source "$env_dir/bin/activate" || {
         echo "Failed to activate virtual environment '$env_dir'. Activation script not found."
         return 1
-    fi
+    }
 
     # Update core packages
     pip install --upgrade pip wheel setuptools || {
@@ -119,7 +117,7 @@ function rmvenv() {
 }
 
 # Activate virtual environment
-venv() {
+function venv() {
     local env_dir=${1:-$PYENV_ROOT} # Default to PYENV_ROOT if no name provided
 
     # Check if environment exists
@@ -136,30 +134,4 @@ venv() {
 
     echo "Activated virtual environment: $env_dir"
     echo "Python version: $(python --version)"
-}
-
-# ------------------------------------------------------------------------------
-# Python Development Helpers
-# ------------------------------------------------------------------------------
-# Run Python tests with coverage
-pytest-cov() {
-    pytest --cov=. --cov-report=term-missing "$@"
-}
-
-# Create a new Python project structure
-pyproject() {
-    local project_name=$1
-
-    if [[ -z "$project_name" ]]; then
-        echo "Error: Please provide a project name"
-        return 1
-    fi
-
-    mkdir -p "$project_name"/{src,tests,docs}
-    touch "$project_name"/{README.md,requirements.txt}
-    touch "$project_name"/src/__init__.py
-    touch "$project_name"/tests/__init__.py
-
-    echo "Created Python project structure: $project_name"
-    tree "$project_name"
 }

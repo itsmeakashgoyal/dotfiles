@@ -97,19 +97,12 @@ export FZF_CTRL_T_OPTS="
     --bind='enter:execute(nvim {})'
 "
 
-# ALT-C configuration (directory search)
-export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
-export FZF_ALT_C_OPTS="
-    --preview='tree -C {} | head -200'
-    --bind='enter:execute(cd {} && ls)'
-"
-
 # ------------------------------------------------------------------------------
 # Path and Completion Setup
 # ------------------------------------------------------------------------------
 # Add FZF to PATH if not already present
-if [[ ! "$PATH" == *${HOME}/.config/.fzf/bin* ]]; then
-    export PATH="${PATH:+${PATH}:}/${HOME}/.config/.fzf/bin"
+if [[ ":$PATH:" != *":$HOME/.config/.fzf/bin:"* ]]; then
+    export PATH="$PATH:$HOME/.config/.fzf/bin"
 fi
 
 # Load auto-completion
@@ -151,39 +144,3 @@ _fzf_comprun() {
 # Aliases
 alias of="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}' | xargs nvim"
 alias fh="history 1 | fzf --tac | cut -c 8-" # Search command history
-
-# ------------------------------------------------------------------------------
-# Navigation Functions
-# ------------------------------------------------------------------------------
-# Change directory and list contents
-cx() {
-    cd "$@" && l
-}
-
-# Fuzzy find directory and cd into it
-fcd() {
-    local dir
-    dir=$(find . -type d -not -path '*/\.*' | fzf --preview 'tree -C {} | head -200')
-    if [[ -n "$dir" ]]; then
-        cd "$dir" && l
-    fi
-}
-
-# Fuzzy find file and copy path to clipboard
-f() {
-    local file
-    file=$(find . -type f -not -path '*/\.*' | fzf --preview 'bat --style=numbers --color=always {}')
-    if [[ -n "$file" ]]; then
-        echo "$file" | pbcopy
-        echo "Path copied to clipboard: $file"
-    fi
-}
-
-# Fuzzy find file and open in neovim
-fv() {
-    local file
-    file=$(find . -type f -not -path '*/\.*' | fzf --preview 'bat --style=numbers --color=always {}')
-    if [[ -n "$file" ]]; then
-        nvim "$file"
-    fi
-}

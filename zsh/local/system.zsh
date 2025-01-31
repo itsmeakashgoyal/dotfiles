@@ -64,9 +64,6 @@ alias du='du -sh * | sort -hr' # Human-readable disk usage
 alias df='df -h'               # Human-readable disk free
 alias top='htop'               # Better top command
 
-# System maintenance
-alias ubrew='brew update && brew upgrade && brew cleanup' # Update Homebrew
-
 # File size information
 fs() {
     if du -b /dev/null >/dev/null 2>&1; then
@@ -102,36 +99,6 @@ pkill() {
 }
 
 # ------------------------------------------------------------------------------
-# SSL Certificate Utilities
-# ------------------------------------------------------------------------------
-getcertnames() {
-    local domain="$1"
-
-    [[ -z "$domain" ]] && {
-        echo "Error: No domain specified."
-        return 1
-    }
-
-    echo "Fetching SSL certificate for ${domain}..."
-
-    local cert_text
-    cert_text=$(openssl s_client -connect "${domain}:443" -servername "${domain}" 2>/dev/null <<<"GET / HTTP/1.0\nEOT" |
-        openssl x509 -text -certopt "no_aux,no_header,no_issuer,no_pubkey,no_serial,no_sigdump,no_signame,no_validity,no_version")
-
-    [[ -z "$cert_text" ]] && {
-        echo "Error: No certificate found."
-        return 1
-    }
-
-    echo "\nCommon Name:"
-    echo "$cert_text" | grep "Subject:" | sed -e "s/^.*CN=//" -e "s/\/emailAddress=.*//"
-
-    echo "\nSubject Alternative Names:"
-    echo "$cert_text" | grep -A 1 "Subject Alternative Name:" |
-        sed -e "2s/DNS://g" -e "s/ //g" | tr "," "\n" | tail -n +2
-}
-
-# ------------------------------------------------------------------------------
 # Utility Functions
 # ------------------------------------------------------------------------------
 
@@ -154,4 +121,102 @@ install_font() {
         fc-cache -f "$font_dir"
 
     echo "Font installed successfully"
+}
+
+# Wrapper for easy extraction of compressed files
+function extract() {
+    if [ -f $1 ]; then
+        case $1 in
+        *.tar.xz) tar xvJf $1 ;;
+        *.tar.bz2) tar xvjf $1 ;;
+        *.tar.gz) tar xvzf $1 ;;
+        *.bz2) bunzip2 $1 ;;
+        *.rar) unrar e $1 ;;
+        *.gz) gunzip $1 ;;
+        *.tar) tar xvf $1 ;;
+        *.tbz2) tar xvjf $1 ;;
+        *.tgz) tar xvzf $1 ;;
+        *.apk) unzip $1 ;;
+        *.epub) unzip $1 ;;
+        *.xpi) unzip $1 ;;
+        *.zip) unzip $1 ;;
+        *.war) unzip $1 ;;
+        *.jar) unzip $1 ;;
+        *.Z) uncompress $1 ;;
+        *.7z) 7z x $1 ;;
+        *) echo "don't know how to extract '$1'..." ;;
+        esac
+    else
+        echo "'$1' is not a valid file!"
+    fi
+}
+
+# Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
+function targz() {
+    local tmpFile="${@%/}.tar"
+    tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1
+
+    size=$(
+        stat -f"%z" "${tmpFile}" 2>/dev/null # macOS `stat`
+        stat -c"%s" "${tmpFile}" 2>/dev/null # GNU `stat`
+    )
+
+    local cmd=""
+    if ((size < 52428800)) && hash zopfli 2>/dev/null; then
+        # the .tar file is smaller than 50 MB and Zopfli is available; use it
+        cmd="zopfli"
+    else
+        if hash pigz 2>/dev/null; then
+            cmd="pigz"
+        else
+            cmd="gzip"
+        fi
+    fi
+
+    echo "Compressing .tar ($((size / 1000)) kB) using \`${cmd}\`…"
+    "${cmd}" -v "${tmpFile}" || return 1
+    [ -f "${tmpFile}" ] && rm "${tmpFile}"
+
+    zippedSize=$(
+        stat -f"%z" "${tmpFile}.gz" 2>/dev/null # macOS `stat`
+        stat -c"%s" "${tmpFile}.gz" 2>/dev/null # GNU `stat`
+    )
+
+    echo "${tmpFile}.gz ($((zippedSize / 1000)) kB) created successfully."
+}
+
+# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
+# the `.git` directory, listing directories first. The output gets piped into
+# `less` with options to preserve color and line numbers, unless the output is
+# small enough for one screen.
+function tre() {
+    tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX
+}
+
+function sshp() {
+    local machine="$1"
+    local user="ir"          # Replace with your username or make this dynamic
+    local password="welcome" # Replace with your password or set dynamically
+
+    # Debug logs
+    # echo "Debug: Machine -> $machine"
+    # echo "Debug: User -> $user"
+    # echo "Debug: Checking if sshpass is installed..."
+
+    # Check if sshpass is installed
+    if ! command -v sshpass >/dev/null 2>&1; then
+        echo "Error: sshpass is not installed. Install it using 'brew install sshpass'."
+        return 1
+    fi
+
+    # Check if machine name is provided
+    if [ -z "$machine" ]; then
+        echo "Error: No machine name provided."
+        echo "Usage: sshp <machinename>"
+        return 1
+    fi
+
+    # Run sshpass with SSH
+    echo "Debug: Connecting to $machine..."
+    sshpass -p "$password" ssh "$user@$machine" -o StrictHostKeyChecking=no
 }
