@@ -19,8 +19,11 @@
 # FZF Configuration
 # https://github.com/junegunn/fzf
 # ------------------------------------------------------------------------------
-[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
-zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
+# Set up fzf key bindings and fuzzy completion
+FZF_BASE_PATH="$(brew --prefix fzf)" # This will automatically get the current version
+FZF_SHELL_PATH="$FZF_BASE_PATH/shell"
+FZF_BIN_PATH="$FZF_BASE_PATH/bin"
+source <(fzf --zsh)
 eval "$(zoxide init --cmd cd zsh)"
 
 # ------------------------------------------------------------------------------
@@ -95,19 +98,11 @@ export FZF_CTRL_T_OPTS="
     --bind='enter:execute(nvim {})'
 "
 
-# ------------------------------------------------------------------------------
-# Path and Completion Setup
-# ------------------------------------------------------------------------------
-# Add FZF to PATH if not already present
-if [[ ":$PATH:" != *":$HOME/.config/.fzf/bin:"* ]]; then
-    export PATH="$PATH:$HOME/.config/.fzf/bin"
-fi
-
 # Load auto-completion
-[[ $- == *i* ]] && source "${HOME}/.config/.fzf/shell/completion.zsh" 2>/dev/null
+[[ $- == *i* ]] && source "${FZF_SHELL_PATH}/shell/completion.zsh" 2>/dev/null
 
 # Load key bindings
-source "${HOME}/.config/.fzf/shell/key-bindings.zsh"
+source "${FZF_SHELL_PATH}/key-bindings.zsh"
 
 # Use fd to respect .gitignore, include hidden files and exclude `.git` folders
 # - The first argument to the function ($1) is the base path to start traversal

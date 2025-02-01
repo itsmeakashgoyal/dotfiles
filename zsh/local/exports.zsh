@@ -80,10 +80,13 @@ export MAKEFLAGS="-j$(nproc)" # Use all CPU cores for compilation
 # Oh My Posh prompt
 # ------------------------------------------------------------------------------
 export OHMYPOSH_THEMES_DIR="${HOMEBREW_PREFIX}/opt/oh-my-posh/themes"
+eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
+# Lazy load Oh My Posh
+# function setup_omp() {
+#     [[ -n $OHMYPOSH_INITIALIZED ]] && return
+#     eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
+#     OHMYPOSH_INITIALIZED=1
+# }
 
-# Lazy load Oh My Posh prompt only when needed
-function lazy_omp() {
-    eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
-}
-
-precmd_functions+=(lazy_omp)
+# # Initialize paths and prompt
+# precmd_functions+=(setup_omp)

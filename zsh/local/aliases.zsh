@@ -76,21 +76,3 @@ up() {
     fi
     cd $d
 }
-
-# Update fzf installation
-# Usage: update-fzf
-update-fzf() {
-    local FZF_DIR="${HOME}/.config/.fzf"
-
-    if [[ ! -d "$FZF_DIR" ]]; then
-        echo "Error: fzf directory not found at $FZF_DIR"
-        return 1
-    fi
-
-    echo "Updating fzf..."
-    (cd "$FZF_DIR" && {
-        git pull &&
-            ./install --all &&
-            echo "✓ fzf updated successfully!"
-    }) || echo "✗ Failed to update fzf"
-}

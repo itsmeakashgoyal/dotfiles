@@ -33,7 +33,6 @@ zmodload zsh/zprof
 
 # Disable unnecessary security checks
 ZSH_DISABLE_COMPFIX=true
-
 DISABLE_MAGIC_FUNCTIONS=true
 
 # add zsh plugins using zinit
@@ -43,22 +42,41 @@ zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light Aloxaf/fzf-tab
 
-# Add in snippets
-zinit snippet OMZP::git
-zinit snippet OMZP::sudo
-zinit snippet OMZP::command-not-found
+# Load OMZ plugins (turbo mode)
+zinit wait lucid for \
+    OMZP::git \
+    OMZP::sudo \
+    OMZP::command-not-found
 
-# Load completions
-autoload -Uz compinit && compinit
 
+# Completion system (lazy loading with caching)
+() {
+    local zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-${ZSH_VERSION}"
+    local compinit_args=(-C)
+    
+    # Only rebuild completion dump once per day
+    if [[ ! -f "$zcompdump" || -n "$(find "$zcompdump" -mtime +1)" ]]; then
+        compinit_args=()
+        mkdir -p "${zcompdump:h}"
+    fi
+    
+    autoload -Uz compinit 
+    compinit "${compinit_args[@]}" -d "$zcompdump"
+}
+
+# Source local configurations (lazy loading)
+function load_local_configs() {
+    local config_dir="$ZDOTDIR/local"
+    [[ -d "$config_dir" ]] || return
+    
+    for config in "$config_dir"/*.zsh; do
+        [[ -f "$config" ]] && source "$config"
+    done
+}
+
+# Defer loading of local configs
+zinit wait lucid atload"load_local_configs" for zdharma-continuum/null
+
+# Clean up
 zinit cdreplay -q
-
 zle_highlight+=(paste:none)
-
-# ------------------------------------------------------------------------------
-# Local Configuration
-# ------------------------------------------------------------------------------
-# Source additional configurations
-for config in "$HOME/dotfiles/zsh/local/"*.zsh; do
-    [[ -f "$config" ]] && source "$config"
-done

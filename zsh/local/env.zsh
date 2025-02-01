@@ -33,18 +33,6 @@ setopt notify              # report the status of background jobs immediately
 setopt numericglobsort     # sort filenames numerically when it makes sense
 setopt promptsubst         # enable command substitution in prompt
 
-#######################################################
-# ZSH Keybindings
-#######################################################
-
-bindkey -v
-# bindkey '^p' history-search-backward
-# bindkey '^n' history-search-forward
-# bindkey '^[w' kill-region
-# bindkey ' ' magic-space                           # do history expansion on space
-bindkey "^[[A" history-beginning-search-backward  # search history with up key
-bindkey "^[[B" history-beginning-search-forward   # search history with down key
-
 # ------------------------------------------------------------------------------
 # Performance Optimizations
 # ------------------------------------------------------------------------------
@@ -160,46 +148,33 @@ setopt bang_hist            # Enable history expansion
 loc=${ZDOTDIR:-"${HOME}/dotfiles/zsh"}
 fpath=($loc/completion $fpath)
 
-# Load completion system efficiently
-autoload -Uz compinit
-if [[ -f "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION" ]]; then
-    compinit -C -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
-else
-    compinit -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
-fi
-
-# Load bash completion only if needed
-if [[ -n "$BASH_COMPLETION" ]]; then
-    autoload -Uz bashcompinit && bashcompinit
-fi
-
 # ------------------------------------------------------------------------------
 # Basic Completion Settings
 # ------------------------------------------------------------------------------
 # Enable caching
 zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path "$XDG_CACHE_HOME"
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion:*' menu no
-zstyle :compinstall filename "$ZDOTDIR/.zshrc"
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
+# zstyle :compinstall filename "$ZDOTDIR/.zshrc"
 
 # Hide unnecessary files
 zstyle ':completion:*' ignored-patterns '.|..|.DS_Store|**/.|**/..|**/.DS_Store|**/.git'
 
 # Set descriptions and messages
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' menu select
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 
-# ------------------------------------------------------------------------------
-# FZF-tab Configuration
-# ------------------------------------------------------------------------------
-# Directory preview
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+# FZF-tab Configuration (lazy loading)
+zinit wait lucid for \
+    atload"setup_fzf_tab" \
+    Aloxaf/fzf-tab
 
-### Set location for compinit's dumpfile.
-autoload -Uz compinit && compinit -d "$XDG_CACHE_HOME/zsh/compinit-dumpfile"
+function setup_fzf_tab() {
+    zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+    zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
+}

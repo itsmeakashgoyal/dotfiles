@@ -29,19 +29,16 @@
 # ------------------------------------------------------------------------------
 # OS Detection and Homebrew Setup
 # ------------------------------------------------------------------------------
-case "$(uname)" in
-"Darwin")
-    # macOS: Configure Homebrew based on architecture
-    if [[ -x "/opt/homebrew/bin/brew" ]]; then
-        # Apple Silicon path
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    fi
-    ;;
+# OS-specific Homebrew setup (lazy loading)
+function setup_homebrew() {
+    case "$(uname)" in
+    "Darwin")
+        [[ -x "/opt/homebrew/bin/brew" ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+        ;;
+    "Linux")
+        [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        ;;
+    esac
+}
 
-"Linux")
-    # Linux: Configure Linuxbrew if available
-    if [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-    fi
-    ;;
-esac
+setup_homebrew

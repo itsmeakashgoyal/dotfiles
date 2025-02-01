@@ -43,17 +43,6 @@ source "$HELPER_FILE"
 # Enable strict mode
 set -euo pipefail
 
-install_fzf() {
-    if command_exists fzf; then
-        info "Fzf already installed"
-        return 0
-    fi
-
-    info "Installing fzf.."
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.config/.fzf
-    ~/.config/.fzf/install
-}
-
 setup_nvim() {
     # Change to the .config/nvim directory and checkout the running branch
     log_message "→ Changing to the ${CONFIG_DIR}/nvim directory"
