@@ -24,6 +24,26 @@ setopt no_auto_menu  # Require extra TAB for menu
 setopt extended_glob # Extended globbing capabilities
 setopt NO_HUP        # Don't kill background jobs on exit
 setopt noflowcontrol # Disable flow control (ctrl-s/ctrl-q)
+setopt autocd              # change directory just by typing its name
+setopt correct             # auto correct mistakes
+setopt interactivecomments # allow comments in interactive mode
+setopt magicequalsubst     # enable filename expansion for arguments of the form ‘anything=expression’
+setopt nonomatch           # hide error message if there is no match for the pattern
+setopt notify              # report the status of background jobs immediately
+setopt numericglobsort     # sort filenames numerically when it makes sense
+setopt promptsubst         # enable command substitution in prompt
+
+#######################################################
+# ZSH Keybindings
+#######################################################
+
+bindkey -v
+# bindkey '^p' history-search-backward
+# bindkey '^n' history-search-forward
+# bindkey '^[w' kill-region
+# bindkey ' ' magic-space                           # do history expansion on space
+bindkey "^[[A" history-beginning-search-backward  # search history with up key
+bindkey "^[[B" history-beginning-search-forward   # search history with down key
 
 # ------------------------------------------------------------------------------
 # Performance Optimizations
@@ -141,7 +161,7 @@ loc=${ZDOTDIR:-"${HOME}/dotfiles/zsh"}
 fpath=($loc/completion $fpath)
 
 # Load completion system efficiently
-autoload -Uz compinit && compinit -u
+autoload -Uz compinit
 if [[ -f "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION" ]]; then
     compinit -C -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
 else
@@ -159,33 +179,19 @@ fi
 # Enable caching
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "$XDG_CACHE_HOME"
-
-## These were created by `compinstall`
-zstyle ':completion:*' completer _complete _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]} r:|[._-]=* r:|=*' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:]}={[:upper:]}'
-zstyle ':completion:*' max-errors 2
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' menu no
 zstyle :compinstall filename "$ZDOTDIR/.zshrc"
-
-## Initialize completion system
-### Set location for compinit's dumpfile.
-autoload -Uz compinit && compinit -d "$XDG_CACHE_HOME/zsh/compinit-dumpfile"
 
 # Hide unnecessary files
 zstyle ':completion:*' ignored-patterns '.|..|.DS_Store|**/.|**/..|**/.DS_Store|**/.git'
 
-# ------------------------------------------------------------------------------
-# Completion Formatting
-# ------------------------------------------------------------------------------
 # Set descriptions and messages
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
-
-# disable sort when completing `git checkout`
-zstyle ':completion:*:git-checkout:*' sort false
-# set list-colors to enable filename colorizing
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # ------------------------------------------------------------------------------
 # FZF-tab Configuration
@@ -193,14 +199,7 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # Directory preview
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-
-# Switch groups using `[` and `]`
-zstyle ':fzf-tab:*' switch-group '[' ']'
-
-zstyle ':fzf-tab:*' popup-min-size 75 20
-
-# Use the same layout as others and respect default settings
-local fzf_flags
-fzf_flags=( "${fzf_flags[@]}" '--layout=reverse-list' )
-zstyle ':fzf-tab:*' fzf-flags $fzf_flags
 zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+
+### Set location for compinit's dumpfile.
+autoload -Uz compinit && compinit -d "$XDG_CACHE_HOME/zsh/compinit-dumpfile"

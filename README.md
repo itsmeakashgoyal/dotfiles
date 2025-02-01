@@ -75,7 +75,6 @@ This script will:
 - **`git/`**: Contains Git configuration files.
 - **`dots/`**: Contains configurations that should be linked to the home directory.
 - **`nvim/`**: Contains configurations for Neovim, managed as a Git submodule.
-- **`nix/`**: Contains Nix configurations specific to Linux.
 - **`packages/`**: Contains Homebrew installation scripts and other packages installation.
 
 ### Customizing Your Setup

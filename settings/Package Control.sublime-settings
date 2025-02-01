@@ -1,13 +1,15 @@
 {
-  "installed_packages": [
-    "SublimeLinter",
-    "SublimeLinter-pylint",
-    "Sublime​Linter-cpplint",
-    "python-black",
-    "JsPrettier",
-    "BracketHighlighter",
-    "Material Theme",
-    "Predawn",
-    "SideBarEnhancements"
-  ]
+  "installed_packages":
+	[
+		"BracketHighlighter",
+		"DocBlockr",
+		"GitGutter",
+		"gruvbox",
+		"Package Control",
+		"python-black",
+		"SideBarEnhancements",
+		"SublimeLinter",
+		"SublimeLinter-cpplint",
+		"SublimeLinter-pylint",
+	]
 }

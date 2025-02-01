@@ -24,22 +24,22 @@ zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
 eval "$(zoxide init --cmd cd zsh)"
 
 # ------------------------------------------------------------------------------
-# Color Scheme (Catppuccin Mocha)
+# Color Scheme (Gruvbox Material)
 # ------------------------------------------------------------------------------
 local color_scheme=(
-    '--color=bg+:#313244'         # Selected background
-    '--color=bg:#1e1e2e'          # Normal background
-    '--color=spinner:#f5e0dc'     # Loading spinner
-    '--color=hl:#f38ba8'          # Highlighted substrings
-    '--color=fg:#cdd6f4'          # Text
-    '--color=header:#f38ba8'      # Header text
-    '--color=info:#cba6f7'        # Info text
-    '--color=pointer:#f5e0dc'     # Pointer arrow
-    '--color=marker:#b4befe'      # Multi-select marker
-    '--color=fg+:#cdd6f4'         # Selected text
-    '--color=prompt:#cba6f7'      # Prompt
-    '--color=hl+:#f38ba8'         # Selected highlighted
-    '--color=selected-bg:#45475a' # Selected item background
+    '--color=bg+:#3c3836'         # Selected background
+    '--color=bg:#282828'          # Normal background
+    '--color=spinner:#d65d0e'     # Loading spinner (bright orange)
+    '--color=hl:#fe8019'          # Highlighted substrings (orange)
+    '--color=fg:#ebdbb2'          # Text (light text)
+    '--color=header:#b8bb26'      # Header text (green)
+    '--color=info:#83a598'        # Info text (blue)
+    '--color=pointer:#fabd2f'     # Pointer arrow (yellow)
+    '--color=marker:#d3869b'      # Multi-select marker (pinkish magenta)
+    '--color=fg+:#fbf1c7'         # Selected text (lightest text)
+    '--color=prompt:#b8bb26'      # Prompt (green)
+    '--color=hl+:#fabd2f'         # Selected highlighted (yellow)
+    '--color=selected-bg:#504945' # Selected item background (dark gray)
 )
 
 # ------------------------------------------------------------------------------
@@ -69,9 +69,7 @@ export FZF_DEFAULT_OPTS="
     --multi
     --height=80%
     --layout=reverse
-    --border=block
-    --border-label-pos=0
-    --preview-window=border-sharp
+    --border=rounded
     --padding=0
     --margin=1
     --prompt='∷ ' 

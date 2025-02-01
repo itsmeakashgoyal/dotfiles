@@ -152,8 +152,15 @@ You're running ${OS_TYPE}.
     # install homebrew and packages
     bash ${DOTFILES_DIR}/packages/install.sh
 
-    # installing oh-my-zsh and its packages
-    install_oh_my_zsh
+    # Check if zsh is installed and set it as the default shell if desired
+    info "Set Zsh as default shell..."
+    if command -v zsh &>/dev/null; then
+        if ! grep -q "$(command -v zsh)" /etc/shells; then
+            substep_info "Adding zsh to available shells..."
+            sudo sh -c "echo $(command -v zsh) >> /etc/shells"
+        fi
+        sudo chsh -s "$(command -v zsh)" "$USER"
+    fi
 
     # installing fzf
     install_fzf

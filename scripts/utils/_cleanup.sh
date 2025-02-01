@@ -48,7 +48,6 @@ Components:
     homebrew   - Uninstall Homebrew and all packages
     nvim       - Remove Neovim configuration
     tmux       - Remove tmux configuration
-    zsh        - Remove zsh configuration and plugins
     all        - Clean everything
 
 Examples:
@@ -68,7 +67,6 @@ cleanup_dotfiles() {
         "${HOME}/.zshenv"
         "${HOME}/.config/nvim"
         "${HOME}/.config/tmux"
-        "${HOME}/.oh-my-zsh"
     )
 
     for link in "${symlinks[@]}"; do
@@ -129,28 +127,12 @@ cleanup_nvim() {
     rm -rf "${HOME}"/.cache/nvim
     success "Neovim configuration cleaned"
 }
-
+ 
 cleanup_tmux() {
     info "Cleaning up tmux..."
     rm -rf "${HOME}/.config/tmux"
     rm -rf "${HOME}/.tmux"
     success "Tmux configuration cleaned"
-}
-
-cleanup_zsh() {
-    info "Cleaning up Zsh configuration..."
-
-    # Remove Oh My Zsh
-    if [[ -d "${HOME}/.oh-my-zsh" ]]; then
-        rm -rf "${HOME}/.oh-my-zsh"
-    fi
-
-    # Remove Zsh configuration files
-    rm -f "${HOME}/.zshenv"
-    rm -f "${HOME}/.zshrc"
-    rm -rf "${HOME}/.zsh"
-
-    success "Zsh configuration cleaned"
 }
 
 # ------------------------------------------------------------------------------
@@ -220,7 +202,6 @@ main() {
         homebrew) cleanup_homebrew ;;
         nvim) cleanup_nvim ;;
         tmux) cleanup_tmux ;;
-        zsh) cleanup_zsh ;;
         *) error "Unknown component: $component" ;;
         esac
     done

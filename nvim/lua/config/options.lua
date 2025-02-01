@@ -103,4 +103,4 @@ vim.cmd(":Copilot disable")
 
 -- Set colorscheme
 -- vim.cmd [[colorscheme onedark]]
-vim.cmd.colorscheme("catppuccin")
+-- vim.cmd.colorscheme("catppuccin")
