@@ -80,3 +80,6 @@ zinit wait lucid atload"load_local_configs" for zdharma-continuum/null
 # Clean up
 zinit cdreplay -q
 zle_highlight+=(paste:none)
+
+export OHMYPOSH_THEMES_DIR="${HOMEBREW_PREFIX}/opt/oh-my-posh/themes"
+eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"

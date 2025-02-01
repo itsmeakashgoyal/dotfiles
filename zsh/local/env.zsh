@@ -42,22 +42,86 @@ alias fd='noglob fd'
 alias fzf='noglob fzf'
 
 # Eza colors: https://github.com/eza-community/eza/blob/main/man/eza_colors.5.md
-EZA_COLORS="reset:$LS_COLORS"                      # Reset default colors, like making everything yellow
-EZA_COLORS+="da=36:"                               # Timestamps
-EZA_COLORS+="ur=0:uw=0:ux=0:ue=0:"                 # User permissions
-EZA_COLORS+="gr=0:gw=0:gx=0:"                      # Group permissions
-EZA_COLORS+="tr=0:tw=0:tx=0:"                      # Other permissions
-EZA_COLORS+="xa=0:"                                # Extended attribute marker ('@')
-EZA_COLORS+="xx=38;5;240:"                         # Punctuation ('-')
-EZA_COLORS+="nb=38;5;240:"                         # Files under 1 KB
-EZA_COLORS+="nk=0:"                                # Files under 1 MB
-EZA_COLORS+="nm=37:"                               # Files under 1 GB
-EZA_COLORS+="ng=38;5;250:"                         # Files under 1 TB
-EZA_COLORS+="nt=38;5;255:"                         # Files over 1 TB
-EZA_COLORS+="do=32:*.md=32:"                       # Documents
-EZA_COLORS+="co=35:*.zip=35:"                      # Archives
-EZA_COLORS+="tm=38;5;242:cm=38;5;242:.*=38;5;242:" # Hidden and temporary files
-export EZA_COLORS
+# ------------------------------------------------------------------------------
+# Eza Configuration
+# ------------------------------------------------------------------------------
+# Icons and colors for different file types
+export EZA_COLORS="
+di=34:                    # Directories (blue)
+fi=0:                     # Files (default)
+ex=32:                    # Executables (green)
+ln=36:                    # Symlinks (cyan)
+or=31:                    # Broken symlinks (red)
+bd=33:                    # Block devices (yellow)
+cd=33:                    # Character devices (yellow)
+so=35:                    # Sockets (magenta)
+pi=35:                    # Pipes (magenta)
+
+# Permissions
+ur=38;5;250:             # User read
+uw=38;5;250:             # User write
+ux=38;5;250:             # User execute
+ue=38;5;250:             # User special
+gr=38;5;245:             # Group read
+gw=38;5;245:             # Group write
+gx=38;5;245:             # Group execute
+ge=38;5;245:             # Group special
+tr=38;5;240:             # Others read
+tw=38;5;240:             # Others write
+tx=38;5;240:             # Others execute
+te=38;5;240:             # Others special
+
+# Size colors
+sn=32:                   # Size numbers (green)
+sb=32:                   # Size unit (green)
+nb=32:                   # Allocated size numbers
+nk=32:                   # Allocated size unit
+
+# Git status colors
+ga=32:                   # New
+gm=33:                   # Modified
+gd=31:                   # Deleted
+gv=36:                   # Renamed
+
+# File types and extensions
+*.zip=38;5;214:         # Archives
+*.tar=38;5;214:
+*.gz=38;5;214:
+*.rar=38;5;214:
+*.7z=38;5;214:
+
+*.pdf=38;5;203:         # Documents
+*.md=38;5;123:
+*.txt=38;5;123:
+*.doc=38;5;123:
+*.docx=38;5;123:
+
+*.mp3=38;5;135:         # Media
+*.wav=38;5;135:
+*.mp4=38;5;135:
+*.mov=38;5;135:
+
+*.jpg=38;5;205:         # Images
+*.jpeg=38;5;205:
+*.png=38;5;205:
+*.gif=38;5;205:
+*.svg=38;5;205:
+
+*.vim=38;5;156:         # Code
+*.zsh=38;5;156:
+*.sh=38;5;156:
+*.py=38;5;156:
+*.js=38;5;156:
+*.rb=38;5;156:
+*.rs=38;5;156:
+*.go=38;5;156:
+
+# Special files
+.git=38;5;197:          # Git directory
+.gitignore=38;5;197:    # Git ignore file
+Dockerfile=38;5;222:    # Docker files
+docker-compose.yml=38;5;222:
+"
 
 # ------------------------------------------------------------------------------
 # Homebrew Configuration
@@ -167,14 +231,3 @@ zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
-
-# FZF-tab Configuration (lazy loading)
-zinit wait lucid for \
-    atload"setup_fzf_tab" \
-    Aloxaf/fzf-tab
-
-function setup_fzf_tab() {
-    zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
-    zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-}

@@ -46,25 +46,15 @@ local color_scheme=(
 )
 
 # ------------------------------------------------------------------------------
-# Preview Configuration
-# ------------------------------------------------------------------------------
-# Define preview command with proper file type handling
-export FZF_PREVIEW_COMMAND="([[ -f {} ]] && (bat --style=numbers --color=always {} || cat {}) || \
-                           ([[ -d {} ]] && tree -C {} || echo {} 2> /dev/null) || \
-                           echo {} 2> /dev/null)"
-
-local fzf_default_opts=(
-    '--preview-window right:50%:noborder:hidden'
-    '--color "preview-bg:234"'
-    '--bind "alt-p:toggle-preview"'
-    '--color "prompt:green,header:grey,spinner:grey,info:grey,hl:blue,hl+:blue,pointer:red"'
-)
-
-# ------------------------------------------------------------------------------
 # Core FZF Configuration
 # ------------------------------------------------------------------------------
-# Default command for file search (using fd)
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --strip-cwd-prefix'
+# Enhanced preview command with syntax highlighting and file type handling
+export FZF_PREVIEW_COMMAND="([[ -f {} ]] && (bat --style=numbers,changes --color=always {} || cat {}) || \
+                           ([[ -d {} ]] && (eza --tree --icons --level=2 --color=always {} || ls -la {})) || \
+                           echo {} 2> /dev/null)"
+
+# Default command using fd for better performance and respecting .gitignore
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules --strip-cwd-prefix'
 
 # Default options combining color scheme, preview, and behavior
 export FZF_DEFAULT_OPTS="
@@ -91,18 +81,63 @@ export FZF_DEFAULT_OPTS="
 # ------------------------------------------------------------------------------
 # FZF Command-specific Configurations
 # ------------------------------------------------------------------------------
-# CTRL-T configuration (file search)
+# CTRL-T - File search
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_CTRL_T_OPTS="
-    --preview='${FZF_PREVIEW_COMMAND}'
+    --preview='$FZF_PREVIEW_COMMAND'
     --bind='enter:execute(nvim {})'
+    --header='Enter to edit, CTRL-Y to copy path'
 "
 
-# Load auto-completion
-[[ $- == *i* ]] && source "${FZF_SHELL_PATH}/shell/completion.zsh" 2>/dev/null
+# CTRL-R - History search
+export FZF_CTRL_R_OPTS="
+    --preview='echo {}'
+    --preview-window='up:3:wrap'
+    --bind='enter:execute-silent(echo -n {2..} | pbcopy)+abort'
+    --header='Enter to execute, CTRL-Y to copy command'
+    --sort
+    --exact
+"
 
-# Load key bindings
+# ALT-C - Directory search
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
+export FZF_ALT_C_OPTS="
+    --preview='eza --tree --icons --level=2 --color=always {}'
+    --header='Enter to cd, CTRL-Y to copy path'
+"
+
+# ------------------------------------------------------------------------------
+# Custom Functions
+# ------------------------------------------------------------------------------
+# Enhanced file search with git awareness
+fzf-git-files() {
+    local files
+    files=$(git ls-files 2>/dev/null || fd --type f --hidden --follow --exclude .git)
+    echo $files | fzf --multi --preview="$FZF_PREVIEW_COMMAND"
+}
+
+# Project directory jump
+fzf-project() {
+    local dir
+    dir=$(fd --type d --max-depth 3 --hidden --follow --exclude .git . "$HOME/projects" |
+        fzf --preview='eza --tree --icons --level=2 --color=always {}')
+    [ -n "$dir" ] && cd "$dir"
+}
+
+# Process management
+fzf-kill() {
+    local pid
+    pid=$(ps -ef | sed 1d | fzf -m --header='Select process(es) to kill' | awk '{print $2}')
+    [ -n "$pid" ] && echo $pid | xargs kill -${1:-9}
+}
+
+# Load auto-completion and key bindings
+[[ $- == *i* ]] && source "${FZF_SHELL_PATH}/shell/completion.zsh" 2>/dev/null
 source "${FZF_SHELL_PATH}/key-bindings.zsh"
+
+# Custom key bindings
+bindkey '^P' fzf-project
+bindkey '^G' fzf-git-files
 
 # Use fd to respect .gitignore, include hidden files and exclude `.git` folders
 # - The first argument to the function ($1) is the base path to start traversal
@@ -131,9 +166,34 @@ _fzf_comprun() {
 }
 
 # ------------------------------------------------------------------------------
+# FZF-TAB Configuration
+# ------------------------------------------------------------------------------
+# FZF-tab Configuration (lazy loading)
+zinit wait lucid for \
+    atload"setup_fzf_tab" \
+    Aloxaf/fzf-tab
+
+function setup_fzf_tab() {
+    # Configure fzf-tab
+    zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+    zstyle ':fzf-tab:*' popup-min-size 50 8
+    zstyle ':fzf-tab:*' popup-pad 30 0
+    zstyle ':fzf-tab:*' fzf-flags '--color=bg+:23'
+    zstyle ':fzf-tab:*' continuous-trigger 'ctrl-space'
+
+    # Preview configuration for different commands
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --icons --level=2 --color=always $realpath'
+    zstyle ':fzf-tab:complete:nvim:*' fzf-preview 'bat --color=always --style=numbers $realpath'
+    zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' \
+        fzf-preview 'echo ${(P)word}'
+}
+
+# ------------------------------------------------------------------------------
 # Custom Keybindings and Aliases
 # ------------------------------------------------------------------------------
 
 # Aliases
-alias of="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}' | xargs nvim"
-alias fh="history 1 | fzf --tac | cut -c 8-" # Search command history
+alias fzf="fzf --preview='$FZF_PREVIEW_COMMAND'"
+alias fzp='fzf-project'
+alias fk='fzf-kill'
+alias ff='fzf-git-files'
