@@ -89,16 +89,6 @@ export FZF_CTRL_T_OPTS="
     --header='Enter to edit, CTRL-Y to copy path'
 "
 
-# CTRL-R - History search
-export FZF_CTRL_R_OPTS="
-    --preview='echo {}'
-    --preview-window='up:3:wrap'
-    --bind='enter:execute-silent(echo -n {2..} | pbcopy)+abort'
-    --header='Enter to execute, CTRL-Y to copy command'
-    --sort
-    --exact
-"
-
 # ALT-C - Directory search
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
 export FZF_ALT_C_OPTS="
@@ -168,25 +158,19 @@ _fzf_comprun() {
 # ------------------------------------------------------------------------------
 # FZF-TAB Configuration
 # ------------------------------------------------------------------------------
-# FZF-tab Configuration (lazy loading)
-zinit wait lucid for \
-    atload"setup_fzf_tab" \
-    Aloxaf/fzf-tab
+# Configure fzf-tab
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+zstyle ':fzf-tab:*' popup-min-size 50 8
+zstyle ':fzf-tab:*' popup-pad 30 0
+zstyle ':fzf-tab:*' fzf-flags '--color=bg+:23'
+zstyle ':fzf-tab:*' continuous-trigger 'ctrl-space'
 
-function setup_fzf_tab() {
-    # Configure fzf-tab
-    zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-    zstyle ':fzf-tab:*' popup-min-size 50 8
-    zstyle ':fzf-tab:*' popup-pad 30 0
-    zstyle ':fzf-tab:*' fzf-flags '--color=bg+:23'
-    zstyle ':fzf-tab:*' continuous-trigger 'ctrl-space'
-
-    # Preview configuration for different commands
-    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --icons --level=2 --color=always $realpath'
-    zstyle ':fzf-tab:complete:nvim:*' fzf-preview 'bat --color=always --style=numbers $realpath'
-    zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' \
-        fzf-preview 'echo ${(P)word}'
-}
+# Preview configuration for different commands
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --icons --level=2 --color=always $realpath'
+zstyle ':fzf-tab:complete:nvim:*' fzf-preview 'bat --color=always --style=numbers $realpath'
+zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' \
+    fzf-preview 'echo ${(P)word}'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
 
 # ------------------------------------------------------------------------------
 # Custom Keybindings and Aliases

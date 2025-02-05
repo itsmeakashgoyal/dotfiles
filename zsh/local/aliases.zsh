@@ -19,6 +19,10 @@
 # General Aliases
 # ------------------------------------------------------------------------------
 
+# Disable glob patterns for faster command execution
+alias find='noglob find'
+alias fd='noglob fd'
+
 # ------------------------------------------------------------------------------
 # File Listing Aliases (using eza, a modern replacement for ls)
 # ------------------------------------------------------------------------------
