@@ -39,6 +39,9 @@ alias apt_clean='sudo apt-get clean && \
 # Combined update and cleanup
 alias apt_maintain='apt_update && apt_clean'
 
+# update linux homebrew and its packages
+alias update_brew='brew update && brew upgrade && brew cleanup' # Only Homebrew updates
+
 # ------------------------------------------------------------------------------
 # Package Management
 # ------------------------------------------------------------------------------

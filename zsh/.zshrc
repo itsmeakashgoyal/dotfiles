@@ -15,6 +15,19 @@
 #
 #█▓▒░
 
+# Load profiling tool
+# zmodload zsh/zprof
+# zmodload zsh/mapfile # Bring mapfile functionality similar to bash
+
+# Create a hash table for globally stashing variables without polluting main
+# scope with a bunch of identifiers.
+typeset -A __AKASH
+
+__AKASH[ITALIC_ON]=$'\e[3m'
+__AKASH[ITALIC_OFF]=$'\e[23m'
+__AKASH[ZSHRC]=$ZDOTDIR/.zshrc
+__AKASH[REAL_ZSHRC]=${__AKASH[ZSHRC]:A}
+
 # ------------------------------------------------------------------------------
 # zinit setup
 # ------------------------------------------------------------------------------
@@ -30,38 +43,12 @@ fi
 # Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Load profiling tool
-# zmodload zsh/zprof
-# zmodload zsh/mapfile # Bring mapfile functionality similar to bash
-
 # Disable unnecessary security checks
-ZSH_DISABLE_COMPFIX=true
+# ZSH_DISABLE_COMPFIX=true
 
-# ------------------------------------------------------------------------------
-# History Configuration
-# ------------------------------------------------------------------------------
-# History file location and size
-export HISTFILE="${HOME}/.zsh_history"
-export HISTSIZE=130000 # Internal history list size
-export SAVEHIST=100000 # History file size
-export HISTDUP=erase   # Erase duplicates in history
-export LESSHISTFILE=-
-# HIST_STAMPS=yyyy/mm/dd
-
-# History Options
-setopt append_history # Append to history file
-setopt extended_history
-setopt hist_expire_dups_first
-setopt share_history        # Share history between sessions
-setopt hist_reduce_blanks   # Remove unnecessary blanks
-setopt hist_ignore_space    # Ignore space-prefixed commands
-setopt hist_ignore_all_dups # Remove older duplicate entries
-setopt hist_save_no_dups    # Don't save duplicates
-setopt hist_ignore_dups     # Don't record duplicates
-setopt hist_find_no_dups    # Skip duplicates when searching
-setopt hist_verify          # Show command before executing from history
-setopt inc_append_history   # Add commands immediately
-setopt bang_hist            # Enable history expansion
+# NOTE: must come before zsh-syntax-highlighting.
+autoload -U select-word-style
+select-word-style bash # only alphanumeric chars are considered WORDCHARS
 
 # add zsh plugins using zinit
 zinit lucid light-mode for \
@@ -76,28 +63,17 @@ zinit wait lucid for \
     OMZP::sudo \
     OMZP::command-not-found
 
-# Completion system (lazy loading with caching)
-function load_local_cache() {
-    local zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-${ZSH_VERSION}"
-    local compinit_args=(-C)
-    
-    # Only rebuild completion dump once per day
-    if [[ ! -f "$zcompdump" || -n "$(find "$zcompdump" -mtime +1)" ]]; then
-        compinit_args=()
-        mkdir -p "${zcompdump:h}"
-    fi
-    
-    # Load completions
-    autoload -Uz compinit
-    compinit "${compinit_args[@]}" -d "$zcompdump"
-}
-load_local_cache
+# For speed:
+# https://github.com/zsh-users/zsh-autosuggestions#disabling-automatic-widget-re-binding
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=59'
+ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion)
 
 # Source local configurations (lazy loading)
 function load_local_configs() {
     local config_dir="$ZDOTDIR/local"
     [[ -d "$config_dir" ]] || return
-    
+
     for config in "$config_dir"/*.zsh; do
         [[ -f "$config" ]] && source "$config"
     done
@@ -105,9 +81,21 @@ function load_local_configs() {
 load_local_configs
 
 if command -v oh-my-posh &>/dev/null; then
-    export OHMYPOSH_THEMES_DIR="${HOMEBREW_PREFIX}/opt/oh-my-posh/themes"
     eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
 fi
 
 # Fix Paste Behavior
 zle_highlight+=(paste:none)
+
+#
+# /etc/motd
+#
+
+# if [ -e /etc/motd ]; then
+#   if ! cmp -s $HOME/.hushlogin /etc/motd; then
+#     tee $HOME/.hushlogin < /etc/motd
+#   fi
+# fi
+if [[ -f /etc/motd ]]; then
+    catn /etc/motd
+fi

@@ -148,6 +148,20 @@ local get_active_lsp = function()
     return msg
 end
 
+local mode_map = {
+    ["NORMAL"] = "N",
+    ["VISUAL"] = "V",
+    ["V-LINE"] = "VL",
+    ["V-BLOCK"] = "VB",
+    ["SELECT"] = "S",
+    ["S-LINE"] = "SL",
+    ["S-BLOCK"] = "SB",
+    ["INSERT"] = "I",
+    ["REPLACE"] = "R",
+    ["COMMAND"] = "C",
+    ["TERMINAL"] = "T",
+}
+
 require("lualine").setup({
     options = {
         icons_enabled = true,
@@ -158,7 +172,14 @@ require("lualine").setup({
         always_divide_middle = true,
     },
     sections = {
-        lualine_a = { "mode" },
+        lualine_a = {
+            {
+                "mode",
+                fmt = function(mode)
+                    return mode_map[mode] or mode
+                end,
+            },
+        },
         lualine_b = {
             {
                 "branch",
