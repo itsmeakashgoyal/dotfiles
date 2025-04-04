@@ -65,9 +65,9 @@ zinit wait lucid for \
 
 # For speed:
 # https://github.com/zsh-users/zsh-autosuggestions#disabling-automatic-widget-re-binding
-ZSH_AUTOSUGGEST_MANUAL_REBIND=1
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=59'
-ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion)
+ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion history)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#d33682"
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 
 # Source local configurations (lazy loading)
 function load_local_configs() {

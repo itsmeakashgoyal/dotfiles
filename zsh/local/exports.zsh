@@ -115,4 +115,3 @@ path=(
 export HOMEBREW_PREFIX HOMEBREW_CELLAR HOMEBREW_REPOSITORY
 export PATH
 export MAKEFLAGS="-j$(nproc)" # Use all CPU cores for compilation
-DISABLE_AUTO_TITLE="true"
