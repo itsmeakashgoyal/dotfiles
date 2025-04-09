@@ -162,9 +162,6 @@ You're running ${OS_TYPE}.
         sudo chsh -s "$(command -v zsh)" "$USER"
     fi
 
-    # installing fzf
-    install_fzf
-
     ## Now proceed with OS specific setup installations
     if [ "$OS_TYPE" = "Darwin" ]; then
         setupDotfiles "macos"

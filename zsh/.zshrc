@@ -86,16 +86,3 @@ fi
 
 # Fix Paste Behavior
 zle_highlight+=(paste:none)
-
-#
-# /etc/motd
-#
-
-# if [ -e /etc/motd ]; then
-#   if ! cmp -s $HOME/.hushlogin /etc/motd; then
-#     tee $HOME/.hushlogin < /etc/motd
-#   fi
-# fi
-if [[ -f /etc/motd ]]; then
-    catn /etc/motd
-fi

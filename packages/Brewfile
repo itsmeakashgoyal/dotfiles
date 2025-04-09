@@ -34,7 +34,6 @@
 #############################################################
 # 1. Taps                                                   #
 #############################################################
-tap "homebrew/bundle"
 tap "jandedobbeleer/oh-my-posh"
 tap "github/gh"                                     # Interact with GitHub PRs, issues, repos
 tap "kyoh86/tap"                                    # for "sd" - RegEx find and replace (better sed) - Rust
@@ -91,9 +90,6 @@ brew "procs"                                        # Advanced process viewer (b
 # CLI Development Tools
 brew "lazygit"                                      # TUI for git - Go
 
-# CLI Docs and Cheatsheets
-brew "tealdeer"                                     # Read cheat sheets (better tldr) - Rust
-
 # Development Tools
 brew "automake"                                     # Build automation tool
 brew "cmake"                                        # Build system
@@ -116,7 +112,6 @@ brew "shellcheck"                                   # Shell script analysis
 brew "shfmt"                                        # Shell formatter
 brew "tldr"                                         # Simplified man pages
 brew "tree"                                         # Directory listings
-brew "wget"                                         # File downloader
 
 # Python Tools
 brew "black"                                        # Python formatter
@@ -151,11 +146,9 @@ if OS.mac?
 
     # Window Management & Tiling
     # cask "alt-tab"                                  # Windows like alt-tab
-    # cask "nikitabobko/tap/aerospace"                # Tiling window manager
 
     # Core Tools
     brew "coreutils"                                # GNU core utilities (those that come with macOS are outdated)
-    brew "curl"                                     # Better URL transfers
     brew "entr"                                     # Run commands when files change
     brew "trash"                                    # Safe rm alternative
     brew "mas"                                      # Mac App Store CLI
