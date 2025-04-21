@@ -93,17 +93,10 @@ brew "lazygit"                                      # TUI for git - Go
 # Development Tools
 brew "automake"                                     # Build automation tool
 brew "cmake"                                        # Build system
-brew "gcc"                                          # GNU compiler collection
 brew "go"                                           # Go programming language
 brew "node"                                         # Node.js
 brew "python3"                                      # Python programming language
-brew "ruby"                                         # Ruby programming language
-brew "rust"                                         # Rust programming language
 brew "pipx"                                         # Python package installer
-brew "rbenv"                                        # Ruby version manager
-brew "ruby-build"                                   # Ruby build plugin for rbenv
-brew "rust"                                         # Rust language
-brew "rustup"                                       # Rust version manager
 
 # Shell Tools
 brew "diff-so-fancy"                                # Better git diff
@@ -140,6 +133,13 @@ brew "s3cmd"                                        # S3 command line tool
 # 3. MacOS Specific Stuff                                   #
 #############################################################
 if OS.mac?
+    brew "gcc"                                          # GNU compiler collection
+    brew "ruby"                                         # Ruby programming language
+    brew "rust"                                         # Rust programming language
+    brew "rbenv"                                        # Ruby version manager
+    brew "ruby-build"                                   # Ruby build plugin for rbenv
+    brew "rustup"                                       # Rust version manager
+
     # Menu Bar Hacks
     brew "sketchybar"                               # Status bar replacement for MacOS
     brew "borders"                                  # borders used in aerospace
