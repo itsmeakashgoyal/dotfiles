@@ -97,23 +97,16 @@ export FZF_ALT_C_OPTS="
 "
 
 # ------------------------------------------------------------------------------
-# Custom Functions
+# Custom Keybindings and Aliases
 # ------------------------------------------------------------------------------
-# Enhanced file search with git awareness
-fzf-git-files() {
-    local files
-    files=$(git ls-files 2>/dev/null || fd --type f --hidden --follow --exclude .git)
-    echo $files | fzf --multi --preview="$FZF_PREVIEW_COMMAND"
-}
 
-# Project directory jump
-fzf-project() {
-    local dir
-    dir=$(fd --type d --max-depth 3 --hidden --follow --exclude .git . "$HOME/projects" |
-        fzf --preview='eza --tree --icons --level=2 --color=always {}')
-    [ -n "$dir" ] && cd "$dir"
-}
+# Aliases
+alias fzf="fzf --preview='$FZF_PREVIEW_COMMAND'"
+alias fk='fzf-kill'
 
+# ------------------------------------------------------------------------------
+# fzf Functions
+# ------------------------------------------------------------------------------
 # Process management
 fzf-kill() {
     local pid
@@ -124,10 +117,6 @@ fzf-kill() {
 # Load auto-completion and key bindings
 [[ $- == *i* ]] && source "${FZF_SHELL_PATH}/shell/completion.zsh" 2>/dev/null
 source "${FZF_SHELL_PATH}/key-bindings.zsh"
-
-# Custom key bindings
-bindkey '^P' fzf-project
-bindkey '^G' fzf-git-files
 
 # Use fd to respect .gitignore, include hidden files and exclude `.git` folders
 # - The first argument to the function ($1) is the base path to start traversal
@@ -154,30 +143,3 @@ _fzf_comprun() {
     *) fzf --preview 'bat -n --color=always {}' "$@" ;;
     esac
 }
-
-# ------------------------------------------------------------------------------
-# FZF-TAB Configuration
-# ------------------------------------------------------------------------------
-# Configure fzf-tab
-zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-zstyle ':fzf-tab:*' popup-min-size 50 8
-zstyle ':fzf-tab:*' popup-pad 30 0
-zstyle ':fzf-tab:*' fzf-flags '--color=bg+:23'
-zstyle ':fzf-tab:*' continuous-trigger 'ctrl-space'
-
-# Preview configuration for different commands
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --icons --level=2 --color=always $realpath'
-zstyle ':fzf-tab:complete:nvim:*' fzf-preview 'bat --color=always --style=numbers $realpath'
-zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' \
-    fzf-preview 'echo ${(P)word}'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-
-# ------------------------------------------------------------------------------
-# Custom Keybindings and Aliases
-# ------------------------------------------------------------------------------
-
-# Aliases
-alias fzf="fzf --preview='$FZF_PREVIEW_COMMAND'"
-alias fzp='fzf-project'
-alias fk='fzf-kill'
-alias ff='fzf-git-files'

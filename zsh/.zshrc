@@ -80,6 +80,9 @@ function load_local_configs() {
 }
 load_local_configs
 
+autoload -Uz compinit
+compinit
+
 if command -v oh-my-posh &>/dev/null; then
     eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
 fi

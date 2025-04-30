@@ -63,20 +63,80 @@ alias -g V=" --version"
 alias list-npm-globals="npm list -g --depth=0" # List global npm packages
 
 # ------------------------------------------------------------------------------
-# Custom Functions
+# Network Utilities
 # ------------------------------------------------------------------------------
+# Get public IP and location information
+alias myip="curl ipinfo.io/ip"                       # Get public IP address
+alias whereami='npx @rafaelrinaldi/whereami -f json' # Get location info in JSON format
 
-# Navigate up multiple directories
-# Usage: up 3 (goes up 3 directories)
-up() {
-    local d=""
-    limit=$1
-    for ((i = 1; i <= limit; i++)); do
-        d=$d/..
-    done
-    d=$(echo $d | sed 's/^\///')
-    if [ -z "$d" ]; then
-        d=..
-    fi
-    cd $d
-}
+# ------------------------------------------------------------------------------
+# System Utilities
+# ------------------------------------------------------------------------------
+# Disk usage with sorting
+alias du='du -sh * | sort -hr' # Human-readable disk usage
+alias df='df -h'               # Human-readable disk free
+alias top='htop'               # Better top command
+
+# ------------------------------------------------------------------------------
+# Basic Tmux Aliases
+# ------------------------------------------------------------------------------
+alias tn='tmux new-session -s'         # Create new session
+alias tk='tmux kill-session -t'        # Kill session
+alias tl='tmux list-sessions'          # List sessions
+alias td='tmux detach'                 # Detach from session
+alias tc='clear && tmux clear-history' # Clear tmux history
+
+# Per-platform settings, will override the above commands
+case $(uname) in
+Darwin)
+  # Update macOS and all package managers
+  alias update='sudo softwareupdate -i -a && \  # System updates
+                brew update && \                 # Update Homebrew
+                brew upgrade && \                # Upgrade formulae
+                brew cleanup && \                # Clean up Homebrew
+                npm update -g && \               # Update global npm packages
+                gem update --system && \         # Update RubyGems
+                gem update' # Update gems
+
+  # Individual update commands
+  alias update_system='sudo softwareupdate -i -a' # Only system updates
+  alias update_brew='brew update && brew upgrade && \
+                    brew upgrade --cask && brew cleanup' # Only Homebrew updates
+
+  # Cleanup
+  alias cleanup="find . -type f -name '*.DS_Store' -ls -delete" # Remove .DS_Store files
+
+  # caffeinate: Prevent the system from sleeping
+  alias ch='caffeinate -u -t 3600'
+  ;;
+Linux)
+  # Update and upgrade system packages
+  alias apt_update='sudo apt-get update && \
+                    sudo apt-get -y upgrade && \
+                    echo "✅ System updated successfully"'
+
+  # Clean up system packages
+  alias apt_clean='sudo apt-get clean && \
+                    sudo apt-get autoclean && \
+                    sudo apt-get autoremove && \
+                    echo "✅ System cleaned successfully"'
+
+  # Combined update and cleanup
+  alias apt_maintain='apt_update && apt_clean'
+
+  # update linux homebrew and its packages
+  alias update_brew='brew update && brew upgrade && brew cleanup' # Only Homebrew updates
+
+  # ------------------------------------------------------------------------------
+  # Package Management
+  # ------------------------------------------------------------------------------
+  # Search for package
+  alias apt_search='apt-cache search'
+
+  # Show package info
+  alias apt_info='apt-cache show'
+
+  # List installed packages
+  alias apt_list='dpkg --list'
+  ;;
+esac

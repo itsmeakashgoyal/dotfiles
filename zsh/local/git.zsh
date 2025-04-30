@@ -26,7 +26,7 @@ unalias gco gcmsg gcam gpr gp gstp gbd 2>/dev/null
 # Basic Git Aliases
 # ------------------------------------------------------------------------------
 alias gs="git status"                  # Git status
-alias gc="git clean -f"                # Force clean untracked files
+alias gc="git clean -fxd"              # Force clean untracked files
 alias gcg="git config --edit --global" # Edit global Git config
 alias gcl="git config --edit --local"  # Edit local Git config
 

@@ -1,30 +1,49 @@
-#!/usr/bin/env zsh
-#                     █████
-#                    ░░███
-#   █████████  █████  ░███████
-#  ░█░░░░███  ███░░   ░███░░███
-#  ░   ███░  ░░█████  ░███ ░███
-#    ███░   █ ░░░░███ ░███ ░███
-#   █████████ ██████  ████ █████
-#  ░░░░░░░░░ ░░░░░░  ░░░░ ░░░░░
-#
-#  ▓▓▓▓▓▓▓▓▓▓
-# ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/local/system.zsh
-# ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
-#
-#█▓▒░
 # ------------------------------------------------------------------------------
-# System Configuration: Aliases and Functions
+# Custom Functions
 # ------------------------------------------------------------------------------
 
+# Navigate up multiple directories
+# Usage: up 3 (goes up 3 directories)
+up() {
+    local d=""
+    limit=$1
+    for ((i = 1; i <= limit; i++)); do
+        d=$d/..
+    done
+    d=$(echo $d | sed 's/^\///')
+    if [ -z "$d" ]; then
+        d=..
+    fi
+    cd $d
+}
+
 # ------------------------------------------------------------------------------
-# Network Utilities
+# Docker Container Inspection and Interaction
 # ------------------------------------------------------------------------------
-# Get public IP and location information
-alias myip="curl ipinfo.io/ip"                       # Get public IP address
-alias whereami='npx @rafaelrinaldi/whereami -f json' # Get location info in JSON format
+# Get container IP
+dcip() {
+    local container_name="$1"
+    if [[ -z "$container_name" ]]; then
+        echo "Usage: dip CONTAINER_NAME"
+        return 1
+    fi
+    docker inspect --format '{{ .NetworkSettings.IPAddress }}' "$container_name"
+}
+
+# Execute bash in container
+dbash() {
+    local container_name="$1"
+    if [[ -z "$container_name" ]]; then
+        echo "Usage: dbash CONTAINER_NAME"
+        return 1
+    fi
+    docker exec -it "$container_name" bash || docker exec -it "$container_name" sh
+}
+
+# Show docker disk usage
+dsize() {
+    docker system df -v
+}
 
 # Detailed IP address information
 ip_info() {
@@ -55,14 +74,6 @@ internet() {
 
     echo '✅ Connected to internet.'
 }
-
-# ------------------------------------------------------------------------------
-# System Utilities
-# ------------------------------------------------------------------------------
-# Disk usage with sorting
-alias du='du -sh * | sort -hr' # Human-readable disk usage
-alias df='df -h'               # Human-readable disk free
-alias top='htop'               # Better top command
 
 # File size information
 fs() {
@@ -220,3 +231,105 @@ function sshp() {
     echo "Debug: Connecting to $machine..."
     sshpass -p "$password" ssh "$user@$machine" -o StrictHostKeyChecking=no
 }
+
+# ------------------------------------------------------------------------------
+# Session Management Functions
+# ------------------------------------------------------------------------------
+# Attach to existing session or create new one
+ta() {
+    if [[ -n "$1" ]]; then
+        tmux attach -t "$1"
+        return
+    fi
+
+    # Interactive session selection
+    tmux ls 2>/dev/null &&
+        read "tmux_session?Session name/number (default: misc): " &&
+        tmux attach -t "${tmux_session:-misc}" ||
+        tmux new -s "${tmux_session:-misc}"
+}
+
+# ------------------------------------------------------------------------------
+# tmux functions
+# ------------------------------------------------------------------------------
+# Interactive session selection with preview
+tls() {
+    local session=$(tmux list-sessions -F "#{session_name}" |
+        fzf --preview 'tmux list-windows -t {}' \
+            --preview-window=right:50% \
+            --prompt="Select session: ")
+
+    [[ -n "$session" ]] && tmux switch-client -t "$session"
+}
+
+# Kill selected session interactively
+tks() {
+    local session=$(tmux list-sessions -F "#{session_name}" |
+        fzf --preview 'tmux list-windows -t {}' \
+            --preview-window=right:50% \
+            --prompt="Select session to kill: ")
+
+    [[ -n "$session" ]] && tmux kill-session -t "$session"
+}
+
+# Per-platform settings, will override the above commands
+case $(uname) in
+Darwin)
+    #█▓▒░ disk info
+    function disks() {
+        # echo
+        function _e() {
+            title=$(echo "$1" | sed 's/./& /g')
+            echo "
+    \033[0;31m╓─────\033[0;35m ${title}
+    \033[0;31m╙────────────────────────────────────── ─ ─"
+        }
+        # loops
+        function _l() {
+            X=$(printf '\033[0m')
+            G=$(printf '\033[0;32m')
+            R=$(printf '\033[0;35m')
+            C=$(printf '\033[0;36m')
+            W=$(printf '\033[0;37m')
+            i=0
+            while IFS= read -r line || [[ -n $line ]]; do
+                if [[ $i == 0 ]]; then
+                    echo "${G}${line}${X}"
+                else
+                    if [[ "$line" == *"%"* ]]; then
+                        percent=$(echo "$line" | awk '{ print $5 }' | sed 's!%!!')
+                        color=$W
+                        ((percent >= 75)) && color=$C
+                        ((percent >= 90)) && color=$R
+                        line=$(echo "$line" | sed "s/${percent}%/${color}${percent}%${W}/")
+                    fi
+                    echo "${W}${line}${X}" | sed "s/\([─└├┌┐└┘├┤┬┴┼]\)/${R}\1${W}/g; s! \(/.*\)! ${C}\1${W}!g;"
+                fi
+                i=$((i + 1))
+            done < <(printf '%s' "$1")
+        }
+        # outputs
+        m=$(lsblk -a | grep -v loop)
+        _e "mount.points"
+        _l "$m"
+        d=$(df -h)
+        _e "disk.usage"
+        _l "$d"
+        s=$(swapon --show)
+        _e "swaps"
+        _l "$s"
+    }
+    ;;
+Linux)
+    # Show system information
+    system_info() {
+        echo "System Information:"
+        echo "------------------"
+        echo "OS: $(lsb_release -ds)"
+        echo "Kernel: $(uname -r)"
+        echo "Memory: $(free -h | awk '/^Mem:/ {print $3 "/" $2}')"
+        echo "Disk Usage: $(df -h / | awk 'NR==2 {print $5 " (" $3 "/" $2 ")"}')"
+        echo "CPU Load: $(uptime | awk -F'load average:' '{print $2}')"
+    }
+    ;;
+esac

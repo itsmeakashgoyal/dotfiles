@@ -16,27 +16,70 @@
 #
 #█▓▒░
 
+function add_to_path() {
+  # NOTE: zsh only
+
+  # usage:
+  # add_to_path prepend /path/to/prepend
+  # add_to_path append /path/to/append
+
+  if [ -d "$2" ]; then
+    # If the given path exist, proceed...
+    if [[ ":$PATH:" == *":$2:"* ]]; then
+      remove_from_path "$2"
+    fi
+
+    if [ "$1" = "prepend" ]; then
+      PATH="$2:$PATH"
+      export PATH
+    elif [ "$1" = "append" ]; then
+      PATH="$PATH:$2"
+      export PATH
+    else
+      echo "Unknown option. Use 'prepend' or 'append'."
+    fi
+  fi
+}
+
+function remove_from_path() {
+  # NOTE: zsh only
+
+  # usage:
+  # remove_from_path /path/to/remove
+
+  local path_to_remove="$1"
+  if [[ -n "$path_to_remove" && ":$PATH:" == *":$path_to_remove:"* ]]; then
+    while [[ ":$PATH:" == *":$path_to_remove:"* ]]; do
+      # Remove
+      PATH="${PATH/#$path_to_remove:/}"   # If it's at the beginning
+      PATH="${PATH/%:$path_to_remove/}"   # If it's at the end
+      PATH="${PATH//:$path_to_remove:/:}" # If it's in the middle
+    done
+    PATH="${PATH#:}" # Remove leading colon
+    PATH="${PATH%:}" # Remove trailing colon
+    export PATH
+  fi
+}
+
 # ------------------------------------------------------------------------------
 # Homebrew Configuration
 # ------------------------------------------------------------------------------
 # Core Homebrew settings
-if command -v brew &> /dev/null; then
-    export HOMEBREW_NO_ANALYTICS=1       # Disable analytics collection
-    export HOMEBREW_AUTOREMOVE=1         # Automatically remove unused dependencies
+if command -v brew &>/dev/null; then
+  export HOMEBREW_NO_ANALYTICS=1 # Disable analytics collection
+  export HOMEBREW_AUTOREMOVE=1   # Automatically remove unused dependencies
 fi
-
-
 
 # ------------------------------------------------------------------------------
 # Terminal and Editor Settings
 # ------------------------------------------------------------------------------
 if command -v nvim >/dev/null 2>&1; then
-    export EDITOR="nvim"
-    export VISUAL="nvim"
-    alias vi="nvim"
+  export EDITOR="nvim"
+  export VISUAL="nvim"
+  alias vi="nvim"
 else
-    export EDITOR="vim"
-    export VISUAL="vim"
+  export EDITOR="vim"
+  export VISUAL="vim"
 fi
 
 # Bat: https://github.com/sharkdp/bat
@@ -63,50 +106,52 @@ ARCH_TYPE=$(uname -m)
 
 # Common paths for both OS types
 COMMON_PATHS=(
-    "/usr/bin"
-    "/usr/sbin"
-    "/bin"
-    "/sbin"
+  "/usr/bin"
+  "/usr/sbin"
+  "/bin"
+  "/sbin"
 )
 
 # OS-specific Homebrew configuration
 case "$OS_TYPE" in
 "Darwin")
-    # macOS Homebrew paths
-    HOMEBREW_PREFIX="/opt/homebrew"
-    HOMEBREW_CELLAR="/opt/homebrew/Cellar"
-    HOMEBREW_REPOSITORY="/opt/homebrew"
+  # macOS Homebrew paths
+  HOMEBREW_PREFIX="/opt/homebrew"
+  HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+  HOMEBREW_REPOSITORY="/opt/homebrew"
 
-    # macOS specific paths
-    OS_PATHS=(
-        "/opt/homebrew/bin"
-        "/opt/homebrew/opt/llvm/bin"
-    )
-    ;;
+  # macOS specific paths
+  OS_PATHS=(
+    "/opt/homebrew/bin"
+    "/opt/homebrew/opt/llvm/bin"
+  )
+  ;;
 "Linux")
-    # Linux Homebrew paths
-    HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-    HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
-    HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
+  # Linux Homebrew paths
+  HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+  HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
+  HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
 
-    # Linux specific paths
-    OS_PATHS=(
-        "/usr/local/bin"
-        "/usr/local/sbin"
-        "/usr/local/compilers/clang15/bin"
-        "/home/linuxbrew/.linuxbrew/bin"
-        "/home/linuxbrew/.linuxbrew/sbin"
-        "/usr/lib/jvm/java-11-openjdk-amd64"
-    )
-    ;;
+  # Linux specific paths
+  OS_PATHS=(
+    "/usr/local/bin"
+    "/usr/local/sbin"
+    "/usr/local/compilers/clang15/bin"
+    "/home/linuxbrew/.linuxbrew/bin"
+    "/home/linuxbrew/.linuxbrew/sbin"
+    "/usr/lib/jvm/java-11-openjdk-amd64"
+    "/usr/local/lib/pkgconfig"
+    "/usr/local/lib"
+  )
+  ;;
 esac
 
 # Combine the common and OS-specific paths and ensure uniqueness in the final path
 typeset -U path
 path=(
-    "${OS_PATHS[@]}"
-    "${COMMON_PATHS[@]}"
-    $path
+  "${OS_PATHS[@]}"
+  "${COMMON_PATHS[@]}"
+  $path
 )
 
 # ------------------------------------------------------------------------------

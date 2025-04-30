@@ -50,31 +50,3 @@ alias dcp='docker container prune -f' # Remove stopped containers
 alias dip='docker image prune -af'    # Remove unused images
 alias dnp='docker network prune -f'   # Remove unused networks
 alias dsp='docker system prune -af'   # Remove all unused objects
-
-# ------------------------------------------------------------------------------
-# Container Inspection and Interaction
-# ------------------------------------------------------------------------------
-# Get container IP
-dcip() {
-    local container_name="$1"
-    if [[ -z "$container_name" ]]; then
-        echo "Usage: dip CONTAINER_NAME"
-        return 1
-    fi
-    docker inspect --format '{{ .NetworkSettings.IPAddress }}' "$container_name"
-}
-
-# Execute bash in container
-dbash() {
-    local container_name="$1"
-    if [[ -z "$container_name" ]]; then
-        echo "Usage: dbash CONTAINER_NAME"
-        return 1
-    fi
-    docker exec -it "$container_name" bash || docker exec -it "$container_name" sh
-}
-
-# Show docker disk usage
-dsize() {
-    docker system df -v
-}
