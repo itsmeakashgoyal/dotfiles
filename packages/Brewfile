@@ -49,7 +49,6 @@ end
 # 2. Software / Web Development                             #
 #############################################################
 # zsh plugins
-brew "zsh-syntax-highlighting"                      # Syntax highlighting for zsh
 brew "zsh-autopair"                                 # Auto-pairing for zsh
 brew "zstd"                                         # Data compression
 
@@ -60,7 +59,6 @@ brew "git-extras"                                   # Extra git commands for com
 brew "git-lfs"                                      # Git Large File Storage
 brew "neovim"                                       # Text editor
 brew "helix"                                        # Text editor
-brew "topgrade"                                     # Upgrade all the things - Rust
 
 # CLI Basics
 brew "ack"                                          # Search tool like grep, but faster
@@ -71,8 +69,6 @@ brew "fzf"                                          # Fuzzy file finder and filt
 brew "grc"                                          # Colorize terminal output
 brew "hexyl"                                        # Hex viewer - Rust
 brew "jq"                                           # JSON parser, output and query files
-brew "most"                                         # Multi-window scroll pager (better less)
-brew "poppler"                                      # PDF rendering library
 brew "ripgrep"                                      # Searching within files (better grep) - Rust
 brew "rsync"                                        # Fast incremental file transfer
 brew "sd"                                           # RegEx find and replace (better sed) - Rust
@@ -140,13 +136,6 @@ if OS.mac?
     brew "ruby-build"                                   # Ruby build plugin for rbenv
     brew "rustup"                                       # Rust version manager
 
-    # Menu Bar Hacks
-    brew "sketchybar"                               # Status bar replacement for MacOS
-    brew "borders"                                  # borders used in aerospace
-
-    # Window Management & Tiling
-    # cask "alt-tab"                                  # Windows like alt-tab
-
     # Core Tools
     brew "coreutils"                                # GNU core utilities (those that come with macOS are outdated)
     brew "entr"                                     # Run commands when files change
@@ -168,7 +157,6 @@ if OS.mac?
     # Development
     brew "brew-cask-completion"                     # Cask completion for brew
     brew "brew-gem"                                 # Ruby gem manager for Homebrew
-    brew "clang-format"                             # C/C++ formatter
     brew "editorconfig"                             # Editor config
 
     # Casks (macOS only)
@@ -179,12 +167,6 @@ if OS.mac?
     cask "font-meslo-lg-nerd-font"                  # Meslo LG Nerd Font
     cask "font-source-code-pro"                     # Source Code Pro Font
     cask "font-ubuntu-mono-nerd-font"               # Ubuntu Mono Nerd Font
-    # cask "google-chrome"                            # Google Chrome browser
-    cask "google-drive"                             # Google Drive client
-    cask "iterm2"                                   # iTerm2 terminal emulator
-    cask "rar"                                      # RAR file archiver
-    cask "rectangle"                                # Window management utility
-    cask "sublime-text"                             # Sublime Text editor
 end
 
 #############################################################
