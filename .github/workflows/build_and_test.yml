@@ -18,9 +18,9 @@ name: Test Dotfiles Setup
   workflow_dispatch:
     inputs:
       debug_enabled:
-        description: 'Enable debug mode'
+        description: "Enable debug mode"
         required: false
-        default: 'false'
+        default: "false"
 
 # Security: Define minimal permissions
 permissions:
@@ -141,6 +141,13 @@ jobs:
         run: |
           echo "✅ Verifying installation..."
 
+          # Configure Homebrew PATH for macOS
+          if [[ -x "/opt/homebrew/bin/brew" ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+          elif [[ -x "/usr/local/bin/brew" ]]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+          fi
+
           # Check if Homebrew is installed
           if ! command -v brew &> /dev/null; then
             echo "❌ Homebrew not found"
@@ -197,6 +204,14 @@ jobs:
         shell: zsh {0}
         run: |
           echo "🧪 Testing zsh configuration..."
+          
+          # Configure Homebrew PATH for macOS
+          if [[ -x "/opt/homebrew/bin/brew" ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+          elif [[ -x "/usr/local/bin/brew" ]]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+          fi
+          
           # Source the zsh config
           export ZDOTDIR="$HOME/dotfiles/zsh"
           source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
@@ -284,6 +299,11 @@ jobs:
         run: |
           echo "✅ Verifying installation..."
 
+          # Configure Homebrew PATH for Linux
+          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          fi
+
           # Check if Homebrew is installed
           if ! command -v brew &> /dev/null; then
             echo "❌ Homebrew not found"
@@ -337,6 +357,12 @@ jobs:
         shell: zsh {0}
         run: |
           echo "🧪 Testing zsh configuration..."
+          
+          # Configure Homebrew PATH for Linux
+          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          fi
+          
           export ZDOTDIR="$HOME/dotfiles/zsh"
           source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
 
@@ -349,6 +375,12 @@ jobs:
         if: always()
         run: |
           echo "🧪 Testing dutils commands..."
+          
+          # Configure Homebrew PATH for Linux
+          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          fi
+          
           export PATH="$HOME/.local/bin:$PATH"
 
           dutils help || echo "dutils help failed"
