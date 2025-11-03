@@ -1,6 +1,7 @@
+---
 name: Test Dotfiles Setup
 
-on:
+"on":
   push:
     branches: ["master", "main"]
     paths:
@@ -152,7 +153,11 @@ jobs:
           fi
 
           # Check if symlinks were created
-          [[ -L "$HOME/.zshenv" ]] && echo "✅ .zshenv symlinked" || echo "⚠️  .zshenv not symlinked"
+          if [[ -L "$HOME/.zshenv" ]]; then
+            echo "✅ .zshenv symlinked"
+          else
+            echo "⚠️  .zshenv not symlinked"
+          fi
 
           # Check if dutils is accessible
           if [[ -f "$HOME/.local/bin/dutils" ]]; then
@@ -263,7 +268,11 @@ jobs:
           fi
 
           # Check if symlinks were created
-          [[ -L "$HOME/.zshenv" ]] && echo "✅ .zshenv symlinked" || echo "⚠️  .zshenv not symlinked"
+          if [[ -L "$HOME/.zshenv" ]]; then
+            echo "✅ .zshenv symlinked"
+          else
+            echo "⚠️  .zshenv not symlinked"
+          fi
 
           # Check if dutils is accessible
           if [[ -f "$HOME/.local/bin/dutils" ]]; then
