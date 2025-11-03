@@ -217,6 +217,26 @@ install_python_packages() {
         done < "$PYTHON_PACKAGES"
         success "Python packages checked/installed"
     fi
+    
+    # Install python-lsp-server plugins via pipx inject
+    if pipx list 2>/dev/null | grep -q "package python-lsp-server"; then
+        info "Installing python-lsp-server plugins..."
+        local lsp_plugins=(
+            "pylsp-mypy"
+            "python-lsp-isort" 
+            "python-lsp-black"
+        )
+        
+        for plugin in "${lsp_plugins[@]}"; do
+            # Check if already injected
+            if pipx runpip python-lsp-server list 2>/dev/null | grep -q "$plugin"; then
+                substep_info "✓ $plugin already injected (skipping)"
+            else
+                pipx inject python-lsp-server "$plugin" 2>/dev/null || warning "Failed to inject: $plugin"
+            fi
+        done
+        success "python-lsp-server plugins checked/installed"
+    fi
 }
 
 install_ruby_packages() {

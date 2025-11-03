@@ -6,6 +6,9 @@ pynvim
 pylint
 vim-vint
 python-lsp-server[all]
-pylsp-mypy
-python-lsp-isort
-python-lsp-black
+
+# LSP plugins (installed via pipx inject, not standalone)
+# These are handled separately in install.sh
+# pylsp-mypy
+# python-lsp-isort
+# python-lsp-black
