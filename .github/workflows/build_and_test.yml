@@ -164,22 +164,25 @@ jobs:
 
           # Check core packages from Brewfile
           echo "🔍 Checking core packages..."
-          # Check using actual binary names
-          declare -A packages=(
-            ["bat"]="bat"
-            ["eza"]="eza"
-            ["fzf"]="fzf"
-            ["rg"]="ripgrep"
-            ["nvim"]="neovim"
-            ["delta"]="git-delta"
-            ["lazygit"]="lazygit"
+          # Check using actual binary names (format: "binary:package_name")
+          # Compatible with Bash 3.2+ (macOS default)
+          packages=(
+            "bat:bat"
+            "eza:eza"
+            "fzf:fzf"
+            "rg:ripgrep"
+            "nvim:neovim"
+            "delta:git-delta"
+            "lazygit:lazygit"
           )
           failed=0
-          for binary in "${!packages[@]}"; do
+          for pkg in "${packages[@]}"; do
+            binary="${pkg%%:*}"
+            name="${pkg##*:}"
             if command -v "$binary" &> /dev/null; then
-              echo "  ✅ ${packages[$binary]}"
+              echo "  ✅ $name"
             else
-              echo "  ⚠️  ${packages[$binary]} not found"
+              echo "  ⚠️  $name not found"
               ((failed++))
             fi
           done
@@ -326,22 +329,25 @@ jobs:
 
           # Check core packages from Brewfile
           echo "🔍 Checking core packages..."
-          # Check using actual binary names
-          declare -A packages=(
-            ["bat"]="bat"
-            ["eza"]="eza"
-            ["fzf"]="fzf"
-            ["rg"]="ripgrep"
-            ["nvim"]="neovim"
-            ["delta"]="git-delta"
-            ["lazygit"]="lazygit"
+          # Check using actual binary names (format: "binary:package_name")
+          # Compatible with Bash 3.2+ (macOS default)
+          packages=(
+            "bat:bat"
+            "eza:eza"
+            "fzf:fzf"
+            "rg:ripgrep"
+            "nvim:neovim"
+            "delta:git-delta"
+            "lazygit:lazygit"
           )
           failed=0
-          for binary in "${!packages[@]}"; do
+          for pkg in "${packages[@]}"; do
+            binary="${pkg%%:*}"
+            name="${pkg##*:}"
             if command -v "$binary" &> /dev/null; then
-              echo "  ✅ ${packages[$binary]}"
+              echo "  ✅ $name"
             else
-              echo "  ⚠️  ${packages[$binary]} not found"
+              echo "  ⚠️  $name not found"
               ((failed++))
             fi
           done
