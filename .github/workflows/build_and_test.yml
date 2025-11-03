@@ -43,7 +43,7 @@ jobs:
           fetch-depth: 1
       
       - name: Cache shellcheck
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/bin
           key: shellcheck-${{ runner.os }}
@@ -107,7 +107,7 @@ jobs:
           df -h
       
       - name: Cache Homebrew packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/Library/Caches/Homebrew
@@ -182,7 +182,7 @@ jobs:
       
       - name: Upload logs on failure
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-logs-${{ matrix.macos-version }}
           path: |
@@ -219,7 +219,7 @@ jobs:
           df -h
       
       - name: Cache APT packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             /var/cache/apt/archives
@@ -307,7 +307,7 @@ jobs:
       
       - name: Upload logs on failure
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ubuntu-logs-${{ matrix.ubuntu-version }}
           path: |
