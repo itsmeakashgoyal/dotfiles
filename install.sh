@@ -27,16 +27,15 @@
 # Load Helper functions persistently
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
 HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
-PACKAGES_FILE="${SCRIPT_DIR}/setup/packages.sh"
-# Check if helper and packages file exists and source it
-if [ ! -f "$HELPER_FILE" && ! -f "$PACKAGES_FILE" ]; then
-    echo "Error: Helper files not found" >&2
+
+# Check if helper file exists and source it
+if [[ ! -f "$HELPER_FILE" ]]; then
+    echo "Error: Helper file not found at $HELPER_FILE" >&2
     exit 1
 fi
 
-# Source the helper and packages file
+# Source the helper file
 source "$HELPER_FILE"
-source "$PACKAGES_FILE"
 
 # Enable strict mode for better error handling
 set -euo pipefail
@@ -73,10 +72,19 @@ setupDotfiles() {
     for target in "${targets[@]}"; do
         case "$target" in
         "macos")
-            [ "$OS_TYPE" = "Darwin" ] && run_script "_macOS" && run_script "_sublime" || error "Not on macOS"
+            if [ "$OS_TYPE" != "Darwin" ]; then
+                error "Not on macOS - cannot run macOS setup"
+                return 1
+            fi
+            run_script "_macOS"
+            run_script "_sublime"
             ;;
         "linux")
-            [ "$OS_TYPE" = "Linux" ] && run_script "_linuxOS" || error "Not on Linux"
+            if [ "$OS_TYPE" != "Linux" ]; then
+                error "Not on Linux - cannot run Linux setup"
+                return 1
+            fi
+            run_script "_linuxOS"
             ;;
         "sublime")
             run_script "_sublime"

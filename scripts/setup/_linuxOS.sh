@@ -16,103 +16,97 @@
 # ░▓ file   ▓ scripts/setup/_linuxOS.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
-#
-#█▓▒░
 
-# ------------------------------
-#          INITIALIZE
-# ------------------------------
-# Load Helper functions persistently
+# ------------------------------------------------------------------------------
+# Linux System Setup Script
+# Installs essential packages and tools for Ubuntu/Debian-based systems
+# ------------------------------------------------------------------------------
+
+# Load helper functions
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
 HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
-# Check if helper file exists and source it
+
 if [[ ! -f "$HELPER_FILE" ]]; then
     echo "Error: Helper file not found at $HELPER_FILE" >&2
     exit 1
 fi
 
-# Source the helper file
 source "$HELPER_FILE"
-
-# Enable strict mode
 set -euo pipefail
-IFS=$'nt'
 
-# Get OS name
-readonly OS_NAME=$(grep ^NAME /etc/*os-release | cut -d '"' -f 2)
+# ------------------------------------------------------------------------------
+# Configuration
+# ------------------------------------------------------------------------------
+readonly OS_NAME=$(grep ^NAME /etc/os-release 2>/dev/null | cut -d '"' -f 2)
+readonly GO_VERSION="1.23.4"  # Update as needed
 
 # ------------------------------------------------------------------------------
 # System Detection
 # ------------------------------------------------------------------------------
 check_ubuntu() {
-    if [ -f /etc/os-release ]; then
+    if [[ -f /etc/os-release ]]; then
         . /etc/os-release
-        if [[ "$ID" == "ubuntu" || "$ID_LIKE" == *"ubuntu"* ]]; then
-            return 0 # It's Ubuntu or Ubuntu-based
-        fi
-    elif [ -f /etc/lsb-release ]; then
+        [[ "$ID" == "ubuntu" || "$ID_LIKE" == *"ubuntu"* ]] && return 0
+    elif [[ -f /etc/lsb-release ]]; then
         . /etc/lsb-release
-        if [[ "$DISTRIB_ID" == "Ubuntu" ]]; then
-            return 0 # It's Ubuntu
-        fi
+        [[ "$DISTRIB_ID" == "Ubuntu" ]] && return 0
     fi
-    return 1 # It's not Ubuntu or Ubuntu-based
+    return 1
 }
 
-# Clean up
-cleanup() {
-    info "
-##############################################
-#              Cleanup Section               #
-##############################################
-"
-    log_message "Starting cleanup process"
-    sudo apt-get -y autoclean
-    sudo apt-get -y clean
-    info "Cleaned!"
-    log_message "Cleanup completed"
-    sleep 2
-}
-
-# Update and install packages
+# ------------------------------------------------------------------------------
+# Package Management
+# ------------------------------------------------------------------------------
 update_and_install() {
     info "
 ##############################################
-#      Update, Install, & Secure Section     #
+#   System Update & Package Installation     #
 ##############################################
 "
     log_message "Starting system update and package installation"
 
-    if [ -z "$CI" ]; then
-        # Update and upgrade system
+    # Skip update in CI environments
+    if [[ -z "${CI:-}" ]]; then
         sudo apt-get update
         sudo apt-get -y upgrade
     fi
 
-    # Core packages
+    # Core development and utility packages
     local packages=(
+        # Build tools
         build-essential
-        libc++-15-dev
-        clang-format-15
         libkrb5-dev
+        
+        # Essential utilities
         procps
         file
-        vim-gtk
-        python3-setuptools
+        curl
+        wget
+        
+        # Development tools
+        vim
         tmux
-        locate
-        libgraph-easy-perl
-        fd-find
-        fontconfig
+        git
+        stow
+        
+        # Python development
+        python3-setuptools
         python3-venv
         python3-pip
-        python3-pylsp
-        luarocks
+        
+        # Shell tools
         shellcheck
+        entr
+        fd-find
+        
+        # System tools
+        mlocate
         strace
         lsb-release
-        entr
-        stow
+        
+        # Miscellaneous
+        libgraph-easy-perl
+        fontconfig
         figlet
         lolcat
     )
@@ -120,77 +114,106 @@ update_and_install() {
     sudo apt-get -y install "${packages[@]}"
     success "Package installation complete"
     log_message "Completed system update and package installation"
-    sleep 2
+}
+
+cleanup() {
+    info "
+##############################################
+#         Cleanup & Optimization             #
+##############################################
+"
+    log_message "Starting cleanup process"
+    
+    sudo apt-get -y autoclean
+    sudo apt-get -y autoremove
+    sudo apt-get -y clean
+    
+    success "Cleanup completed!"
+    log_message "Cleanup completed"
 }
 
 # ------------------------------------------------------------------------------
 # Tool Installation Functions
 # ------------------------------------------------------------------------------
-installEzaAndExa() {
-    if command_exists exa; then
-        info "exa already installed"
-    else
-        info "Installing exa.."
-        EXA_VERSION=$(curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
-        curl -Lo exa.zip "https://github.com/ogham/exa/releases/latest/download/exa-linux-x86_64-v${EXA_VERSION}.zip"
-        sudo unzip -q exa.zip bin/exa -d /usr/local
-        rm exa.zip
-    fi
-
+install_eza() {
     if command_exists eza; then
         info "eza already installed"
-    else
-        info "Installing eza.."
-        sudo apt install -y gpg
-        sudo mkdir -p /etc/apt/keyrings
-        wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-        echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
-        sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-        sudo apt update
-        sudo apt install -y eza
+        return 0
     fi
+
+    info "Installing eza..."
+    sudo apt-get install -y gpg
+    sudo mkdir -p /etc/apt/keyrings
+    
+    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | \
+        sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+    
+    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | \
+        sudo tee /etc/apt/sources.list.d/gierens.list
+    
+    sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+    sudo apt-get update
+    sudo apt-get install -y eza
+    
+    success "eza installed successfully"
 }
 
-installLatestGo() {
+install_go() {
     if command_exists go; then
-        info "go already installed"
-    else
-        info "Installing go.."
-        GO_VERSION="1.23.0" # Update this version as needed
-        curl -LO "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
-        sudo rm -rf /usr/local/go
-        sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
-        rm "go${GO_VERSION}.linux-amd64.tar.gz"
+        local current_version=$(go version | awk '{print $3}' | sed 's/go//')
+        info "Go already installed (version: ${current_version})"
+        return 0
     fi
+
+    info "Installing Go ${GO_VERSION}..."
+    
+    local go_archive="go${GO_VERSION}.linux-amd64.tar.gz"
+    curl -LO "https://go.dev/dl/${go_archive}"
+    
+    sudo rm -rf /usr/local/go
+    sudo tar -C /usr/local -xzf "${go_archive}"
+    rm "${go_archive}"
+    
+    success "Go ${GO_VERSION} installed successfully"
 }
 
-installCargoPackageManager() {
+install_cargo() {
     if command_exists cargo; then
-        info "cargo already installed"
-    else
-        info "Installing cargo package manager."
-        sudo apt install -y cargo
-        # cargo install just onefetch
+        info "Cargo already installed"
+        return 0
     fi
+
+    info "Installing Rust and Cargo..."
+    sudo apt-get install -y cargo
+    success "Cargo installed successfully"
 }
 
-installNvim() {
+install_nvim() {
     if command_exists nvim; then
-        info "nvim already installed"
+        info "Neovim already installed"
+        return 0
+    fi
+
+    info "Installing Neovim..."
+    if [[ -f ~/dotfiles/scripts/utils/_install_nvim.sh ]]; then
+        bash ~/dotfiles/scripts/utils/_install_nvim.sh
     else
-        info "Installing nvim.."
-        sh ~/dotfiles/scripts/utils/_install_nvim.sh
+        error "Neovim install script not found"
+        return 1
     fi
 }
 
-installZoxide() {
+install_zoxide() {
     if command_exists zoxide; then
         info "Zoxide already installed"
-        return
+        return 0
     fi
 
-    if ! curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
-        error "Something went wrong during zoxide install!"
+    info "Installing zoxide..."
+    if curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
+        success "Zoxide installed successfully"
+    else
+        error "Zoxide installation failed"
         return 1
     fi
 }
@@ -199,52 +222,47 @@ installZoxide() {
 # Main Function
 # ------------------------------------------------------------------------------
 main() {
-    log_message "Script started"
+    log_message "Linux setup script started"
+    
     info "
-You're running ${OS_NAME}.
 ##############################################
-#      We will begin applying updates,       #
-#      and securing the system.              #
+#        Linux System Setup                  #
+#        OS: ${OS_NAME}                      #
 ##############################################
-#      You will be prompted for your         #
-#      sudo password.                        #
+#  You will be prompted for your sudo        #
+#  password to install packages.             #
 ##############################################
 "
 
-    if check_ubuntu; then
-        success "
-##############################################
-#      Ubuntu-based system detected.         #
-#      Proceeding with setup...              #
-##############################################
-"
-        log_message "Ubuntu-based system detected. Proceeding with setup."
-    else
+    # Verify this is an Ubuntu-based system
+    if ! check_ubuntu; then
         error "
 ##############################################
-#      This script is intended for           #
-#      Ubuntu-based systems only.            #
-#      Exiting Now!                          #
+#  This script is for Ubuntu-based systems  #
+#  Detected: ${OS_NAME}                     #
+#  Exiting...                               #
 ##############################################
 "
         log_message "Non-Ubuntu system detected. Script execution aborted."
         exit 1
     fi
 
-    # Install components
+    success "Ubuntu-based system detected. Proceeding with setup..."
+    log_message "Ubuntu-based system confirmed"
+
+    # Run installation steps
     update_and_install
-    # installEzaAndExa
-    # installLatestGo
-    installCargoPackageManager
-    # installNvim
-    # installZoxide
+    install_eza
+    install_cargo
+    install_zoxide
+    cleanup
 
     success "
 ###################################################
-#      Installation Completed for _linuxOS.sh     #
+#     Linux Setup Completed Successfully!         #
 ###################################################
 "
-    log_message "Installation Completed for Ubuntu-based system detected. Proceeding with other steps"
+    log_message "Linux setup completed successfully"
 }
 
 # Set error trap
