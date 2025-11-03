@@ -35,25 +35,25 @@ jobs:
     name: Lint Scripts
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      
+
       - name: Cache shellcheck
         uses: actions/cache@v4
         with:
           path: ~/bin
           key: shellcheck-${{ runner.os }}
-      
+
       - name: Install shellcheck
         run: |
           if ! command -v shellcheck &> /dev/null; then
             sudo apt-get update && sudo apt-get install -y shellcheck
           fi
-      
+
       - name: Run shellcheck on all scripts
         run: |
           echo "🔍 Checking bash/shell scripts..."
@@ -61,18 +61,19 @@ jobs:
             ! -path "*/node_modules/*" \
             ! -path "*/.git/*" \
             -exec shellcheck -x {} + || echo "⚠️  Shellcheck found issues"
-      
+
       - name: Check file permissions
         run: |
           echo "🔐 Checking executable permissions..."
-          for script in install.sh bootstrap.sh scripts/**/*.sh scripts/utils/dutils; do
+          scripts="install.sh bootstrap.sh scripts/**/*.sh scripts/utils/dutils"
+          for script in $scripts; do
             if [[ -f "$script" ]] && [[ ! -x "$script" ]]; then
               echo "❌ Missing execute permission: $script"
               exit 1
             fi
           done
           echo "✅ All scripts have correct permissions"
-      
+
       - name: Validate YAML files
         run: |
           sudo apt-get install -y yamllint
@@ -84,18 +85,18 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 30
     needs: lint
-    
+
     strategy:
       fail-fast: false
       matrix:
         macos-version: [latest, 13]  # Test on multiple macOS versions
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Display system info
         run: |
           echo "🖥️  System Information"
@@ -105,7 +106,7 @@ jobs:
           echo "Shell: $SHELL"
           echo "Home: $HOME"
           df -h
-      
+
       - name: Cache Homebrew packages
         uses: actions/cache@v4
         with:
@@ -115,57 +116,57 @@ jobs:
           key: ${{ runner.os }}-brew-${{ hashFiles('**/Brewfile') }}
           restore-keys: |
             ${{ runner.os }}-brew-
-      
+
       - name: Setup dotfiles directory
         run: |
           echo "📁 Setting up dotfiles directory..."
           mkdir -p "$HOME/dotfiles"
           rsync -av --exclude='.git' . "$HOME/dotfiles/"
           ls -la "$HOME/dotfiles"
-      
+
       - name: Make scripts executable
-        working-directory: ${{ env.HOME }}/dotfiles
+        working-directory: ~/dotfiles
         run: |
           echo "🔧 Making scripts executable..."
           chmod +x install.sh bootstrap.sh
           find scripts -type f -name "*.sh" -exec chmod +x {} +
           chmod +x scripts/utils/dutils
-      
+
       - name: Run dotfiles installation
-        working-directory: ${{ env.HOME }}/dotfiles
+        working-directory: ~/dotfiles
         run: |
           export CI=1
           export DOTFILES_TEST=1
           echo "🚀 Running dotfiles installation..."
           echo "y" | ./install.sh
         continue-on-error: false
-      
+
       - name: Verify installation
         run: |
           echo "✅ Verifying installation..."
-          
+
           # Check if zsh is installed
           if ! command -v zsh &> /dev/null; then
             echo "❌ zsh not found"
             exit 1
           fi
-          
+
           # Check if zinit was installed
           if [[ ! -d "$HOME/.local/share/zinit" ]]; then
             echo "⚠️  zinit not installed"
           fi
-          
+
           # Check if symlinks were created
           [[ -L "$HOME/.zshenv" ]] && echo "✅ .zshenv symlinked" || echo "⚠️  .zshenv not symlinked"
-          
+
           # Check if dutils is accessible
           if [[ -f "$HOME/.local/bin/dutils" ]]; then
             echo "✅ dutils installed"
             "$HOME/.local/bin/dutils" version || true
           fi
-          
+
           echo "✅ Installation verified successfully"
-      
+
       - name: Test zsh configuration
         shell: zsh {0}
         run: |
@@ -173,13 +174,13 @@ jobs:
           # Source the zsh config
           export ZDOTDIR="$HOME/dotfiles/zsh"
           source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
-          
+
           # Test if basic commands work
           echo "Testing basic commands..."
           type l ll gs gco 2>/dev/null || echo "Some aliases not loaded"
-          
+
           echo "✅ Zsh configuration test complete"
-      
+
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -196,18 +197,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: lint
-    
+
     strategy:
       fail-fast: false
       matrix:
         ubuntu-version: [latest, 22.04, 20.04]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Display system info
         run: |
           echo "🖥️  System Information"
@@ -217,7 +218,7 @@ jobs:
           echo "Shell: $SHELL"
           echo "Home: $HOME"
           df -h
-      
+
       - name: Cache APT packages
         uses: actions/cache@v4
         with:
@@ -227,84 +228,84 @@ jobs:
           key: ${{ runner.os }}-apt-${{ hashFiles('**/packages/*.txt') }}
           restore-keys: |
             ${{ runner.os }}-apt-
-      
+
       - name: Install ZSH
         run: |
           echo "📦 Installing zsh..."
           sudo apt-get update -qq
           sudo apt-get install -y zsh git curl
           zsh --version
-      
+
       - name: Setup dotfiles directory
         run: |
           echo "📁 Setting up dotfiles directory..."
           mkdir -p "$HOME/dotfiles"
           rsync -av --exclude='.git' . "$HOME/dotfiles/"
           ls -la "$HOME/dotfiles"
-      
+
       - name: Make scripts executable
-        working-directory: ${{ env.HOME }}/dotfiles
+        working-directory: ~/dotfiles
         run: |
           echo "🔧 Making scripts executable..."
           chmod +x install.sh bootstrap.sh
           find scripts -type f -name "*.sh" -exec chmod +x {} +
           chmod +x scripts/utils/dutils
-      
+
       - name: Run dotfiles installation
-        working-directory: ${{ env.HOME }}/dotfiles
+        working-directory: ~/dotfiles
         run: |
           export CI=1
           export DOTFILES_TEST=1
           echo "🚀 Running dotfiles installation..."
           echo "y" | ./install.sh
         continue-on-error: false
-      
+
       - name: Verify installation
         run: |
           echo "✅ Verifying installation..."
-          
+
           # Check if zsh is installed
           zsh --version || exit 1
-          
+
           # Check if zinit was installed
           if [[ ! -d "$HOME/.local/share/zinit" ]]; then
             echo "⚠️  zinit not installed"
           fi
-          
+
           # Check if symlinks were created
           [[ -L "$HOME/.zshenv" ]] && echo "✅ .zshenv symlinked" || echo "⚠️  .zshenv not symlinked"
-          
+
           # Check if dutils is accessible
           if [[ -f "$HOME/.local/bin/dutils" ]]; then
             echo "✅ dutils installed"
             "$HOME/.local/bin/dutils" version || true
           fi
-          
+
           echo "✅ Installation verified successfully"
-      
+
       - name: Test zsh configuration
         shell: zsh {0}
         run: |
           echo "🧪 Testing zsh configuration..."
           export ZDOTDIR="$HOME/dotfiles/zsh"
           source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
-          
+
           echo "Testing basic commands..."
           type l ll 2>/dev/null || echo "Some aliases not loaded"
-          
+
           echo "✅ Zsh configuration test complete"
-      
+
       - name: Test dutils commands
         if: always()
         run: |
           echo "🧪 Testing dutils commands..."
           export PATH="$HOME/.local/bin:$PATH"
-          
+
           dutils help || echo "dutils help failed"
           dutils version || echo "dutils version failed"
           dutils detect-os || echo "dutils detect-os failed"
           dutils list-functions || echo "dutils list-functions failed"
-      
+
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -321,7 +322,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint, test-macos, test-ubuntu]
     if: always()
-    
+
     steps:
       - name: Check test results
         run: |
@@ -330,7 +331,7 @@ jobs:
           echo "Lint: ${{ needs.lint.result }}"
           echo "macOS: ${{ needs.test-macos.result }}"
           echo "Ubuntu: ${{ needs.test-ubuntu.result }}"
-          
+
           if [[ "${{ needs.lint.result }}" == "success" ]] && \
              [[ "${{ needs.test-macos.result }}" == "success" ]] && \
              [[ "${{ needs.test-ubuntu.result }}" == "success" ]]; then
