@@ -1,2 +1,6 @@
+# Node packages installed via npm
+# Install these by setting: INSTALL_NODE=1 before running install.sh
+# Note: Use pnpm_packages.txt if you prefer pnpm
+
 corepack
 npm

@@ -1,4 +1,7 @@
+# Rust packages installed via cargo
+# Install these by setting: INSTALL_RUST=1 before running install.sh
+
+bws
 ccase
 ouch
 suckit
-bws

@@ -88,10 +88,6 @@ update_and_install() {
         git
         stow
         
-        # Python development
-        python3-pip
-        python3-venv
-        
         # Shell tools
         shellcheck
         fd-find

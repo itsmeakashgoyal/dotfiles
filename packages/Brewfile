@@ -12,167 +12,155 @@
 # ░▓ file   ▓ packages/Brewfile
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
-#
-#█▓▒░
 
 ###############################################################
-# Brewfile - Software Installs for MacOS and LinuxOS          #
-#                                                             #
-# List of packages to be installed / updated via Homebrew     #
-# Apps are sorted by category, and arranged alphabetically    #
-# Be sure to delete / comment out anything you do not need    #
-# See brew docs for more info: https://docs.brew.sh/Manpage   #
-#                                                             #
-# 1. Command Line                                             #
-# 2. Software Dev                                             #
-# 3. Desktop Apps                                             #
-# 4. MacOS Specific packages                                  #
-# 5. LinuxOS Specific packages                                #
-#                                                             #
+# Brewfile - Software Installs for macOS and Linux          #
+#                                                            #
+# Organized by category, sorted alphabetically              #
+# Comment out anything you don't need                       #
 ###############################################################
 
 #############################################################
-# 1. Taps                                                   #
+# Taps                                                      #
 #############################################################
 tap "jandedobbeleer/oh-my-posh"
-tap "github/gh"                                     # Interact with GitHub PRs, issues, repos
-tap "kyoh86/tap"                                    # for "sd" - RegEx find and replace (better sed) - Rust
-tap "teamookla/speedtest"                           # Command line speed test utility
+tap "github/gh"
+tap "kyoh86/tap"
 
 if OS.mac?
-    tap "FelixKratz/formulae"                       # JankyBorders/Sketchybar - MacOS utilities
-    tap "buo/cask-upgrade"                          # Upgrade casks
+    tap "FelixKratz/formulae"
+    tap "buo/cask-upgrade"
 end
 
 #############################################################
-# 2. Software / Web Development                             #
+# Core Utilities (Both macOS and Linux)                    #
 #############################################################
-# zsh plugins
-brew "zsh-autopair"                                 # Auto-pairing for zsh
-brew "zstd"                                         # Data compression
 
-# CLI Essentials
-brew "gh"                                           # Interact with GitHub PRs, issues, repos
-brew "git-delta"                                    # Git diff viewer - Rust
-brew "git-extras"                                   # Extra git commands for common tasks
-brew "git-lfs"                                      # Git Large File Storage
-brew "neovim"                                       # Text editor
-brew "helix"                                        # Text editor
-
-# CLI Basics
-brew "ack"                                          # Search tool like grep, but faster
-brew "bat"                                          # Output highlighting (better cat) - Rust
-brew "eza"                                          # Listing files with info (better ls) replaces exa - Rust
-brew "fd"                                           # Find files - Rust
-brew "fzf"                                          # Fuzzy file finder and filtering - Go
-brew "grc"                                          # Colorize terminal output
-brew "hexyl"                                        # Hex viewer - Rust
-brew "jq"                                           # JSON parser, output and query files
-brew "ripgrep"                                      # Searching within files (better grep) - Rust
-brew "rsync"                                        # Fast incremental file transfer
-brew "sd"                                           # RegEx find and replace (better sed) - Rust
-brew "sevenzip"                                     # 7-Zip file archiver
-brew "zoxide"                                       # Auto-learning navigation (better cd/jump) - Rust
-
-# CLI Monitoring and Performance Apps
-brew "bmon"                                         # Bandwidth utilization monitor
-brew "btop"                                         # Resource monitor
-brew "ctop"                                         # Docker Container metrics and monitoring - Go
-brew "dua-cli"                                      # Disk usage analyzer and monitor (better du)
-brew "duf"                                          # Get info on mounted disks (better df) - Go
-brew "procs"                                        # Advanced process viewer (better ps) - Rust
-
-# CLI Development Tools
-brew "lazygit"                                      # TUI for git - Go
-
-# Development Tools
-brew "automake"                                     # Build automation tool
-brew "cmake"                                        # Build system
-brew "go"                                           # Go programming language
-brew "node"                                         # Node.js
-brew "python3"                                      # Python programming language
-brew "pipx"                                         # Python package installer
-
-# Shell Tools
-brew "diff-so-fancy"                                # Better git diff
-brew "htop"                                         # Process viewer
-brew "shellcheck"                                   # Shell script analysis
-brew "shfmt"                                        # Shell formatter
-brew "tldr"                                         # Simplified man pages
-brew "tree"                                         # Directory listings
-
-# Python Tools
-brew "black"                                        # Python formatter
-brew "pyenv"                                        # Python version manager
-brew "pylint"                                       # Python linter
-
-# Lua Tools
-brew "lua"                                          # Lua interpreter
-brew "lua-language-server"                          # Lua language server
-brew "python-lsp-server"                            # Python language server
-brew "luajit"                                       # Lua JIT compiler
-brew "luarocks"                                     # Lua package manager
-brew "luv"                                          # Lua bindings for libuv
-brew "stylua"                                       # Lua formatter
+# Essential CLI Tools
+brew "bat"                  # Cat with syntax highlighting (Rust)
+brew "eza"                  # Better ls (Rust)
+brew "fd"                   # Better find (Rust)
+brew "fzf"                  # Fuzzy finder (Go)
+brew "gh"                   # GitHub CLI
+brew "git-delta"            # Better git diff (Rust)
+brew "git-extras"           # Extra git commands
+brew "git-lfs"              # Git Large File Storage
+brew "jq"                   # JSON processor
+brew "ripgrep"              # Better grep (Rust)
+brew "sd"                   # Better sed (Rust)
+brew "tree"                 # Directory tree
+brew "zoxide"               # Smart cd (Rust)
 
 # System Monitoring
-brew "bpytop"                                       # Resource monitor
+brew "bmon"                 # Bandwidth monitor
+brew "btop"                 # System monitor
+brew "ctop"                 # Container metrics (Go)
+brew "dua-cli"              # Disk usage analyzer
+brew "duf"                  # Better df (Go)
+brew "htop"                 # Process viewer
+brew "procs"                # Better ps (Rust)
 
-# Oh My Posh
-brew "jandedobbeleer/oh-my-posh/oh-my-posh"         # Prompt theme engine
+# Editors
+brew "helix"                # Modern text editor (Rust)
+brew "neovim"               # Vim-based text editor
 
-# DevOps SCMs and CI/CD Tools
-brew "s3cmd"                                        # S3 command line tool
+# Shell & Prompt
+brew "jandedobbeleer/oh-my-posh/oh-my-posh"
+brew "zsh-autopair"
 
 #############################################################
-# 3. MacOS Specific Stuff                                   #
+# Development Tools                                         #
+#############################################################
+
+# Build Tools
+brew "automake"
+brew "cmake"
+
+# Version Control & Tools
+brew "diff-so-fancy"
+brew "lazygit"              # Git TUI (Go)
+
+# Programming Languages
+brew "go"                   # Go programming language
+brew "node"                 # Node.js
+brew "python3"              # Python 3
+
+# Language Tools - Python
+brew "black"                # Python formatter
+brew "pipx"                 # Python package installer
+brew "pyenv"                # Python version manager
+brew "pylint"               # Python linter
+brew "python-lsp-server"    # Python LSP
+
+# Language Tools - Lua
+brew "lua"
+brew "lua-language-server"
+brew "luajit"
+brew "luarocks"
+brew "luv"
+brew "stylua"               # Lua formatter
+
+# Shell Tools
+brew "shellcheck"           # Shell script linter
+brew "shfmt"                # Shell formatter
+
+# Other Tools
+brew "ack"                  # Search tool
+brew "grc"                  # Colorize output
+brew "hexyl"                # Hex viewer (Rust)
+brew "rsync"                # File sync
+brew "sevenzip"             # 7-Zip archiver
+brew "tldr"                 # Simplified man pages
+brew "zstd"                 # Compression
+
+#############################################################
+# macOS Specific                                            #
 #############################################################
 if OS.mac?
-    brew "gcc"                                          # GNU compiler collection
-    brew "ruby"                                         # Ruby programming language
-    brew "rust"                                         # Rust programming language
-    brew "rbenv"                                        # Ruby version manager
-    brew "ruby-build"                                   # Ruby build plugin for rbenv
-    brew "rustup"                                       # Rust version manager
-
     # Core Tools
-    brew "coreutils"                                # GNU core utilities (those that come with macOS are outdated)
-    brew "entr"                                     # Run commands when files change
-    brew "trash"                                    # Safe rm alternative
-    brew "mas"                                      # Mac App Store CLI
-    brew "stow"                                     # Dotfile manager
-    brew "figlet"
-    brew "lolcat"
-    brew "lld"
-    brew "cmake-docs"
-    brew "universal-ctags"
+    brew "coreutils"        # GNU core utilities
+    brew "entr"             # File watcher
+    brew "figlet"           # ASCII art
+    brew "gcc"              # GNU compiler
+    brew "lolcat"           # Rainbow text
+    brew "mas"              # Mac App Store CLI
+    brew "stow"             # Dotfile manager
+    brew "trash"            # Safe rm
 
-    # Security Utilities
-    brew "openssh"                                  # OpenSSH client
-    brew "openssl"                                  # Cryptography and SSL/TLS Toolkit
-    brew "ssh-copy-id"                              # Copy SSH keys to remote hosts
-    brew "sshs"                                     # Terminal user interface for SSH - Rust
+    # Programming Languages
+    brew "rbenv"            # Ruby version manager
+    brew "ruby"
+    brew "ruby-build"
+    brew "rust"
+    brew "rustup"           # Rust version manager
+
+    # Security
+    brew "openssh"
+    brew "openssl"
+    brew "ssh-copy-id"
+    brew "sshs"             # SSH TUI (Rust)
 
     # Development
-    brew "brew-cask-completion"                     # Cask completion for brew
-    brew "brew-gem"                                 # Ruby gem manager for Homebrew
-    brew "editorconfig"                             # Editor config
+    brew "brew-cask-completion"
+    brew "cmake-docs"
+    brew "editorconfig"
+    brew "lld"              # LLVM linker
+    brew "universal-ctags"
 
-    # Casks (macOS only)
-    cask "font-symbols-only-nerd-font"              # Nerd Font Symbols Only
-    cask "font-3270-nerd-font"                      # 3270 Nerd Font
-    cask "font-fira-code-nerd-font"                 # Dev Font - Quaternary (4th)
-    cask "font-jetbrains-mono-nerd-font"            # JetBrains Mono Nerd Font
-    cask "font-meslo-lg-nerd-font"                  # Meslo LG Nerd Font
-    cask "font-source-code-pro"                     # Source Code Pro Font
-    cask "font-ubuntu-mono-nerd-font"               # Ubuntu Mono Nerd Font
+    # Nerd Fonts
+    cask "font-3270-nerd-font"
+    cask "font-fira-code-nerd-font"
+    cask "font-jetbrains-mono-nerd-font"
+    cask "font-meslo-lg-nerd-font"
+    cask "font-source-code-pro"
+    cask "font-symbols-only-nerd-font"
+    cask "font-ubuntu-mono-nerd-font"
 end
 
 #############################################################
-# 4. Linux Specific                                         #
+# Linux Specific                                            #
 #############################################################
 if OS.linux?
-    brew "gettext"                                      # GNU internationalization
-    brew "xclip"                                        # X11 clipboard tool
+    brew "gettext"          # GNU i18n utilities
+    brew "xclip"            # X11 clipboard
 end
-

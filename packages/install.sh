@@ -1,54 +1,86 @@
 #!/bin/bash
-#                               █████
-#                              ░░███
-#  ████████   ██████    ██████  ░███ █████  ██████    ███████  ██████   █████
-# ░░███░░███ ░░░░░███  ███░░███ ░███░░███  ░░░░░███  ███░░███ ███░░███ ███░░
-#  ░███ ░███  ███████ ░███ ░░░  ░██████░    ███████ ░███ ░███░███████ ░░█████
-#  ░███ ░███ ███░░███ ░███  ███ ░███░░███  ███░░███ ░███ ░███░███░░░   ░░░░███
-#  ░███████ ░░████████░░██████  ████ █████░░████████░░███████░░██████  ██████
-#  ░███░░░   ░░░░░░░░  ░░░░░░  ░░░░ ░░░░░  ░░░░░░░░  ░░░░░███ ░░░░░░  ░░░░░░
-#  ░███                                              ███ ░███
-#  █████                                            ░░██████
-# ░░░░░                                              ░░░░░░
-#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ packages/install.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
-#
-#█▓▒░
 
-# ------------------------------
-#          INITIALIZE
-# ------------------------------
-# Load Helper functions persistently
+# ------------------------------------------------------------------------------
+# Package Installation Script
+# Installs Homebrew and packages from Brewfile
+# Optionally installs language-specific packages (Node, Python, Ruby, Rust)
+# ------------------------------------------------------------------------------
+
+set -euo pipefail
+
+# Load helper functions
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
 HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
-# Check if helper file exists and source it
-if [ ! -f "$HELPER_FILE" ]; then
+
+if [[ ! -f "$HELPER_FILE" ]]; then
     echo "Error: Helper file not found at $HELPER_FILE" >&2
     exit 1
 fi
 
-# Source the helper file
-. "$HELPER_FILE"
+source "$HELPER_FILE"
 
-# Enable strict mode for better error handling
-set -eu pipefail
-
+# ------------------------------------------------------------------------------
+# Configuration
+# ------------------------------------------------------------------------------
 readonly PACKAGES_DIR="${DOTFILES_DIR}/packages"
+readonly BREWFILE="${PACKAGES_DIR}/Brewfile"
 
-# Define variables for each package manager and include the corresponding package lists
-brewfile="${PACKAGES_DIR}/Brewfile"
-node_packages="${PACKAGES_DIR}/node_packages.txt"
-python_packages="${PACKAGES_DIR}/pipx_packages.txt"
-ruby_packages="${PACKAGES_DIR}/ruby_packages.txt"
-rust_packages="${PACKAGES_DIR}/rust_packages.txt"
+# Language package files
+readonly NODE_PACKAGES="${PACKAGES_DIR}/node_packages.txt"
+readonly PNPM_PACKAGES="${PACKAGES_DIR}/pnpm_packages.txt"
+readonly PYTHON_PACKAGES="${PACKAGES_DIR}/pipx_packages.txt"
+readonly RUBY_PACKAGES="${PACKAGES_DIR}/ruby_packages.txt"
+readonly RUST_PACKAGES="${PACKAGES_DIR}/rust_packages.txt"
+
+# Installation flags (set to 1 to enable)
+INSTALL_NODE="${INSTALL_NODE:-0}"
+INSTALL_PYTHON="${INSTALL_PYTHON:-0}"
+INSTALL_RUBY="${INSTALL_RUBY:-0}"
+INSTALL_RUST="${INSTALL_RUST:-0}"
 
 # ------------------------------------------------------------------------------
 # Homebrew Functions
 # ------------------------------------------------------------------------------
+install_homebrew() {
+    if command_exists brew; then
+        success "Homebrew is already installed"
+        return 0
+    fi
+
+    info "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    check_command "Homebrew installation"
+
+    # Configure Homebrew PATH
+    case "$OS_TYPE" in
+    "Darwin")
+        if [[ -x "/opt/homebrew/bin/brew" ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        elif [[ -x "/usr/local/bin/brew" ]]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+        ;;
+    "Linux")
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        ;;
+    esac
+
+    # Verify installation
+    if ! command_exists brew; then
+        error "Failed to configure Homebrew in PATH"
+        return 1
+    fi
+
+    # Turn off analytics
+    brew analytics off
+    success "Homebrew installed successfully"
+}
+
 update_brew() {
     if ! command_exists brew; then
         return 1
@@ -57,161 +89,214 @@ update_brew() {
     info "Updating Homebrew..."
     brew update
     brew upgrade
-    [ "$OS_TYPE" = "Darwin" ] && brew upgrade --cask
+    [[ "$OS_TYPE" == "Darwin" ]] && brew upgrade --cask
     brew cleanup
+    success "Homebrew updated"
 }
 
-install_homebrew() {
-    # Install Homebrew if it isn't already installed
-    if command_exists brew; then
-        success "Homebrew is already installed"
-    else
-        info "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        check_command "Homebrew installation"
-
-        # Configure Homebrew PATH
-        case "$OS_TYPE" in
-        "Darwin")
-            if [ -x "/opt/homebrew/bin/brew" ]; then
-                info "Configuring Homebrew in PATH for Apple Silicon Mac..."
-                eval "$(/opt/homebrew/bin/brew shellenv)" # Apple Silicon
-            elif [ -x "/usr/local/bin/brew" ]; then
-                info "Configuring Homebrew in PATH for Intel Mac..."
-                eval "$(/usr/local/bin/brew shellenv)" # Intel Mac
-            fi
-            ;;
-        "Linux")
-            info "Configuring Homebrew in PATH for Linux..."
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-            ;;
-        esac
-    fi
-
-    # Verify installation
-    if ! command -v brew &>/dev/null; then
-        error "Failed to configure Homebrew in PATH"
+install_brewfile_packages() {
+    if [[ ! -f "$BREWFILE" ]]; then
+        error "Brewfile not found at $BREWFILE"
         return 1
     fi
 
-    # Turn off analytics
-    brew analytics off
-
-    # Update Homebrew and Upgrade any already-installed formulae
-    info "Updating Homebrew and upgrading formulae..."
-    update_brew
+    info "Installing packages from Brewfile..."
+    brew bundle --file="$BREWFILE"
+    success "Brewfile packages installed"
 }
 
-install_packages() {
-    info "Installing Homebrew packages..."
-
-    if [ ! -f "$brewfile" ]; then
-        error "Error: Brewfile not found at $brewfile"
-        return 1
-    fi
-
-    brew bundle --file="$brewfile"
-    success "Finished installing Homebrew packages."
-}
-
-# Install Node with FNM and set latest LTS as default, then install npm packages
+# ------------------------------------------------------------------------------
+# Language-Specific Package Managers (Optional)
+# ------------------------------------------------------------------------------
 install_node_packages() {
-    # Install FNM
-    if ! command -v fnm &>/dev/null; then
-        substep_info "Installing FNM..."
-        curl -fsSL https://fnm.vercel.app/install | bash
-        eval "$(fnm env --use-on-cd)" # needed to install npm packages - already set for Fish
-        substep_success "FNM installed."
+    [[ "$INSTALL_NODE" != "1" ]] && return 0
+
+    info "Setting up Node.js environment..."
+
+    # Install/verify Node (should be in Brewfile)
+    if ! command_exists node; then
+        warning "Node.js not found. Install it via: brew install node"
+        return 1
     fi
 
-    # Install latest LTS version of Node with FNM and set as default
-    if ! fnm use --lts &>/dev/null; then
-        info "Installing latest LTS version of Node..."
-        fnm install --lts
-        fnm alias lts-latest default
-        fnm use default
-        substep_success "Node LTS installed and set as default for FNM."
+    # Enable corepack for pnpm/yarn
+    if command_exists corepack; then
+        info "Enabling corepack..."
+        corepack enable
     fi
 
-    # Install NPM packages
-    info "Installing NPM packages..."
-    npm install -g $(cat $node_packages)
-    corepack enable
-    success "All NPM global packages installed."
+    # Install pnpm packages if file exists
+    if [[ -f "$PNPM_PACKAGES" ]]; then
+        info "Installing pnpm packages..."
+        while IFS= read -r package; do
+            [[ -z "$package" || "$package" =~ ^# ]] && continue
+            
+            # Check if already installed globally
+            if pnpm list -g 2>/dev/null | grep -q "$package"; then
+                substep_info "✓ $package already installed (skipping)"
+            else
+                pnpm add -g "$package" || warning "Failed to install: $package"
+            fi
+        done < "$PNPM_PACKAGES"
+        success "pnpm packages checked/installed"
+    fi
+
+    # Install npm packages if file exists
+    if [[ -f "$NODE_PACKAGES" ]]; then
+        info "Installing npm packages..."
+        while IFS= read -r package; do
+            [[ -z "$package" || "$package" =~ ^# ]] && continue
+            
+            # Check if already installed globally
+            if npm list -g "$package" &>/dev/null; then
+                substep_info "✓ $package already installed (skipping)"
+            else
+                npm install -g "$package" || warning "Failed to install: $package"
+            fi
+        done < "$NODE_PACKAGES"
+        success "npm packages checked/installed"
+    fi
 }
 
-# Define a function for installing packages with Python
 install_python_packages() {
-    if ! command -v $(which python) &>/dev/null; then
-        substep_info "Python not found. Installing..."
-        brew install python
-        if ! command -v $(which python) &>/dev/null; then
-            error "Failed to install Python. Exiting."
-            exit 1
-        fi
-        substep_success "Python installed."
+    [[ "$INSTALL_PYTHON" != "1" ]] && return 0
+
+    info "Setting up Python environment..."
+
+    # Verify Python (should be in Brewfile)
+    if ! command_exists python3; then
+        warning "Python 3 not found. Install it via: brew install python3"
+        return 1
     fi
-    info "Installing Python packages..."
-    pip install $(cat "$python_packages")
-    success "Finished installing Python packages."
+
+    # Verify pipx (should be in Brewfile)
+    if ! command_exists pipx; then
+        warning "pipx not found. Install it via: brew install pipx"
+        return 1
+    fi
+
+    # Install packages with pipx
+    if [[ -f "$PYTHON_PACKAGES" ]]; then
+        info "Installing Python packages with pipx..."
+        while IFS= read -r package; do
+            [[ -z "$package" || "$package" =~ ^# ]] && continue
+            
+            # Extract package name (handle "package[extras]" format)
+            local pkg_name="${package%%\[*}"
+            
+            # Check if already installed
+            if pipx list 2>/dev/null | grep -q "package $pkg_name"; then
+                substep_info "✓ $pkg_name already installed (skipping)"
+            else
+                pipx install "$package" 2>/dev/null || warning "Failed to install: $package"
+            fi
+        done < "$PYTHON_PACKAGES"
+        success "Python packages checked/installed"
+    fi
 }
 
-# Install Ruby with rbenv, set 3.1.3 as default, then install gems
 install_ruby_packages() {
-    # Install rbenv
-    if ! command -v rbenv &>/dev/null; then
-        substep_info "Installing rbenv..."
-        brew install rbenv ruby-build
-        eval "$(rbenv init - zsh)" # needed to install gems - already set for Fish
-        substep_success "rbenv installed."
+    [[ "$INSTALL_RUBY" != "1" ]] && return 0
+
+    info "Setting up Ruby environment..."
+
+    # Verify rbenv (should be in Brewfile for macOS)
+    if ! command_exists rbenv; then
+        warning "rbenv not found. Install it via: brew install rbenv ruby-build"
+        return 1
     fi
 
-    # Install Ruby 3.1.3 with rbenv and set as default
-    if ! rbenv versions | grep -q 3.1.3; then
-        substep_info "Installing Ruby 3.1.3..."
+    # Install Ruby 3.1.3 if not present
+    if ! rbenv versions | grep -q "3.1.3"; then
+        info "Installing Ruby 3.1.3..."
         rbenv install 3.1.3
         rbenv global 3.1.3
         rbenv rehash
-        substep_success "Ruby 3.1.3 installed and set as default for rbenv."
     fi
 
     # Install gems
-    info "Installing Ruby gems..."
-    gem install $(cat ruby_packages.txt)
-    success "Ruby gems installed."
+    if [[ -f "$RUBY_PACKAGES" ]]; then
+        info "Installing Ruby gems..."
+        eval "$(rbenv init - zsh)"
+        while IFS= read -r package; do
+            [[ -z "$package" || "$package" =~ ^# ]] && continue
+            
+            # Check if already installed
+            if gem list -i "^${package}$" &>/dev/null; then
+                substep_info "✓ $package already installed (skipping)"
+            else
+                gem install "$package" || warning "Failed to install: $package"
+            fi
+        done < "$RUBY_PACKAGES"
+        success "Ruby gems checked/installed"
+    fi
 }
 
-# Define a function for installing packages with Rust
 install_rust_packages() {
-    if ! command -v $(which rustc) &>/dev/null; then
-        substep_info "Rust not found. Installing..."
-        brew install rust rustup-init
-        rustup-init
-        if ! command -v $(which rustc) &>/dev/null; then
-            error "Failed to install Rust. Exiting."
-            exit 1
-        fi
-        substep_success "Rust installed."
+    [[ "$INSTALL_RUST" != "1" ]] && return 0
+
+    info "Setting up Rust environment..."
+
+    # Verify Rust (should be in Brewfile for macOS)
+    if ! command_exists cargo; then
+        warning "Rust not found. Install it via: brew install rust"
+        return 1
     fi
-    info "Installing Rust packages..."
-    rustup update
-    cargo install $(cat "$rust_packages")
-    success "Finished installing Rust packages."
+
+    # Update Rust
+    rustup update stable || true
+
+    # Install Rust packages
+    if [[ -f "$RUST_PACKAGES" ]]; then
+        info "Installing Rust packages..."
+        while IFS= read -r package; do
+            [[ -z "$package" || "$package" =~ ^# ]] && continue
+            
+            # Check if already installed
+            if cargo install --list 2>/dev/null | grep -q "^${package} "; then
+                substep_info "✓ $package already installed (skipping)"
+            else
+                cargo install "$package" || warning "Failed to install: $package"
+            fi
+        done < "$RUST_PACKAGES"
+        success "Rust packages checked/installed"
+    fi
 }
 
 # ------------------------------------------------------------------------------
 # Main Function
 # ------------------------------------------------------------------------------
 main() {
-    info "Initiating packages installation.."
+    info "
+##############################################
+#      Package Installation                  #
+##############################################
+"
 
-    # Call each installation function
-    install_homebrew
-    install_packages
+    # Install Homebrew
+    install_homebrew || exit 1
+
+    # Update Homebrew
     update_brew
 
-    success "Packages installation completed successfully"
-    log_message "Packages installation completed successfully"
+    # Install Brewfile packages (core packages)
+    install_brewfile_packages || exit 1
+
+    # Optional: Install language-specific packages
+    install_node_packages
+    install_python_packages
+    install_ruby_packages
+    install_rust_packages
+
+    # Final cleanup
+    update_brew
+
+    success "
+###################################################
+#     Package Installation Completed!             #
+###################################################
+"
+    log_message "Package installation completed successfully"
 }
 
 # Set error trap

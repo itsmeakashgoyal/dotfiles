@@ -141,9 +141,35 @@ jobs:
         run: |
           echo "✅ Verifying installation..."
 
+          # Check if Homebrew is installed
+          if ! command -v brew &> /dev/null; then
+            echo "❌ Homebrew not found"
+            exit 1
+          else
+            echo "✅ Homebrew installed: $(brew --version | head -n1)"
+          fi
+
           # Check if zsh is installed
           if ! command -v zsh &> /dev/null; then
             echo "❌ zsh not found"
+            exit 1
+          fi
+
+          # Check core packages from Brewfile
+          echo "🔍 Checking core packages..."
+          packages=("bat" "eza" "fzf" "ripgrep" "neovim" "git-delta" "lazygit")
+          failed=0
+          for pkg in "${packages[@]}"; do
+            if command -v "$pkg" &> /dev/null; then
+              echo "  ✅ $pkg"
+            else
+              echo "  ⚠️  $pkg not found"
+              ((failed++))
+            fi
+          done
+
+          if [[ $failed -gt 3 ]]; then
+            echo "❌ Too many packages missing ($failed)"
             exit 1
           fi
 
@@ -259,8 +285,34 @@ jobs:
         run: |
           echo "✅ Verifying installation..."
 
+          # Check if Homebrew is installed
+          if ! command -v brew &> /dev/null; then
+            echo "❌ Homebrew not found"
+            exit 1
+          else
+            echo "✅ Homebrew installed: $(brew --version | head -n1)"
+          fi
+
           # Check if zsh is installed
           zsh --version || exit 1
+
+          # Check core packages from Brewfile
+          echo "🔍 Checking core packages..."
+          packages=("bat" "eza" "fzf" "ripgrep" "neovim" "git-delta" "lazygit")
+          failed=0
+          for pkg in "${packages[@]}"; do
+            if command -v "$pkg" &> /dev/null; then
+              echo "  ✅ $pkg"
+            else
+              echo "  ⚠️  $pkg not found"
+              ((failed++))
+            fi
+          done
+
+          if [[ $failed -gt 3 ]]; then
+            echo "❌ Too many packages missing ($failed)"
+            exit 1
+          fi
 
           # Check if zinit was installed
           if [[ ! -d "$HOME/.local/share/zinit" ]]; then
@@ -315,7 +367,71 @@ jobs:
             ~/.cache/
           retention-days: 7
 
-  # Job 4: Summary and notification
+  # Job 4: Test optional packages (Node/Python)
+  test-optional-packages:
+    name: Test Optional Packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: lint
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[test-packages]')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup dotfiles directory
+        run: |
+          mkdir -p "$HOME/dotfiles"
+          rsync -av --exclude='.git' . "$HOME/dotfiles/"
+
+      - name: Install Homebrew
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          echo "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" >> $GITHUB_ENV
+
+      - name: Test Node package installation
+        run: |
+          cd "$HOME/dotfiles"
+          export CI=1
+          export INSTALL_NODE=1
+          bash packages/install.sh
+
+          # Verify Node tools
+          if ! command -v node &> /dev/null; then
+            echo "❌ Node not installed"
+            exit 1
+          fi
+          echo "✅ Node installed: $(node --version)"
+
+          if ! command -v pnpm &> /dev/null; then
+            echo "⚠️  pnpm not found"
+          else
+            echo "✅ pnpm installed: $(pnpm --version)"
+          fi
+
+      - name: Test Python package installation
+        run: |
+          cd "$HOME/dotfiles"
+          export CI=1
+          export INSTALL_PYTHON=1
+          bash packages/install.sh
+
+          # Verify Python tools
+          if ! command -v python3 &> /dev/null; then
+            echo "❌ Python not installed"
+            exit 1
+          fi
+          echo "✅ Python installed: $(python3 --version)"
+
+          if ! command -v pipx &> /dev/null; then
+            echo "⚠️  pipx not found"
+          else
+            echo "✅ pipx installed"
+            pipx list || true
+          fi
+
+  # Job 5: Summary and notification
   summary:
     name: Test Summary
     runs-on: ubuntu-latest

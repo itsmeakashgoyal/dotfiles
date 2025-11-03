@@ -1,3 +1,7 @@
+# Ruby gems
+# Install these by setting: INSTALL_RUBY=1 before running install.sh
+# Requires rbenv (installed via Brewfile on macOS)
+
 bundle
 jekyll
 neovim
