@@ -214,7 +214,6 @@ jobs:
           name: macos-logs
           path: |
             /tmp/setup_log.txt
-            ~/Library/Logs/
           retention-days: 7
 
   # Job 3: Test on Ubuntu
@@ -364,7 +363,6 @@ jobs:
           name: ubuntu-logs
           path: |
             /tmp/setup_log.txt
-            ~/.cache/
           retention-days: 7
 
   # Job 4: Test optional packages (Node/Python)

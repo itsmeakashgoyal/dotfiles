@@ -123,22 +123,46 @@ install_node_packages() {
     if command_exists corepack; then
         info "Enabling corepack..."
         corepack enable
+        
+        # Setup pnpm if not already configured
+        if command_exists pnpm; then
+            info "Setting up pnpm..."
+            pnpm setup 2>/dev/null || true
+            
+            # Add pnpm to PATH for current session
+            export PNPM_HOME="${HOME}/.local/share/pnpm"
+            export PATH="${PNPM_HOME}:${PATH}"
+        fi
     fi
 
     # Install pnpm packages if file exists
     if [[ -f "$PNPM_PACKAGES" ]]; then
-        info "Installing pnpm packages..."
-        while IFS= read -r package; do
-            [[ -z "$package" || "$package" =~ ^# ]] && continue
-            
-            # Check if already installed globally
-            if pnpm list -g 2>/dev/null | grep -q "$package"; then
-                substep_info "✓ $package already installed (skipping)"
-            else
-                pnpm add -g "$package" || warning "Failed to install: $package"
+        # Verify pnpm is available and configured
+        if ! command_exists pnpm; then
+            warning "pnpm not found. Packages will be installed via npm instead."
+            # Fall back to npm for these packages
+            if [[ -f "$NODE_PACKAGES" ]]; then
+                while IFS= read -r package; do
+                    [[ -z "$package" || "$package" =~ ^# ]] && continue
+                    if ! npm list -g "$package" &>/dev/null; then
+                        npm install -g "$package" || warning "Failed to install: $package"
+                    fi
+                done < "$PNPM_PACKAGES"
             fi
-        done < "$PNPM_PACKAGES"
-        success "pnpm packages checked/installed"
+        else
+            info "Installing pnpm packages..."
+            while IFS= read -r package; do
+                [[ -z "$package" || "$package" =~ ^# ]] && continue
+                
+                # Check if already installed globally
+                if pnpm list -g 2>/dev/null | grep -q "$package"; then
+                    substep_info "✓ $package already installed (skipping)"
+                else
+                    pnpm add -g "$package" 2>/dev/null || warning "Failed to install: $package"
+                fi
+            done < "$PNPM_PACKAGES"
+            success "pnpm packages checked/installed"
+        fi
     fi
 
     # Install npm packages if file exists
