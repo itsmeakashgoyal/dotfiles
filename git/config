@@ -21,224 +21,128 @@
 [init]
 	defaultBranch = main
 
+[user]
+	name = Akash Goyal
+	email = ag.akgoyal@gmail.com
+
+# ============================================================================
+# Aliases
+# ============================================================================
 [alias]
-	# list all aliases
-    la = "!git config -l | grep alias | cut -c 7-"
-
-	# View abbreviated SHA, description, and history graph of the latest 20 commits.
-	l = log --pretty=oneline -n 20 --graph --abbrev-commit
-
-	# View the current working tree status using the short format.
+	# Basic shortcuts
 	s = status
-
-	# Show the diff between the latest commit and the current state.
-	d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
-
-	# `git di $number` shows the diff between the state `$number` revisions ago and the current state.
-	di = !"d() { git diff --patch-with-stat HEAD~$1; }; git diff-index --quiet HEAD -- || clear; d"
-
-	# Pull in remote changes for the current repository and all its submodules.
-	ps = pull --recurse-submodules
-
-	# init git submodules
-	is = submodule update --init --recursive
-
-	# update git submodules from remote
-	us = submodule update --recursive --remote
-
-	# Clone a repository including all submodules.
 	c = clone --recursive
-
-	# Commit all changes.
-	ca = !git add ':(exclude,attr:builtin_objectmode=160000)' && git commit -av
-
-	# Switch to a branch, creating it if necessary.
-	go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
-
-	# rebase the current branch with changes from upstream remote
-    update = !git fetch upstream && git rebase upstream/`git rev-parse --abbrev-ref HEAD`
-
-	dg = "!sh -c 'git ls-files -m | grep $1 | xargs git diff' -"
-
-	# Show verbose output about tags, branches or remotes
-	tags = tag -l
-	branches = branch --all
-	remotes = remote --verbose
-
-	# Amend the currently staged files to the latest commit.
+	ca = !git add -A && git commit -av
 	amend = commit --amend --reuse-message=HEAD
-
-	# Credit an author on the latest commit.
-	credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
-
-	# Interactive rebase with the given number of latest commits.
-	reb = "!r() { git rebase -i HEAD~$1; }; r"
-
-	# Remove the old tag with this name and tag the latest commit with it.
-	retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
-
-	# Find branches containing commit
-	fb = "!f() { git branch -a --contains $1; }; f"
-
-	# Find tags containing commit
-	ft = "!f() { git describe --always --contains $1; }; f"
-
-	# Find commits by source code
-	fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
-
-	# Find commits by commit message
-	fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
-
-	# Remove branches that have already been merged with main.
-	# a.k.a. ‘delete merged’
+	
+	# Branch management
+	go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+	branches = branch --all
 	dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
-
-	# List contributors with number of commits.
+	
+	# Logs and diffs
+	l = log --pretty=oneline -n 20 --graph --abbrev-commit
+	d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
+	
+	# Submodules
+	ps = pull --recurse-submodules
+	sm-init = submodule update --init --recursive
+	sm-update = submodule update --recursive --remote
+	
+	# Search
+	fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+	fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+	
+	# Utilities
+	whoami = config user.email
 	contributors = shortlog --summary --numbered
 
-	# Show the user email for the current repository.
-	whoami = config user.email
-
-[user]
-    name = Akash Goyal
-    email = ag.akgoyal@gmail.com
+# ============================================================================
+# Core Settings
+# ============================================================================
+[core]
+	editor = nvim
+	attributesFile = ~/dotfiles/git/gitattributes
+	pager = delta
+	whitespace = space-before-tab,-indent-with-non-tab,trailing-space
+	trustctime = false
+	precomposeunicode = false
+	untrackedCache = true
 
 [apply]
-	# Detect whitespace errors when applying a patch.
 	whitespace = fix
 
 [branch]
-	# Show most recently changed branches first.
 	sort = -committerdate
 
 [color]
-	diff = auto
-    status = auto
-    branch = auto
-    interactive = auto
-    ui = auto
+	ui = auto
 
-[color "branch"]
-	current = green bold
-    local = green
-    remote = red bold
-
-[color "diff"]
-	meta = yellow bold
-	frag = magenta bold # line info
-	old = red # deletions
-	new = green # additions
-
-[color "status"]
-	added = yellow
-	changed = green
-	untracked = red
-
-[color "sh"]
-    branch = yellow
-
-[core]
-	attributesFile = ~/dotfiles/git/gitattributes
-
-	pager = delta --line-numbers --dark
-
-	# Treat spaces before tabs and all kinds of trailing whitespace as an error.
-	# [default] trailing-space: looks for spaces at the end of a line
-	# [default] space-before-tab: looks for spaces before tabs at the beginning of a line
-	whitespace = space-before-tab,-indent-with-non-tab,trailing-space
-
-	# Make `git rebase` safer on macOS.
-	# More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
-	trustctime = false
-
-	# Prevent showing files whose names contain non-ASCII symbols as unversioned.
-	# http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
-	precomposeunicode = false
-
-	# Speed up commands involving untracked files such as `git status`.
-	# https://git-scm.com/docs/git-update-index#_untracked_cache
-	untrackedCache = true
-
-    # default editor for git
-    editor = nvim
-
+# ============================================================================
+# Delta (diff viewer)
+# ============================================================================
 [delta]
-    features = unobtrusive-line-numbers decorations
-    whitespace-error-style = 22 reverse
-    syntax-theme = base16-256
+	navigate = true
 	side-by-side = true
-	navigate = true  # use n and N to move between diff sections
-    dark = true      # or light = true, or omit for auto-detection
-
-[delta "unobtrusive-line-numbers"]
-    line-numbers = true
-    # line-numbers-minus-style = "#444444"
-    # line-numbers-zero-style = "#444444"
-    # line-numbers-plus-style = "#444444"
-    line-numbers-left-format = "{nm:>4}┊"
-    line-numbers-right-format = "{np:>4}│"
-    line-numbers-left-style = blue
-    line-numbers-right-style = blue
-
-[delta "decorations"]
-    commit-decoration-style = bold yellow box ul
-    file-style = bold yellow ul
-    file-decoration-style = none
-    hunk-header-decoration-style = yellow box
+	line-numbers = true
+	syntax-theme = base16-256
 
 [interactive]
-    diffFilter = delta --color-only
+	diffFilter = delta --color-only
 
-[rerere]
-    enabled = true
+# ============================================================================
+# Diff & Merge
+# ============================================================================
+[diff]
+	renames = copies
+	mnemonicprefix = true
 
-[grep]
-    extendRegexp = true
-    lineNumber = true
-
-[help]
-	# Automatically correct and execute mistyped commands.
-	autocorrect = 1
+[difftool]
+	prompt = false
 
 [merge]
-	# Include summaries of merged commits in newly created merge commit messages
 	log = true
-    tool = vimdiff3
-
-[mergetool "vimdiff3"]
-    cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
+	tool = vimdiff3
 
 [mergetool]
-    prompt = false
+	prompt = false
 
+[mergetool "vimdiff3"]
+	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
+
+# ============================================================================
+# Push & Pull
+# ============================================================================
 [push]
-	# https://git-scm.com/docs/git-config#git-config-pushdefault
 	default = current
-	# Make `git push` push relevant annotated tags when pushing branches out.
 	followTags = true
 
-[diff]
-    renames = copies
-    mnemonicprefix = true
-    compactionHeuristic = true
-[difftool]
-    prompt = false
+# ============================================================================
+# Utilities
+# ============================================================================
+[rerere]
+	enabled = true
 
-# URL shorthands
+[grep]
+	extendRegexp = true
+	lineNumber = true
+
+[help]
+	autocorrect = 1
+
+# ============================================================================
+# GitHub Integration
+# ============================================================================
 [url "git@github.com:"]
 	insteadOf = "gh:"
 	pushInsteadOf = "github:"
 	pushInsteadOf = "git://github.com/"
+
 [url "git://github.com/"]
 	insteadOf = "github:"
-[url "git@gist.github.com:"]
-	insteadOf = "gst:"
-	pushInsteadOf = "gist:"
-	pushInsteadOf = "git://gist.github.com/"
-[url "git://gist.github.com/"]
-	insteadOf = "gist:"
 
 [credential "https://github.com"]
-        helper = !/usr/bin/gh auth git-credential
+	helper = !/usr/bin/gh auth git-credential
+
 [credential "https://gist.github.com"]
-        helper = !/usr/bin/gh auth git-credential
+	helper = !/usr/bin/gh auth git-credential

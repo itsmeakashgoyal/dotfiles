@@ -164,13 +164,22 @@ jobs:
 
           # Check core packages from Brewfile
           echo "🔍 Checking core packages..."
-          packages=("bat" "eza" "fzf" "ripgrep" "neovim" "git-delta" "lazygit")
+          # Check using actual binary names
+          declare -A packages=(
+            ["bat"]="bat"
+            ["eza"]="eza"
+            ["fzf"]="fzf"
+            ["rg"]="ripgrep"
+            ["nvim"]="neovim"
+            ["delta"]="git-delta"
+            ["lazygit"]="lazygit"
+          )
           failed=0
-          for pkg in "${packages[@]}"; do
-            if command -v "$pkg" &> /dev/null; then
-              echo "  ✅ $pkg"
+          for binary in "${!packages[@]}"; do
+            if command -v "$binary" &> /dev/null; then
+              echo "  ✅ ${packages[$binary]}"
             else
-              echo "  ⚠️  $pkg not found"
+              echo "  ⚠️  ${packages[$binary]} not found"
               ((failed++))
             fi
           done
@@ -317,13 +326,22 @@ jobs:
 
           # Check core packages from Brewfile
           echo "🔍 Checking core packages..."
-          packages=("bat" "eza" "fzf" "ripgrep" "neovim" "git-delta" "lazygit")
+          # Check using actual binary names
+          declare -A packages=(
+            ["bat"]="bat"
+            ["eza"]="eza"
+            ["fzf"]="fzf"
+            ["rg"]="ripgrep"
+            ["nvim"]="neovim"
+            ["delta"]="git-delta"
+            ["lazygit"]="lazygit"
+          )
           failed=0
-          for pkg in "${packages[@]}"; do
-            if command -v "$pkg" &> /dev/null; then
-              echo "  ✅ $pkg"
+          for binary in "${!packages[@]}"; do
+            if command -v "$binary" &> /dev/null; then
+              echo "  ✅ ${packages[$binary]}"
             else
-              echo "  ⚠️  $pkg not found"
+              echo "  ⚠️  ${packages[$binary]} not found"
               ((failed++))
             fi
           done
