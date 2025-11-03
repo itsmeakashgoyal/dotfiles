@@ -25,22 +25,25 @@ set -eo pipefail
 detect_os() {
     # Get system architecture
     local arch=$(uname -m)
-    # Get OS type without version info
-    local os_type=$(echo "$OSTYPE" | cut -d"-" -f1)
+    # Get OS type (remove version numbers)
+    local os_type=$(uname -s)
 
     # Detect OS and architecture combination
     case "${os_type},${arch}" in
-    "linux,arm" | "linux,arm64" | "linux,x86_64")
-        echo "linux"
+    "Linux,arm"* | "Linux,aarch64")
+        echo "Linux (ARM)"
         ;;
-    "darwin,arm64")
-        echo "M1"
+    "Linux,x86_64" | "Linux,amd64")
+        echo "Linux (x86_64)"
         ;;
-    "darwin,x86_64")
-        echo "mac"
+    "Darwin,arm64")
+        echo "macOS (Apple Silicon)"
+        ;;
+    "Darwin,x86_64")
+        echo "macOS (Intel)"
         ;;
     *)
-        echo "Unsupported OS: ${os_type} on ${arch}" >&2
+        echo "Unknown: ${os_type} on ${arch}"
         return 1
         ;;
     esac

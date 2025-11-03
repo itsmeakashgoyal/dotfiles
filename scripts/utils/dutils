@@ -1,0 +1,244 @@
+#!/usr/bin/env bash
+#              █████     ███  ████
+#             ░░███     ░░░  ░░███
+#  █████ ████ ███████   ████  ░███   █████
+# ░░███ ░███ ░░░███░   ░░███  ░███  ███░░
+#  ░███ ░███   ░███     ░███  ░███ ░░█████
+#  ░███ ░███   ░███ ███ ░███  ░███  ░░░░███
+#  ░░████████  ░░█████  █████ █████ ██████
+#   ░░░░░░░░    ░░░░░  ░░░░░ ░░░░░ ░░░░░░
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ scripts/utils/dutils
+# ░▓▓▓▓▓▓▓▓▓▓
+# ░░░░░░░░░░
+#
+#█▓▒░
+# Unified Dotfiles Utility Tool
+# A single entry point for all dotfile utility scripts
+
+set -euo pipefail
+
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+readonly VERSION="1.0.0"
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly HELPER_FILE="${SCRIPT_DIR}/_helper.sh"
+
+# Source helper functions
+if [[ -f "$HELPER_FILE" ]]; then
+    source "$HELPER_FILE"
+else
+    echo "Error: Helper file not found at $HELPER_FILE" >&2
+    exit 1
+fi
+
+# ------------------------------------------------------------------------------
+# Help Functions
+# ------------------------------------------------------------------------------
+show_version() {
+    echo "dutils version $VERSION"
+    echo "Dotfiles utility tools by Akash Goyal"
+}
+
+show_help() {
+    cat <<EOF
+dutils - Dotfiles Utility Tools
+
+Usage: dutils <command> [options]
+
+Commands:
+  cleanup         Clean up dotfiles, Homebrew, Neovim, tmux configurations
+  ssh-keygen      Generate SSH keys with custom names and types
+  detect-os       Detect current operating system and architecture
+  diff            Interactive file diff with fzf and live watching
+  install-nvim    Install latest Neovim (Linux only)
+  list-functions  List all custom zsh functions
+  debug           Run a script with debug tracing (bash -x)
+  help            Show this help message
+  version         Show version information
+
+Examples:
+  dutils cleanup nvim              # Clean Neovim configuration
+  dutils ssh-keygen -e user@email  # Generate SSH key
+  dutils detect-os                 # Detect current OS
+  dutils diff                      # Interactive file diff
+  dutils list-functions            # Show all zsh functions
+  dutils debug script.sh           # Run script with tracing
+
+For command-specific help:
+  dutils <command> --help
+
+EOF
+}
+
+# ------------------------------------------------------------------------------
+# Command: cleanup
+# ------------------------------------------------------------------------------
+cmd_cleanup() {
+    local script="${SCRIPT_DIR}/_cleanup.sh"
+    if [[ ! -f "$script" ]]; then
+        error "Cleanup script not found: $script"
+        return 1
+    fi
+    exec "$script" "$@"
+}
+
+# ------------------------------------------------------------------------------
+# Command: ssh-keygen
+# ------------------------------------------------------------------------------
+cmd_ssh_keygen() {
+    local script="${SCRIPT_DIR}/_setup_ssh.sh"
+    if [[ ! -f "$script" ]]; then
+        error "SSH setup script not found: $script"
+        return 1
+    fi
+    exec "$script" "$@"
+}
+
+# ------------------------------------------------------------------------------
+# Command: detect-os
+# ------------------------------------------------------------------------------
+cmd_detect_os() {
+    local script="${SCRIPT_DIR}/_detect_os.sh"
+    if [[ ! -f "$script" ]]; then
+        error "OS detection script not found: $script"
+        return 1
+    fi
+    
+    # Run the script and capture output
+    local os_type
+    os_type=$("$script")
+    
+    # Display results with formatting
+    local arch=$(uname -m)
+    local kernel=$(uname -s)
+    local kernel_ver=$(uname -r)
+    
+    echo "Operating System Detection"
+    echo "=========================="
+    echo "OS Type:     $os_type"
+    echo "Kernel:      $kernel"
+    echo "Version:     $kernel_ver"
+    echo "Arch:        $arch"
+    
+    # Additional info for Linux
+    if [[ "$kernel" == "Linux" ]] && [[ -f /etc/os-release ]]; then
+        source /etc/os-release
+        echo "Distro:      ${PRETTY_NAME:-Unknown}"
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Command: diff
+# ------------------------------------------------------------------------------
+cmd_diff() {
+    local script="${SCRIPT_DIR}/_diff_files_interactive.sh"
+    if [[ ! -f "$script" ]]; then
+        error "Diff script not found: $script"
+        return 1
+    fi
+    exec "$script" "$@"
+}
+
+# ------------------------------------------------------------------------------
+# Command: install-nvim
+# ------------------------------------------------------------------------------
+cmd_install_nvim() {
+    # Check if Linux
+    if [[ "$(uname -s)" != "Linux" ]]; then
+        error "This command is only available on Linux"
+        info "On macOS, use: brew install neovim"
+        return 1
+    fi
+    
+    local script="${SCRIPT_DIR}/_install_nvim.sh"
+    if [[ ! -f "$script" ]]; then
+        error "Neovim install script not found: $script"
+        return 1
+    fi
+    exec "$script" "$@"
+}
+
+# ------------------------------------------------------------------------------
+# Command: list-functions
+# ------------------------------------------------------------------------------
+cmd_list_functions() {
+    local script="${SCRIPT_DIR}/_print-functions.sh"
+    if [[ ! -f "$script" ]]; then
+        error "Function list script not found: $script"
+        return 1
+    fi
+    exec "$script" "$@"
+}
+
+# ------------------------------------------------------------------------------
+# Command: debug
+# ------------------------------------------------------------------------------
+cmd_debug() {
+    local script="${SCRIPT_DIR}/_run_with_xtrace.sh"
+    if [[ ! -f "$script" ]]; then
+        error "Debug script not found: $script"
+        return 1
+    fi
+    exec "$script" "$@"
+}
+
+# ------------------------------------------------------------------------------
+# Main Function
+# ------------------------------------------------------------------------------
+main() {
+    # Handle no arguments
+    if [[ $# -eq 0 ]]; then
+        show_help
+        exit 0
+    fi
+    
+    # Parse command
+    local command="$1"
+    shift
+    
+    case "$command" in
+        cleanup)
+            cmd_cleanup "$@"
+            ;;
+        ssh-keygen)
+            cmd_ssh_keygen "$@"
+            ;;
+        detect-os)
+            cmd_detect_os "$@"
+            ;;
+        diff)
+            cmd_diff "$@"
+            ;;
+        install-nvim)
+            cmd_install_nvim "$@"
+            ;;
+        list-functions)
+            cmd_list_functions "$@"
+            ;;
+        debug)
+            cmd_debug "$@"
+            ;;
+        -h|--help|help)
+            show_help
+            exit 0
+            ;;
+        -v|--version|version)
+            show_version
+            exit 0
+            ;;
+        *)
+            error "Unknown command: $command"
+            echo ""
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+# Run main function
+main "$@"
+

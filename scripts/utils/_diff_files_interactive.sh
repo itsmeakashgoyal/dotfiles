@@ -32,20 +32,27 @@ readonly PROJECT_DIR="${HOME}/dotfiles"  # Adjust this to your project root
 check_dependencies() {
     local missing_deps=()
     
-    for cmd in fzf diff diff-so-fancy entr; do
+    # Check for required commands
+    for cmd in fzf diff entr; do
         if ! command -v "$cmd" >/dev/null 2>&1; then
             missing_deps+=("$cmd")
         fi
     done
+    
+    # diff-so-fancy is optional, use regular diff if not available
+    local use_fancy_diff=false
+    if command -v diff-so-fancy >/dev/null 2>&1; then
+        use_fancy_diff=true
+    fi
 
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
         echo "Error: Missing required dependencies: ${missing_deps[*]}"
         echo -e "\nInstallation instructions:"
         
-        if [[ "$(uname)" == "Darwin" ]]; then
+        if [[ "$(uname -s)" == "Darwin" ]]; then
             echo "Using Homebrew:"
             echo "  brew install ${missing_deps[*]}"
-        elif [[ "$(uname)" == "Linux" ]]; then
+        elif [[ "$(uname -s)" == "Linux" ]]; then
             if command -v apt-get >/dev/null 2>&1; then
                 echo "Using apt:"
                 echo "  sudo apt-get install ${missing_deps[*]}"
@@ -60,6 +67,9 @@ check_dependencies() {
         
         exit 1
     fi
+    
+    # Return whether to use fancy diff
+    echo "$use_fancy_diff"
 }
 
 # ------------------------------------------------------------------------------
@@ -87,15 +97,11 @@ select_file() {
 perform_diff() {
     local file1="$1"
     local file2="$2"
+    local use_fancy="${3:-false}"
 
     # Construct full paths
     local full_path1="${PROJECT_DIR}/${file1}"
     local full_path2="${PROJECT_DIR}/${file2}"
-
-    # Debug output
-    echo "Checking paths:"
-    echo "File 1: $full_path1"
-    echo "File 2: $full_path2"
 
     # Verify files exist
     if [[ ! -f "$full_path1" || ! -f "$full_path2" ]]; then
@@ -105,20 +111,29 @@ perform_diff() {
         return 1
     fi
 
-    # Perform diff with fancy output
-    echo -e "\nComparing files:"
+    # Clear screen for better visibility
+    clear
+    
+    # Perform diff with or without fancy output
+    echo "Comparing files:"
     echo "1: $full_path1"
     echo "2: $full_path2"
     echo -e "\nDifferences:\n"
-    diff --unified=0 "$full_path1" "$full_path2" | diff-so-fancy
+    
+    if [[ "$use_fancy" == "true" ]]; then
+        diff --unified=3 "$full_path1" "$full_path2" | diff-so-fancy
+    else
+        diff --unified=3 --color=auto "$full_path1" "$full_path2" || true
+    fi
 }
 
 # ------------------------------------------------------------------------------
 # Main Function
 # ------------------------------------------------------------------------------
 main() {
-    # Check dependencies first
-    check_dependencies
+    # Check dependencies and get fancy diff status
+    local use_fancy
+    use_fancy=$(check_dependencies)
 
     # Ensure we're in the project directory
     cd "$PROJECT_DIR" || exit 1
@@ -141,17 +156,21 @@ main() {
         exit 1
     fi
 
-    # Debug output
-    echo "Selected files:"
-    echo "File 1: $file1"
-    echo "File 2: $file2"
+    # Initial diff
+    perform_diff "$file1" "$file2" "$use_fancy"
 
     # Watch files for changes and perform diff
-    echo -e "\nWatching files for changes. Press Ctrl+C to exit.\n"
-    (
-        echo "$full_path1"
-        echo "$full_path2"
-    ) | entr -s "$(declare -f perform_diff); perform_diff '$file1' '$file2'"
+    echo -e "\n\nWatching files for changes. Press Ctrl+C to exit."
+    local full_path1="${PROJECT_DIR}/${file1}"
+    local full_path2="${PROJECT_DIR}/${file2}"
+    
+    # Export function and variables for entr
+    export -f perform_diff
+    export PROJECT_DIR
+    export use_fancy
+    
+    printf "%s\n%s\n" "$full_path1" "$full_path2" | \
+        entr bash -c "perform_diff '$file1' '$file2' '$use_fancy'"
 }
 
 # Run main function

@@ -22,13 +22,14 @@
 set -eu pipefail
 
 # Constants
-readonly FUNCTIONS_FILE="${HOME}/dotfiles/zsh/local/functions.zsh"
+readonly FUNCTIONS_FILE="${HOME}/dotfiles/zsh/local/function.zsh"
 readonly TABLE_FORMAT="%-20s %s\n"
 readonly HEADER_LINE="%-20s %s\n"
 
 # Check if functions file exists
 if [[ ! -f "$FUNCTIONS_FILE" ]]; then
     echo "Error: Function file not found at $FUNCTIONS_FILE" >&2
+    echo "Looking for: $FUNCTIONS_FILE" >&2
     exit 1
 fi
 
