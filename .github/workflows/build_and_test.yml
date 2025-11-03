@@ -216,14 +216,14 @@ jobs:
         shell: zsh {0}
         run: |
           echo "🧪 Testing zsh configuration..."
-          
+
           # Configure Homebrew PATH for macOS
           if [[ -x "/opt/homebrew/bin/brew" ]]; then
             eval "$(/opt/homebrew/bin/brew shellenv)"
           elif [[ -x "/usr/local/bin/brew" ]]; then
             eval "$(/usr/local/bin/brew shellenv)"
           fi
-          
+
           # Source the zsh config
           export ZDOTDIR="$HOME/dotfiles/zsh"
           source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
@@ -381,12 +381,12 @@ jobs:
         shell: zsh {0}
         run: |
           echo "🧪 Testing zsh configuration..."
-          
+
           # Configure Homebrew PATH for Linux
           if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           fi
-          
+
           export ZDOTDIR="$HOME/dotfiles/zsh"
           source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
 
@@ -399,12 +399,12 @@ jobs:
         if: always()
         run: |
           echo "🧪 Testing dutils commands..."
-          
+
           # Configure Homebrew PATH for Linux
           if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           fi
-          
+
           export PATH="$HOME/.local/bin:$PATH"
 
           dutils help || echo "dutils help failed"
