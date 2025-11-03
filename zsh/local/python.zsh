@@ -49,7 +49,6 @@ fi
 function mkvenv() {
     # Set the environment directory name, default to 'PYENV_ROOT' if no name provided
     local env_dir=${1:-$PYENV_ROOT}
-    local requirements_path="$HOME/dotfiles/packages/pipx_packages.txt"
 
     # Check if environment already exists
     if [[ -d "$env_dir" ]]; then
@@ -75,17 +74,6 @@ function mkvenv() {
         echo "Error: Failed to upgrade core packages"
         return 1
     }
-
-    # Install packages from captured-requirements.txt if it exists
-    if [[ -f "$requirements_path" ]]; then
-        echo "Installing packages from $requirements_path..."
-        pip install -r "$requirements_path" || {
-            echo "Error: Failed to install packages from $requirements_path"
-            return 1
-        }
-    else
-        echo "Warning: $requirements_path not found. No packages installed."
-    fi
 
     echo "Virtual environment created and activated successfully"
     echo "Location: $(pwd)/$env_dir"

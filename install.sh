@@ -157,15 +157,8 @@ You're running ${OS_TYPE}.
         fi
     fi
 
-    # Install all packages (Homebrew + language-specific packages)
-    info "Installing packages from Homebrew and language package managers..."
-    
-    # Install everything automatically as part of dotfiles setup
-    export INSTALL_NODE=1
-    export INSTALL_PYTHON=1
-    export INSTALL_RUBY=1
-    export INSTALL_RUST=1
-    
+    # Install all packages from Homebrew
+    info "Installing packages from Homebrew..."
     bash ${DOTFILES_DIR}/packages/install.sh
 
     # Check if zsh is installed and set it as the default shell if desired
