@@ -40,7 +40,6 @@ tap "kyoh86/tap"                                    # for "sd" - RegEx find and 
 tap "teamookla/speedtest"                           # Command line speed test utility
 
 if OS.mac?
-    tap "homebrew/command-not-found"
     tap "FelixKratz/formulae"                       # JankyBorders/Sketchybar - MacOS utilities
     tap "buo/cask-upgrade"                          # Upgrade casks
 end

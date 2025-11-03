@@ -51,23 +51,31 @@ autoload -U select-word-style
 select-word-style bash # only alphanumeric chars are considered WORDCHARS
 
 # add zsh plugins using zinit
+# zinit lucid light-mode for \
+#     zsh-users/zsh-syntax-highlighting \
+#     zsh-users/zsh-completions \
+#     zsh-users/zsh-autosuggestions \
+#     Aloxaf/fzf-tab
+
 zinit lucid light-mode for \
-    zsh-users/zsh-syntax-highlighting \
-    zsh-users/zsh-completions \
+    zsh-users/zsh-completions    "blockf" \
     zsh-users/zsh-autosuggestions \
     Aloxaf/fzf-tab
+
+zinit light zsh-users/zsh-syntax-highlighting
 
 # Load OMZ plugins (turbo mode)
 zinit wait lucid for \
     OMZP::git \
-    OMZP::sudo \
-    OMZP::command-not-found
+    OMZP::sudo
 
 # For speed:
 # https://github.com/zsh-users/zsh-autosuggestions#disabling-automatic-widget-re-binding
 ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion history)
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#d33682"
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
+ZSH_AUTOSUGGEST_USE_ASYNC=1
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 
 # Source local configurations (lazy loading)
 function load_local_configs() {
@@ -78,10 +86,10 @@ function load_local_configs() {
         [[ -f "$config" ]] && source "$config"
     done
 }
-load_local_configs
+zinit wait lucid atload"load_local_configs" for zdharma-continuum/null
 
-autoload -Uz compinit
-compinit
+# autoload -Uz compinit
+# compinit
 
 if command -v oh-my-posh &>/dev/null; then
     eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"

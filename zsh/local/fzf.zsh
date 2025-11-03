@@ -23,8 +23,14 @@
 FZF_BASE_PATH="$(brew --prefix fzf)" # This will automatically get the current version
 FZF_SHELL_PATH="$FZF_BASE_PATH/shell"
 FZF_BIN_PATH="$FZF_BASE_PATH/bin"
-source <(fzf --zsh)
-eval "$(zoxide init --cmd cd zsh)"
+eval "$(zoxide init zsh --cmd cd)"
+
+_clipcopy() {
+    if command -v pbcopy >/dev/null 2>&1; then cat | pbcopy
+    elif command -v xclip >/dev/null 2>&1; then cat | xclip -selection clipboard
+    elif command -v xsel >/dev/null 2>&1; then cat | xsel --clipboard --input
+    else cat >/dev/null; fi
+}
 
 # ------------------------------------------------------------------------------
 # Color Scheme (Gruvbox Material)
@@ -74,7 +80,7 @@ export FZF_DEFAULT_OPTS="
     --scroll-off=4
     --info=right
     --bind='ctrl-/:toggle-preview'
-    --bind='ctrl-y:execute-silent(echo {} | pbcopy)'
+    --bind='ctrl-y:execute-silent(echo {} | _clipcopy)'
     --bind='ctrl-space:toggle+down'
 "
 
@@ -115,7 +121,7 @@ fzf-kill() {
 }
 
 # Load auto-completion and key bindings
-[[ $- == *i* ]] && source "${FZF_SHELL_PATH}/shell/completion.zsh" 2>/dev/null
+[[ $- == *i* ]] && source "${FZF_SHELL_PATH}/completion.zsh" 2>/dev/null
 source "${FZF_SHELL_PATH}/key-bindings.zsh"
 
 # Use fd to respect .gitignore, include hidden files and exclude `.git` folders

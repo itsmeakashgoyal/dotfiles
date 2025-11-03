@@ -56,14 +56,11 @@ setopt auto_resume
 setopt pushd_ignore_dups
 setopt pushd_silent
 setopt clobber
-setopt correct
-setopt correct_all
 setopt extended_glob
 setopt glob_dots
 setopt ignore_eof
 setopt interactive_comments
 setopt magic_equal_subst
-setopt menu_complete
 setopt nonomatch
 setopt notify
 setopt numeric_glob_sort
