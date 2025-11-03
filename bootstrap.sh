@@ -18,67 +18,143 @@
 # ░░░░░░░░░░
 #
 #█▓▒░
-# ------------------------------
-#          INITIALIZE
-# ------------------------------
-# Load Helper functions persistently
-SCRIPT_DIR="${HOME}/dotfiles/scripts"
-HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
-# Check if helper file exists and source it
-if [[ ! -f "$HELPER_FILE" ]]; then
-    echo "Error: Helper file not found at $HELPER_FILE" >&2
-    exit 1
-fi
+# Bootstrap script to download and install dotfiles from GitHub
 
-# Source the helper file
-source "$HELPER_FILE"
-
-# Enable strict mode for better error handling
 set -euo pipefail
 
-# Define the source and target locations
-SOURCE="https://github.com/itsmeakashgoyal/dotfiles"
-TARBALL="$SOURCE/tarball/master"
-TARGET="$HOME/dotfiles"
-TAR_CMD="tar -xzv -C \"$TARGET\" --strip-components=1 --exclude='{.gitignore}'"
+# ------------------------------------------------------------------------------
+# Configuration
+# ------------------------------------------------------------------------------
+readonly SOURCE="https://github.com/itsmeakashgoyal/dotfiles"
+readonly TARGET="$HOME/dotfiles"
 
-# Function to check if a command is executable
-is_executable() {
-    type "$1" >/dev/null 2>&1
+# Color codes for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# ------------------------------------------------------------------------------
+# Helper Functions
+# ------------------------------------------------------------------------------
+info() {
+    echo -e "${BLUE}INFO:${NC} $*"
 }
 
-# check for git, curl, or wget
-# Determine the download commands based on available tools
-if is_executable "git"; then
-    CMD="git clone $SOURCE $TARGET"
-elif is_executable "curl"; then
-    CMD="curl -#L $TARBALL | $TAR_CMD"
-elif is_executable "wget"; then
-    CMD="wget --no-check-certificate -O - $TARBALL | $TAR_CMD"
-fi
+success() {
+    echo -e "${GREEN}SUCCESS:${NC} $*"
+}
 
-# Execute the download command or abort if no tools are available
-if [ -z "$CMD" ]; then
-    error "No git, curl, or wget available. Aborting."
-else
-    info "Installing dotfiles..."
+error() {
+    echo -e "${RED}ERROR:${NC} $*" >&2
+}
+
+warning() {
+    echo -e "${YELLOW}WARNING:${NC} $*"
+}
+
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# ------------------------------------------------------------------------------
+# Download Functions
+# ------------------------------------------------------------------------------
+download_with_git() {
+    info "Downloading dotfiles with git..."
+    git clone "$SOURCE" "$TARGET"
+}
+
+download_with_curl() {
+    info "Downloading dotfiles with curl..."
     mkdir -p "$TARGET"
-    eval "$CMD"
+    curl -fsSL "$SOURCE/tarball/master" | tar -xz -C "$TARGET" --strip-components=1
+}
 
-    # Check if install.sh exists
-    if [ -f "$TARGET/install.sh" ]; then
-        # Prompt the user for confirmation before proceeding
-        read -p "Do you want to continue with the installation? [y/N] " -n 1 -r
-        echo # Move to a new line
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            info "Running install script..."
-            bash "$TARGET/install.sh"
-        else
-            warning "Installation aborted by user."
-            exit 1
-        fi
+download_with_wget() {
+    info "Downloading dotfiles with wget..."
+    mkdir -p "$TARGET"
+    wget -qO- "$SOURCE/tarball/master" | tar -xz -C "$TARGET" --strip-components=1
+}
+
+download_dotfiles() {
+    if command_exists git; then
+        download_with_git
+    elif command_exists curl; then
+        download_with_curl
+    elif command_exists wget; then
+        download_with_wget
     else
-        error "Error: install.sh not found in the dotfiles repository."
+        error "No download tool available (git, curl, or wget)"
+        error "Please install one of these tools and try again."
+        return 1
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Main Function
+# ------------------------------------------------------------------------------
+main() {
+    echo ""
+    info "Dotfiles Bootstrap Script"
+    echo ""
+
+    # Check if dotfiles already exist
+    if [[ -d "$TARGET" ]]; then
+        warning "Dotfiles directory already exists at: $TARGET"
+        read -p "Do you want to remove it and re-download? [y/N] " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            info "Removing existing dotfiles..."
+            rm -rf "$TARGET"
+        else
+            info "Keeping existing dotfiles. Skipping download."
+            if [[ ! -f "$TARGET/install.sh" ]]; then
+                error "install.sh not found in existing dotfiles directory"
+                exit 1
+            fi
+            # Skip to installation
+            read -p "Do you want to run the installation? [y/N] " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                info "Running install script..."
+                bash "$TARGET/install.sh"
+                exit 0
+            else
+                info "Installation skipped."
+                exit 0
+            fi
+        fi
+    fi
+
+    # Download dotfiles
+    if ! download_dotfiles; then
+        error "Failed to download dotfiles"
         exit 1
     fi
-fi
+
+    success "Dotfiles downloaded successfully!"
+
+    # Verify install script exists
+    if [[ ! -f "$TARGET/install.sh" ]]; then
+        error "install.sh not found in the dotfiles repository"
+        exit 1
+    fi
+
+    # Prompt for installation
+    echo ""
+    read -p "Do you want to continue with the installation? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        info "Running install script..."
+        bash "$TARGET/install.sh"
+        success "Bootstrap complete!"
+    else
+        warning "Installation skipped."
+        info "You can run the installation later with: bash $TARGET/install.sh"
+    fi
+}
+
+# Run main function
+main

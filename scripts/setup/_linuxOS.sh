@@ -72,16 +72,15 @@ update_and_install() {
     fi
 
     # Core development and utility packages
+    # Only including essential, universally available packages
     local packages=(
         # Build tools
         build-essential
-        libkrb5-dev
         
         # Essential utilities
-        procps
-        file
         curl
         wget
+        unzip
         
         # Development tools
         vim
@@ -90,28 +89,38 @@ update_and_install() {
         stow
         
         # Python development
-        python3-setuptools
-        python3-venv
         python3-pip
+        python3-venv
         
         # Shell tools
         shellcheck
-        entr
         fd-find
         
-        # System tools
-        mlocate
-        strace
-        lsb-release
-        
         # Miscellaneous
-        libgraph-easy-perl
         fontconfig
+    )
+    
+    # Optional packages (install if available, don't fail if not)
+    local optional_packages=(
         figlet
         lolcat
+        entr
+        strace
     )
 
+    # Install essential packages
     sudo apt-get -y install "${packages[@]}"
+    success "Essential packages installed"
+    
+    # Install optional packages (ignore failures)
+    for pkg in "${optional_packages[@]}"; do
+        if sudo apt-get -y install "$pkg" 2>/dev/null; then
+            info "✓ Installed optional package: $pkg"
+        else
+            warning "⊘ Skipped unavailable package: $pkg"
+        fi
+    done
+    
     success "Package installation complete"
     log_message "Completed system update and package installation"
 }
