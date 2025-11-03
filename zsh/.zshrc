@@ -15,9 +15,8 @@
 #
 #█▓▒░
 
-# Load profiling tool
+# Load profiling tool (uncomment to profile startup time)
 # zmodload zsh/zprof
-# zmodload zsh/mapfile # Bring mapfile functionality similar to bash
 
 # Create a hash table for globally stashing variables without polluting main
 # scope with a bunch of identifiers.
@@ -43,25 +42,18 @@ fi
 # Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Disable unnecessary security checks
-# ZSH_DISABLE_COMPFIX=true
-
 # NOTE: must come before zsh-syntax-highlighting.
 autoload -U select-word-style
 select-word-style bash # only alphanumeric chars are considered WORDCHARS
 
-# add zsh plugins using zinit
-# zinit lucid light-mode for \
-#     zsh-users/zsh-syntax-highlighting \
-#     zsh-users/zsh-completions \
-#     zsh-users/zsh-autosuggestions \
-#     Aloxaf/fzf-tab
-
+# Add zsh plugins using zinit
 zinit lucid light-mode for \
-    zsh-users/zsh-completions    "blockf" \
+    blockf \
+    zsh-users/zsh-completions \
     zsh-users/zsh-autosuggestions \
     Aloxaf/fzf-tab
 
+# Load syntax highlighting last (must be loaded after other plugins)
 zinit light zsh-users/zsh-syntax-highlighting
 
 # Load OMZ plugins (turbo mode)
@@ -77,19 +69,12 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 
-# Source local configurations (lazy loading)
-function load_local_configs() {
-    local config_dir="$ZDOTDIR/local"
-    [[ -d "$config_dir" ]] || return
-
-    for config in "$config_dir"/*.zsh; do
+# Source local configurations
+if [[ -d "$ZDOTDIR/local" ]]; then
+    for config in "$ZDOTDIR/local"/*.zsh; do
         [[ -f "$config" ]] && source "$config"
     done
-}
-zinit wait lucid atload"load_local_configs" for zdharma-continuum/null
-
-# autoload -Uz compinit
-# compinit
+fi
 
 if command -v oh-my-posh &>/dev/null; then
     eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"

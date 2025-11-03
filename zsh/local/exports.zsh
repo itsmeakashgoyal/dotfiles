@@ -94,10 +94,10 @@ fi
 # ------------------------------------------------------------------------------
 # Zsh Completion Configuration
 # ------------------------------------------------------------------------------
-# Set up completion system
-loc=${ZDOTDIR:-"${HOME}/dotfiles/zsh"}
-# typeset -U fpath
-fpath=($loc/completion $fpath)
+# Add custom completions directory to fpath if it exists
+if [[ -d "$ZDOTDIR/completion" ]]; then
+    fpath=("$ZDOTDIR/completion" $fpath)
+fi
 
 # ------------------------------------------------------------------------------
 # Environment Detection and Base Configuration
@@ -160,4 +160,12 @@ path=(
 # ------------------------------------------------------------------------------
 export HOMEBREW_PREFIX HOMEBREW_CELLAR HOMEBREW_REPOSITORY
 export PATH
-export MAKEFLAGS="-j$(nproc)" # Use all CPU cores for compilation
+
+# Set parallel make flags based on OS
+if command -v nproc >/dev/null 2>&1; then
+    # Linux
+    export MAKEFLAGS="-j$(nproc)"
+elif command -v sysctl >/dev/null 2>&1; then
+    # macOS
+    export MAKEFLAGS="-j$(sysctl -n hw.ncpu)"
+fi

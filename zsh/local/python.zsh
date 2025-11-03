@@ -31,17 +31,15 @@ export PYTHONUNBUFFERED=1        # Prevent Python from buffering stdout/stderr
 # ------------------------------------------------------------------------------
 # pyenv Configuration
 # ------------------------------------------------------------------------------
-
-# pyenv configuration
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-
-# Initialize pyenv if it's installed
-if command -v pyenv 1>/dev/null 2>&1; then
-    eval "$(pyenv init --path)"
-    eval "$(pyenv init -)"
-else
-    echo "pyenv is not installed. Please install pyenv to manage Python versions."
+# Initialize pyenv if it's installed (lazy loading for better performance)
+if [[ -d "$HOME/.pyenv" ]]; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    
+    if command -v pyenv >/dev/null 2>&1; then
+        eval "$(pyenv init --path)"
+        eval "$(pyenv init -)"
+    fi
 fi
 
 # ------------------------------------------------------------------------------

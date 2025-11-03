@@ -42,17 +42,25 @@ alias glogn="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Crese
 # ------------------------------------------------------------------------------
 # Fuzzy checkout local branch
 gco() {
-    if [ -n "$1" ]; then
+    if [[ -n "$1" ]]; then
         git checkout "$1"
         return
+    fi
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fzf is required for interactive selection"
+        return 1
     fi
     git branch -vv | fzf | awk '{print $1}' | xargs git checkout
 }
 
 # Fuzzy checkout remote branch
 gcr() {
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fzf is required for interactive selection"
+        return 1
+    fi
     git fetch
-    if [ -n "$1" ]; then
+    if [[ -n "$1" ]]; then
         git checkout "$1"
         return
     fi
@@ -61,6 +69,10 @@ gcr() {
 
 # Fuzzy checkout from branch history
 gch() {
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fzf is required for interactive selection"
+        return 1
+    fi
     local branches selection branch
     branches=$(git reflog show --pretty=format:'%gs ~ %gd' --date=relative |
         grep 'checkout' |
@@ -70,35 +82,51 @@ gch() {
         awk -F' ~ HEAD@{' '{printf("%s: %s\n", substr($2, 1, length($2)-1), $1)}')
     selection=$(echo "$branches" | fzf +m)
     branch=$(echo "$selection" | awk '{print $NF}')
-    [ -n "$branch" ] && git checkout "$branch"
+    [[ -n "$branch" ]] && git checkout "$branch"
 }
 
 # Fuzzy checkout PR
 gpr() {
-    if [ -n "$1" ]; then
+    if ! command -v gh >/dev/null 2>&1; then
+        echo "Error: gh (GitHub CLI) is required"
+        return 1
+    fi
+    if [[ -n "$1" ]]; then
         gh pr checkout "$1"
         return
+    fi
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fzf is required for interactive selection"
+        return 1
     fi
     gh pr list | fzf | awk '{print $1}' | xargs gh pr checkout
 }
 
 # Fuzzy checkout tag
 gct() {
-    if [ -n "$1" ]; then
+    if [[ -n "$1" ]]; then
         git checkout "$1"
         return
+    fi
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fzf is required for interactive selection"
+        return 1
     fi
     git tag | fzf | xargs git checkout
 }
 
 # Fuzzy delete branch with confirmation
 gbd() {
-    if [ -n "$1" ]; then
+    if [[ -n "$1" ]]; then
         git branch -d "$1"
         return
     fi
+    if ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fzf is required for interactive selection"
+        return 1
+    fi
     local selected=$(git branch -vv | fzf | awk '{print $1}')
-    if [ -n "$selected" ]; then
+    if [[ -n "$selected" ]]; then
         echo "Delete branch [\e[0;31m$selected\e[0m]? (Type 'delete' to confirm)"
         read -r confirmation
         [[ "$confirmation" == "delete" ]] && git branch -D "$selected"

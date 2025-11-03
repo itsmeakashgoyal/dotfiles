@@ -19,11 +19,29 @@
 # FZF Configuration
 # https://github.com/junegunn/fzf
 # ------------------------------------------------------------------------------
-# Set up fzf key bindings and fuzzy completion
-FZF_BASE_PATH="$(brew --prefix fzf)" # This will automatically get the current version
+# Check if fzf is installed
+if ! command -v fzf >/dev/null 2>&1; then
+    return 0
+fi
+
+# Set up fzf paths (cache brew prefix for performance)
+if ! [[ -v FZF_BASE_PATH ]]; then
+    if command -v brew >/dev/null 2>&1; then
+        FZF_BASE_PATH="$(brew --prefix fzf)"
+    else
+        # Fallback to common locations
+        [[ -d "/usr/share/fzf" ]] && FZF_BASE_PATH="/usr/share/fzf"
+        [[ -d "$HOME/.fzf" ]] && FZF_BASE_PATH="$HOME/.fzf"
+    fi
+fi
+
 FZF_SHELL_PATH="$FZF_BASE_PATH/shell"
 FZF_BIN_PATH="$FZF_BASE_PATH/bin"
-eval "$(zoxide init zsh --cmd cd)"
+
+# Initialize zoxide if available
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh --cmd cd)"
+fi
 
 _clipcopy() {
     if command -v pbcopy >/dev/null 2>&1; then cat | pbcopy
@@ -120,9 +138,13 @@ fzf-kill() {
     [ -n "$pid" ] && echo $pid | xargs kill -${1:-9}
 }
 
-# Load auto-completion and key bindings
-[[ $- == *i* ]] && source "${FZF_SHELL_PATH}/completion.zsh" 2>/dev/null
-source "${FZF_SHELL_PATH}/key-bindings.zsh"
+# Load auto-completion and key bindings (if they exist)
+if [[ -f "${FZF_SHELL_PATH}/completion.zsh" ]]; then
+    [[ $- == *i* ]] && source "${FZF_SHELL_PATH}/completion.zsh"
+fi
+if [[ -f "${FZF_SHELL_PATH}/key-bindings.zsh" ]]; then
+    source "${FZF_SHELL_PATH}/key-bindings.zsh"
+fi
 
 # Use fd to respect .gitignore, include hidden files and exclude `.git` folders
 # - The first argument to the function ($1) is the base path to start traversal

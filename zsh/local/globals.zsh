@@ -1,9 +1,12 @@
 #!/usr/bin/env zsh
 
+# ------------------------------------------------------------------------------
+# OS-Specific Configuration
+# ------------------------------------------------------------------------------
 # macOS-specific ulimit tweaks
-if [[ $(uname -s) = Darwin ]]; then
-  ulimit -n 65536 # Increase max number of open files
-  ulimit -u 1064  # Increase max number of user processes
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    ulimit -n 65536 2>/dev/null # Increase max number of open files
+    ulimit -u 1064 2>/dev/null  # Increase max number of user processes
 fi
 
 # ------------------------------------------------------------------------------

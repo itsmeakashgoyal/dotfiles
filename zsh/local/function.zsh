@@ -69,8 +69,10 @@ internet() {
         sleep 1
     done
 
-    [[ $disconnected == true ]] &&
-        osascript -e 'display notification "Connection restored ✅" with title "Internet"'
+    # macOS notification (only if running on macOS)
+    if [[ $disconnected == true ]] && [[ "$(uname -s)" == "Darwin" ]]; then
+        osascript -e 'display notification "Connection restored ✅" with title "Internet"' 2>/dev/null
+    fi
 
     echo '✅ Connected to internet.'
 }
@@ -204,32 +206,49 @@ function tre() {
     tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX
 }
 
+# SSH with password helper (use SSH keys instead for better security!)
+# WARNING: Storing passwords in shell config is insecure
+# This function expects credentials in ~/.ssh/sshpass_config
 function sshp() {
     local machine="$1"
-    local user="ir"          # Replace with your username or make this dynamic
-    local password="welcome" # Replace with your password or set dynamically
-
-    # Debug logs
-    # echo "Debug: Machine -> $machine"
-    # echo "Debug: User -> $user"
-    # echo "Debug: Checking if sshpass is installed..."
+    local config_file="${HOME}/.ssh/sshpass_config"
 
     # Check if sshpass is installed
     if ! command -v sshpass >/dev/null 2>&1; then
-        echo "Error: sshpass is not installed. Install it using 'brew install sshpass'."
+        echo "Error: sshpass is not installed."
+        echo "Install: brew install hudochenkov/sshpass/sshpass  # macOS"
+        echo "        sudo apt-get install sshpass               # Linux"
         return 1
     fi
 
     # Check if machine name is provided
-    if [ -z "$machine" ]; then
+    if [[ -z "$machine" ]]; then
         echo "Error: No machine name provided."
         echo "Usage: sshp <machinename>"
+        echo ""
+        echo "Configure credentials in: $config_file"
+        echo "Format: USER=username"
+        echo "        PASS=password"
         return 1
     fi
 
-    # Run sshpass with SSH
-    echo "Debug: Connecting to $machine..."
-    sshpass -p "$password" ssh "$user@$machine" -o StrictHostKeyChecking=no
+    # Check for config file
+    if [[ ! -f "$config_file" ]]; then
+        echo "Error: Configuration file not found: $config_file"
+        echo "Create it with your credentials (ensure it's chmod 600!)"
+        return 1
+    fi
+
+    # Source credentials from config
+    source "$config_file"
+
+    if [[ -z "$USER" ]] || [[ -z "$PASS" ]]; then
+        echo "Error: USER or PASS not set in $config_file"
+        return 1
+    fi
+
+    # Connect using sshpass
+    sshpass -p "$PASS" ssh "$USER@$machine" -o StrictHostKeyChecking=no
 }
 
 # ------------------------------------------------------------------------------
@@ -272,64 +291,41 @@ tks() {
     [[ -n "$session" ]] && tmux kill-session -t "$session"
 }
 
-# Per-platform settings, will override the above commands
-case $(uname) in
-Darwin)
-    #█▓▒░ disk info
-    function disks() {
-        # echo
-        function _e() {
-            title=$(echo "$1" | sed 's/./& /g')
-            echo "
-    \033[0;31m╓─────\033[0;35m ${title}
-    \033[0;31m╙────────────────────────────────────── ─ ─"
+# Per-platform settings
+case "$(uname -s)" in
+    Darwin)
+        # macOS disk info (uses df instead of lsblk)
+        function disks() {
+            echo "\n\033[0;35m╓───── Disk Usage\033[0;31m ──────────────────────────────────────\033[0m"
+            df -h | awk 'NR==1 || /^\/dev\/disk/'
+            echo "\n\033[0;35m╓───── Mount Points\033[0;31m ────────────────────────────────────\033[0m"
+            mount | grep ^/dev/ | column -t
         }
-        # loops
-        function _l() {
-            X=$(printf '\033[0m')
-            G=$(printf '\033[0;32m')
-            R=$(printf '\033[0;35m')
-            C=$(printf '\033[0;36m')
-            W=$(printf '\033[0;37m')
-            i=0
-            while IFS= read -r line || [[ -n $line ]]; do
-                if [[ $i == 0 ]]; then
-                    echo "${G}${line}${X}"
-                else
-                    if [[ "$line" == *"%"* ]]; then
-                        percent=$(echo "$line" | awk '{ print $5 }' | sed 's!%!!')
-                        color=$W
-                        ((percent >= 75)) && color=$C
-                        ((percent >= 90)) && color=$R
-                        line=$(echo "$line" | sed "s/${percent}%/${color}${percent}%${W}/")
-                    fi
-                    echo "${W}${line}${X}" | sed "s/\([─└├┌┐└┘├┤┬┴┼]\)/${R}\1${W}/g; s! \(/.*\)! ${C}\1${W}!g;"
-                fi
-                i=$((i + 1))
-            done < <(printf '%s' "$1")
+        ;;
+    Linux)
+        # Linux disk info with lsblk
+        function disks() {
+            if command -v lsblk >/dev/null 2>&1; then
+                echo "\n\033[0;35m╓───── Block Devices\033[0;31m ───────────────────────────────────\033[0m"
+                lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE
+            fi
+            echo "\n\033[0;35m╓───── Disk Usage\033[0;31m ────────────────────────────────────────\033[0m"
+            df -h -x tmpfs -x devtmpfs
+            if command -v swapon >/dev/null 2>&1; then
+                echo "\n\033[0;35m╓───── Swap\033[0;31m ─────────────────────────────────────────────\033[0m"
+                swapon --show
+            fi
         }
-        # outputs
-        m=$(lsblk -a | grep -v loop)
-        _e "mount.points"
-        _l "$m"
-        d=$(df -h)
-        _e "disk.usage"
-        _l "$d"
-        s=$(swapon --show)
-        _e "swaps"
-        _l "$s"
-    }
-    ;;
-Linux)
-    # Show system information
-    system_info() {
-        echo "System Information:"
-        echo "------------------"
-        echo "OS: $(lsb_release -ds)"
-        echo "Kernel: $(uname -r)"
-        echo "Memory: $(free -h | awk '/^Mem:/ {print $3 "/" $2}')"
-        echo "Disk Usage: $(df -h / | awk 'NR==2 {print $5 " (" $3 "/" $2 ")"}')"
-        echo "CPU Load: $(uptime | awk -F'load average:' '{print $2}')"
-    }
-    ;;
+
+        # Show system information
+        function system_info() {
+            echo "System Information:"
+            echo "──────────────────"
+            [[ -f /etc/os-release ]] && source /etc/os-release && echo "OS: $PRETTY_NAME"
+            echo "Kernel: $(uname -r)"
+            command -v free >/dev/null && echo "Memory: $(free -h | awk '/^Mem:/ {print $3 "/" $2}')"
+            echo "Disk Usage: $(df -h / | awk 'NR==2 {print $5 " (" $3 "/" $2 ")"}')"
+            echo "CPU Load:$(uptime | awk -F'load average:' '{print $2}')"
+        }
+        ;;
 esac

@@ -66,8 +66,7 @@ alias list-npm-globals="npm list -g --depth=0" # List global npm packages
 # Network Utilities
 # ------------------------------------------------------------------------------
 # Get public IP and location information
-alias myip="curl ipinfo.io/ip"                       # Get public IP address
-alias whereami='npx @rafaelrinaldi/whereami -f json' # Get location info in JSON format
+alias myip="curl -s ipinfo.io/ip" # Get public IP address
 
 # ------------------------------------------------------------------------------
 # System Utilities
@@ -86,57 +85,57 @@ alias tl='tmux list-sessions'          # List sessions
 alias td='tmux detach'                 # Detach from session
 alias tc='clear && tmux clear-history' # Clear tmux history
 
-# Per-platform settings, will override the above commands
-case $(uname) in
-Darwin)
-  # Update macOS and all package managers
-  alias update='sudo softwareupdate -i -a && \  # System updates
-                brew update && \                 # Update Homebrew
-                brew upgrade && \                # Upgrade formulae
-                brew cleanup && \                # Clean up Homebrew
-                npm update -g && \               # Update global npm packages
-                gem update --system && \         # Update RubyGems
-                gem update' # Update gems
+# ------------------------------------------------------------------------------
+# OS-Specific Aliases
+# ------------------------------------------------------------------------------
+case "$(uname -s)" in
+    Darwin)
+        # macOS system update function (more reliable than alias)
+        update_system() {
+            echo "🔄 Updating macOS..."
+            sudo softwareupdate -i -a
+        }
 
-  # Individual update commands
-  alias update_system='sudo softwareupdate -i -a' # Only system updates
-  alias update_brew='brew update && brew upgrade && \
-                    brew upgrade --cask && brew cleanup' # Only Homebrew updates
+        # Homebrew updates
+        update_brew() {
+            echo "🔄 Updating Homebrew..."
+            brew update && brew upgrade && brew upgrade --cask && brew cleanup
+        }
 
-  # Cleanup
-  alias cleanup="find . -type f -name '*.DS_Store' -ls -delete" # Remove .DS_Store files
+        # Combined update command
+        update() {
+            update_system
+            update_brew
+            if command -v npm >/dev/null 2>&1; then
+                echo "🔄 Updating npm packages..."
+                npm update -g
+            fi
+        }
 
-  # caffeinate: Prevent the system from sleeping
-  alias ch='caffeinate -u -t 3600'
-  ;;
-Linux)
-  # Update and upgrade system packages
-  alias apt_update='sudo apt-get update && \
-                    sudo apt-get -y upgrade && \
-                    echo "✅ System updated successfully"'
+        # Cleanup
+        alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
 
-  # Clean up system packages
-  alias apt_clean='sudo apt-get clean && \
-                    sudo apt-get autoclean && \
-                    sudo apt-get autoremove && \
-                    echo "✅ System cleaned successfully"'
+        # Prevent system from sleeping (1 hour)
+        alias caffeinate1h='caffeinate -u -t 3600'
+        ;;
 
-  # Combined update and cleanup
-  alias apt_maintain='apt_update && apt_clean'
+    Linux)
+        # APT package management (Debian/Ubuntu)
+        if command -v apt-get >/dev/null 2>&1; then
+            alias apt_update='sudo apt-get update && sudo apt-get -y upgrade && echo "✅ System updated"'
+            alias apt_clean='sudo apt-get clean && sudo apt-get autoclean && sudo apt-get autoremove && echo "✅ Cleaned"'
+            alias apt_maintain='apt_update && apt_clean'
+            alias apt_search='apt-cache search'
+            alias apt_info='apt-cache show'
+            alias apt_list='dpkg --list'
+        fi
 
-  # update linux homebrew and its packages
-  alias update_brew='brew update && brew upgrade && brew cleanup' # Only Homebrew updates
-
-  # ------------------------------------------------------------------------------
-  # Package Management
-  # ------------------------------------------------------------------------------
-  # Search for package
-  alias apt_search='apt-cache search'
-
-  # Show package info
-  alias apt_info='apt-cache show'
-
-  # List installed packages
-  alias apt_list='dpkg --list'
-  ;;
+        # Homebrew updates (if installed on Linux)
+        if command -v brew >/dev/null 2>&1; then
+            update_brew() {
+                echo "🔄 Updating Homebrew..."
+                brew update && brew upgrade && brew cleanup
+            }
+        fi
+        ;;
 esac
