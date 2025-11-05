@@ -1,5 +1,6 @@
 return {
     "neovim/nvim-lspconfig",
+    version = "v1.0.0", -- Pin to stable version to avoid deprecation warnings
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
         "hrsh7th/cmp-nvim-lsp",

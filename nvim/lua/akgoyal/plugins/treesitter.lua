@@ -17,31 +17,25 @@ return {
 
                 -- ensure these languages parsers are installed
                 ensure_installed = {
-                    "json",
-                    "javascript",
-                    "typescript",
-                    "tsx",
-                    "go",
-                    "yaml",
-                    "html",
-                    "css",
-                    "python",
-                    "http",
-                    "prisma",
-                    "markdown",
+                    "c",           -- C language
+                    "cpp",         -- C++ language
+                    "python",      -- Python language
+                    "make",        -- Makefile
+                    "cmake",       -- CMake
+                    "bash",        -- Shell scripts
+                    "lua",         -- Neovim config
+                    "vim",         -- Vim config
+                    "vimdoc",      -- Vim documentation
+                    "markdown",    -- Documentation
                     "markdown_inline",
-                    "svelte",
-                    "graphql",
-                    "bash",
-                    "lua",
-                    "vim",
-                    "dockerfile",
-                    "gitignore",
-                    "query",
-                    "vimdoc",
-                    "c",
-                    "java",
-                    "rust",
+                    "git_config",  -- Git configuration
+                    "git_rebase",  -- Git rebase
+                    "gitcommit",   -- Git commits
+                    "gitignore",   -- Git ignore
+                    "diff",        -- Diffs
+                    "json",        -- JSON files
+                    "yaml",        -- YAML files
+                    "toml",        -- TOML files (Python configs)
                 },
                 incremental_selection = {
                     enable = true,
