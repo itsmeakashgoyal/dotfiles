@@ -105,6 +105,7 @@ jobs:
 
       - name: Cache Homebrew packages
         uses: actions/cache@v4
+        continue-on-error: true
         with:
           path: |
             ~/Library/Caches/Homebrew
@@ -192,11 +193,6 @@ jobs:
             exit 1
           fi
 
-          # Check if zinit was installed
-          if [[ ! -d "$HOME/.local/share/zinit" ]]; then
-            echo "⚠️  zinit not installed"
-          fi
-
           # Check if symlinks were created
           if [[ -L "$HOME/.zshenv" ]]; then
             echo "✅ .zshenv symlinked"
@@ -211,6 +207,7 @@ jobs:
           fi
 
           echo "✅ Installation verified successfully"
+          echo "ℹ️  Note: Zinit will auto-install on first Zsh launch"
 
       - name: Test zsh configuration
         shell: zsh {0}
@@ -266,15 +263,16 @@ jobs:
           echo "Home: $HOME"
           df -h
 
-      - name: Cache APT packages
+      - name: Cache Homebrew packages
         uses: actions/cache@v4
+        continue-on-error: true
         with:
           path: |
-            /var/cache/apt/archives
-            ~/.cache
-          key: ${{ runner.os }}-apt-${{ hashFiles('**/Brewfile') }}
+            ~/.cache/Homebrew
+            /home/linuxbrew/.linuxbrew/Homebrew
+          key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
           restore-keys: |
-            ${{ runner.os }}-apt-
+            ${{ runner.os }}-homebrew-
 
       - name: Install ZSH
         run: |
@@ -357,11 +355,6 @@ jobs:
             exit 1
           fi
 
-          # Check if zinit was installed
-          if [[ ! -d "$HOME/.local/share/zinit" ]]; then
-            echo "⚠️  zinit not installed"
-          fi
-
           # Check if symlinks were created
           if [[ -L "$HOME/.zshenv" ]]; then
             echo "✅ .zshenv symlinked"
@@ -376,6 +369,7 @@ jobs:
           fi
 
           echo "✅ Installation verified successfully"
+          echo "ℹ️  Note: Zinit will auto-install on first Zsh launch"
 
       - name: Test zsh configuration
         shell: zsh {0}
