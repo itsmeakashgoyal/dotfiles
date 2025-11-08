@@ -1,4 +1,14 @@
-# 𝙄𝙂𝙉𝙊𝙍𝙀 𝙈𝙀! 🙈
+.DS_Store
+**/.DS_Store
+
+# Zsh generated files
+zsh/.zcompdump
+zsh/.zcompdump-*
+zsh/.zsh_history
+
+# Caches (keep repo clean)
+.cache/
+
 # Compiled Python files
 *.pyc
 

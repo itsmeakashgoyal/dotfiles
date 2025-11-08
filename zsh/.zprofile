@@ -38,3 +38,12 @@ case "$(uname -s)" in
         [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         ;;
 esac
+
+# ------------------------------------------------------------------------------
+# First-run environment setup for login shells
+# ------------------------------------------------------------------------------
+# Ensure XDG directories exist (safe here; avoid in .zshenv)
+mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_RUNTIME_DIR" 2>/dev/null
+
+# Sensible default permissions for created files/dirs
+umask 022

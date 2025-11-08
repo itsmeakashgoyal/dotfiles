@@ -26,21 +26,29 @@ alias fd='noglob fd'
 # ------------------------------------------------------------------------------
 # File Listing Aliases (using eza, a modern replacement for ls)
 # ------------------------------------------------------------------------------
-alias l="eza -l --icons --git -a"                         # List all files with git status
-alias lt="eza --tree --level=2 --long --icons --git"      # Tree view, 2 levels deep
-alias ld="eza -lD"                                        # List only directories
-alias lf="eza -lF --color=always | grep -v /"             # List only files
-alias lh="eza -dl .* --group-directories-first"           # List hidden files
-alias ll="eza -al --group-directories-first"              # List all, directories first
-alias ls="eza -lF --color=always --sort=size | grep -v /" # List files by size
+if command -v eza >/dev/null 2>&1; then
+  alias l="eza -l --icons --git -a"                         # List all files with git status
+  alias lt="eza --tree --level=2 --long --icons --git"      # Tree view, 2 levels deep
+  alias ld="eza -lD"                                        # List only directories
+  alias lf="eza -lF --color=always | grep -v /"             # List only files
+  alias lh="eza -dl .* --group-directories-first"           # List hidden files
+  alias ll="eza -al --group-directories-first"              # List all, directories first
+  alias ls="eza -lF --color=always --sort=size | grep -v /" # List files by size
+else
+  alias l="ls -la"
+fi
 
 # ------------------------------------------------------------------------------
 # File Operations and Viewing
 # ------------------------------------------------------------------------------
 # Use bat instead of cat for better syntax highlighting
-alias cat="bat"                                    # Syntax-highlighted cat
-alias catn="bat --style=plain"                     # Plain output (no line numbers)
-alias preview="bat --color=always --style=numbers" # Preview with line numbers
+if command -v bat >/dev/null 2>&1; then
+  alias cat="bat"                                    # Syntax-highlighted cat
+  alias catn="bat --style=plain"                     # Plain output (no line numbers)
+  alias preview="bat --color=always --style=numbers" # Preview with line numbers
+else
+  alias cat="cat"
+fi
 
 # ------------------------------------------------------------------------------
 # System Navigation and Management
@@ -74,7 +82,7 @@ alias myip="curl -s ipinfo.io/ip" # Get public IP address
 # Disk usage with sorting
 alias du='du -sh * | sort -hr' # Human-readable disk usage
 alias df='df -h'               # Human-readable disk free
-alias top='htop'               # Better top command
+command -v htop >/dev/null 2>&1 && alias top='htop' # Better top command
 
 # ------------------------------------------------------------------------------
 # Basic Tmux Aliases

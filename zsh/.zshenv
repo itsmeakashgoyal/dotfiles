@@ -37,8 +37,10 @@ export XDG_STATE_HOME="${HOME}/.local/state"
 export XDG_RUNTIME_DIR="${HOME}/.runtime"
 export XDG_DOTFILES_DIR="${HOME}/dotfiles"
 
-# Make sure directories actually exist (mkdir -p is idempotent)
-mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_RUNTIME_DIR" 2>/dev/null
+# Locale and TTY (safe in all shells)
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+export GPG_TTY="$(tty 2>/dev/null || true)"
 
 # ------------------------------------------------------------------------------
 # Application Paths

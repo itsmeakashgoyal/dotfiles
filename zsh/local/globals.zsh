@@ -32,22 +32,23 @@ export LESS_TERMCAP_us=$'\e[1;4;32m'
 # History Configuration
 # ------------------------------------------------------------------------------
 export HISTFILE="${HOME}/.zsh_history"
-export HISTSIZE=130000
-export SAVEHIST=100000
+export HISTSIZE=200000
+export SAVEHIST=200000
 export HISTDUP=erase
 
 setopt append_history
 setopt inc_append_history
 setopt extended_history
+setopt share_history
+setopt hist_ignore_dups
 setopt hist_ignore_all_dups
 setopt hist_save_no_dups
 setopt hist_expire_dups_first
 setopt hist_reduce_blanks
 setopt hist_verify
 setopt hist_ignore_space
-setopt share_history
-setopt bang_hist
 setopt hist_find_no_dups
+setopt bang_hist
 
 # ------------------------------------------------------------------------------
 # Shell Behavior and Completion
