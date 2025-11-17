@@ -136,12 +136,16 @@ You're running ${OS_TYPE}.
     # check for required commands
     check_required_commands
 
-    # Confirmation prompt
-    warning "This will install & configure dotfiles on your system. It may overwrite existing files."
-    read -p "Are you sure you want to proceed? (y/n) " confirm
-    if [[ "$confirm" != "y" ]]; then
-        error "${RED}Installation aborted."
-        exit 0
+    # Confirmation prompt (skip in CI)
+    if [ -n "$CI" ]; then
+        info "Running in CI mode - skipping confirmation prompt"
+    else
+        warning "This will install & configure dotfiles on your system. It may overwrite existing files."
+        read -p "Are you sure you want to proceed? (y/n) " confirm
+        if [[ "$confirm" != "y" ]]; then
+            error "Installation aborted."
+            exit 0
+        fi
     fi
 
     if [ -z "$CI" ]; then

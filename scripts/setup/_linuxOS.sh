@@ -37,7 +37,7 @@ set -euo pipefail
 # ------------------------------------------------------------------------------
 # Configuration
 # ------------------------------------------------------------------------------
-readonly OS_NAME=$(grep ^NAME /etc/os-release 2>/dev/null | cut -d '"' -f 2)
+readonly OS_NAME=$(grep ^NAME /etc/os-release 2>/dev/null | cut -d '"' -f 2 || echo "Unknown Linux")
 readonly GO_VERSION="1.23.4"  # Update as needed
 
 # ------------------------------------------------------------------------------

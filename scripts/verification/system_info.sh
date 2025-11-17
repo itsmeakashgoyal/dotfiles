@@ -22,7 +22,7 @@ if [[ ! -f "$LOGGER_FILE" ]]; then
 fi
 
 source "$LOGGER_FILE"
-set -euo pipefail
+set -uo pipefail
 
 readonly OS_TYPE=$(uname)
 

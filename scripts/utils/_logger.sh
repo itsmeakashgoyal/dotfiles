@@ -73,7 +73,14 @@ _log() {
     
     # Format message
     local formatted_message
-    if [[ -t 1 ]]; then
+    if [[ -n "${CI:-}" ]]; then
+        # CI mode: clean output without level prefixes for INFO/SUCCESS
+        if [[ "$level" == "INFO" ]] || [[ "$level" == "SUCCESS" ]]; then
+            formatted_message="${message}"
+        else
+            formatted_message="[${level}] ${message}"
+        fi
+    elif [[ -t 1 ]]; then
         # Terminal output with colors
         formatted_message="${color}[${level}]${LOG_NC} ${message}"
     else
