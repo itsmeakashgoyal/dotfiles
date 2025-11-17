@@ -163,6 +163,11 @@ dotfiles/
 │   │   ├── _macOS.sh       # macOS configurations
 │   │   ├── _linuxOS.sh     # Linux configurations
 │   │   └── _sublime.sh     # Sublime Text setup
+│   ├── verification/        # Verification & diagnostic scripts
+│   │   ├── health_check.sh          # Quick health check
+│   │   ├── verify_installation.sh   # Full verification
+│   │   ├── system_info.sh           # System diagnostics
+│   │   └── check_packages.sh        # Package verification
 │   ├── utils/               # Helper utilities
 │   │   ├── dutils          # Dotfiles utility CLI
 │   │   ├── _helper.sh      # Common functions
@@ -274,6 +279,7 @@ Features:
 
 The Makefile provides convenient commands for managing your dotfiles:
 
+#### Installation & Management
 ```bash
 make help              # Show all available commands
 make install          # Run full installation
@@ -284,6 +290,15 @@ make update           # Update all stowed packages
 make list             # List available packages
 make verify           # Verify package directories
 make clean            # Remove backup files
+```
+
+#### Verification & Diagnostics
+```bash
+make health           # Quick health check
+make check            # Full installation verification
+make sysinfo          # Display system information
+make packages         # Check packages against Brewfile
+make diagnose         # Run all diagnostic tools
 ```
 
 ### Utility Script (dutils)
@@ -365,6 +380,92 @@ brew bundle --file=packages/Brewfile
 
 ---
 
+## 🔍 Verification & Diagnostic Tools
+
+After installation, use these scripts to verify and diagnose your setup:
+
+### Quick Health Check
+
+Get a fast overview of your installation status:
+
+```bash
+bash ~/dotfiles/scripts/verification/health_check.sh
+```
+
+This performs quick checks on:
+- Core components (Git, Homebrew, dotfiles directory)
+- Shell configuration (Zsh, Oh My Posh, symlinks)
+- Neovim setup
+- Git configuration
+- Essential CLI tools
+
+### Full Installation Verification
+
+Run comprehensive verification of all components:
+
+```bash
+bash ~/dotfiles/scripts/verification/verify_installation.sh
+```
+
+This checks:
+- Directory structure
+- All symlinks
+- Core tools and their versions
+- Shell configuration
+- Neovim setup and plugins
+- Git configuration
+- Tmux setup
+- Modern CLI tools (bat, eza, ripgrep, fzf, etc.)
+- Development tools
+
+**Exit Codes:**
+- `0` - All checks passed
+- `1` - Critical issues found
+
+### System Information
+
+Display comprehensive system diagnostics:
+
+```bash
+# Show all information
+bash ~/dotfiles/scripts/verification/system_info.sh
+
+# Show specific sections only
+bash ~/dotfiles/scripts/verification/system_info.sh --system
+bash ~/dotfiles/scripts/verification/system_info.sh --dev --tools
+```
+
+**Available Sections:**
+- `--system` - System information (OS, hardware, uptime)
+- `--shell` - Shell configuration and environment
+- `--dev` - Development tools (Git, Python, Node, etc.)
+- `--tools` - Editors and CLI tools
+- `--dotfiles` - Dotfiles configuration status
+- `--network` - Network information
+- `--disk` - Disk usage
+- `--process` - Process information
+- `--env` - Environment variables
+
+### Package Verification
+
+Check installed packages against your Brewfile:
+
+```bash
+# Verify packages
+bash ~/dotfiles/scripts/verification/check_packages.sh
+
+# Export current packages to new Brewfile
+bash ~/dotfiles/scripts/verification/check_packages.sh --export ~/my-brewfile
+```
+
+This shows:
+- Installed vs missing packages
+- Outdated packages
+- Extra packages not in Brewfile
+- Installation coverage percentage
+
+---
+
 ## 🔧 Troubleshooting
 
 ### Homebrew Not Found (Linux)
@@ -419,6 +520,33 @@ which delta
 # If not found
 brew install git-delta
 ```
+
+### Debugging Installation Issues
+
+1. **Run health check first:**
+   ```bash
+   bash ~/dotfiles/scripts/verification/health_check.sh
+   ```
+
+2. **Run full verification:**
+   ```bash
+   bash ~/dotfiles/scripts/verification/verify_installation.sh
+   ```
+
+3. **Check system info:**
+   ```bash
+   bash ~/dotfiles/scripts/verification/system_info.sh
+   ```
+
+4. **Verify packages:**
+   ```bash
+   bash ~/dotfiles/scripts/verification/check_packages.sh
+   ```
+
+5. **Review logs:**
+   ```bash
+   cat /tmp/setup_log.txt
+   ```
 
 ---
 

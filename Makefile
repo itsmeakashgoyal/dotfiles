@@ -174,6 +174,38 @@ clean: ## Remove backup files created by stow
 	@find ~ -maxdepth 1 -name ".*~" -type f -delete 2>/dev/null || true
 	@echo "$(GREEN)✓ Cleanup complete$(CLR)"
 
+##@ Verification & Diagnostics
+
+.PHONY: health
+health: ## Run quick health check
+	@echo "$(YELLOW)Running health check...$(CLR)"
+	@bash scripts/verification/health_check.sh || true
+
+.PHONY: check
+check: ## Run full installation verification
+	@echo "$(YELLOW)Running full installation verification...$(CLR)"
+	@bash scripts/verification/verify_installation.sh || true
+
+.PHONY: sysinfo
+sysinfo: ## Display system information
+	@bash scripts/verification/system_info.sh
+
+.PHONY: packages
+packages: ## Check installed packages against Brewfile
+	@bash scripts/verification/check_packages.sh || true
+
+.PHONY: diagnose
+diagnose: ## Run all diagnostic tools
+	@echo "$(YELLOW)Running complete diagnostic suite...$(CLR)"
+	@echo ""
+	@bash scripts/verification/health_check.sh || true
+	@echo ""
+	@bash scripts/verification/verify_installation.sh || true
+	@echo ""
+	@bash scripts/verification/check_packages.sh || true
+	@echo ""
+	@echo "$(GREEN)✓ All diagnostics complete!$(CLR)"
+
 ##@ Aliases (shortcuts)
 
 up: update      ## Alias for update
