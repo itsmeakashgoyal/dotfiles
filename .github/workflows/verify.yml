@@ -1,0 +1,44 @@
+name: Verify Installation
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  verify-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run installation
+        run: |
+          export CI=true
+          bash install.sh
+
+      - name: Run health check
+        run: bash scripts/verification/health_check.sh
+
+      - name: Run full verification
+        run: bash scripts/verification/verify_installation.sh
+
+  verify-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run installation
+        run: |
+          export CI=true
+          bash install.sh
+
+      - name: Run health check
+        run: bash scripts/verification/health_check.sh
+
+      - name: Run full verification
+        run: bash scripts/verification/verify_installation.sh
+

@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-#   ██                ██
-#  ░░                ░░
-#   ████  ███████   ██████  ██████
-#  ░░███ ░░███░░███ ███░░███ ███░░███
-#   ░███  ░███ ░███░███ ░░ ░███ ░███
-#   ░███  ░███ ░███░███    ░███ ░███
-#   █████ ████ █████░░██████░░██████
-#  ░░░░░ ░░░░ ░░░░░  ░░░░░░  ░░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
@@ -22,31 +14,22 @@
 # Load Helper Functions
 # ------------------------------------------------------------------------------
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
-HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+LOGGER_FILE="${SCRIPT_DIR}/utils/_logger.sh"
 
-if [[ ! -f "$HELPER_FILE" ]]; then
-    echo "Error: Helper file not found at $HELPER_FILE" >&2
+if [[ ! -f "$LOGGER_FILE" ]]; then
+    echo "Error: Logger file not found at $LOGGER_FILE" >&2
     exit 1
 fi
 
-source "$HELPER_FILE"
+source "$LOGGER_FILE"
 set -euo pipefail
 
-# ------------------------------------------------------------------------------
-# Helper Functions
-# ------------------------------------------------------------------------------
-section_header() {
-    local title="$1"
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "  $title"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-}
+readonly OS_TYPE=$(uname)
 
 info_line() {
     local label="$1"
     local value="$2"
-    printf "  %-30s : %s\n" "$label" "$value"
+    log_kvp "$label" "$value"
 }
 
 command_exists() {
@@ -68,7 +51,7 @@ get_version() {
 # System Information
 # ------------------------------------------------------------------------------
 show_system_info() {
-    section_header "SYSTEM INFORMATION"
+    log_section "SYSTEM INFORMATION"
     
     info_line "Hostname" "$(hostname)"
     info_line "User" "$USER"
@@ -128,7 +111,7 @@ show_system_info() {
 # Shell Information
 # ------------------------------------------------------------------------------
 show_shell_info() {
-    section_header "SHELL INFORMATION"
+    log_section "SHELL INFORMATION"
     
     info_line "Current Shell" "$SHELL"
     info_line "Shell Version" "$($SHELL --version | head -n 1)"
@@ -156,7 +139,7 @@ show_shell_info() {
 # Development Tools
 # ------------------------------------------------------------------------------
 show_dev_tools() {
-    section_header "DEVELOPMENT TOOLS"
+    log_section "DEVELOPMENT TOOLS"
     
     # Package managers
     if command_exists brew; then
@@ -216,7 +199,7 @@ show_dev_tools() {
 # Editors and Tools
 # ------------------------------------------------------------------------------
 show_editors_tools() {
-    section_header "EDITORS & CLI TOOLS"
+    log_section "EDITORS & CLI TOOLS"
     
     # Editors
     if command_exists nvim; then
@@ -286,7 +269,7 @@ show_editors_tools() {
 # Dotfiles Information
 # ------------------------------------------------------------------------------
 show_dotfiles_info() {
-    section_header "DOTFILES CONFIGURATION"
+    log_section "DOTFILES CONFIGURATION"
     
     # Dotfiles directory
     if [[ -d "$HOME/dotfiles" ]]; then
@@ -345,7 +328,7 @@ show_dotfiles_info() {
 # Network Information
 # ------------------------------------------------------------------------------
 show_network_info() {
-    section_header "NETWORK INFORMATION"
+    log_section "NETWORK INFORMATION"
     
     # Hostname and IP
     info_line "Hostname" "$(hostname)"
@@ -384,7 +367,7 @@ show_network_info() {
 # Disk Usage
 # ------------------------------------------------------------------------------
 show_disk_usage() {
-    section_header "DISK USAGE"
+    log_section "DISK USAGE"
     
     if [[ "$OS_TYPE" == "Darwin" ]]; then
         df -h / | tail -n 1 | awk '{printf "  %-30s : %s / %s (%s used)\n", "Root Volume", $3, $2, $5}'
@@ -410,7 +393,7 @@ show_disk_usage() {
 # Environment Variables
 # ------------------------------------------------------------------------------
 show_env_vars() {
-    section_header "KEY ENVIRONMENT VARIABLES"
+    log_section "KEY ENVIRONMENT VARIABLES"
     
     info_line "HOME" "${HOME:-not set}"
     info_line "USER" "${USER:-not set}"
@@ -465,7 +448,7 @@ main() {
                 exit 0
                 ;;
             *)
-                error "Unknown option: $1"
+                log_error "Unknown option: $1"
                 echo "Use --help for usage information"
                 exit 1
                 ;;
@@ -473,12 +456,7 @@ main() {
         shift
     done
     
-    echo ""
-    echo "╔═══════════════════════════════════════════════════╗"
-    echo "║                                                   ║"
-    echo "║        System Information & Diagnostics           ║"
-    echo "║                                                   ║"
-    echo "╚═══════════════════════════════════════════════════╝"
+    log_box "System Information & Diagnostics"
     
     if $show_all; then
         show_system_info
@@ -505,9 +483,9 @@ main() {
     fi
     
     echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    log_separator
     echo ""
-    substep_info "For installation verification, run:"
+    log_substep "For installation verification, run:"
     echo "  bash ~/dotfiles/scripts/verification/verify_installation.sh"
     echo ""
 }

@@ -1,134 +1,108 @@
 # 🔍 Verification & Diagnostic Tools
 
-This directory contains scripts to verify and diagnose your dotfiles installation. These tools help ensure everything is installed correctly and help troubleshoot issues.
+## Overview
 
-## 📋 Available Scripts
-
-### 1. Quick Health Check (`health_check.sh`)
-
-**Purpose:** Fast overview of installation status
-
-**Usage:**
-```bash
-bash ~/dotfiles/scripts/verification/health_check.sh
-```
-
-**What it checks:**
-- ✓ Core components (Git, Homebrew, dotfiles directory)
-- ✓ Shell configuration (Zsh, symlinks, Oh My Posh)
-- ✓ Neovim setup
-- ✓ Git configuration
-- ✓ Essential CLI tools
-
-**When to use:**
-- After initial installation
-- Quick status check
-- Before making changes
-- Daily health monitoring
+This directory contains scripts to verify and diagnose your dotfiles installation. These tools are **automatically integrated** into the installation process and can be run manually anytime.
 
 ---
 
-### 2. Full Installation Verification (`verify_installation.sh`)
+## 🎯 Automatic Integration
 
-**Purpose:** Comprehensive verification of all components
+### During Installation
 
-**Usage:**
+Verification is **automatically run** at the end of:
+
+1. **Main installation** (`install.sh`) - Runs health check
+2. **Package installation** (`packages/install.sh`) - Verifies packages
+
+No manual intervention needed! 🎉
+
+### Manual Verification
+
+You can run verification anytime using:
+
 ```bash
-bash ~/dotfiles/scripts/verification/verify_installation.sh
+make health          # Quick health check
+make check           # Full verification
+make packages        # Package verification
+make diagnose        # Complete diagnostic suite
 ```
 
-**What it checks:**
-- ✓ Directory structure
-- ✓ All symlinks and their targets
-- ✓ Core tools with version numbers
-- ✓ Shell configuration and plugins
-- ✓ Neovim setup and plugin manager
-- ✓ Git configuration and tools (delta, lazygit)
-- ✓ Tmux setup
-- ✓ Modern CLI tools (bat, eza, ripgrep, fd, fzf, zoxide)
-- ✓ Development tools (Python, Node, npm, etc.)
+---
 
-**Exit codes:**
-- `0` - All checks passed
-- `1` - Critical issues found
+## 📋 Available Scripts
 
-**Generates:** Report saved to `/tmp/dotfiles_verification_YYYYMMDD_HHMMSS.txt`
+### 1. Health Check (`health_check.sh`)
 
-**When to use:**
-- After installation to verify everything
-- When troubleshooting issues
-- Before and after major updates
-- When reporting issues
+**Quick 22-point check** of critical components.
+
+```bash
+make health
+```
+
+**Checks:**
+- Core components (Git, Homebrew, dotfiles)
+- Shell configuration (Zsh, Oh My Posh)
+- Neovim setup
+- Git configuration
+- Essential CLI tools
+
+**Use when:**
+- After installation
+- Daily health monitoring
+- Before making changes
+
+---
+
+### 2. Full Verification (`verify_installation.sh`)
+
+**Comprehensive 40+ point check** with detailed reporting.
+
+```bash
+make check
+```
+
+**Checks:**
+- Everything in health check
+- Tool versions
+- Symlink targets
+- Directory structure
+- Development tools
+
+**Generates:** Report in `/tmp/`
 
 ---
 
 ### 3. System Information (`system_info.sh`)
 
-**Purpose:** Display comprehensive system diagnostics
+**Display system diagnostics** and environment details.
 
-**Usage:**
 ```bash
-# Show all information
-bash ~/dotfiles/scripts/verification/system_info.sh
-
-# Show specific sections
-bash ~/dotfiles/scripts/verification/system_info.sh --system
-bash ~/dotfiles/scripts/verification/system_info.sh --dev --tools
-bash ~/dotfiles/scripts/verification/system_info.sh --dotfiles
+make sysinfo
 ```
 
-**Available Options:**
-- `--system` - OS, hardware, kernel, uptime
-- `--shell` - Shell info, environment, terminal
-- `--dev` - Git, Python, Node, Go, Ruby, Rust
-- `--tools` - Neovim, Tmux, modern CLI tools
-- `--dotfiles` - Dotfiles status, git info, symlinks
-- `--network` - Network configuration, IP addresses
-- `--disk` - Disk usage, home directory size
-- `--process` - Load average, top processes
-- `--env` - Key environment variables
-- `--help` - Show help message
-
-**When to use:**
-- Gathering system information
-- Troubleshooting environment issues
-- Checking versions of installed tools
-- Reporting bugs
-- Documenting your setup
+**Shows:**
+- OS and hardware info
+- Installed software versions
+- Dotfiles status
+- Network configuration
+- Disk usage
 
 ---
 
 ### 4. Package Verification (`check_packages.sh`)
 
-**Purpose:** Verify installed packages against Brewfile
+**Verify packages** against Brewfile.
 
-**Usage:**
 ```bash
-# Check packages
-bash ~/dotfiles/scripts/verification/check_packages.sh
-
-# Export current packages to Brewfile
-bash ~/dotfiles/scripts/verification/check_packages.sh --export ~/my-brewfile
+make packages
 ```
 
-**What it checks:**
-- ✓ Homebrew installation and version
-- ✓ Outdated packages
-- ✓ Missing packages from Brewfile
-- ✓ Extra packages not in Brewfile
-- ✓ Taps, Formulae, and Casks
-
-**Reports:**
-- Installation coverage percentage
-- Detailed status of each package
-- Update recommendations
-
-**When to use:**
-- Verifying package installation
-- Before/after updating packages
-- Checking for missing dependencies
-- Auditing installed packages
-- Creating backup Brewfiles
+**Checks:**
+- Installed vs missing packages
+- Outdated packages
+- Extra packages
+- Installation coverage
 
 ---
 
@@ -136,174 +110,84 @@ bash ~/dotfiles/scripts/verification/check_packages.sh --export ~/my-brewfile
 
 ### After Fresh Installation
 
-Run in this order:
-
-1. **Quick check:**
-   ```bash
-   bash ~/dotfiles/scripts/verification/health_check.sh
-   ```
-
-2. **If issues found, run full verification:**
-   ```bash
-   bash ~/dotfiles/scripts/verification/verify_installation.sh
-   ```
-
-3. **Check packages:**
-   ```bash
-   bash ~/dotfiles/scripts/verification/check_packages.sh
-   ```
-
----
-
-## 🎯 Use Cases
-
-### Troubleshooting Installation Issues
+Installation automatically verifies! But you can re-check:
 
 ```bash
-# 1. Run health check
-bash ~/dotfiles/scripts/verification/health_check.sh
-
-# 2. If issues found, get detailed info
-bash ~/dotfiles/scripts/verification/verify_installation.sh
-
-# 3. Check system info for environment issues
-bash ~/dotfiles/scripts/verification/system_info.sh --system --shell
-
-# 4. Verify packages
-bash ~/dotfiles/scripts/verification/check_packages.sh
+make health
 ```
 
-### Reporting Bugs
-
-Gather information for bug reports:
+### Regular Maintenance
 
 ```bash
-# System info
-bash ~/dotfiles/scripts/verification/system_info.sh > ~/system_info.txt
+# Weekly
+make health
 
-# Installation status
-bash ~/dotfiles/scripts/verification/verify_installation.sh > ~/install_status.txt
-
-# Package status
-bash ~/dotfiles/scripts/verification/check_packages.sh > ~/package_status.txt
+# Monthly
+make diagnose
 ```
 
-### Before Making Changes
+### Before Reporting Issues
 
 ```bash
-# Verify current state
-bash ~/dotfiles/scripts/verification/health_check.sh
-
-# Backup current packages
-bash ~/dotfiles/scripts/verification/check_packages.sh --export ~/brewfile_backup
-```
-
-### After Updating
-
-```bash
-# Verify everything still works
-bash ~/dotfiles/scripts/verification/verify_installation.sh
-
-# Check for new/missing packages
-bash ~/dotfiles/scripts/verification/check_packages.sh
+make diagnose > ~/diagnostic-report.txt
 ```
 
 ---
 
 ## 📊 Understanding Results
 
-### Health Check Results
+### Status Indicators
 
-- **✓ OK** (Green) - Component working correctly
-- **⚠ WARNING** (Yellow) - Optional component missing or misconfigured
-- **✗ MISSING** (Red) - Critical component missing
+| Symbol | Meaning |
+|--------|---------|
+| ✓ | Pass - Working correctly |
+| ⚠ | Warning - Optional issue |
+| ✗ | Fail - Critical problem |
 
-**Health Scores:**
-- **90-100%** - Excellent (all critical components OK)
-- **75-89%** - Good (minor issues)
-- **60-74%** - Fair (some attention needed)
-- **<60%** - Poor (immediate attention required)
+### Health Scores
 
-### Installation Verification Results
-
-- **PASS** (Green) - Component installed and configured
-- **WARN** (Yellow) - Optional or minor issue
-- **FAIL** (Red) - Critical component missing
-
-### Package Check Results
-
-- **Coverage Percentage** - % of Brewfile packages installed
-- **Outdated Count** - Packages with updates available
-- **Extra Packages** - Installed but not in Brewfile (usually dependencies)
+| Score | Status |
+|-------|--------|
+| 90-100% | Excellent |
+| 75-89% | Good |
+| 60-74% | Fair |
+| <60% | Needs attention |
 
 ---
 
-## 🛠️ Script Details
+## 🔄 CI/CD Integration
 
-### Requirements
+Verification is included in GitHub Actions workflow (`.github/workflows/verify.yml`):
 
-All scripts require:
-- Bash or Zsh
-- Helper script at `~/dotfiles/scripts/utils/_helper.sh`
-- Dotfiles directory at `~/dotfiles`
+```yaml
+- name: Run health check
+  run: bash scripts/verification/health_check.sh
 
-### Generated Files
-
-Scripts may generate temporary files in `/tmp/`:
-- `dotfiles_verification_*.txt` - Verification reports
-- `setup_log.txt` - Installation logs
-
-### Exit Codes
-
-Standard exit codes for automation:
-- `0` - Success, no issues
-- `1` - Failures or critical issues detected
-
-Use in CI/CD:
-```bash
-if bash ~/dotfiles/scripts/verification/verify_installation.sh; then
-    echo "Installation verified successfully"
-else
-    echo "Installation verification failed"
-    exit 1
-fi
+- name: Run full verification
+  run: bash scripts/verification/verify_installation.sh
 ```
 
----
-
-## 🔄 Maintenance
-
-### Updating Scripts
-
-These scripts are part of your dotfiles. To update:
-
-```bash
-cd ~/dotfiles
-git pull
-```
-
-### Adding Custom Checks
-
-To add custom checks, modify the scripts or create new ones in this directory following the existing patterns.
-
-### Contributing
-
-If you find bugs or want to add features:
-1. Test your changes
-2. Ensure scripts remain non-destructive (read-only)
-3. Follow existing coding style
-4. Update this README
-5. Submit a pull request
+Runs on every push to test installation on:
+- macOS
+- Linux (Ubuntu)
 
 ---
 
-## 📚 Related Documentation
+## 💡 Tips
 
-- [Main README](../../README.md) - Full dotfiles documentation
-- [Helper Functions](../utils/_helper.sh) - Shared utility functions
-- [Installation Guide](../../README.md#-detailed-installation) - Installation instructions
+1. **Run health check regularly** - Catch issues early
+2. **Use in scripts** - Exit codes enable automation
+3. **Save reports** - Useful for troubleshooting
+4. **Check before updates** - Verify current state first
 
 ---
 
-Made with ❤️ for troubleshooting and peace of mind!
+## 🔗 Related
 
+- [Main README](../../README.md) - Full documentation
+- [Logger Documentation](../utils/_logger.sh) - Logging system
+- [Helper Functions](../utils/_helper.sh) - Utility functions
+
+---
+
+**All scripts are read-only and safe to run anytime!**

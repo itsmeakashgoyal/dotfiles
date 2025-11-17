@@ -69,6 +69,7 @@ This will:
 6. ✅ Set up Git with Delta
 7. ✅ Create symlinks for all configs
 8. ✅ Apply OS-specific configurations
+9. ✅ Run post-installation verification
 
 ---
 
@@ -382,13 +383,17 @@ brew bundle --file=packages/Brewfile
 
 ## 🔍 Verification & Diagnostic Tools
 
-After installation, use these scripts to verify and diagnose your setup:
+**✨ Automatic Verification:** The installation process now automatically runs verification checks at the end to ensure everything is set up correctly!
+
+You can also run these verification scripts manually anytime:
 
 ### Quick Health Check
 
 Get a fast overview of your installation status:
 
 ```bash
+make health
+# or
 bash ~/dotfiles/scripts/verification/health_check.sh
 ```
 
@@ -404,6 +409,8 @@ This performs quick checks on:
 Run comprehensive verification of all components:
 
 ```bash
+make check
+# or
 bash ~/dotfiles/scripts/verification/verify_installation.sh
 ```
 
@@ -452,6 +459,8 @@ Check installed packages against your Brewfile:
 
 ```bash
 # Verify packages
+make packages
+# or
 bash ~/dotfiles/scripts/verification/check_packages.sh
 
 # Export current packages to new Brewfile

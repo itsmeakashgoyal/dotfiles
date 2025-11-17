@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
-#                    ██  ████
-#                   ░░  ░░███
-#  █████ █████  ██████  ░███████ █████ ████
-# ░░███ ░░███  ███░░███ ░███░░███░░███ ░███
-#  ░███  ░███ ░███████  ░███ ░░░  ░███ ░███
-#  ░░███ ███  ░███░░░   ░███      ░███ ░███
-#   ░░█████   ░░██████  █████     ░░███████
-#    ░░░░░     ░░░░░░  ░░░░░       ░░░░░███
-#                                   ███ ░███
-#                                  ░░██████
-#                                   ░░░░░░
-#
+
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ scripts/verification/verify_installation.sh
@@ -25,15 +14,14 @@
 # Load Helper Functions
 # ------------------------------------------------------------------------------
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
-HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+LOGGER_FILE="${SCRIPT_DIR}/utils/_logger.sh"
 
-if [[ ! -f "$HELPER_FILE" ]]; then
-    echo "Error: Helper file not found at $HELPER_FILE" >&2
+if [[ ! -f "$LOGGER_FILE" ]]; then
+    echo "Error: Logger file not found at $LOGGER_FILE" >&2
     exit 1
 fi
 
-source "$HELPER_FILE"
-# Note: Not using 'set -e' here because we want to continue checking even when items fail
+source "$LOGGER_FILE"
 set -uo pipefail
 
 # ------------------------------------------------------------------------------
@@ -56,13 +44,13 @@ check_item() {
     printf "  %-45s " "$name:"
     
     if [[ "$status" == "pass" ]]; then
-        echo -e "${GREEN}✓ PASS${NC} ${message}"
+        echo -e "${LOG_GREEN}✓ PASS${LOG_NC} ${message}"
         ((PASS_COUNT++))
     elif [[ "$status" == "warn" ]]; then
-        echo -e "${YELLOW}⚠ WARN${NC} ${message}"
+        echo -e "${LOG_YELLOW}⚠ WARN${LOG_NC} ${message}"
         ((WARN_COUNT++))
     else
-        echo -e "${RED}✗ FAIL${NC} ${message}"
+        echo -e "${LOG_RED}✗ FAIL${LOG_NC} ${message}"
         ((FAIL_COUNT++))
     fi
 }
@@ -86,7 +74,7 @@ get_version() {
 # Core Tools Verification
 # ------------------------------------------------------------------------------
 verify_core_tools() {
-    info "Verifying Core Tools..."
+    log_banner "Verifying Core Tools"
     echo ""
     
     # Git
@@ -128,7 +116,7 @@ verify_core_tools() {
 # Shell Verification
 # ------------------------------------------------------------------------------
 verify_shell() {
-    info "Verifying Shell Configuration..."
+    log_banner "Verifying Shell Configuration"
     echo ""
     
     # Zsh
@@ -178,7 +166,7 @@ verify_shell() {
 # Neovim Verification
 # ------------------------------------------------------------------------------
 verify_neovim() {
-    info "Verifying Neovim Setup..."
+    log_banner "Verifying Neovim Setup"
     echo ""
     
     # Neovim
@@ -220,7 +208,7 @@ verify_neovim() {
 # Git Configuration Verification
 # ------------------------------------------------------------------------------
 verify_git() {
-    info "Verifying Git Configuration..."
+    log_banner "Verifying Git Configuration"
     echo ""
     
     # Git config (at dotfiles location)
@@ -269,7 +257,7 @@ verify_git() {
 # Tmux Verification
 # ------------------------------------------------------------------------------
 verify_tmux() {
-    info "Verifying Tmux Setup..."
+    log_banner "Verifying Tmux Setup"
     echo ""
     
     # Tmux
@@ -303,7 +291,7 @@ verify_tmux() {
 # Modern CLI Tools Verification
 # ------------------------------------------------------------------------------
 verify_modern_tools() {
-    info "Verifying Modern CLI Tools..."
+    log_banner "Verifying Modern CLI Tools"
     echo ""
     
     # bat (cat replacement)
@@ -369,7 +357,7 @@ verify_modern_tools() {
 # Development Tools Verification
 # ------------------------------------------------------------------------------
 verify_dev_tools() {
-    info "Verifying Development Tools..."
+    log_banner "Verifying Development Tools"
     echo ""
     
     # Homebrew
@@ -419,7 +407,7 @@ verify_dev_tools() {
 # Symlinks Verification
 # ------------------------------------------------------------------------------
 verify_symlinks() {
-    info "Verifying Dotfiles Symlinks..."
+    log_banner "Verifying Dotfiles Symlinks"
     echo ""
     
     declare -A symlinks=(
@@ -453,7 +441,7 @@ verify_symlinks() {
 # Directory Structure Verification
 # ------------------------------------------------------------------------------
 verify_directories() {
-    info "Verifying Directory Structure..."
+    log_banner "Verifying Directory Structure"
     echo ""
     
     declare -a required_dirs=(
@@ -501,20 +489,20 @@ generate_summary() {
     echo "  INSTALLATION VERIFICATION SUMMARY"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    echo -e "  ${GREEN}✓ Passed:${NC}       $PASS_COUNT / $TOTAL_COUNT"
-    echo -e "  ${YELLOW}⚠ Warnings:${NC}     $WARN_COUNT / $TOTAL_COUNT"
-    echo -e "  ${RED}✗ Failed:${NC}       $FAIL_COUNT / $TOTAL_COUNT"
+    echo -e "  ${LOG_GREEN}✓ Passed:${LOG_NC}       $PASS_COUNT / $TOTAL_COUNT"
+    echo -e "  ${LOG_YELLOW}⚠ Warnings:${LOG_NC}     $WARN_COUNT / $TOTAL_COUNT"
+    echo -e "  ${LOG_RED}✗ Failed:${LOG_NC}       $FAIL_COUNT / $TOTAL_COUNT"
     echo ""
-    echo -e "  Installation Score: ${score_color}${pass_pct}% - ${score_status}${NC}"
+    echo -e "  Installation Score: ${score_color}${pass_pct}% - ${score_status}${LOG_NC}"
     echo ""
     
     if [[ $FAIL_COUNT -gt 0 ]]; then
-        echo -e "  ${RED}⚠️  $FAIL_COUNT critical issues found!${NC}"
+        echo -e "  ${LOG_RED}⚠️  $FAIL_COUNT critical issues found!${LOG_NC}"
         echo "  Consider running: cd ~/dotfiles && make install"
     elif [[ $WARN_COUNT -gt 0 ]]; then
-        echo -e "  ${YELLOW}⚠️  $WARN_COUNT warnings - optional improvements available${NC}"
+        echo -e "  ${LOG_YELLOW}⚠️  $WARN_COUNT warnings - optional improvements available${LOG_NC}"
     else
-        echo -e "  ${GREEN}✓ All checks passed! Your dotfiles are properly installed.${NC}"
+        echo -e "  ${LOG_GREEN}✓ All checks passed! Your dotfiles are properly installed.${LOG_NC}"
     fi
     
     echo ""
@@ -527,8 +515,7 @@ generate_summary() {
 # ------------------------------------------------------------------------------
 show_next_steps() {
     if [[ $FAIL_COUNT -gt 0 ]] || [[ $WARN_COUNT -gt 5 ]]; then
-        info "Recommended Next Steps"
-        echo ""
+        log_banner "Recommended Next Steps"
         echo "  1. Review failed checks above"
         echo "  2. Reinstall if needed: cd ~/dotfiles && make install"
         echo "  3. Run this verification again after fixes"
@@ -541,15 +528,7 @@ show_next_steps() {
 # Main Function
 # ------------------------------------------------------------------------------
 main() {
-    log_message "Installation verification started"
-    
-    echo ""
-    echo "╔═══════════════════════════════════════════════════╗"
-    echo "║                                                   ║"
-    echo "║    Dotfiles Installation Verification Tool       ║"
-    echo "║                                                   ║"
-    echo "╚═══════════════════════════════════════════════════╝"
-    echo ""
+    log_box "Dotfiles Installation Verification Tool"
     echo "  Verifying your dotfiles installation..."
     echo "  This will check all components and configurations."
     echo ""
@@ -584,9 +563,7 @@ main() {
         echo "Total Checks: $TOTAL_COUNT"
     } > "$report_file"
     
-    substep_info "Report saved to: $report_file"
-    
-    log_message "Installation verification completed"
+    log_substep "Report saved to: $report_file"
     
     # Exit with appropriate code
     if [[ $FAIL_COUNT -gt 0 ]]; then

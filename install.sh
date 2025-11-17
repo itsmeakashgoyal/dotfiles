@@ -202,9 +202,18 @@ You're running ${OS_TYPE}.
 
     log_message "Installation Completed!"
 
+    info "Running post-installation verification..."
+    echo ""
+    
+    if bash "${DOTFILES_DIR}/scripts/verification/health_check.sh"; then
+        success "✓ Installation verified successfully!"
+    else
+        warning "Some verification checks failed - review output above"
+    fi
+
     success "
 ################################################################################################
-#      At last, do source your zsh configuration using 'exec zsh' and restart terminal         #
+#      Installation complete! Run 'exec zsh' to start using your new configuration            #
 ################################################################################################
 "
 }

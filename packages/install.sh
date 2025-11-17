@@ -118,6 +118,19 @@ main() {
 #     Package Installation Completed!             #
 ###################################################
 "
+    
+    info "Verifying package installation..."
+    echo ""
+    
+    if bash "${DOTFILES_DIR}/scripts/verification/check_packages.sh"; then
+        success "✓ All packages verified successfully!"
+    else
+        warning "Some packages may be missing - see details above"
+        echo ""
+        echo "To install missing packages, run:"
+        echo "  brew bundle --file=${BREWFILE}"
+    fi
+    
     log_message "Package installation completed successfully"
 }
 

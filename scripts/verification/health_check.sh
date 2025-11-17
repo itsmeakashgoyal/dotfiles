@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-#  ██                     ████  █████     ██
-# ░██                    ░██░  ░░███     ░██
-# ░██      ██████   ███████░   ███████  ░██
-# ░██████ ███░░███ ░░░███░    ░░░███░   ░██████
-# ░██░░░██░███████   ░███       ░███    ░██░░░██
-# ░██  ░██░███░░░    ░███ ███   ░███ ███░██  ░██
-# ░██  ░██░░██████   ░░█████    ░░█████ ░██  ░██
-# ░░   ░░  ░░░░░░     ░░░░░      ░░░░░  ░░   ░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
@@ -22,26 +14,19 @@
 # Load Helper Functions
 # ------------------------------------------------------------------------------
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
-HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+LOGGER_FILE="${SCRIPT_DIR}/utils/_logger.sh"
 
-if [[ ! -f "$HELPER_FILE" ]]; then
-    echo "Error: Helper file not found at $HELPER_FILE" >&2
+if [[ ! -f "$LOGGER_FILE" ]]; then
+    echo "Error: Logger file not found at $LOGGER_FILE" >&2
     exit 1
 fi
 
-source "$HELPER_FILE"
-# Note: Not using 'set -e' here because we want to continue checking even when items fail
+source "$LOGGER_FILE"
 set -uo pipefail
 
-# ------------------------------------------------------------------------------
-# Variables
-# ------------------------------------------------------------------------------
 ISSUES=0
 WARNINGS=0
 
-# ------------------------------------------------------------------------------
-# Check Functions
-# ------------------------------------------------------------------------------
 check_status() {
     local name="$1"
     local condition="$2"
@@ -50,17 +35,17 @@ check_status() {
     printf "  %-35s " "$name:"
     
     if eval "$condition"; then
-        echo -e "${GREEN}✓ OK${NC}"
+        echo -e "${LOG_GREEN}✓ OK${LOG_NC}"
         return 0
     else
         if [[ "$critical" == "true" ]]; then
-            echo -e "${RED}✗ MISSING${NC}"
+            echo -e "${LOG_RED}✗ MISSING${LOG_NC}"
             ((ISSUES++))
         else
-            echo -e "${YELLOW}⚠ WARNING${NC}"
+            echo -e "${LOG_YELLOW}⚠ WARNING${LOG_NC}"
             ((WARNINGS++))
         fi
-        return 0  # Return 0 to not trigger 'set -e' in other contexts
+        return 0
     fi
 }
 
@@ -138,13 +123,13 @@ show_summary() {
     echo ""
     
     if [[ $ISSUES -eq 0 ]] && [[ $WARNINGS -eq 0 ]]; then
-        echo -e "  ${GREEN}✓ System Health: EXCELLENT${NC}"
+        echo -e "  ${LOG_GREEN}✓ System Health: EXCELLENT${LOG_NC}"
         echo "  All critical components are installed and configured."
     elif [[ $ISSUES -eq 0 ]]; then
-        echo -e "  ${YELLOW}⚠ System Health: GOOD${NC}"
+        echo -e "  ${LOG_YELLOW}⚠ System Health: GOOD${LOG_NC}"
         echo "  Critical components OK, but $WARNINGS optional component(s) missing."
     else
-        echo -e "  ${RED}✗ System Health: NEEDS ATTENTION${NC}"
+        echo -e "  ${LOG_RED}✗ System Health: NEEDS ATTENTION${LOG_NC}"
         echo "  $ISSUES critical issue(s) and $WARNINGS warning(s) detected."
     fi
     
@@ -153,14 +138,14 @@ show_summary() {
     echo ""
     
     if [[ $ISSUES -gt 0 ]]; then
-        echo "  ${RED}⚠️  ACTION REQUIRED:${NC}"
+        echo "  ${LOG_RED}⚠️  ACTION REQUIRED:${LOG_NC}"
         echo "  • Run: cd ~/dotfiles && make install"
         echo "  • Or: bash ~/dotfiles/install.sh"
         echo ""
     fi
     
     if [[ $WARNINGS -gt 0 ]]; then
-        echo "  ${YELLOW}💡 OPTIONAL IMPROVEMENTS:${NC}"
+        echo "  ${LOG_YELLOW}💡 OPTIONAL IMPROVEMENTS:${LOG_NC}"
         echo "  • Install missing tools with Homebrew"
         echo "  • Configure Git user settings"
         echo "  • Set Zsh as default shell: chsh -s \$(which zsh)"
