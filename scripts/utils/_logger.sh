@@ -28,19 +28,22 @@ readonly LOG_NC='\033[0m' # No Color
 # ------------------------------------------------------------------------------
 # Available log levels: TRACE, DEBUG, INFO, SUCCESS, WARNING, ERROR, FATAL
 # Set LOG_LEVEL environment variable to control verbosity
-declare -A LOG_LEVELS=(
-    [TRACE]=0
-    [DEBUG]=1
-    [INFO]=2
-    [SUCCESS]=3
-    [WARNING]=4
-    [ERROR]=5
-    [FATAL]=6
-)
+_get_log_level_num() {
+    case "$1" in
+        TRACE)   echo 0 ;;
+        DEBUG)   echo 1 ;;
+        INFO)    echo 2 ;;
+        SUCCESS) echo 3 ;;
+        WARNING) echo 4 ;;
+        ERROR)   echo 5 ;;
+        FATAL)   echo 6 ;;
+        *)       echo 2 ;;
+    esac
+}
 
 # Default log level
 LOG_LEVEL="${LOG_LEVEL:-INFO}"
-LOG_MIN_LEVEL="${LOG_LEVELS[$LOG_LEVEL]}"
+LOG_MIN_LEVEL=$(_get_log_level_num "$LOG_LEVEL")
 
 # Log file location (optional)
 LOG_FILE="${LOG_FILE:-/tmp/dotfiles.log}"
@@ -56,7 +59,8 @@ _log() {
     local level="$1"
     local color="$2"
     local message="$3"
-    local level_num="${LOG_LEVELS[$level]}"
+    local level_num
+    level_num=$(_get_log_level_num "$level")
     
     # Check if message should be logged based on level
     if [[ $level_num -lt $LOG_MIN_LEVEL ]]; then
