@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 #                    █████
 #                   ░░███
 #   █████   ██████  ███████   █████ ████ ████████
@@ -22,6 +22,12 @@
 # Installs Package Control and configures Sublime Text settings
 # ------------------------------------------------------------------------------
 
+# Skip in CI environment (before loading anything)
+if [[ -n "${CI:-}" ]]; then
+    echo "Skipping Sublime Text setup in CI environment"
+    exit 0
+fi
+
 # Load helper functions
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
 HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
@@ -33,9 +39,6 @@ fi
 
 source "$HELPER_FILE"
 set -euo pipefail
-
-# Skip in CI environment
-[[ -n "${CI:-}" ]] && exit 0
 
 # ------------------------------------------------------------------------------
 # Configuration
