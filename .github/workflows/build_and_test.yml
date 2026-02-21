@@ -221,8 +221,8 @@ jobs:
             eval "$(/usr/local/bin/brew shellenv)"
           fi
 
-          # Source the zsh config
-          export ZDOTDIR="$HOME/dotfiles/zsh"
+          # Source the zsh config (ZDOTDIR set via stow symlink)
+          export ZDOTDIR="$HOME/dotfiles/zsh/.config/zsh"
           source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
 
           # Test if basic commands work
@@ -381,7 +381,8 @@ jobs:
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           fi
 
-          export ZDOTDIR="$HOME/dotfiles/zsh"
+          # ZDOTDIR set via stow symlink
+          export ZDOTDIR="$HOME/dotfiles/zsh/.config/zsh"
           source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
 
           echo "Testing basic commands..."

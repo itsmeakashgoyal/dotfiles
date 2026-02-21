@@ -29,7 +29,7 @@
 *.toml     text
 *.yaml     text
 *.yml      text
-*.xml      text
+*.xml      text eol=lf
 
 # ============================================================================
 # Binary Files

@@ -7,7 +7,7 @@
 #█▓▒░
 
 # Stowable packages (directories with dotfiles)
-STOW_PACKAGES := git zsh nvim tmux lazygit ohmyposh
+STOW_PACKAGES := git zsh nvim tmux ohmyposh
 
 # Color codes
 YELLOW := \033[33m
@@ -44,6 +44,22 @@ install: ## Bootstrap and install dotfiles
 	@echo "$(GREEN)✓ System provisioning complete!$(CLR)"
 	@echo ""
 	@echo "$(YELLOW)💡 Tip: Run 'make health' anytime to verify your setup$(CLR)"
+
+##@ App Settings
+
+.PHONY: apps
+apps: sublime iterm ## Setup all app settings (Sublime Text + iTerm2)
+	@echo "$(GREEN)✓ All app settings applied$(CLR)"
+
+.PHONY: sublime
+sublime: ## Setup Sublime Text settings
+	@echo "$(YELLOW)Setting up Sublime Text...$(CLR)"
+	@bash scripts/setup/_sublime.sh
+
+.PHONY: iterm
+iterm: ## Setup iTerm2 preferences
+	@echo "$(YELLOW)Setting up iTerm2...$(CLR)"
+	@bash scripts/setup/_iterm.sh
 
 ##@ Stow Management
 

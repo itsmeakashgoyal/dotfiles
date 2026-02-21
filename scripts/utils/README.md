@@ -199,7 +199,7 @@ up                  Navigate up multiple directories
 ```
 
 **Features:**
-- Parses `~/dotfiles/zsh/local/function.zsh`
+- Parses `~/dotfiles/zsh/.config/zsh/conf.d/functions.zsh`
 - Extracts function names and comments
 - Displays in a formatted table
 - Sorted alphabetically
@@ -463,8 +463,8 @@ git pull origin main
 
 - **Zsh Configuration:** See `/dotfiles/zsh/README.md`
 - **Main Dotfiles:** See `/dotfiles/README.md`
-- **Neovim Setup:** See `/dotfiles/nvim/README.md`
-- **Tmux Setup:** See `/dotfiles/tmux/README.md`
+- **Neovim Setup:** See `/dotfiles/nvim/.config/nvim/PLUGINS.md`
+- **Tmux Setup:** See `/dotfiles/tmux/.config/tmux/README.md`
 
 ---
 

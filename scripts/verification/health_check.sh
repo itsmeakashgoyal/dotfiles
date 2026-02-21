@@ -91,7 +91,7 @@ run_health_checks() {
     echo "  GIT CONFIGURATION"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
-    check_status "Git Config" "[[ -f '$HOME/.config/git/config' ]] || [[ -f '$HOME/.gitconfig' ]] || [[ -f '$HOME/dotfiles/git/config' ]]" false
+    check_status "Git Config" "[[ -f '$HOME/.config/git/config' ]] || [[ -f '$HOME/.gitconfig' ]]" false
     check_status "Git User Name" "git config --global user.name >/dev/null 2>&1" false
     check_status "Git User Email" "git config --global user.email >/dev/null 2>&1" false
     

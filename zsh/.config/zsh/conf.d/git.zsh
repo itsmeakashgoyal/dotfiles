@@ -10,7 +10,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/local/git.zsh
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/git.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #

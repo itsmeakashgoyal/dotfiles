@@ -38,7 +38,6 @@ set -euo pipefail
 # Configuration
 # ------------------------------------------------------------------------------
 readonly OS_NAME=$(grep ^NAME /etc/os-release 2>/dev/null | cut -d '"' -f 2 || echo "Unknown Linux")
-readonly GO_VERSION="1.23.4"  # Update as needed
 
 # ------------------------------------------------------------------------------
 # System Detection
@@ -163,25 +162,6 @@ install_eza() {
     success "eza installed successfully"
 }
 
-install_go() {
-    if command_exists go; then
-        local current_version=$(go version | awk '{print $3}' | sed 's/go//')
-        info "Go already installed (version: ${current_version})"
-        return 0
-    fi
-
-    info "Installing Go ${GO_VERSION}..."
-    
-    local go_archive="go${GO_VERSION}.linux-amd64.tar.gz"
-    curl -LO "https://go.dev/dl/${go_archive}"
-    
-    sudo rm -rf /usr/local/go
-    sudo tar -C /usr/local -xzf "${go_archive}"
-    rm "${go_archive}"
-    
-    success "Go ${GO_VERSION} installed successfully"
-}
-
 install_cargo() {
     if command_exists cargo; then
         info "Cargo already installed"
@@ -191,21 +171,6 @@ install_cargo() {
     info "Installing Rust and Cargo..."
     sudo apt-get install -y cargo
     success "Cargo installed successfully"
-}
-
-install_nvim() {
-    if command_exists nvim; then
-        info "Neovim already installed"
-        return 0
-    fi
-
-    info "Installing Neovim..."
-    if [[ -f ~/dotfiles/scripts/utils/_install_nvim.sh ]]; then
-        bash ~/dotfiles/scripts/utils/_install_nvim.sh
-    else
-        error "Neovim install script not found"
-        return 1
-    fi
 }
 
 install_zoxide() {

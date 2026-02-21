@@ -19,10 +19,10 @@
 # ------------------------------------------------------------------------------
 # Initialization
 # ------------------------------------------------------------------------------
-set -eu pipefail
+set -euo pipefail
 
 # Constants
-readonly FUNCTIONS_FILE="${HOME}/dotfiles/zsh/local/function.zsh"
+readonly FUNCTIONS_FILE="${HOME}/dotfiles/zsh/.config/zsh/conf.d/functions.zsh"
 readonly TABLE_FORMAT="%-20s %s\n"
 readonly HEADER_LINE="%-20s %s\n"
 

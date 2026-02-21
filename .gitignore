@@ -2,9 +2,10 @@
 **/.DS_Store
 
 # Zsh generated files
-zsh/.zcompdump
-zsh/.zcompdump-*
-zsh/.zsh_history
+**/.zcompdump
+**/.zcompdump-*
+**/.zsh_history
+**/.zsh_sessions/
 
 # Caches (keep repo clean)
 .cache/
@@ -13,7 +14,6 @@ zsh/.zsh_history
 *.pyc
 
 # Folder view configuration files
-.DS_Store
 *.swp
 .vscode
 
@@ -24,11 +24,10 @@ Thumbs.db
 # Files that might appear on external disks
 .Spotlight-V100
 .Trashes
-tmux/plugins/*
-zsh/zsh_plugins.zsh
-zsh/.zcompdump*
+
+# Tmux plugins (managed by TPM)
+tmux/.config/tmux/plugins/*
 
 # Private Information
 private/*
-zsh/local/private.zsh
-zsh/.zsh_history
+zsh/.config/zsh/conf.d/private.zsh

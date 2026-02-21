@@ -119,8 +119,8 @@ install_package_control() {
 }
 
 copy_settings() {
-    local settings_source="${DOTFILES_DIR}/sublime/settings"
-    
+    local settings_source="${DOTFILES_DIR}/settings/sublime"
+
     if [[ ! -d "${settings_source}" ]]; then
         warning "Settings directory not found at ${settings_source}"
         return 0

@@ -10,7 +10,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/local/docker.zsh
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/docker.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #

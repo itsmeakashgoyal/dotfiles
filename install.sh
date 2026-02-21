@@ -15,10 +15,7 @@
 # ░░░░░░░░░░
 #
 #█▓▒░
-# This script creates symlinks from the home directory to any desired dotfiles in $HOME/dotfiles
-# It sets up both macOS and Linux configurations.
-# Install necessary pacakges for both MacOS and Linux.
-# Configures Sublime Text
+# Install packages, run OS-specific setup, and stow dotfiles.
 #################################################
 
 # ------------------------------
@@ -57,6 +54,7 @@ show_targets() {
     echo "  linux    - Setup Linux specific configurations"
     echo "  brew     - Install Homebrew and packages"
     echo "  sublime  - Setup Sublime Text configuration"
+    echo "  iterm    - Setup iTerm2 preferences"
 }
 
 # Setup dotfiles based on specified targets
@@ -78,6 +76,7 @@ setupDotfiles() {
             fi
             run_script "_macOS"
             run_script "_sublime"
+            run_script "_iterm"
             ;;
         "linux")
             if [ "$OS_TYPE" != "Linux" ]; then
@@ -88,6 +87,9 @@ setupDotfiles() {
             ;;
         "sublime")
             run_script "_sublime"
+            ;;
+        "iterm")
+            run_script "_iterm"
             ;;
         *)
             error "Unknown target: $target"
@@ -182,15 +184,22 @@ You're running ${OS_TYPE}.
         setupDotfiles "linux"
     fi
 
-    # Backup and initiate symlinks
-    backup_existing_files "zsh/.zshenv" ".zshenv"
-    symlink "zsh/.zshenv" ".zshenv"
+    # Clean up old manual symlinks before stowing
+    info "Cleaning up old symlinks..."
+    for old_link in "$HOME/.zshenv" "$HOME/.config/nvim" "$HOME/.config/tmux" "$HOME/.config/git" "$HOME/.config/zsh" "$HOME/.config/ohmyposh"; do
+        if [ -L "$old_link" ]; then
+            rm "$old_link"
+            substep_info "Removed old symlink: $old_link"
+        fi
+    done
 
-    backup_existing_files "nvim" ".config/nvim"
-    symlink "nvim" ".config/nvim"
-
-    backup_existing_files "tmux" ".config/tmux"
-    symlink "tmux" ".config/tmux"
+    # Stow all dotfile packages
+    info "Stowing dotfile packages..."
+    for pkg in git zsh nvim tmux ohmyposh; do
+        substep_info "Stowing $pkg..."
+        stow --restow --dir="${DOTFILES_DIR}" --target="$HOME" "$pkg"
+    done
+    success "All packages stowed successfully."
 
     ### Hostname
     ###########################################################

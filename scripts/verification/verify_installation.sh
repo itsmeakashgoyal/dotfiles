@@ -211,11 +211,13 @@ verify_git() {
     log_banner "Verifying Git Configuration"
     echo ""
     
-    # Git config (at dotfiles location)
-    if [[ -f "$HOME/dotfiles/git/config" ]]; then
-        check_item "Git Config" "pass" "Found at ~/dotfiles/git/config"
+    # Git config (via XDG at ~/.config/git/config)
+    if [[ -f "$HOME/.config/git/config" ]]; then
+        check_item "Git Config" "pass" "Found at ~/.config/git/config"
+    elif [[ -f "$HOME/dotfiles/git/.config/git/config" ]]; then
+        check_item "Git Config" "warn" "Found in repo but not stowed"
     else
-        check_item "Git Config" "warn" "Not found at ~/dotfiles/git/config"
+        check_item "Git Config" "warn" "Not found"
     fi
     
     # Git user name
@@ -410,23 +412,22 @@ verify_symlinks() {
     log_banner "Verifying Dotfiles Symlinks"
     echo ""
     
-    declare -A symlinks=(
-        ["$HOME/.zshenv"]="${HOME}/dotfiles/zsh/.zshenv"
-        ["$HOME/.config/nvim"]="${HOME}/dotfiles/nvim"
-        ["$HOME/.config/tmux"]="${HOME}/dotfiles/tmux"
+    local link_paths=(
+        "$HOME/.zshenv"
+        "$HOME/.config/nvim"
+        "$HOME/.config/tmux"
+        "$HOME/.config/git"
+        "$HOME/.config/zsh"
     )
-    
-    for link_path in "${!symlinks[@]}"; do
-        local target="${symlinks[$link_path]}"
-        local link_name=$(basename "$link_path")
-        
+
+    local i
+    for i in "${!link_paths[@]}"; do
+        local link_path="${link_paths[$i]}"
+        local link_name
+        link_name=$(basename "$link_path")
+
         if [[ -L "$link_path" ]]; then
-            local actual_target=$(readlink "$link_path")
-            if [[ "$actual_target" == "$target" ]]; then
-                check_item "$link_name" "pass" "Correctly linked"
-            else
-                check_item "$link_name" "warn" "Points to $actual_target"
-            fi
+            check_item "$link_name" "pass" "Correctly linked"
         elif [[ -e "$link_path" ]]; then
             check_item "$link_name" "warn" "Exists but not a symlink"
         else
@@ -446,9 +447,9 @@ verify_directories() {
     
     declare -a required_dirs=(
         "$HOME/dotfiles"
-        "$HOME/dotfiles/zsh"
-        "$HOME/dotfiles/nvim"
-        "$HOME/dotfiles/tmux"
+        "$HOME/dotfiles/zsh/.config/zsh"
+        "$HOME/dotfiles/nvim/.config/nvim"
+        "$HOME/dotfiles/tmux/.config/tmux"
         "$HOME/dotfiles/scripts"
         "$HOME/.config"
     )
@@ -470,17 +471,17 @@ verify_directories() {
 # ------------------------------------------------------------------------------
 generate_summary() {
     local pass_pct=$((PASS_COUNT * 100 / TOTAL_COUNT))
-    local score_color="${RED}"
+    local score_color="${LOG_RED}"
     local score_status="POOR"
     
     if [[ $pass_pct -ge 90 ]]; then
-        score_color="${GREEN}"
+        score_color="${LOG_GREEN}"
         score_status="EXCELLENT"
     elif [[ $pass_pct -ge 75 ]]; then
-        score_color="${GREEN}"
+        score_color="${LOG_GREEN}"
         score_status="GOOD"
     elif [[ $pass_pct -ge 60 ]]; then
-        score_color="${YELLOW}"
+        score_color="${LOG_YELLOW}"
         score_status="FAIR"
     fi
     

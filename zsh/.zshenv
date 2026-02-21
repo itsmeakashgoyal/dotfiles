@@ -45,5 +45,4 @@ export GPG_TTY="$(tty 2>/dev/null || true)"
 # ------------------------------------------------------------------------------
 # Application Paths
 # ------------------------------------------------------------------------------
-export ZDOTDIR="${XDG_DOTFILES_DIR}/zsh"                  # Zsh config directory
-export GIT_CONFIG_GLOBAL="${XDG_DOTFILES_DIR}/git/config" # Git config
+export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"

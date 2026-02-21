@@ -9,7 +9,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/.zshrc
+# ░▓ file   ▓ zsh/.config/zsh/.zshrc
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #
@@ -39,6 +39,11 @@ if [ ! -d "$ZINIT_HOME" ]; then
     git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 fi
 
+# Enable Powerlevel10k instant prompt (makes shell appear instantly)
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
@@ -61,6 +66,10 @@ zinit wait lucid for \
     OMZP::git \
     OMZP::sudo
 
+# Load Powerlevel10k theme
+zinit ice depth=1
+zinit light romkatv/powerlevel10k
+
 # For speed:
 # https://github.com/zsh-users/zsh-autosuggestions#disabling-automatic-widget-re-binding
 ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion history)
@@ -69,16 +78,30 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 
-# Source local configurations
-if [[ -d "$ZDOTDIR/local" ]]; then
-    for config in "$ZDOTDIR/local"/*.zsh; do
+# Source modular configurations
+if [[ -d "$ZDOTDIR/conf.d" ]]; then
+    for config in "$ZDOTDIR/conf.d"/*.zsh; do
         [[ -f "$config" ]] && source "$config"
     done
 fi
 
-if command -v oh-my-posh &>/dev/null; then
-    eval "$(oh-my-posh init zsh --config ${XDG_DOTFILES_DIR}/ohmyposh/emodipt.json)"
-fi
-
 # Fix Paste Behavior
 zle_highlight+=(paste:none)
+
+# To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh
+[[ ! -f "$ZDOTDIR/.p10k.zsh" ]] || source "$ZDOTDIR/.p10k.zsh"
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/opt/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+

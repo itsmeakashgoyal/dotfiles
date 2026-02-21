@@ -10,7 +10,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/local/python.zsh
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/python.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #

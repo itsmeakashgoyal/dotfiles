@@ -10,7 +10,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/local/exports.zsh
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/exports.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #
@@ -111,6 +111,8 @@ COMMON_PATHS=(
   "/usr/sbin"
   "/bin"
   "/sbin"
+  "/usr/local/bin"
+  "/usr/local/sbin"
 )
 
 # OS-specific Homebrew configuration
@@ -125,6 +127,9 @@ case "$OS_TYPE" in
   OS_PATHS=(
     "/opt/homebrew/bin"
     "/opt/homebrew/opt/llvm/bin"
+    "/Library/Frameworks/Python.framework/Versions/Current/bin"
+    "${HOME}/Library/Python/3.13/bin"
+    "/opt/anaconda3/bin"
   )
   ;;
 "Linux")

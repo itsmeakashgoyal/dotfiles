@@ -12,7 +12,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ git/config
+# ░▓ file   ▓ git/.config/git/config
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #
@@ -62,12 +62,14 @@
 # ============================================================================
 [core]
 	editor = nvim
-	attributesFile = ~/dotfiles/git/gitattributes
 	pager = delta
 	whitespace = space-before-tab,-indent-with-non-tab,trailing-space
 	trustctime = false
 	precomposeunicode = false
 	untrackedCache = true
+	autocrlf = input
+	safecrlf = warn
+	filemode = false
 
 [apply]
 	whitespace = fix
@@ -146,3 +148,8 @@
 
 [credential "https://gist.github.com"]
 	helper = !/usr/bin/gh auth git-credential
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
