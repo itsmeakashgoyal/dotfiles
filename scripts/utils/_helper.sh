@@ -298,7 +298,7 @@ run_script() {
 }
 
 check_required_commands() {
-    required_commands="curl git stow"
+    required_commands="curl git"
     for cmd in $required_commands; do
         if ! command -v "$cmd" &>/dev/null; then
             echo "Error: $cmd is not installed." >&2
