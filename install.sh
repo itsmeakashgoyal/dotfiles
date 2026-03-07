@@ -155,7 +155,7 @@ You're running ${OS_TYPE}.
         if sudo --validate; then
             sudo_keep_alive &
             SUDO_PID=$!
-            trap 'kill "$SUDO_PID"' EXIT
+            trap '[[ -n "${SUDO_PID:-}" ]] && kill "$SUDO_PID" 2>/dev/null || true' EXIT
             substep_info "Sudo password saved. Continuing with script."
         else
             substep_error "Incorrect sudo password. Exiting script."

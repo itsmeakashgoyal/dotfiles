@@ -86,7 +86,6 @@ brew "node"                 # Node.js
 brew "python3"              # Python 3
 
 # Language Tools - Python
-brew "black"                # Python formatter
 brew "pipx"                 # Python package installer
 brew "pyenv"                # Python version manager
 brew "pylint"               # Python linter

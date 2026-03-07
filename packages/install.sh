@@ -32,15 +32,37 @@ readonly BREWFILE="${PACKAGES_DIR}/Brewfile"
 # ------------------------------------------------------------------------------
 # Homebrew Functions
 # ------------------------------------------------------------------------------
+install_homebrew_prereqs_linux() {
+    [[ "$OS_TYPE" == "Linux" ]] || return 0
+
+    if ! command_exists apt-get; then
+        warning "apt-get not found; skipping Homebrew prerequisites install"
+        return 0
+    fi
+
+    if ! command_exists sudo; then
+        warning "sudo not found; cannot install Homebrew prerequisites automatically"
+        return 0
+    fi
+
+    info "Installing Homebrew prerequisites (Ubuntu/Debian)..."
+    sudo apt-get update
+    sudo apt-get install -y build-essential procps curl file git
+    success "Homebrew prerequisites installed"
+}
+
 install_homebrew() {
     if command_exists brew; then
         success "Homebrew is already installed"
         return 0
     fi
 
+    install_homebrew_prereqs_linux
+
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    check_command "Homebrew installation"
+    # Verify brew exists (the install script may not modify PATH for this shell)
+    check_command brew
 
     # Configure Homebrew PATH
     case "$OS_TYPE" in
