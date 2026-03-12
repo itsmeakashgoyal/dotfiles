@@ -33,6 +33,12 @@
 case "$(uname -s)" in
     Darwin)
         [[ -x "/opt/homebrew/bin/brew" ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+        # Prefer Python.org (and other /usr/local tools) over Homebrew.
+        # This avoids pip's PEP 668 "externally managed environment" for Homebrew Python,
+        # while keeping Homebrew available later in PATH.
+        if [[ -d "/usr/local/bin" ]]; then
+            path=(/usr/local/bin ${path:#/usr/local/bin})
+        fi
         ;;
     Linux)
         [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"

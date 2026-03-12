@@ -4,9 +4,14 @@
 function load_local_cache() {
     local zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-${ZSH_VERSION}"
     local compinit_args=(-C)
-    
-    # Only rebuild completion dump once per day
-    if [[ ! -f "$zcompdump" || -n "$(find "$zcompdump" -mtime +1)" ]]; then
+
+    # Only rebuild completion dump once per day (faster startup)
+    # Use zsh builtins to avoid forking an external `find` process on every start
+    zmodload zsh/datetime 2>/dev/null
+    zmodload -F zsh/stat b:zstat 2>/dev/null
+    local -a _mtime=(0)
+    [[ -f "$zcompdump" ]] && zstat -A _mtime +mtime "$zcompdump" 2>/dev/null
+    if [[ ! -f "$zcompdump" || $(( EPOCHSECONDS - _mtime[1] )) -gt 86400 ]]; then
         compinit_args=()
         mkdir -p "${zcompdump:h}"
     fi
@@ -14,6 +19,11 @@ function load_local_cache() {
     # Load completions
     autoload -Uz compinit
     compinit "${compinit_args[@]}" -d "$zcompdump"
+
+    # Compile zcompdump for faster loading (if not already compiled or outdated)
+    if [[ ! -f "${zcompdump}.zwc" || "$zcompdump" -nt "${zcompdump}.zwc" ]]; then
+        zcompile "$zcompdump" &>/dev/null &|
+    fi
 }
 load_local_cache
 

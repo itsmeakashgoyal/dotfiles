@@ -16,6 +16,7 @@
 # Folder view configuration files
 *.swp
 .vscode
+.cursor/rules
 
 # Thumbnail cache files
 ._*

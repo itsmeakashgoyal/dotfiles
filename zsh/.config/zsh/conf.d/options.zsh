@@ -28,10 +28,6 @@ export LESS_TERMCAP_us=$'\e[1;4;32m'
 export HISTFILE="${HOME}/.zsh_history"
 export HISTSIZE=200000
 export SAVEHIST=200000
-export HISTDUP=erase
-
-setopt append_history
-setopt inc_append_history
 setopt extended_history
 setopt share_history
 setopt hist_ignore_dups

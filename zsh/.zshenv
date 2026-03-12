@@ -40,7 +40,7 @@ export XDG_DOTFILES_DIR="${HOME}/dotfiles"
 # Locale and TTY (safe in all shells)
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
-export GPG_TTY="$(tty 2>/dev/null || true)"
+export GPG_TTY=$TTY
 
 # ------------------------------------------------------------------------------
 # Application Paths

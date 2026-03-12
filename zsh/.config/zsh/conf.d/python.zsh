@@ -31,15 +31,17 @@ export PYTHONUNBUFFERED=1        # Prevent Python from buffering stdout/stderr
 # ------------------------------------------------------------------------------
 # pyenv Configuration
 # ------------------------------------------------------------------------------
-# Initialize pyenv if it's installed (lazy loading for better performance)
+# Initialize pyenv lazily: only run `pyenv init` on first use, not at shell startup
 if [[ -d "$HOME/.pyenv" ]]; then
     export PYENV_ROOT="$HOME/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    
-    if command -v pyenv >/dev/null 2>&1; then
-        eval "$(pyenv init --path)"
-        eval "$(pyenv init -)"
-    fi
+    path=("$PYENV_ROOT/bin" $path)
+
+    pyenv() {
+        unfunction pyenv
+        eval "$(command pyenv init --path)"
+        eval "$(command pyenv init -)"
+        pyenv "$@"
+    }
 fi
 
 # ------------------------------------------------------------------------------

@@ -26,21 +26,29 @@ fi
 
 # Set up fzf paths (cache brew prefix for performance)
 if ! [[ -v FZF_BASE_PATH ]]; then
-    if command -v brew >/dev/null 2>&1; then
-        FZF_BASE_PATH="$(brew --prefix fzf)"
-    else
-        # Fallback to common locations
-        [[ -d "/usr/share/fzf" ]] && FZF_BASE_PATH="/usr/share/fzf"
-        [[ -d "$HOME/.fzf" ]] && FZF_BASE_PATH="$HOME/.fzf"
+    # Fast path: check common locations first (avoid slow `brew --prefix`)
+    if [[ -d "/opt/homebrew/opt/fzf" ]]; then
+        FZF_BASE_PATH="/opt/homebrew/opt/fzf"
+    elif [[ -d "/usr/local/opt/fzf" ]]; then
+        FZF_BASE_PATH="/usr/local/opt/fzf"
+    elif [[ -d "/home/linuxbrew/.linuxbrew/opt/fzf" ]]; then
+        FZF_BASE_PATH="/home/linuxbrew/.linuxbrew/opt/fzf"
+    elif [[ -d "/usr/share/fzf" ]]; then
+        FZF_BASE_PATH="/usr/share/fzf"
+    elif [[ -d "$HOME/.fzf" ]]; then
+        FZF_BASE_PATH="$HOME/.fzf"
+    elif command -v brew >/dev/null 2>&1; then
+        # Fallback to slow brew --prefix (only if common paths don't exist)
+        FZF_BASE_PATH="$(brew --prefix fzf 2>/dev/null)"
     fi
 fi
 
 FZF_SHELL_PATH="$FZF_BASE_PATH/shell"
 FZF_BIN_PATH="$FZF_BASE_PATH/bin"
 
-# Initialize zoxide if available
+# Initialize zoxide if available (lazy: only when first cd is used)
 if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh --cmd cd)"
+    eval "$(zoxide init zsh --cmd cd --hook prompt)"
 fi
 
 _clipcopy() {
@@ -49,25 +57,6 @@ _clipcopy() {
     elif command -v xsel >/dev/null 2>&1; then cat | xsel --clipboard --input
     else cat >/dev/null; fi
 }
-
-# ------------------------------------------------------------------------------
-# Color Scheme (Gruvbox Material)
-# ------------------------------------------------------------------------------
-local color_scheme=(
-    '--color=bg+:#3c3836'         # Selected background
-    '--color=bg:#282828'          # Normal background
-    '--color=spinner:#d65d0e'     # Loading spinner (bright orange)
-    '--color=hl:#fe8019'          # Highlighted substrings (orange)
-    '--color=fg:#ebdbb2'          # Text (light text)
-    '--color=header:#b8bb26'      # Header text (green)
-    '--color=info:#83a598'        # Info text (blue)
-    '--color=pointer:#fabd2f'     # Pointer arrow (yellow)
-    '--color=marker:#d3869b'      # Multi-select marker (pinkish magenta)
-    '--color=fg+:#fbf1c7'         # Selected text (lightest text)
-    '--color=prompt:#b8bb26'      # Prompt (green)
-    '--color=hl+:#fabd2f'         # Selected highlighted (yellow)
-    '--color=selected-bg:#504945' # Selected item background (dark gray)
-)
 
 # ------------------------------------------------------------------------------
 # Core FZF Configuration
@@ -80,8 +69,27 @@ export FZF_PREVIEW_COMMAND="([[ -f {} ]] && (bat --style=numbers,changes --color
 # Default command using fd for better performance and respecting .gitignore
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules --strip-cwd-prefix'
 
-# Default options combining color scheme, preview, and behavior
-export FZF_DEFAULT_OPTS="
+# Build FZF_DEFAULT_OPTS in an anonymous function to avoid leaking color_scheme
+# into the global namespace (`local` has no effect outside a function scope).
+() {
+    # Color Scheme (Gruvbox Material)
+    local color_scheme=(
+        '--color=bg+:#3c3836'         # Selected background
+        '--color=bg:#282828'          # Normal background
+        '--color=spinner:#d65d0e'     # Loading spinner (bright orange)
+        '--color=hl:#fe8019'          # Highlighted substrings (orange)
+        '--color=fg:#ebdbb2'          # Text (light text)
+        '--color=header:#b8bb26'      # Header text (green)
+        '--color=info:#83a598'        # Info text (blue)
+        '--color=pointer:#fabd2f'     # Pointer arrow (yellow)
+        '--color=marker:#d3869b'      # Multi-select marker (pinkish magenta)
+        '--color=fg+:#fbf1c7'         # Selected text (lightest text)
+        '--color=prompt:#b8bb26'      # Prompt (green)
+        '--color=hl+:#fabd2f'         # Selected highlighted (yellow)
+        '--color=selected-bg:#504945' # Selected item background (dark gray)
+    )
+
+    export FZF_DEFAULT_OPTS="
     ${color_scheme[*]}
     --multi
     --height=80%
@@ -89,7 +97,7 @@ export FZF_DEFAULT_OPTS="
     --border=rounded
     --padding=0
     --margin=1
-    --prompt='∷ ' 
+    --prompt='∷ '
     --pointer='▶ '
     --marker='✔ '
     --separator='~'
@@ -101,6 +109,7 @@ export FZF_DEFAULT_OPTS="
     --bind='ctrl-y:execute-silent(echo {} | _clipcopy)'
     --bind='ctrl-space:toggle+down'
 "
+}
 
 # ------------------------------------------------------------------------------
 # FZF Command-specific Configurations

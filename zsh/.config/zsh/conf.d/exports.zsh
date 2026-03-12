@@ -130,6 +130,7 @@ case "$OS_TYPE" in
     "/Library/Frameworks/Python.framework/Versions/Current/bin"
     "${HOME}/Library/Python/3.13/bin"
     "/opt/anaconda3/bin"
+    "${HOME}/.local/bin"
   )
   ;;
 "Linux")
