@@ -1,7 +1,13 @@
 # Modern Development Environment Dotfiles
 
-[![Test Setup dotfiles](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml)
+[![CI](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml)
 [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
+[![macOS](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple)](https://www.apple.com/macos/)
+[![Linux](https://img.shields.io/badge/Linux-Ubuntu%2FDebian-orange?logo=linux)](https://ubuntu.com/)
+[![Shell](https://img.shields.io/badge/Shell-Zsh-informational?logo=gnu-bash)](https://www.zsh.org/)
+[![Neovim](https://img.shields.io/badge/Neovim-0.10%2B-green?logo=neovim)](https://neovim.io/)
+[![Last Commit](https://img.shields.io/github/last-commit/itsmeakashgoyal/dotfiles)](https://github.com/itsmeakashgoyal/dotfiles/commits/master)
+[![Stars](https://img.shields.io/github/stars/itsmeakashgoyal/dotfiles?style=social)](https://github.com/itsmeakashgoyal/dotfiles/stargazers)
 
 ```text
      █████           █████       ██████   ███  ████
@@ -19,6 +25,13 @@ A comprehensive, automated dotfiles setup for **macOS** and **Linux**, featuring
 > **Warning:** These dotfiles are personalized and will overwrite existing configurations.
 > Fork the repo and review the scripts before running on your machine.
 > Backup your current configs first -- some changes are hard to reverse without a fresh install.
+
+---
+
+## Preview
+
+> Screenshots and animated demos coming soon.
+> See [`docs/SCREENSHOTS.md`](docs/SCREENSHOTS.md) for instructions on recording your own terminal demos with [vhs](https://github.com/charmbracelet/vhs).
 
 ---
 
@@ -428,14 +441,22 @@ This only removes the symlinks -- your dotfiles repo and all config files remain
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-change`
-3. Commit your changes: `git commit -m 'Add my change'`
-4. Push and open a Pull Request
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for full guidelines — how to add a new Stow package, shell script conventions, and the PR process.
 
 Issues and suggestions welcome at [github.com/itsmeakashgoyal/dotfiles/issues](https://github.com/itsmeakashgoyal/dotfiles/issues).
 
 ---
+
+## Documentation
+
+| Document | Purpose |
+|---|---|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Deep dive into directory structure, Zsh config flow, CI pipeline |
+| [`docs/SCREENSHOTS.md`](docs/SCREENSHOTS.md) | How to record terminal demos with `vhs` |
+| [`docs/MANUAL_SETUP.md`](docs/MANUAL_SETUP.md) | GitHub repo settings, Ghostty/WezTerm config, mise setup |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to contribute |
+| [`CHANGELOG.md`](CHANGELOG.md) | What changed in each version |
+| [`SECURITY.md`](SECURITY.md) | Secrets management and security practices |
 
 ## Resources
 
@@ -443,6 +464,7 @@ Issues and suggestions welcome at [github.com/itsmeakashgoyal/dotfiles/issues](h
 - [Homebrew](https://brew.sh/) -- Package manager for macOS and Linux
 - [Neovim](https://neovim.io/) -- Hyperextensible text editor
 - [Oh My Posh](https://ohmyposh.dev/) -- Prompt theme engine
+- [VHS](https://github.com/charmbracelet/vhs) -- Terminal demo recorder
 - [Awesome Dotfiles](https://github.com/webpro/awesome-dotfiles) -- Community dotfiles resources
 
 ---

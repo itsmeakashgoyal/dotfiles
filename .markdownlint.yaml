@@ -1,0 +1,21 @@
+# Markdownlint configuration
+default: true
+
+# Allow longer lines in code blocks and tables
+MD013:
+  line_length: 120
+  code_blocks: false
+  tables: false
+
+# Allow duplicate headings in different sections
+MD024:
+  siblings_only: true
+
+# Allow bare URLs in some cases
+MD034: false
+
+# Allow raw HTML (used for badges)
+MD033: false
+
+# Allow multiple blank lines (common in config files shown in docs)
+MD012: false
