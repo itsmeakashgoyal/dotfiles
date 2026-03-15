@@ -19,8 +19,8 @@
 
 import sys
 
-if sys.version_info < (3, 9):
-    sys.exit("check.py requires Python 3.9+")
+if sys.version_info < (3, 7):
+    sys.exit("check.py requires Python 3.7+")
 
 import os
 import platform

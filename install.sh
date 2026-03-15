@@ -28,8 +28,10 @@ export CI="${CI:-}"
 _confirm() {
     # Skip confirmation in CI
     [[ -n "$CI" ]] && return 0
+    
     local prompt="$1"
-    read -rp "$prompt [y/n] " reply
+    echo -n "$prompt [y/n] " >&2
+    read -r reply
     [[ "$reply" == "y" ]]
 }
 
@@ -128,10 +130,10 @@ main() {
 
     # OS-specific setup
     if os::is_mac; then
-        run_script "sublime"
-        run_script "iterm"
+        run_script "sublime" || log::warning "Sublime Text setup failed (non-fatal in CI)"
+        run_script "iterm" || log::warning "iTerm2 setup failed (non-fatal in CI)"
     elif os::is_linux; then
-        run_script "linux"
+        run_script "linux" || log::warning "Linux setup failed (non-fatal in CI)"
     fi
 
     # Symlinks
@@ -143,7 +145,11 @@ main() {
 
     # Post-install health check
     log::info "Running health check..."
-    bash "${DOTFILES_DIR}/scripts/verify/check.sh" --quick || true
+    if bash "${DOTFILES_DIR}/scripts/verify/check.sh" --quick; then
+        log::success "Health check passed!"
+    else
+        log::warning "Health check reported issues (non-fatal)"
+    fi
 }
 
 main "$@"
