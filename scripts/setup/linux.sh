@@ -13,7 +13,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/setup/_linuxOS.sh
+# ░▓ file   ▓ scripts/setup/linux.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 
@@ -24,14 +24,14 @@
 
 # Load helper functions
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
-HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+CORE_FILE="${SCRIPT_DIR}/lib/core.sh"
 
-if [[ ! -f "$HELPER_FILE" ]]; then
-    echo "Error: Helper file not found at $HELPER_FILE" >&2
+if [[ ! -f "$CORE_FILE" ]]; then
+    echo "Error: Core library not found at $CORE_FILE" >&2
     exit 1
 fi
 
-source "$HELPER_FILE"
+source "$CORE_FILE"
 set -euo pipefail
 
 # ------------------------------------------------------------------------------

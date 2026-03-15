@@ -1,177 +1,113 @@
 #!/usr/bin/env bash
-#              █████     ███  ████
-#             ░░███     ░░░  ░░███
-#  █████ ████ ███████   ████  ░███   █████
-# ░░███ ░███ ░░░███░   ░░███  ░███  ███░░
-#  ░███ ░███   ░███     ░███  ░███ ░░█████
-#  ░███ ░███   ░███ ███ ░███  ░███  ░░░░███
-#  ░░████████  ░░█████  █████ █████ ██████
-#   ░░░░░░░░    ░░░░░  ░░░░░ ░░░░░ ░░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ scripts/utils/_diff_files_interactive.sh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
+# Interactive file diff using fzf for selection and entr for live watching.
+# Uses delta for enhanced output if available, otherwise falls back to
+# built-in colored diff.
 
-# ------------------------------------------------------------------------------
-# Initialization
-# ------------------------------------------------------------------------------
-set -eu pipefail
+set -euo pipefail
 
-# ------------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────────
 # Constants
-# ------------------------------------------------------------------------------
-readonly PROJECT_DIR="${HOME}/dotfiles"  # Adjust this to your project root
+# ──────────────────────────────────────────────────────────────────────────────
+readonly PROJECT_DIR="${DOTFILES_DIR:-${HOME}/dotfiles}"
 
-# ------------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────────
 # Dependency Check
-# ------------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────────
 check_dependencies() {
-    local missing_deps=()
-    
-    # Check for required commands
+    local missing=()
     for cmd in fzf diff entr; do
-        if ! command -v "$cmd" >/dev/null 2>&1; then
-            missing_deps+=("$cmd")
-        fi
+        command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
     done
-    
-    # diff-so-fancy is optional, use regular diff if not available
-    local use_fancy_diff=false
-    if command -v diff-so-fancy >/dev/null 2>&1; then
-        use_fancy_diff=true
-    fi
 
-    if [[ ${#missing_deps[@]} -gt 0 ]]; then
-        echo "Error: Missing required dependencies: ${missing_deps[*]}"
-        echo -e "\nInstallation instructions:"
-        
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Error: missing required tools: ${missing[*]}" >&2
         if [[ "$(uname -s)" == "Darwin" ]]; then
-            echo "Using Homebrew:"
-            echo "  brew install ${missing_deps[*]}"
-        elif [[ "$(uname -s)" == "Linux" ]]; then
-            if command -v apt-get >/dev/null 2>&1; then
-                echo "Using apt:"
-                echo "  sudo apt-get install ${missing_deps[*]}"
-            elif command -v dnf >/dev/null 2>&1; then
-                echo "Using dnf:"
-                echo "  sudo dnf install ${missing_deps[*]}"
-            elif command -v pacman >/dev/null 2>&1; then
-                echo "Using pacman:"
-                echo "  sudo pacman -S ${missing_deps[*]}"
-            fi
+            echo "  brew install ${missing[*]}" >&2
+        else
+            echo "  sudo apt-get install ${missing[*]}  # or equivalent" >&2
         fi
-        
         exit 1
     fi
-    
-    # Return whether to use fancy diff
-    echo "$use_fancy_diff"
+
+    # delta (git-delta) is optional — prettier diffs
+    command -v delta >/dev/null 2>&1 && USE_DELTA=true || USE_DELTA=false
 }
 
-# ------------------------------------------------------------------------------
-# Functions
-# ------------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────────
+# File Selection
+# ──────────────────────────────────────────────────────────────────────────────
 select_file() {
     local prompt="$1"
-    
-    # Change to project directory
     cd "$PROJECT_DIR" || exit 1
-    
-    # Find files, excluding common directories to ignore
     find . \
         -type f \
         -not -path "*/\.*" \
         -not -path "*/node_modules/*" \
-        -not -path "*/vendor/*" \
-        2>/dev/null | \
-        sed 's|^./||' | \
-        fzf --height 40% \
-            --reverse \
-            --prompt="Select $prompt file: " || echo ""
+        2>/dev/null \
+        | sed 's|^\./||' \
+        | fzf --height 40% \
+              --reverse \
+              --prompt="Select $prompt file: " || echo ""
 }
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Diff
+# ──────────────────────────────────────────────────────────────────────────────
 perform_diff() {
-    local file1="$1"
-    local file2="$2"
-    local use_fancy="${3:-false}"
+    local file1="$1" file2="$2"
+    local full1="${PROJECT_DIR}/${file1}"
+    local full2="${PROJECT_DIR}/${file2}"
 
-    # Construct full paths
-    local full_path1="${PROJECT_DIR}/${file1}"
-    local full_path2="${PROJECT_DIR}/${file2}"
-
-    # Verify files exist
-    if [[ ! -f "$full_path1" || ! -f "$full_path2" ]]; then
-        echo "Error: One or both files do not exist:"
-        [[ ! -f "$full_path1" ]] && echo "Missing: $full_path1"
-        [[ ! -f "$full_path2" ]] && echo "Missing: $full_path2"
+    if [[ ! -f "$full1" || ! -f "$full2" ]]; then
+        echo "Error: one or both files do not exist:" >&2
+        [[ ! -f "$full1" ]] && echo "  Missing: $full1" >&2
+        [[ ! -f "$full2" ]] && echo "  Missing: $full2" >&2
         return 1
     fi
 
-    # Clear screen for better visibility
     clear
-    
-    # Perform diff with or without fancy output
-    echo "Comparing files:"
-    echo "1: $full_path1"
-    echo "2: $full_path2"
-    echo -e "\nDifferences:\n"
-    
-    if [[ "$use_fancy" == "true" ]]; then
-        diff --unified=3 "$full_path1" "$full_path2" | diff-so-fancy
+    echo "Comparing:"
+    echo "  1: $full1"
+    echo "  2: $full2"
+    echo ""
+
+    if [[ "${USE_DELTA:-false}" == "true" ]]; then
+        diff --unified=3 "$full1" "$full2" | delta || true
     else
-        diff --unified=3 --color=auto "$full_path1" "$full_path2" || true
+        diff --unified=3 --color=auto "$full1" "$full2" || true
     fi
 }
 
-# ------------------------------------------------------------------------------
-# Main Function
-# ------------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────────
+# Main
+# ──────────────────────────────────────────────────────────────────────────────
 main() {
-    # Check dependencies and get fancy diff status
-    local use_fancy
-    use_fancy=$(check_dependencies)
+    check_dependencies
 
-    # Ensure we're in the project directory
     cd "$PROJECT_DIR" || exit 1
 
-    # Select files
-    local file1
-    local file2
-    
-    # Select first file
+    local file1 file2
     file1=$(select_file "first")
-    if [[ -z "$file1" ]]; then
-        echo "No file selected. Exiting."
-        exit 1
-    fi
+    [[ -z "$file1" ]] && { echo "No file selected. Exiting."; exit 1; }
 
-    # Select second file
     file2=$(select_file "second")
-    if [[ -z "$file2" ]]; then
-        echo "No file selected. Exiting."
-        exit 1
-    fi
+    [[ -z "$file2" ]] && { echo "No file selected. Exiting."; exit 1; }
 
-    # Initial diff
-    perform_diff "$file1" "$file2" "$use_fancy"
+    perform_diff "$file1" "$file2"
 
-    # Watch files for changes and perform diff
-    echo -e "\n\nWatching files for changes. Press Ctrl+C to exit."
-    local full_path1="${PROJECT_DIR}/${file1}"
-    local full_path2="${PROJECT_DIR}/${file2}"
-    
-    # Export function and variables for entr
+    echo ""
+    echo "Watching for changes. Press Ctrl+C to exit."
+
     export -f perform_diff
-    export PROJECT_DIR
-    export use_fancy
-    
-    printf "%s\n%s\n" "$full_path1" "$full_path2" | \
-        entr bash -c "perform_diff '$file1' '$file2' '$use_fancy'"
+    export PROJECT_DIR USE_DELTA
+    printf "%s\n%s\n" "${PROJECT_DIR}/${file1}" "${PROJECT_DIR}/${file2}" \
+        | entr bash -c "perform_diff '$file1' '$file2'"
 }
 
-# Run main function
 main

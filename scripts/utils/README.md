@@ -239,9 +239,9 @@ dutils debug script.sh arg1 arg2
 ```
 scripts/utils/
 ├── dutils                       # Main CLI entry point
-├── _helper.sh                   # Shared helper functions
+├── core.sh                   # Shared helper functions
 ├── _cleanup.sh                  # Cleanup functionality
-├── _detect_os.sh               # OS detection
+├── _cleanup.sh                  # Backup and cleanup utilities
 ├── _diff_files_interactive.sh  # Interactive diff
 ├── _install_nvim.sh            # Neovim installer
 ├── _print-functions.sh         # Function lister
@@ -250,7 +250,7 @@ scripts/utils/
 └── README.md                   # This file
 ```
 
-### Helper Functions (_helper.sh)
+### Helper Functions (core.sh)
 
 The helper file provides shared functionality:
 
@@ -330,7 +330,7 @@ chmod +x ~/dotfiles/scripts/utils/_*.sh
 **Solution:**
 ```bash
 # Verify helper file exists
-ls -la ~/dotfiles/scripts/utils/_helper.sh
+ls -la ~/dotfiles/scripts/lib/core.sh
 
 # If missing, check your dotfiles are properly cloned
 cd ~/dotfiles
@@ -429,7 +429,7 @@ git pull origin main
 
 - Use `#!/usr/bin/env bash` shebang
 - Enable strict mode: `set -euo pipefail`
-- Source `_helper.sh` for common functions
+- Source `core.sh` for common functions
 - Add header banner with author and file info
 - Include `--help` option for all commands
 - Use `readonly` for constants
@@ -520,7 +520,7 @@ dutils cleanup nvim && dutils install-nvim
 #!/usr/bin/env bash
 
 # Source the helper library
-source ~/dotfiles/scripts/utils/_helper.sh
+source ~/dotfiles/scripts/lib/core.sh
 
 # Use helper functions
 info "Starting setup..."

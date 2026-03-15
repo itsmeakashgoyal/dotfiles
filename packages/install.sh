@@ -12,16 +12,13 @@
 
 set -euo pipefail
 
-# Load helper functions
-SCRIPT_DIR="${HOME}/dotfiles/scripts"
-HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
-
-if [[ ! -f "$HELPER_FILE" ]]; then
-    echo "Error: Helper file not found at $HELPER_FILE" >&2
+# Load shared library
+CORE="${HOME}/dotfiles/scripts/lib/core.sh"
+if [[ ! -f "$CORE" ]]; then
+    echo "Error: core library not found at $CORE" >&2
     exit 1
 fi
-
-source "$HELPER_FILE"
+source "$CORE"
 
 # ------------------------------------------------------------------------------
 # Configuration
@@ -144,7 +141,7 @@ main() {
     info "Verifying package installation..."
     echo ""
     
-    if bash "${DOTFILES_DIR}/scripts/verification/check_packages.sh"; then
+    if bash "${DOTFILES_DIR}/scripts/verify/check.sh" --packages; then
         success "✓ All packages verified successfully!"
     else
         warning "Some packages may be missing - see details above"

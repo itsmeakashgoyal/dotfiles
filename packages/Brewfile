@@ -25,7 +25,6 @@
 #############################################################
 tap "jandedobbeleer/oh-my-posh"
 tap "github/gh"
-tap "kyoh86/tap"
 
 if OS.mac?
     tap "FelixKratz/formulae"
@@ -52,7 +51,6 @@ brew "tree"                 # Directory tree
 brew "zoxide"               # Smart cd (Rust)
 
 # System Monitoring
-brew "bmon"                 # Bandwidth monitor
 brew "btop"                 # System monitor
 brew "ctop"                 # Container metrics (Go)
 brew "dua-cli"              # Disk usage analyzer
@@ -77,19 +75,11 @@ brew "automake"
 brew "cmake"
 
 # Version Control & Tools
-brew "diff-so-fancy"
 brew "lazygit"              # Git TUI (Go)
 
 # Programming Languages
 brew "go"                   # Go programming language
 brew "node"                 # Node.js
-brew "python3"              # Python 3
-
-# Language Tools - Python
-brew "pipx"                 # Python package installer
-brew "pyenv"                # Python version manager
-brew "pylint"               # Python linter
-brew "python-lsp-server"    # Python LSP
 
 # Language Tools - Lua
 brew "lua"
@@ -104,13 +94,8 @@ brew "shellcheck"           # Shell script linter
 brew "shfmt"                # Shell formatter
 
 # Other Tools
-brew "ack"                  # Search tool
-brew "grc"                  # Colorize output
-brew "hexyl"                # Hex viewer (Rust)
 brew "rsync"                # File sync
-brew "sevenzip"             # 7-Zip archiver
 brew "tldr"                 # Simplified man pages
-brew "zstd"                 # Compression
 
 #############################################################
 # macOS Specific                                            #
@@ -119,9 +104,7 @@ if OS.mac?
     # Core Tools
     brew "coreutils"        # GNU core utilities
     brew "entr"             # File watcher
-    brew "figlet"           # ASCII art
     brew "gcc"              # GNU compiler
-    brew "lolcat"           # Rainbow text
     brew "mas"              # Mac App Store CLI
     brew "stow"             # Dotfile manager
     brew "trash"            # Safe rm
@@ -140,10 +123,7 @@ if OS.mac?
     brew "sshs"             # SSH TUI (Rust)
 
     # Development
-    brew "brew-cask-completion"
-    brew "cmake-docs"
     brew "editorconfig"
-    brew "lld"              # LLVM linker
     brew "universal-ctags"
 
     # Nerd Fonts

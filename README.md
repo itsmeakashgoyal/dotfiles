@@ -123,14 +123,14 @@ The installer runs through these stages in order:
 | --- | --- |
 | **Homebrew** | Installs Homebrew (or Linuxbrew on Linux), updates it, then installs every formula and cask listed in `packages/Brewfile`. |
 | **Default shell** | Adds `zsh` to `/etc/shells` if missing, then sets it as your login shell via `chsh`. |
-| **OS-specific setup** | Runs `scripts/setup/_macOS.sh` (Finder, Dock, trackpad, keyboard preferences) or `scripts/setup/_linuxOS.sh` (essential apt packages, fonts, locale). |
+| **OS-specific setup** | Runs `scripts/setup/macos.sh` (Finder, Dock, trackpad, keyboard preferences) or `scripts/setup/linux.sh` (essential apt packages, fonts, locale). |
 | **Stow** | Removes any old manual symlinks, then runs `stow --restow` for each package: `git`, `zsh`, `nvim`, `tmux`, `ohmyposh`. |
-| **Verification** | Runs `scripts/verification/health_check.sh` to confirm everything is linked and working. |
+| **Verification** | Runs `scripts/verify/check.sh --quick` to confirm everything is linked and working. |
 
 ### macOS-Specific Notes
 
 - Homebrew installs to `/opt/homebrew` on Apple Silicon and `/usr/local` on Intel Macs. The installer handles both.
-- The macOS setup script (`scripts/setup/_macOS.sh`) configures system preferences (Finder, Dock, keyboard repeat, trackpad). Review it and remove any settings you don't want before running.
+- The macOS setup script (`scripts/setup/macos.sh`) configures system preferences (Finder, Dock, keyboard repeat, trackpad). Review it and remove any settings you don't want before running.
 - GUI apps (casks) in the Brewfile are macOS-only and are skipped on Linux automatically.
 
 ### Linux-Specific Notes
@@ -142,7 +142,7 @@ The installer runs through these stages in order:
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
   ```
 
-- The Linux setup script (`scripts/setup/_linuxOS.sh`) installs base development packages via `apt` (compilers, libraries, fonts).
+- The Linux setup script (`scripts/setup/linux.sh`) installs base development packages via `apt` (compilers, libraries, fonts).
 
 ### (Optional) SSH Key Setup
 
@@ -209,9 +209,9 @@ dotfiles/
 │   └── install.sh             # Homebrew install + bundle
 │
 ├── scripts/
-│   ├── setup/                 # _macOS.sh, _linuxOS.sh, _sublime.sh
+│   ├── setup/                 # macos.sh, linux.sh, sublime.sh
 │   ├── verification/          # health_check.sh, verify_installation.sh, etc.
-│   ├── utils/                 # _helper.sh (logging, OS detection, utilities)
+│   ├── utils/                 # core.sh (logging, OS detection, utilities)
 │   └── tmux/                  # Tmux helper scripts
 │
 ├── settings/                  # App settings (deployed by make apps)
@@ -352,9 +352,9 @@ Comprehensive check of all 40+ components: directory structure, symlinks, tool v
 ### System Information
 
 ```bash
-bash ~/dotfiles/scripts/verification/system_info.sh            # Everything
-bash ~/dotfiles/scripts/verification/system_info.sh --system    # OS & hardware only
-bash ~/dotfiles/scripts/verification/system_info.sh --dev       # Dev tools only
+bash ~/dotfiles/scripts/verify/check.sh system_info.sh            # Everything
+bash ~/dotfiles/scripts/verify/check.sh system_info.sh --system    # OS & hardware only
+bash ~/dotfiles/scripts/verify/check.sh system_info.sh --dev       # Dev tools only
 ```
 
 ### Package Audit

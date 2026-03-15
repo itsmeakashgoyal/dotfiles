@@ -1,235 +1,149 @@
-#!/bin/bash
-#   ███                      █████              ████  ████
-#  ░░░                      ░░███              ░░███ ░░███
-#  ████  ████████    █████  ███████    ██████   ░███  ░███
-# ░░███ ░░███░░███  ███░░  ░░░███░    ░░░░░███  ░███  ░███
-#  ░███  ░███ ░███ ░░█████   ░███      ███████  ░███  ░███
-#  ░███  ░███ ░███  ░░░░███  ░███ ███ ███░░███  ░███  ░███
-#  █████ ████ █████ ██████   ░░█████ ░░████████ █████ █████
-# ░░░░░ ░░░░ ░░░░░ ░░░░░░     ░░░░░   ░░░░░░░░ ░░░░░ ░░░░░
+#!/usr/bin/env bash
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ install.sh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
 # Install packages, run OS-specific setup, and stow dotfiles.
-#################################################
 
-# ------------------------------
-#          INITIALIZE
-# ------------------------------
-# Load Helper functions persistently
-SCRIPT_DIR="${HOME}/dotfiles/scripts"
-HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
-
-# Check if helper file exists and source it
-if [[ ! -f "$HELPER_FILE" ]]; then
-    echo "Error: Helper file not found at $HELPER_FILE" >&2
-    exit 1
-fi
-
-# Source the helper file
-source "$HELPER_FILE"
-
-# Enable strict mode for better error handling
 set -euo pipefail
 
-# Set CI environment variable if not already set
+# ------------------------------------------------------------------------------
+# Bootstrap: load shared library
+# ------------------------------------------------------------------------------
+CORE="${HOME}/dotfiles/scripts/lib/core.sh"
+if [[ ! -f "$CORE" ]]; then
+    echo "Error: core library not found at $CORE" >&2
+    exit 1
+fi
+source "$CORE"
+
+trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 export CI="${CI:-}"
 
-# Initialize Git submodules
-initGitSubmodules() {
-    log_message "→ Initializing and updating git submodules..."
-    git submodule update --init --recursive --remote
+# ------------------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------------------
+_confirm() {
+    # Skip confirmation in CI
+    [[ -n "$CI" ]] && return 0
+    local prompt="$1"
+    read -rp "$prompt [y/n] " reply
+    [[ "$reply" == "y" ]]
 }
 
-# Show available setup targets
-show_targets() {
-    echo "Available targets:"
-    echo "  all      - Install everything"
-    echo "  macos    - Setup macOS specific configurations"
-    echo "  linux    - Setup Linux specific configurations"
-    echo "  brew     - Install Homebrew and packages"
-    echo "  sublime  - Setup Sublime Text configuration"
-    echo "  iterm    - Setup iTerm2 preferences"
-}
-
-# Setup dotfiles based on specified targets
-setupDotfiles() {
-    local targets=("$@")
-
-    # If no targets specified, show help
-    if [ ${#targets[@]} -eq 0 ]; then
-        show_targets
-        return 1
+_ensure_python3() {
+    if command_exists python3; then
+        log::success "Python 3 available: $(python3 --version 2>&1)"
+        return 0
     fi
 
-    for target in "${targets[@]}"; do
-        case "$target" in
-        "macos")
-            if [ "$OS_TYPE" != "Darwin" ]; then
-                error "Not on macOS - cannot run macOS setup"
-                return 1
-            fi
-            run_script "_macOS"
-            run_script "_sublime"
-            run_script "_iterm"
-            ;;
-        "linux")
-            if [ "$OS_TYPE" != "Linux" ]; then
-                error "Not on Linux - cannot run Linux setup"
-                return 1
-            fi
-            run_script "_linuxOS"
-            ;;
-        "sublime")
-            run_script "_sublime"
-            ;;
-        "iterm")
-            run_script "_iterm"
-            ;;
-        *)
-            error "Unknown target: $target"
-            show_targets
-            return 1
-            ;;
-        esac
-    done
-}
+    log::info "Python 3 not found — installing..."
 
-# Set the error trap
-trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
-
-# Main function
-main() {
-    log_message "Script started"
-    info "
-You're running ${OS_TYPE}.
-##############################################
-#      We will begin applying updates,       #
-#      and securing the system.              #
-##############################################
-#      You will be prompted for your         #
-#      sudo password.                        #
-##############################################
-"
-
-    if [ "$OS_TYPE" = "Darwin" ]; then
-        success "
-##############################################
-#      MacOS system detected.                #
-#      Proceeding with setup...              #
-##############################################
-"
-        log_message "MacOS system detected. Proceeding with setup."
-    else
-        success "
-##############################################
-#      Ubuntu-based system detected.         #
-#      Proceeding with setup...              #
-##############################################
-"
-        log_message "Ubuntu-based system detected. Proceeding with setup."
-    fi
-
-    # check for required commands
-    check_required_commands
-
-    # Confirmation prompt (skip in CI)
-    if [ -n "$CI" ]; then
-        info "Running in CI mode - skipping confirmation prompt"
-    else
-        warning "This will install & configure dotfiles on your system. It may overwrite existing files."
-        read -p "Are you sure you want to proceed? (y/n) " confirm
-        if [[ "$confirm" != "y" ]]; then
-            error "Installation aborted."
-            exit 0
-        fi
-    fi
-
-    if [ -z "$CI" ]; then
-        # Check for sudo password and keep alive
-        if sudo --validate; then
-            sudo_keep_alive &
-            SUDO_PID=$!
-            trap '[[ -n "${SUDO_PID:-}" ]] && kill "$SUDO_PID" 2>/dev/null || true' EXIT
-            substep_info "Sudo password saved. Continuing with script."
+    if os::is_mac; then
+        brew install python3
+    elif os::is_linux; then
+        if command_exists apt-get; then
+            sudo apt-get update -qq && sudo apt-get install -y python3
+        elif command_exists dnf; then
+            sudo dnf install -y python3
+        elif command_exists pacman; then
+            sudo pacman -S --noconfirm python
+        elif command_exists brew; then
+            brew install python3
         else
-            substep_error "Incorrect sudo password. Exiting script."
-            exit 1
+            log::fatal "Cannot install Python 3 automatically. Install it manually and re-run."
         fi
     fi
 
-    # Install all packages from Homebrew
-    info "Installing packages from Homebrew..."
-    bash ${DOTFILES_DIR}/packages/install.sh
+    command_exists python3 \
+        || log::fatal "Python 3 installation failed. Install it manually and re-run."
 
-    # Check if zsh is installed and set it as the default shell if desired
-    info "Set Zsh as default shell..."
-    if command -v zsh &>/dev/null; then
-        if ! grep -q "$(command -v zsh)" /etc/shells; then
-            substep_info "Adding zsh to available shells..."
-            sudo sh -c "echo $(command -v zsh) >> /etc/shells"
-        fi
-        sudo chsh -s "$(command -v zsh)" "$USER"
-    fi
+    log::success "Python 3 installed: $(python3 --version 2>&1)"
+}
 
-    ## Now proceed with OS specific setup installations
-    if [ "$OS_TYPE" = "Darwin" ]; then
-        setupDotfiles "macos"
-    elif [ "$OS_TYPE" = "Linux" ]; then
-        setupDotfiles "linux"
-    fi
+_stow_packages() {
+    local packages=(git zsh nvim tmux ohmyposh)
 
-    # Clean up old manual symlinks before stowing
-    info "Cleaning up old symlinks..."
-    for old_link in "$HOME/.zshenv" "$HOME/.config/nvim" "$HOME/.config/tmux" "$HOME/.config/git" "$HOME/.config/zsh" "$HOME/.config/ohmyposh"; do
-        if [ -L "$old_link" ]; then
-            rm "$old_link"
-            substep_info "Removed old symlink: $old_link"
+    log::info "Cleaning up old symlinks..."
+    local old_links=("$HOME/.zshenv" "$HOME/.config/nvim" "$HOME/.config/tmux"
+                      "$HOME/.config/git" "$HOME/.config/zsh" "$HOME/.config/ohmyposh")
+    for link in "${old_links[@]}"; do
+        if [[ -L "$link" ]]; then
+            rm "$link"
+            log::substep "Removed old symlink: $link"
         fi
     done
 
-    # Stow all dotfile packages
-    info "Stowing dotfile packages..."
-    for pkg in git zsh nvim tmux ohmyposh; do
-        substep_info "Stowing $pkg..."
+    log::info "Stowing dotfile packages..."
+    for pkg in "${packages[@]}"; do
+        log::substep "Stowing $pkg..."
         stow --restow --dir="${DOTFILES_DIR}" --target="$HOME" "$pkg"
     done
-    success "All packages stowed successfully."
-
-    ### Hostname
-    ###########################################################
-    if [ -x "$(command -v figlet)" ]; then
-        if [ -x "$(command -v lolcat)" ]; then
-            figlet $(hostname) | lolcat -f
-        else
-            figlet $(hostname)
-        fi
-    else
-        echo "$(hostname)"
-    fi
-
-    log_message "Installation Completed!"
-
-    info "Running post-installation verification..."
-    echo ""
-    
-    if bash "${DOTFILES_DIR}/scripts/verification/health_check.sh"; then
-        success "✓ Installation verified successfully!"
-    else
-        warning "Some verification checks failed - review output above"
-    fi
-
-    success "
-################################################################################################
-#      Installation complete! Run 'exec zsh' to start using your new configuration            #
-################################################################################################
-"
+    log::success "All packages stowed."
 }
 
-# Run the main function
+# ------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------
+main() {
+    log::banner "Dotfiles Installer"
+    log::info "OS: $(os::detail)"
+
+    check_required_commands
+
+    if ! _confirm "This will install and configure dotfiles on your system. Proceed?"; then
+        log::error "Installation aborted."
+        exit 0
+    fi
+
+    # Keep sudo alive for the duration
+    if [[ -z "$CI" ]]; then
+        if sudo --validate; then
+            sudo_keep_alive &
+            local sudo_pid=$!
+            trap '[[ -n "${sudo_pid:-}" ]] && kill "$sudo_pid" 2>/dev/null || true' EXIT
+        else
+            log::fatal "Sudo validation failed."
+        fi
+    fi
+
+    # Packages
+    log::info "Installing packages..."
+    bash "${DOTFILES_DIR}/packages/install.sh"
+
+    # Python 3 (required by dutils scripts)
+    _ensure_python3
+
+    # Default shell
+    log::info "Setting Zsh as default shell..."
+    if command_exists zsh; then
+        local zsh_path; zsh_path=$(command -v zsh)
+        if ! grep -q "$zsh_path" /etc/shells; then
+            sudo sh -c "echo $zsh_path >> /etc/shells"
+        fi
+        sudo chsh -s "$zsh_path" "$USER"
+    fi
+
+    # OS-specific setup
+    if os::is_mac; then
+        run_script "sublime"
+        run_script "iterm"
+    elif os::is_linux; then
+        run_script "linux"
+    fi
+
+    # Symlinks
+    _stow_packages
+
+    log::success "Installation complete!"
+    log::info "Run 'exec zsh' to start using your new configuration."
+    echo ""
+
+    # Post-install health check
+    log::info "Running health check..."
+    bash "${DOTFILES_DIR}/scripts/verify/check.sh" --quick || true
+}
+
 main "$@"

@@ -50,10 +50,9 @@ shfmt -d scripts/                   # Check shell formatting
 - `private.zsh` — Machine-local overrides, gitignored
 
 ### Scripts Layout
-- `scripts/utils/_helper.sh` — Shared library for logging, OS detection, command checking; sourced by all install scripts
-- `scripts/utils/_logger.sh` — Multi-level logging (TRACE → FATAL)
-- `scripts/verification/` — `health_check.sh`, `verify_installation.sh`, `system_info.sh`, `check_packages.sh`
-- `scripts/setup/` — OS-specific setup: `_macOS.sh`, `_linuxOS.sh`, `_sublime.sh`, `_iterm.sh`
+- `scripts/lib/core.sh` — Shared library for logging, OS detection, command checking; sourced by all install scripts
+- `scripts/verify/check.sh` → `check.py` — Health/verification checks (`--quick`, `--full`, `--packages`, `--system`)
+- `scripts/setup/` — OS-specific setup: `macos.sh`, `linux.sh`, `sublime.sh`, `iterm.sh`
 - `packages/install.sh` + `packages/Brewfile` — Homebrew bundle installation
 
 ### Installation Flow
@@ -66,7 +65,7 @@ shfmt -d scripts/                   # Check shell formatting
 
 ## Key Conventions
 
-- All shell scripts source `scripts/utils/_helper.sh` for consistent logging and OS detection
+- All shell scripts source `scripts/lib/core.sh` for consistent logging and OS detection
 - XDG Base Directory spec: configs live in `~/.config/`, not `$HOME` directly (except `.zshenv`)
 - `private.zsh` is gitignored and used for machine-local secrets/overrides — don't commit secrets to tracked files
 - The `.cursor/rules/security-global/` directory contains security linting rules that apply to code edits

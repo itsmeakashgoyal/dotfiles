@@ -69,4 +69,4 @@ ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 
 ## macOS System Preferences Script
 
-`scripts/setup/_macOS.sh` modifies system preferences (Finder, Dock, keyboard). Review it before running — it is not reversible without a fresh macOS install of those defaults.
+`scripts/setup/macos.sh` modifies system preferences (Finder, Dock, keyboard). Review it before running — it is not reversible without a fresh macOS install of those defaults.

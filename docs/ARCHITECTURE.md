@@ -79,13 +79,13 @@ bootstrap.sh  (fresh machines without git)
      │  git clone + exec install.sh
      ▼
 install.sh
-     ├── 1. Source scripts/utils/_helper.sh  (logging, OS detection)
+     ├── 1. Source scripts/lib/core.sh  (logging, OS detection)
      ├── 2. packages/install.sh              (Homebrew + Brewfile bundle)
      ├── 3. chsh → zsh                       (set default shell)
-     ├── 4. scripts/setup/_macOS.sh          (macOS system prefs)
-     │      or scripts/setup/_linuxOS.sh     (apt packages, locale)
+     ├── 4. scripts/setup/macos.sh          (macOS system prefs)
+     │      or scripts/setup/linux.sh     (apt packages, locale)
      ├── 5. stow --restow <each package>     (create all symlinks)
-     └── 6. scripts/verification/health_check.sh
+     └── 6. scripts/verify/check.sh --quick
 ```
 
 ---
@@ -97,24 +97,24 @@ All scripts share a common utility layer:
 ```
 scripts/
 ├── utils/
-│   ├── _helper.sh         ← sourced by everything; provides:
+│   ├── core.sh         ← sourced by everything; provides:
 │   │                         log_message(), info(), success(),
 │   │                         warning(), error(), substep_info()
 │   │                         check_required_commands()
 │   │                         sudo_keep_alive()
 │   │                         OS_TYPE detection
-│   ├── _logger.sh         ← multi-level logging (TRACE→FATAL)
-│   ├── _detect_os.sh      ← OS/arch detection helpers
+│   ├── core.sh         ← multi-level logging (TRACE→FATAL)
+│   ├── core.sh      ← OS/arch detection helpers
 │   ├── _cleanup.sh        ← backup and cleanup utilities
 │   ├── _setup_ssh.sh      ← Ed25519 SSH key generation
 │   ├── _install_nvim.sh   ← Neovim manual installer (fallback)
 │   └── dutils             ← CLI tool wrapping helper functions
 │
 ├── setup/
-│   ├── _macOS.sh          ← defaults write system preferences
-│   ├── _linuxOS.sh        ← apt-get packages, fonts, locale
-│   ├── _sublime.sh        ← Sublime Text config deployment
-│   └── _iterm.sh          ← iTerm2 plist deployment
+│   ├── macos.sh          ← defaults write system preferences
+│   ├── linux.sh        ← apt-get packages, fonts, locale
+│   ├── sublime.sh        ← Sublime Text config deployment
+│   └── iterm.sh          ← iTerm2 plist deployment
 │
 └── verification/
     ├── health_check.sh         ← fast: symlinks, core tools (~5s)

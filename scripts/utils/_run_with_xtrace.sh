@@ -20,7 +20,7 @@
 # The set -u referencing a previously undefined  variable - with the exceptions of $* and $@ - is an error
 # The set -o pipefaile if any command in a pipeline fails, that return code will be used as the return code of the whole pipeline
 # https://bit.ly/37nFgin
-set -eo pipefail
+set -euo pipefail
 
 # Set new line and tab for word splitting
 IFS=$'\n\t'

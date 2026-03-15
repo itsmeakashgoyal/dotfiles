@@ -69,7 +69,7 @@ make stow pkg=<toolname>
 All scripts must:
 - Start with `#!/bin/bash`
 - Use `set -euo pipefail`
-- Source `scripts/utils/_helper.sh` for logging
+- Source `scripts/lib/core.sh` for logging
 - Pass `shellcheck -x` with no errors
 
 ### 4. Test locally
@@ -114,7 +114,7 @@ chore: update Brewfile with new tools
 - 4-space indentation
 - `snake_case` for variable and function names
 - Always quote variables: `"$variable"` not `$variable`
-- Use `log_message`, `info`, `success`, `warning`, `error` from `_helper.sh` for output — never raw `echo` for status messages
+- Use `log_message`, `info`, `success`, `warning`, `error` from `core.sh` for output — never raw `echo` for status messages
 
 ### Makefile
 
