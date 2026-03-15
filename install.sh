@@ -93,14 +93,19 @@ main() {
     log::banner "Dotfiles Installer"
     log::info "OS: $(os::detail)"
 
+    log::info "[STEP 1/8] Checking required commands..."
     check_required_commands
+    log::success "[STEP 1/8] Required commands OK"
 
+    log::info "[STEP 2/8] Confirming installation..."
     if ! _confirm "This will install and configure dotfiles on your system. Proceed?"; then
         log::error "Installation aborted."
         exit 0
     fi
+    log::success "[STEP 2/8] Confirmed"
 
     # Keep sudo alive for the duration
+    log::info "[STEP 3/8] Setting up sudo..."
     if [[ -z "$CI" ]]; then
         if sudo --validate; then
             sudo_keep_alive &
@@ -109,34 +114,48 @@ main() {
         else
             log::fatal "Sudo validation failed."
         fi
+    else
+        log::info "[STEP 3/8] CI mode — skipping sudo keep-alive"
     fi
+    log::success "[STEP 3/8] Sudo setup done"
 
     # Packages
-    log::info "Installing packages..."
+    log::info "[STEP 4/8] Installing packages (DOTFILES_DIR=${DOTFILES_DIR})..."
     bash "${DOTFILES_DIR}/packages/install.sh"
+    log::success "[STEP 4/8] Packages installed"
 
     # Python 3 (required by dutils scripts)
+    log::info "[STEP 5/8] Ensuring Python 3..."
     _ensure_python3
+    log::success "[STEP 5/8] Python 3 OK"
 
     # Default shell
-    log::info "Setting Zsh as default shell..."
+    log::info "[STEP 6/8] Setting Zsh as default shell..."
     if command_exists zsh; then
         local zsh_path; zsh_path=$(command -v zsh)
+        log::info "[STEP 6/8] zsh found at: $zsh_path"
         if ! grep -q "$zsh_path" /etc/shells; then
+            log::info "[STEP 6/8] Adding $zsh_path to /etc/shells..."
             sudo sh -c "echo $zsh_path >> /etc/shells"
         fi
         sudo chsh -s "$zsh_path" "$USER" || log::warning "Could not change default shell (non-fatal in CI)"
+    else
+        log::warning "[STEP 6/8] zsh not found — skipping shell change"
     fi
+    log::success "[STEP 6/8] Default shell step done"
 
     # OS-specific setup
+    log::info "[STEP 7/8] Running OS-specific setup (OS: $(os::detail))..."
     if os::is_mac; then
         run_script "sublime" || log::warning "Sublime Text setup failed (non-fatal in CI)"
         run_script "iterm" || log::warning "iTerm2 setup failed (non-fatal in CI)"
     elif os::is_linux; then
         run_script "linux" || log::warning "Linux setup failed (non-fatal in CI)"
     fi
+    log::success "[STEP 7/8] OS-specific setup done"
 
     # Symlinks
+    log::info "[STEP 8/8] Stowing dotfile packages..."
     _stow_packages
 
     log::success "Installation complete!"
