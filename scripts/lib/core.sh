@@ -260,6 +260,7 @@ run_script() {
 readonly DOTFILES_DIR="${HOME}/dotfiles"
 readonly CONFIG_DIR="${HOME}/.config"
 readonly BACKUP_DIR="${HOME}/linuxtoolbox"
+export DOTFILES_DIR CONFIG_DIR BACKUP_DIR
 
 # ==============================================================================
 # Initialization Side-effects
