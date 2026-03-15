@@ -73,7 +73,7 @@ _log() {
         echo "[$ts] [$level] $message" >> "$LOG_FILE"
     fi
 
-    [[ "$level" == "FATAL" ]] && exit 1
+    if [[ "$level" == "FATAL" ]]; then exit 1; fi
 }
 
 # ==============================================================================
