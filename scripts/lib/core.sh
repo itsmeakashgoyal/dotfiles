@@ -125,7 +125,7 @@ log::progress() {
     local pct=$((cur * 100 / tot)) filled=$((cur * w / tot)) empty=$((w - cur * w / tot))
     printf "\r  ["; printf "%${filled}s" | tr ' ' '█'; printf "%${empty}s" | tr ' ' '░'
     printf "] %3d%%" "$pct"
-    [[ $cur -eq $tot ]] && echo ""
+    if [[ $cur -eq $tot ]]; then echo ""; fi
 }
 
 is_verbose() { [[ "${LOG_LEVEL}" == "DEBUG" || "${LOG_LEVEL}" == "TRACE" ]]; }
@@ -278,13 +278,21 @@ if [[ "$LOG_TO_FILE" == "true" ]]; then
 fi
 
 # Export functions so sub-shells can use them
+export -f _log _log::level_num
 export -f log::trace log::debug log::info log::success log::warning log::error log::fatal
-export -f log::section log::banner log::box log::substep log::kvp
+export -f log::section log::banner log::box log::substep log::kvp log::sep log::newline
 export -f log::ok log::fail log::warn log::bullet log::spinner log::progress
-export -f command_exists pkg::exists pkg::version get_version check_command
-export -f info success warning error substep_info substep_success substep_error
+export -f command_exists pkg::exists pkg::version get_version check_command check_required_commands
+export -f info success warning error substep_info substep_success substep_error section_header log_message
 export -f log_trace log_debug log_info log_success log_warning log_error log_fatal
+export -f log_section log_banner log_box log_substep log_kvp log_ok log_fail log_warn
+export -f log_bullet log_spinner log_progress log_separator log_newline
+export -f os::is_mac os::is_linux os::arch os::detail
+export -f is_verbose print_error run_script sudo_keep_alive
+# Export variables used by exported functions
 export LOG_RED LOG_YELLOW LOG_GREEN LOG_BLUE LOG_MAGENTA LOG_CYAN LOG_WHITE LOG_BOLD LOG_NC
+export LOG_LEVEL LOG_MIN_LEVEL LOG_FILE LOG_TO_FILE LOG_TIMESTAMP_FORMAT
+export OS_TYPE
 
 readonly CORE_LOADED=true
 export CORE_LOADED
