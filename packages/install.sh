@@ -58,10 +58,8 @@ install_homebrew() {
 
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Verify brew exists (the install script may not modify PATH for this shell)
-    check_command brew
 
-    # Configure Homebrew PATH
+    # Configure Homebrew PATH (install script runs in a subshell and does not modify this shell's PATH)
     case "$OS_TYPE" in
     "Darwin")
         if [[ -x "/opt/homebrew/bin/brew" ]]; then

@@ -125,7 +125,7 @@ main() {
         if ! grep -q "$zsh_path" /etc/shells; then
             sudo sh -c "echo $zsh_path >> /etc/shells"
         fi
-        sudo chsh -s "$zsh_path" "$USER"
+        sudo chsh -s "$zsh_path" "$USER" || log::warning "Could not change default shell (non-fatal in CI)"
     fi
 
     # OS-specific setup
