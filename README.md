@@ -7,7 +7,6 @@
 [![Shell](https://img.shields.io/badge/Shell-Zsh-informational?logo=gnu-bash)](https://www.zsh.org/)
 [![Neovim](https://img.shields.io/badge/Neovim-0.10%2B-green?logo=neovim)](https://neovim.io/)
 [![Last Commit](https://img.shields.io/github/last-commit/itsmeakashgoyal/dotfiles)](https://github.com/itsmeakashgoyal/dotfiles/commits/master)
-[![Stars](https://img.shields.io/github/stars/itsmeakashgoyal/dotfiles?style=social)](https://github.com/itsmeakashgoyal/dotfiles/stargazers)
 
 ```text
      █████           █████       ██████   ███  ████
@@ -103,8 +102,6 @@ dotfiles/
 | **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues, debug workflow, uninstalling |
 | **[Architecture](docs/ARCHITECTURE.md)** | Deep dive: Stow internals, Zsh flow, scripts, CI, XDG |
-| **[Manual Setup](docs/MANUAL_SETUP.md)** | GitHub settings, Ghostty, WezTerm, mise |
-| **[Screenshots](docs/SCREENSHOTS.md)** | Recording terminal demos with VHS |
 | **[Contributing](CONTRIBUTING.md)** | How to contribute, code style, PR process |
 | **[Security](SECURITY.md)** | Secrets management and security practices |
 
