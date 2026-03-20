@@ -27,7 +27,6 @@ tap "jandedobbeleer/oh-my-posh"
 tap "github/gh"
 
 if OS.mac?
-    tap "FelixKratz/formulae"
     tap "buo/cask-upgrade"
 end
 
@@ -141,5 +140,4 @@ end
 #############################################################
 if OS.linux?
     brew "gettext"          # GNU i18n utilities
-    brew "xclip"            # X11 clipboard
 end
