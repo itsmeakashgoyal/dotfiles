@@ -75,7 +75,7 @@ dutils cleanup -y all     # No confirmations
 
 ```
 ~/dotfiles/scripts/utils/dutils           # Main CLI
-~/dotfiles/scripts/utils/_helper.sh       # Helper functions
+~/dotfiles/scripts/lib/core.sh       # Helper functions
 ~/dotfiles/scripts/utils/README.md        # Full documentation
 ~/.local/bin/dutils                       # Symlink (if created)
 ```

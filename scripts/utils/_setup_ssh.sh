@@ -21,15 +21,15 @@
 # ------------------------------
 # Load Helper functions persistently
 SCRIPT_DIR="${HOME}/dotfiles/scripts"
-HELPER_FILE="${SCRIPT_DIR}/utils/_helper.sh"
+CORE_FILE="${SCRIPT_DIR}/lib/core.sh"
 
-# Check if helper file exists and source it
-if [[ ! -f "$HELPER_FILE" ]]; then
-    echo "Error: Helper file not found at $HELPER_FILE" >&2
+# Source shared library
+if [[ ! -f "$CORE_FILE" ]]; then
+    echo "Error: Core library not found at $CORE_FILE" >&2
     exit 1
 fi
 
-source "$HELPER_FILE"
+source "$CORE_FILE"
 set -euo pipefail
 
 generate_ssh_key() {
@@ -138,4 +138,4 @@ fi
 trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 
 # Generate the SSH key
-generate_ssh_key "$email" "${key_type:-rsa}"
+generate_ssh_key "$email" "${key_type:-ed25519}"

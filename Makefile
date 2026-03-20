@@ -54,12 +54,12 @@ apps: sublime iterm ## Setup all app settings (Sublime Text + iTerm2)
 .PHONY: sublime
 sublime: ## Setup Sublime Text settings
 	@echo "$(YELLOW)Setting up Sublime Text...$(CLR)"
-	@bash scripts/setup/_sublime.sh
+	@bash scripts/setup/sublime.sh
 
 .PHONY: iterm
 iterm: ## Setup iTerm2 preferences
 	@echo "$(YELLOW)Setting up iTerm2...$(CLR)"
-	@bash scripts/setup/_iterm.sh
+	@bash scripts/setup/iterm.sh
 
 ##@ Stow Management
 
@@ -188,33 +188,23 @@ clean: ## Remove backup files created by stow
 
 .PHONY: health
 health: ## Run quick health check
-	@echo "$(YELLOW)Running health check...$(CLR)"
-	@bash scripts/verification/health_check.sh || true
+	@bash scripts/verify/check.sh --quick || true
 
 .PHONY: check
 check: ## Run full installation verification
-	@echo "$(YELLOW)Running full installation verification...$(CLR)"
-	@bash scripts/verification/verify_installation.sh || true
+	@bash scripts/verify/check.sh --full || true
 
 .PHONY: sysinfo
 sysinfo: ## Display system information
-	@bash scripts/verification/system_info.sh
+	@bash scripts/verify/check.sh --system
 
 .PHONY: packages
 packages: ## Check installed packages against Brewfile
-	@bash scripts/verification/check_packages.sh || true
+	@bash scripts/verify/check.sh --packages || true
 
 .PHONY: diagnose
 diagnose: ## Run all diagnostic tools
-	@echo "$(YELLOW)Running complete diagnostic suite...$(CLR)"
-	@echo ""
-	@bash scripts/verification/health_check.sh || true
-	@echo ""
-	@bash scripts/verification/verify_installation.sh || true
-	@echo ""
-	@bash scripts/verification/check_packages.sh || true
-	@echo ""
-	@echo "$(GREEN)✓ All diagnostics complete!$(CLR)"
+	@bash scripts/verify/check.sh --all || true
 
 ##@ Aliases (shortcuts)
 

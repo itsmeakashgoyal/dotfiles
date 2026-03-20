@@ -1,0 +1,63 @@
+# private.zsh.example
+#
+# Copy this file to private.zsh (same directory) for machine-local configuration.
+# private.zsh is gitignored — never commit secrets or personal tokens.
+#
+# cp private.zsh.example private.zsh
+#
+# This file is sourced last in conf.d/, so it overrides anything in other files.
+
+# ------------------------------
+# API Keys & Tokens
+# ------------------------------
+# export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
+# export OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxx"
+# export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxx"
+# export HOMEBREW_GITHUB_API_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
+
+# ------------------------------
+# Work / Company Config
+# ------------------------------
+# export WORK_EMAIL="you@company.com"
+# export ARTIFACTORY_TOKEN="xxxxxxxxxxxxxxxxxxxx"
+# export NPM_TOKEN="xxxxxxxxxxxxxxxxxxxx"
+
+# Work git identity (overrides global git config for work directories)
+# git config --global --conditional includeIf "gitdir:~/work/" .gitconfig-work
+
+# ------------------------------
+# Machine-Specific PATH
+# ------------------------------
+# export PATH="$HOME/.local/mytools/bin:$PATH"
+# export PATH="/opt/company-tools/bin:$PATH"
+
+# ------------------------------
+# Work Aliases
+# ------------------------------
+# alias work="cd ~/work"
+# alias vpn="sudo openconnect vpn.company.com"
+# alias deploy-staging="kubectl --context staging apply -f k8s/"
+
+# ------------------------------
+# Machine-Specific Environment
+# ------------------------------
+# export DOCKER_HOST="tcp://localhost:2375"
+# export KUBECONFIG="$HOME/.kube/config:$HOME/.kube/work-config"
+# export AWS_PROFILE="default"
+# export AWS_DEFAULT_REGION="us-east-1"
+
+# ------------------------------
+# Local Tool Overrides
+# ------------------------------
+# Uncomment if you want a different editor on this machine
+# export EDITOR="code"
+
+# Override default browser
+# export BROWSER="firefox"
+
+# ------------------------------
+# Proxy Settings (corporate networks)
+# ------------------------------
+# export HTTP_PROXY="http://proxy.company.com:8080"
+# export HTTPS_PROXY="http://proxy.company.com:8080"
+# export NO_PROXY="localhost,127.0.0.1,.company.com"
