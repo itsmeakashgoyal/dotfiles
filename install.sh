@@ -66,11 +66,11 @@ _ensure_python3() {
 }
 
 _stow_packages() {
-    local packages=(git zsh nvim tmux ohmyposh)
+    local packages=(git zsh nvim tmux)
 
     log::info "Cleaning up old symlinks..."
     local old_links=("$HOME/.zshenv" "$HOME/.config/nvim" "$HOME/.config/tmux"
-                      "$HOME/.config/git" "$HOME/.config/zsh" "$HOME/.config/ohmyposh")
+                      "$HOME/.config/git" "$HOME/.config/zsh")
     for link in "${old_links[@]}"; do
         if [[ -L "$link" ]]; then
             rm "$link"

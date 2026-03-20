@@ -77,7 +77,7 @@ The installer runs through these stages in order:
 | **Homebrew** | Installs Homebrew (or Linuxbrew on Linux), updates it, then installs every formula and cask listed in `packages/Brewfile`. |
 | **Default shell** | Adds `zsh` to `/etc/shells` if missing, then sets it as your login shell via `chsh`. |
 | **OS-specific setup** | Runs `scripts/setup/macos.sh` (Finder, Dock, trackpad, keyboard preferences) or `scripts/setup/linux.sh` (essential apt packages, fonts, locale). |
-| **Stow** | Removes any old manual symlinks, then runs `stow --restow` for each package: `git`, `zsh`, `nvim`, `tmux`, `ohmyposh`. |
+| **Stow** | Removes any old manual symlinks, then runs `stow --restow` for each package: `git`, `zsh`, `nvim`, `tmux`. |
 | **Verification** | Runs `scripts/verify/check.sh --quick` to confirm everything is linked and working. |
 
 ---

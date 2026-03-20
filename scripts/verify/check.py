@@ -343,7 +343,6 @@ class QuickHealthCheck(SystemChecker):
         self.check_cmd("Zsh", "zsh", critical=True)
         self.check_condition("Zsh as default", "zsh" in os.environ.get("SHELL", ""))
         self.check_link(".zshenv symlink", str(home / ".zshenv"), critical=True)
-        self.check_cmd("Oh My Posh", "oh-my-posh")
 
     def _check_neovim(self) -> None:
         log.section("NEOVIM")
@@ -406,7 +405,6 @@ class FullVerification(SystemChecker):
         self.check_cmd("Zsh", "zsh", critical=True)
         self.check_condition("Default shell", "zsh" in os.environ.get("SHELL", ""))
         self.check_link(".zshenv", str(home / ".zshenv"), critical=True)
-        self.check_cmd("Oh My Posh", "oh-my-posh")
         self.check_condition("Zsh config dir", (home / ".config" / "zsh").is_dir())
 
         log.section("NEOVIM")
@@ -672,7 +670,6 @@ class SystemInfo:
             (home / ".config" / "tmux", "tmux"),
             (home / ".config" / "git", "git"),
             (home / ".config" / "zsh", "zsh config"),
-            (home / ".config" / "ohmyposh", "ohmyposh"),
         ]:
             log.kvp(f"{label} symlink", "✓ linked" if path.is_symlink() else "✗ missing")
 

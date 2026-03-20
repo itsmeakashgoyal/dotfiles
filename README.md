@@ -60,7 +60,7 @@ exec zsh
 
 ## How It Works
 
-Every top-level directory (`git/`, `zsh/`, `nvim/`, `tmux/`, `ohmyposh/`) is a **Stow package**. Each package mirrors the target path relative to `$HOME`:
+Every top-level directory (`git/`, `zsh/`, `nvim/`, `tmux/`) is a **Stow package**. Each package mirrors the target path relative to `$HOME`:
 
 ```text
 dotfiles/nvim/.config/nvim/init.lua
@@ -82,10 +82,9 @@ dotfiles/
 ├── zsh/                       → ~/.config/zsh/          Zsh shell configuration
 ├── nvim/                      → ~/.config/nvim/         Neovim editor setup
 ├── tmux/                      → ~/.config/tmux/         Tmux multiplexer
-├── ohmyposh/                  → ~/.config/ohmyposh/     Prompt theme
 ├── packages/                  Brewfile & install script
 ├── scripts/                   Setup, verification, utilities
-├── settings/                  App preferences (iTerm, Sublime, Rectangle)
+├── settings/                  App preferences (iTerm, Sublime)
 ├── install.sh                 Main installer
 ├── bootstrap.sh               One-liner bootstrap for fresh machines
 └── Makefile                   Stow management & diagnostics
@@ -112,7 +111,6 @@ dotfiles/
 - [GNU Stow](https://www.gnu.org/software/stow/) -- Symlink farm manager
 - [Homebrew](https://brew.sh/) -- Package manager for macOS and Linux
 - [Neovim](https://neovim.io/) -- Hyperextensible text editor
-- [Oh My Posh](https://ohmyposh.dev/) -- Prompt theme engine
 - [VHS](https://github.com/charmbracelet/vhs) -- Terminal demo recorder
 - [Awesome Dotfiles](https://github.com/webpro/awesome-dotfiles) -- Community dotfiles resources
 

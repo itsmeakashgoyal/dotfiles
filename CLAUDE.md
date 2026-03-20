@@ -43,7 +43,6 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `zsh/` → `~/.zshenv` + `~/.config/zsh/` — Shell config with Zinit plugin manager
 - `nvim/` → `~/.config/nvim/` — Neovim with Lazy.nvim
 - `tmux/` → `~/.config/tmux/` — Tmux config
-- `ohmyposh/` → `~/.config/ohmyposh/` — Prompt theme
 
 ### Zsh Configuration Layout
 `zsh/.config/zsh/conf.d/` contains modular config files sourced alphabetically:

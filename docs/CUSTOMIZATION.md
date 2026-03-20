@@ -56,9 +56,3 @@ tmux source ~/.config/tmux/tmux.conf
 ```
 
 ---
-
-## Oh My Posh
-
-Edit `ohmyposh/.config/ohmyposh/emodipt.json` to customize the prompt theme. Changes take effect in new shell sessions or after running `exec zsh`.
-
-See [Oh My Posh docs](https://ohmyposh.dev/docs/configuration/overview) for theme configuration options.

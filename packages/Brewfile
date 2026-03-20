@@ -23,9 +23,6 @@
 #############################################################
 # Taps                                                      #
 #############################################################
-tap "jandedobbeleer/oh-my-posh"
-tap "github/gh"
-
 if OS.mac?
     tap "buo/cask-upgrade"
 end
@@ -42,50 +39,27 @@ brew "fzf"                  # Fuzzy finder (Go)
 brew "gh"                   # GitHub CLI
 brew "git-delta"            # Better git diff (Rust)
 brew "git-extras"           # Extra git commands
-brew "git-lfs"              # Git Large File Storage
 brew "jq"                   # JSON processor
 brew "ripgrep"              # Better grep (Rust)
-brew "sd"                   # Better sed (Rust)
 brew "tree"                 # Directory tree
 brew "zoxide"               # Smart cd (Rust)
 
 # System Monitoring
 brew "btop"                 # System monitor
-brew "ctop"                 # Container metrics (Go)
-brew "dua-cli"              # Disk usage analyzer
-brew "duf"                  # Better df (Go)
 brew "htop"                 # Process viewer
 brew "procs"                # Better ps (Rust)
 
 # Editors
-brew "helix"                # Modern text editor (Rust)
 brew "neovim"               # Vim-based text editor
-
-# Shell & Prompt
-brew "jandedobbeleer/oh-my-posh/oh-my-posh"
-brew "zsh-autopair"
 
 #############################################################
 # Development Tools                                         #
 #############################################################
 
-# Build Tools
-brew "automake"
-brew "cmake"
-
-# Version Control & Tools
-brew "lazygit"              # Git TUI (Go)
-
-# Programming Languages
-brew "go"                   # Go programming language
-brew "node"                 # Node.js
-
 # Language Tools - Lua
 brew "lua"
 brew "lua-language-server"
-brew "luajit"
 brew "luarocks"
-brew "luv"
 brew "stylua"               # Lua formatter
 
 # Shell Tools
@@ -102,36 +76,17 @@ brew "tldr"                 # Simplified man pages
 if OS.mac?
     # Core Tools
     brew "coreutils"        # GNU core utilities
-    brew "entr"             # File watcher
     brew "gcc"              # GNU compiler
-    brew "mas"              # Mac App Store CLI
     brew "stow"             # Dotfile manager
-    brew "trash"            # Safe rm
-
-    # Programming Languages
-    brew "rbenv"            # Ruby version manager
-    brew "ruby"
-    brew "ruby-build"
-    brew "rust"
-    brew "rustup"           # Rust version manager
 
     # Security
-    brew "openssh"
-    brew "openssl"
-    brew "ssh-copy-id"
     brew "sshs"             # SSH TUI (Rust)
 
-    # Development
-    brew "editorconfig"
-    brew "universal-ctags"
-
     # Nerd Fonts
-    cask "font-3270-nerd-font"
     cask "font-fira-code-nerd-font"
     cask "font-jetbrains-mono-nerd-font"
     cask "font-meslo-lg-nerd-font"
     cask "font-source-code-pro"
-    cask "font-symbols-only-nerd-font"
     cask "font-ubuntu-mono-nerd-font"
 end
 

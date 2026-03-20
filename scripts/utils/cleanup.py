@@ -46,7 +46,6 @@ def cleanup_dotfiles() -> None:
         HOME / ".config" / "tmux",
         HOME / ".config" / "git",
         HOME / ".config" / "zsh",
-        HOME / ".config" / "ohmyposh",
     ]
     for link in symlinks:
         if link.is_symlink():

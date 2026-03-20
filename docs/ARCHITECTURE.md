@@ -33,8 +33,7 @@ dotfiles/
 ├── zsh/      → ~/.zshenv               XDG pointer; sets ZDOTDIR
 │             → ~/.config/zsh/          All Zsh config
 ├── nvim/     → ~/.config/nvim/         Neovim with Lazy.nvim
-├── tmux/     → ~/.config/tmux/         Tmux with TPM
-└── ohmyposh/ → ~/.config/ohmyposh/     Oh My Posh prompt theme
+└── tmux/     → ~/.config/tmux/         Tmux with TPM
 ```
 
 ---

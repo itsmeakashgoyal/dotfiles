@@ -48,7 +48,7 @@ dotfiles/
 Then register it in the `Makefile`:
 
 ```makefile
-STOW_PACKAGES := git zsh nvim tmux ohmyposh <toolname>
+STOW_PACKAGES := git zsh nvim tmux <toolname>
 ```
 
 And stow it:
