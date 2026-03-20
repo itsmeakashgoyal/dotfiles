@@ -105,10 +105,33 @@ The installer runs through these stages in order:
 
 ## (Optional) SSH Key Setup
 
-To generate and configure SSH keys for GitHub:
+Generate and configure SSH keys for GitHub or other services.
+
+### Usage
 
 ```bash
-./scripts/utils/_setup_ssh.sh
+./scripts/utils/_setup_ssh.sh -e EMAIL [-t KEY_TYPE]
 ```
 
-This generates an Ed25519 key, starts `ssh-agent`, and copies the public key to your clipboard.
+| Flag | Description | Default |
+| --- | --- | --- |
+| `-e` | Email address for the SSH key (required) | -- |
+| `-t` | Key type: `ed25519` or `rsa` | `ed25519` |
+| `-h` | Show help | -- |
+
+### Examples
+
+```bash
+# Generate an Ed25519 key (recommended)
+./scripts/utils/_setup_ssh.sh -e you@example.com
+
+# Generate an RSA key (for legacy systems that don't support Ed25519)
+./scripts/utils/_setup_ssh.sh -e you@example.com -t rsa
+```
+
+### What it does
+
+1. Generates the key at `~/.ssh/id_<type>` (prompts for a new name if one already exists)
+2. Starts `ssh-agent` and adds the key
+3. Sets correct permissions (`600` for private key, `644` for public key)
+4. Copies the public key to your clipboard (macOS via `pbcopy`, Linux via `xclip`)
