@@ -78,13 +78,11 @@ zinit lucid light-mode for \
     zsh-users/zsh-completions
 
 # --- 6b. Completion system init (compinit + tab/title hooks) -----------------
-# startup.zsh must run after zsh-completions but before fzf-tab.
 source "$ZDOTDIR/conf.d/startup.zsh"
 
 # --- 6c. Core interactive plugins (synchronous) ------------------------------
 zinit lucid light-mode for \
-    zsh-users/zsh-autosuggestions \
-    Aloxaf/fzf-tab
+    zsh-users/zsh-autosuggestions
 
 # --- 6d. Syntax highlighting — must be the last synchronous plugin -----------
 zinit light zsh-users/zsh-syntax-highlighting
@@ -139,3 +137,5 @@ fi
 if [[ -z "${CONDA_PREFIX:-}" && -d "/usr/local/bin" ]]; then
     path=(/usr/local/bin ${path:#/usr/local/bin})
 fi
+
+. "$HOME/.local/share/../bin/env"

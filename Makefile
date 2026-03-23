@@ -7,7 +7,7 @@
 #█▓▒░
 
 # Stowable packages (directories with dotfiles)
-STOW_PACKAGES := git zsh nvim tmux
+STOW_PACKAGES := git zsh nvim tmux television
 
 # Color codes
 YELLOW := \033[33m

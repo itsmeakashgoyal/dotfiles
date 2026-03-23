@@ -2,6 +2,12 @@
 # Custom Functions
 # ------------------------------------------------------------------------------
 
+# cd and list directory contents
+cx() { cd "$@" && l; }
+
+# Find file with tv and open in nvim
+fv() { nvim "$(fd --type f --hidden --exclude .git | tv)" }
+
 # Navigate up multiple directories
 # Usage: up 3 (goes up 3 directories)
 up() {
@@ -99,16 +105,9 @@ gz() {
 
 # Interactive process killer
 pkill() {
-    ps aux |
-        fzf --height 40% \
-            --layout=reverse \
-            --header-lines=1 \
-            --prompt="Select process to kill: " \
-            --preview 'echo {}' \
-            --preview-window up:3:hidden:wrap \
-            --bind 'F2:toggle-preview' |
-        awk '{print $2}' |
-        xargs -r kill -15 || sudo kill -15
+    local pid
+    pid=$(ps aux | sed 1d | tv | awk '{print $2}')
+    [[ -n "$pid" ]] && kill -15 "$pid"
 }
 
 # ------------------------------------------------------------------------------
@@ -271,23 +270,15 @@ ta() {
 # ------------------------------------------------------------------------------
 # tmux functions
 # ------------------------------------------------------------------------------
-# Interactive session selection with preview
+# Interactive session selection
 tls() {
-    local session=$(tmux list-sessions -F "#{session_name}" |
-        fzf --preview 'tmux list-windows -t {}' \
-            --preview-window=right:50% \
-            --prompt="Select session: ")
-
+    local session=$(tmux list-sessions -F "#{session_name}" | tv)
     [[ -n "$session" ]] && tmux switch-client -t "$session"
 }
 
 # Kill selected session interactively
 tks() {
-    local session=$(tmux list-sessions -F "#{session_name}" |
-        fzf --preview 'tmux list-windows -t {}' \
-            --preview-window=right:50% \
-            --prompt="Select session to kill: ")
-
+    local session=$(tmux list-sessions -F "#{session_name}" | tv)
     [[ -n "$session" ]] && tmux kill-session -t "$session"
 }
 

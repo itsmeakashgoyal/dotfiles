@@ -5,7 +5,7 @@
 # ░▓ file   ▓ scripts/utils/_diff_files_interactive.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Interactive file diff using fzf for selection and entr for live watching.
+# Interactive file diff using tv for selection and entr for live watching.
 # Uses delta for enhanced output if available, otherwise falls back to
 # built-in colored diff.
 
@@ -21,7 +21,7 @@ readonly PROJECT_DIR="${DOTFILES_DIR:-${HOME}/dotfiles}"
 # ──────────────────────────────────────────────────────────────────────────────
 check_dependencies() {
     local missing=()
-    for cmd in fzf diff entr; do
+    for cmd in tv diff entr; do
         command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
     done
 
@@ -51,9 +51,7 @@ select_file() {
         -not -path "*/node_modules/*" \
         2>/dev/null \
         | sed 's|^\./||' \
-        | fzf --height 40% \
-              --reverse \
-              --prompt="Select $prompt file: " || echo ""
+        | tv || echo ""
 }
 
 # ──────────────────────────────────────────────────────────────────────────────

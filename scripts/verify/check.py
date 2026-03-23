@@ -365,7 +365,7 @@ class QuickHealthCheck(SystemChecker):
     def _check_essential_tools(self) -> None:
         log.section("ESSENTIAL TOOLS")
         self.check_cmd("Tmux", "tmux")
-        self.check_cmd("fzf", "fzf")
+        self.check_cmd("television", "tv")
         self.check_cmd("ripgrep", "rg")
         self.check_cmd("bat", "bat")
         self.check_cmd("eza", "eza")
@@ -433,7 +433,7 @@ class FullVerification(SystemChecker):
         self.check_condition("tmux.conf", (home / ".config" / "tmux" / "tmux.conf").is_file())
 
         log.section("MODERN CLI TOOLS")
-        for cmd in ["bat", "eza", "rg", "fd", "fzf", "zoxide", "jq"]:
+        for cmd in ["bat", "eza", "rg", "fd", "tv", "zoxide", "jq"]:
             self.check_cmd(cmd, cmd)
 
         log.section("DEVELOPMENT TOOLS")
@@ -652,7 +652,7 @@ class SystemInfo:
 
     def _show_tools(self) -> None:
         log.section("TOOLS")
-        for t in ["git", "zsh", "nvim", "tmux", "brew", "fzf", "rg", "bat", "eza", "fd", "zoxide", "jq", "python3", "node", "gh"]:
+        for t in ["git", "zsh", "nvim", "tmux", "brew", "tv", "rg", "bat", "eza", "fd", "zoxide", "jq", "python3", "node", "gh"]:
             if shutil.which(t):
                 log.kvp(t, self._version(t))
             else:

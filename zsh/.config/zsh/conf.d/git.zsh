@@ -46,17 +46,17 @@ gco() {
         git checkout "$1"
         return
     fi
-    if ! command -v fzf >/dev/null 2>&1; then
-        echo "Error: fzf is required for interactive selection"
+    if ! command -v tv >/dev/null 2>&1; then
+        echo "Error: tv (television) is required for interactive selection"
         return 1
     fi
-    git branch -vv | fzf | awk '{print $1}' | xargs git checkout
+    git branch -vv | tv | awk '{print $1}' | xargs git checkout
 }
 
 # Fuzzy checkout remote branch
 gcr() {
-    if ! command -v fzf >/dev/null 2>&1; then
-        echo "Error: fzf is required for interactive selection"
+    if ! command -v tv >/dev/null 2>&1; then
+        echo "Error: tv (television) is required for interactive selection"
         return 1
     fi
     git fetch
@@ -64,13 +64,13 @@ gcr() {
         git checkout "$1"
         return
     fi
-    git branch --all | fzf | sed "s#remotes/[^/]*/##" | xargs git checkout
+    git branch --all | tv | sed "s#remotes/[^/]*/##" | xargs git checkout
 }
 
 # Fuzzy checkout from branch history
 gch() {
-    if ! command -v fzf >/dev/null 2>&1; then
-        echo "Error: fzf is required for interactive selection"
+    if ! command -v tv >/dev/null 2>&1; then
+        echo "Error: tv (television) is required for interactive selection"
         return 1
     fi
     local branches selection branch
@@ -80,7 +80,7 @@ gch() {
         awk -F~ '!seen[$1]++' |
         head -n 10 |
         awk -F' ~ HEAD@{' '{printf("%s: %s\n", substr($2, 1, length($2)-1), $1)}')
-    selection=$(echo "$branches" | fzf +m)
+    selection=$(echo "$branches" | tv)
     branch=$(echo "$selection" | awk '{print $NF}')
     [[ -n "$branch" ]] && git checkout "$branch"
 }
@@ -95,11 +95,11 @@ gpr() {
         gh pr checkout "$1"
         return
     fi
-    if ! command -v fzf >/dev/null 2>&1; then
-        echo "Error: fzf is required for interactive selection"
+    if ! command -v tv >/dev/null 2>&1; then
+        echo "Error: tv (television) is required for interactive selection"
         return 1
     fi
-    gh pr list | fzf | awk '{print $1}' | xargs gh pr checkout
+    gh pr list | tv | awk '{print $1}' | xargs gh pr checkout
 }
 
 # Fuzzy checkout tag
@@ -108,11 +108,11 @@ gct() {
         git checkout "$1"
         return
     fi
-    if ! command -v fzf >/dev/null 2>&1; then
-        echo "Error: fzf is required for interactive selection"
+    if ! command -v tv >/dev/null 2>&1; then
+        echo "Error: tv (television) is required for interactive selection"
         return 1
     fi
-    git tag | fzf | xargs git checkout
+    git tag | tv | xargs git checkout
 }
 
 # Fuzzy delete branch with confirmation
@@ -121,11 +121,11 @@ gbd() {
         git branch -d "$1"
         return
     fi
-    if ! command -v fzf >/dev/null 2>&1; then
-        echo "Error: fzf is required for interactive selection"
+    if ! command -v tv >/dev/null 2>&1; then
+        echo "Error: tv (television) is required for interactive selection"
         return 1
     fi
-    local selected=$(git branch -vv | fzf | awk '{print $1}')
+    local selected=$(git branch -vv | tv | awk '{print $1}')
     if [[ -n "$selected" ]]; then
         echo "Delete branch [\e[0;31m$selected\e[0m]? (Type 'delete' to confirm)"
         read -r confirmation
@@ -201,50 +201,40 @@ nah() {
 # ------------------------------------------------------------------------------
 # Interactive git log viewer
 logg() {
-    git lg | fzf --ansi --no-sort \
-        --preview 'echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % git show % --color=always' \
-        --preview-window=right:50%:wrap \
-        --bind 'enter:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % sh -c "git show % | nvim -")' \
-        --bind 'ctrl-e:execute(echo {} | grep -o "[a-f0-9]\{7\}" | head -1 | xargs -I % sh -c "gh browse %")'
-}
-
-# FZF completion for git commands
-_fzf_complete_git() {
-    _fzf_complete -- "$@" < <(
-        git --help -a | grep -E '^\s+' | awk '{print $1}'
-    )
+    local commit
+    commit=$(git lg | tv)
+    [[ -z "$commit" ]] && return
+    local hash=$(echo "$commit" | grep -o "[a-f0-9]\{7\}" | head -1)
+    [[ -n "$hash" ]] && git show "$hash" | nvim -
 }
 
 # ------------------------------------------------------------------------------
 # Advanced Git Functions
 # ------------------------------------------------------------------------------
 
-# Interactive branch deletion with preview
+# Interactive branch deletion (loop mode — pick one at a time, Esc to stop)
 delete-branches() {
-    echo "Selecting branches to delete (use TAB for multi-select)..."
-    git branch |
-        grep --invert-match '\*' |
-        cut -c 3- |
-        fzf --multi \
-            --preview="git log {} --" \
-            --preview-window=right:60% \
-            --bind='ctrl-/:toggle-preview' |
-        xargs --no-run-if-empty git branch --delete --force
+    echo "Select branches to delete one at a time (Esc to stop)..."
+    while true; do
+        local branch
+        branch=$(git branch | grep --invert-match '\*' | cut -c 3- | tv)
+        [[ -z "$branch" ]] && break
+        echo "Deleting branch: $branch"
+        git branch --delete --force "$branch"
+    done
 }
 
-# Interactive remote branch deletion
+# Interactive remote branch deletion (loop mode)
 delete-remote-branches() {
-    echo "Selecting remote branches to delete (use TAB for multi-select)..."
-    local remote=${1:-origin} # Default to 'origin' if no remote specified
-    git branch -r |
-        grep "$remote/" |
-        grep --invert-match '\*' |
-        cut -c 3- |
-        fzf --multi \
-            --preview="git log {} --" \
-            --preview-window=right:60% \
-            --bind='ctrl-/:toggle-preview' |
-        xargs --no-run-if-empty git push "$remote" --delete
+    local remote=${1:-origin}
+    echo "Select remote branches to delete one at a time (Esc to stop)..."
+    while true; do
+        local branch
+        branch=$(git branch -r | grep "$remote/" | grep --invert-match '\*' | cut -c 3- | tv)
+        [[ -z "$branch" ]] && break
+        echo "Deleting remote branch: $branch"
+        git push "$remote" --delete "${branch#$remote/}"
+    done
 }
 
 # Enhanced PR checkout with preview
@@ -265,11 +255,7 @@ pr-checkout() {
         gh api 'repos/:owner/:repo/pulls' |
             jq ".[] | $jq_template" |
             sed -e 's/"\(.*\)"/\1/' -e 's/\\t/\t/' |
-            fzf \
-                --with-nth=1 \
-                --delimiter='\t' \
-                --preview='echo -e {2}' \
-                --preview-window=top:wrap |
+            tv |
             sed 's/^#\([0-9]\+\).*/\1/'
     )
 
@@ -285,7 +271,7 @@ if hash git &>/dev/null; then
     }
 fi
 
-# Repository management with FZF and tmux integration
+# Repository management with television and tmux integration
 repo() {
     local dev_path="${HOME}/dev"
     local selected_repo
@@ -293,11 +279,8 @@ repo() {
     # Find and select repository
     selected_repo=$(fd . "$dev_path" \
         --type=directory \
-        --max-depth=1 \
-        --color always |
-        fzf --ansi \
-            --preview "onefetch ${dev_path}/{1}" \
-            --preview-window up)
+        --max-depth=1 |
+        tv)
 
     if [[ -z "$selected_repo" ]]; then
         echo "No repository selected"

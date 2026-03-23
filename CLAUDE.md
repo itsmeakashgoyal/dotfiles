@@ -46,7 +46,7 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 
 ### Zsh Configuration Layout
 `zsh/.config/zsh/conf.d/` contains modular config files sourced alphabetically:
-- `aliases.zsh`, `exports.zsh`, `functions.zsh`, `fzf.zsh`, `git.zsh`, `docker.zsh`, `options.zsh`, `python.zsh`, `startup.zsh`
+- `aliases.zsh`, `exports.zsh`, `functions.zsh`, `git.zsh`, `docker.zsh`, `options.zsh`, `python.zsh`, `startup.zsh`, `television.zsh`
 - `private.zsh` — Machine-local overrides, gitignored
 
 ### Scripts Layout

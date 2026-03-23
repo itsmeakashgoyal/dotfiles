@@ -28,7 +28,7 @@ A comprehensive, automated dotfiles setup for **macOS** and **Linux**, featuring
 
 ## What's Included
 
-- **Zsh** -- Modular config via `conf.d/`, Zinit plugin manager, Powerlevel10k prompt, fzf integration
+- **Zsh** -- Modular config via `conf.d/`, Zinit plugin manager, Powerlevel10k prompt, television fuzzy finder
 - **Neovim** -- Lazy.nvim, LSP, Treesitter, Telescope, autocompletions
 - **Git** -- 40+ aliases, delta diff viewer, XDG-compliant config
 - **Tmux** -- TPM plugin manager, vim-aware pane switching, session persistence

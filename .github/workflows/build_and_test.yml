@@ -176,7 +176,7 @@ jobs:
           packages=(
             "bat:bat"
             "eza:eza"
-            "fzf:fzf"
+            "tv:television"
             "rg:ripgrep"
             "nvim:neovim"
             "delta:git-delta"
@@ -338,7 +338,7 @@ jobs:
           packages=(
             "bat:bat"
             "eza:eza"
-            "fzf:fzf"
+            "tv:television"
             "rg:ripgrep"
             "nvim:neovim"
             "delta:git-delta"

@@ -58,7 +58,7 @@ zsh invoked
               ├── aliases.zsh
               ├── docker.zsh
               ├── exports.zsh
-              ├── fzf.zsh
+              ├── television.zsh
               ├── functions.zsh
               ├── git.zsh
               ├── options.zsh

@@ -35,13 +35,13 @@ end
 brew "bat"                  # Cat with syntax highlighting (Rust)
 brew "eza"                  # Better ls (Rust)
 brew "fd"                   # Better find (Rust)
-brew "fzf"                  # Fuzzy finder (Go)
 brew "gh"                   # GitHub CLI
 brew "git-delta"            # Better git diff (Rust)
 brew "git-extras"           # Extra git commands
 brew "jq"                   # JSON processor
 brew "ripgrep"              # Better grep (Rust)
 brew "tree"                 # Directory tree
+brew "television"           # Fuzzy finder with channels (Rust)
 brew "zoxide"               # Smart cd (Rust)
 
 # System Monitoring

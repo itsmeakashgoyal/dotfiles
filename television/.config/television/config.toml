@@ -1,0 +1,37 @@
+# Television configuration
+# https://github.com/alexpasmantier/television
+
+tick_rate = 50
+default_channel = "files"
+history_size = 200
+shell = "zsh"
+
+[ui]
+ui_scale = 100
+orientation = "landscape"
+theme = "gruvbox-dark"
+
+[ui.input_bar]
+position = "top"
+border_type = "rounded"
+
+[ui.preview_panel]
+size = 50
+scrollbar = true
+
+[shell_integration]
+fallback_channel = "files"
+
+[shell_integration.channel_triggers]
+"files" = ["cat", "bat", "less", "head", "tail", "vim", "nvim", "cp", "mv", "rm"]
+"dirs" = ["cd", "ls", "eza", "rmdir", "z"]
+"git-branch" = ["git checkout", "git switch", "git merge", "git rebase", "git branch -d"]
+"git-log" = ["git log", "git show"]
+"git-diff" = ["git add", "git restore"]
+"git-repos" = ["code"]
+"docker-images" = ["docker run"]
+"env" = ["export", "unset"]
+
+[shell_integration.keybindings]
+"smart_autocomplete" = "ctrl-t"
+"command_history" = "ctrl-r"
