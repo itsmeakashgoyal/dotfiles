@@ -83,6 +83,7 @@ alias myip="curl -s ipinfo.io/ip" # Get public IP address
 alias du='du -sh * | sort -hr' # Human-readable disk usage
 alias df='df -h'               # Human-readable disk free
 command -v htop >/dev/null 2>&1 && alias top='htop' # Better top command
+command -v fastfetch >/dev/null 2>&1 && alias sysinfo='fastfetch' # System info
 
 # ------------------------------------------------------------------------------
 # Basic Tmux Aliases

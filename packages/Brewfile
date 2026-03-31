@@ -32,14 +32,17 @@ end
 #############################################################
 
 # Essential CLI Tools
+brew "atuin"                # Shell history search (Rust)
 brew "bat"                  # Cat with syntax highlighting (Rust)
 brew "eza"                  # Better ls (Rust)
+brew "fastfetch"            # System info tool (C)
 brew "fd"                   # Better find (Rust)
 brew "gh"                   # GitHub CLI
 brew "git-delta"            # Better git diff (Rust)
 brew "git-extras"           # Extra git commands
 brew "jq"                   # JSON processor
 brew "ripgrep"              # Better grep (Rust)
+brew "starship"             # Cross-shell prompt (Rust)
 brew "tree"                 # Directory tree
 brew "television"           # Fuzzy finder with channels (Rust)
 brew "zoxide"               # Smart cd (Rust)

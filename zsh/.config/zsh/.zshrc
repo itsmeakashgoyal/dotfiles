@@ -63,7 +63,7 @@ autoload -U select-word-style
 select-word-style bash  # only alphanumeric chars are considered WORDCHARS
 
 # exports.zsh must run before compinit — it extends fpath with custom completions.
-source "$ZDOTDIR/conf.d/exports.zsh"
+source "$ZDOTDIR/conf.d/01-exports.zsh"
 
 # p10k config must be sourced before the theme plugin loads.
 [[ -f "$ZDOTDIR/.p10k.zsh" ]] && source "$ZDOTDIR/.p10k.zsh"
@@ -78,7 +78,7 @@ zinit lucid light-mode for \
     zsh-users/zsh-completions
 
 # --- 6b. Completion system init (compinit + tab/title hooks) -----------------
-source "$ZDOTDIR/conf.d/startup.zsh"
+source "$ZDOTDIR/conf.d/03-startup.zsh"
 
 # --- 6c. Core interactive plugins (synchronous) ------------------------------
 zinit lucid light-mode for \
@@ -93,6 +93,13 @@ zinit wait lucid for \
     OMZP::sudo
 
 # --- 6f. Theme ---------------------------------------------------------------
+# To switch to Starship prompt instead of Powerlevel10k:
+# 1. Comment out the two zinit lines below (ice + light romkatv/powerlevel10k)
+# 2. Comment out p10k instant prompt (section 1) and p10k.zsh source (section 5)
+# 3. Run: make stow pkg=starship
+# 4. Add to 99-private.zsh or create conf.d/12-starship.zsh with:
+#      export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+#      eval "$(starship init zsh)"
 zinit ice depth=1
 zinit light romkatv/powerlevel10k
 
@@ -102,7 +109,7 @@ zinit light romkatv/powerlevel10k
 # (N) glob qualifier silently skips if the dir is empty or pattern has no match.
 # ==============================================================================
 for _config in "$ZDOTDIR/conf.d"/*.zsh(N); do
-    [[ "$_config" == */exports.zsh || "$_config" == */startup.zsh ]] && continue
+    [[ "$_config" == */01-exports.zsh || "$_config" == */03-startup.zsh ]] && continue
     source "$_config"
 done
 unset _config
