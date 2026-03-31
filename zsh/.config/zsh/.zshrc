@@ -137,5 +137,3 @@ fi
 if [[ -z "${CONDA_PREFIX:-}" && -d "/usr/local/bin" ]]; then
     path=(/usr/local/bin ${path:#/usr/local/bin})
 fi
-
-. "$HOME/.local/share/../bin/env"
