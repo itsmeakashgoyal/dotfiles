@@ -93,13 +93,6 @@ zinit wait lucid for \
     OMZP::sudo
 
 # --- 6f. Theme ---------------------------------------------------------------
-# To switch to Starship prompt instead of Powerlevel10k:
-# 1. Comment out the two zinit lines below (ice + light romkatv/powerlevel10k)
-# 2. Comment out p10k instant prompt (section 1) and p10k.zsh source (section 5)
-# 3. Run: make stow pkg=starship
-# 4. Add to 99-private.zsh or create conf.d/12-starship.zsh with:
-#      export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
-#      eval "$(starship init zsh)"
 zinit ice depth=1
 zinit light romkatv/powerlevel10k
 

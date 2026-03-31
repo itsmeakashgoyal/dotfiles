@@ -42,7 +42,6 @@ brew "git-delta"            # Better git diff (Rust)
 brew "git-extras"           # Extra git commands
 brew "jq"                   # JSON processor
 brew "ripgrep"              # Better grep (Rust)
-brew "starship"             # Cross-shell prompt (Rust)
 brew "tree"                 # Directory tree
 brew "television"           # Fuzzy finder with channels (Rust)
 brew "zoxide"               # Smart cd (Rust)

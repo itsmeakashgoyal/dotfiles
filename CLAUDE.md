@@ -47,7 +47,7 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `bin/` → `~/.local/bin/` — Custom scripts (yank, zoxide-edit)
 - `atuin/` → `~/.config/atuin/` — Shell history search
 - `fastfetch/` → `~/.config/fastfetch/` — System info display
-- `starship/` → `~/.config/starship/` — Optional prompt (not in STOW_PACKAGES, user opts in)
+
 
 ### Zsh Configuration Layout
 `zsh/.config/zsh/conf.d/` contains numbered modular config files sourced in order:
