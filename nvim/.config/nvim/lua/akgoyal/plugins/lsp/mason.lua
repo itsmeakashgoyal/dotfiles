@@ -1,117 +1,194 @@
 return {
-    "williamboman/mason.nvim",
-    lazy = false,
-    dependencies = {
-        "williamboman/mason-lspconfig.nvim",
-        "WhoIsSethDaniel/mason-tool-installer.nvim",
-        "hrsh7th/cmp-nvim-lsp",
-        "neovim/nvim-lspconfig",
-        -- "saghen/blink.cmp",
-    },
-    config = function()
-        -- import mason and mason_lspconfig
-        local mason = require("mason")
-        local mason_lspconfig = require("mason-lspconfig")
-        local mason_tool_installer = require("mason-tool-installer")
+	"williamboman/mason.nvim",
+	lazy = false,
+	dependencies = {
+		"williamboman/mason-lspconfig.nvim",
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		"hrsh7th/cmp-nvim-lsp",
+		"neovim/nvim-lspconfig",
+		{ "antosha417/nvim-lsp-file-operations", config = true },
+		{
+			"folke/lazydev.nvim",
+			ft = "lua",
+			opts = {
+				library = {
+					{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
+				},
+			},
+		},
+	},
+	config = function()
+		local mason = require("mason")
+		local mason_lspconfig = require("mason-lspconfig")
+		local mason_tool_installer = require("mason-tool-installer")
+		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-        -- NOTE: Moved from lspconfig.lua
-        -- import lspconfig plugin
-        local lspconfig = require("lspconfig")
-        local cmp_nvim_lsp = require("cmp_nvim_lsp")
-        local capabilities = cmp_nvim_lsp.default_capabilities()
+		-- ======================================================================
+		-- Mason setup (binary installer)
+		-- ======================================================================
+		mason.setup({
+			ui = {
+				icons = {
+					package_installed = "✓",
+					package_pending = "➜",
+					package_uninstalled = "✗",
+				},
+			},
+		})
 
-        -- enable mason and configure icons
-        mason.setup({
-            ui = {
-                icons = {
-                    package_installed = "✓",
-                    package_pending = "➜",
-                    package_uninstalled = "✗",
-                },
-            },
-        })
+		mason_lspconfig.setup({
+			ensure_installed = {
+				"clangd",
+				"pyright",
+				"bashls",
+				"lua_ls",
+			},
+			automatic_enable = false, -- we call vim.lsp.enable() ourselves
+		})
 
-        mason_lspconfig.setup({
-            -- servers for mason to install
-            ensure_installed = {
-                "clangd", -- C/C++ language server
-                "pyright", -- Python language server
-                "bashls", -- Bash/Shell language server
-                "lua_ls", -- Lua language server (for neovim config)
-            },
-            -- auto install configured servers (with lspconfig)
-            automatic_installation = true,
-        })
+		mason_tool_installer.setup({
+			ensure_installed = {
+				"clang-format", -- C/C++ formatter
+				"codelldb", -- C/C++ debugger
+				"black", -- Python formatter
+				"isort", -- Python import sorter
+				"pylint", -- Python linter
+				"shfmt", -- Shell formatter
+				"shellcheck", -- Shell linter
+				"stylua", -- Lua formatter
+			},
+		})
 
-        mason_tool_installer.setup({
-            ensure_installed = {
-                "clang-format", -- C/C++ formatter
-                "codelldb", -- C/C++ debugger
-                "black", -- Python formatter
-                "isort", -- Python import sorter
-                "pylint", -- Python linter
-                "shfmt", -- Shell formatter
-                "shellcheck", -- Shell linter
-                "stylua", -- Lua formatter
-            },
-        })
+		-- ======================================================================
+		-- Native LSP configuration (Neovim 0.12+)
+		-- ======================================================================
 
-        -- Configure LSP servers directly (compatible with all mason-lspconfig versions)
-        
-        -- Lua Language Server (with Neovim-specific settings)
-        lspconfig.lua_ls.setup({
-            capabilities = capabilities,
-            settings = {
-                Lua = {
-                    diagnostics = {
-                        globals = { "vim" },
-                    },
-                    completion = {
-                        callSnippet = "Replace",
-                    },
-                    workspace = {
-                        library = {
-                            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-                            [vim.fn.stdpath("config") .. "/lua"] = true,
-                        },
-                    },
-                },
-            },
-        })
+		-- Global capabilities for all servers (nvim-cmp integration)
+		vim.lsp.config("*", {
+			capabilities = cmp_nvim_lsp.default_capabilities(),
+		})
 
-        -- Clangd (C/C++)
-        lspconfig.clangd.setup({
-            capabilities = capabilities,
-            cmd = { "clangd", "--offset-encoding=utf-16" },
-            filetypes = { "c", "cpp", "hpp", "h", "objc", "objcpp", "cuda" },
-            settings = {
-                clangd = {
-                    compilationDatabasePath = "build",
-                    fallbackFlags = { "-std=c++17" },
-                },
-            },
-            single_file_support = true,
-        })
+		-- Lua Language Server (with Neovim-specific settings)
+		vim.lsp.config("lua_ls", {
+			settings = {
+				Lua = {
+					diagnostics = {
+						globals = { "vim" },
+					},
+					completion = {
+						callSnippet = "Replace",
+					},
+					workspace = {
+						library = {
+							[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+							[vim.fn.stdpath("config") .. "/lua"] = true,
+						},
+					},
+				},
+			},
+		})
 
-        -- Pyright (Python)
-        lspconfig.pyright.setup({
-            capabilities = capabilities,
-            settings = {
-                python = {
-                    analysis = {
-                        typeCheckingMode = "basic",
-                        autoSearchPaths = true,
-                        useLibraryCodeForTypes = true,
-                        diagnosticMode = "workspace",
-                    },
-                },
-            },
-        })
+		-- Clangd (C/C++)
+		vim.lsp.config("clangd", {
+			cmd = { "clangd", "--offset-encoding=utf-16" },
+			filetypes = { "c", "cpp", "hpp", "h", "objc", "objcpp", "cuda" },
+			settings = {
+				clangd = {
+					compilationDatabasePath = "build",
+					fallbackFlags = { "-std=c++17" },
+				},
+			},
+			single_file_support = true,
+		})
 
-        -- Bash Language Server
-        lspconfig.bashls.setup({
-            capabilities = capabilities,
-            filetypes = { "sh", "bash", "zsh" },
-        })
-    end,
+		-- Pyright (Python)
+		vim.lsp.config("pyright", {
+			settings = {
+				python = {
+					analysis = {
+						typeCheckingMode = "basic",
+						autoSearchPaths = true,
+						useLibraryCodeForTypes = true,
+						diagnosticMode = "workspace",
+					},
+				},
+			},
+		})
+
+		-- Bash Language Server
+		vim.lsp.config("bashls", {
+			filetypes = { "sh", "bash", "zsh" },
+		})
+
+		-- Enable all configured servers
+		vim.lsp.enable({ "lua_ls", "clangd", "pyright", "bashls" })
+
+		-- ======================================================================
+		-- LSP Keymaps (on attach)
+		-- ======================================================================
+		vim.api.nvim_create_autocmd("LspAttach", {
+			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+			callback = function(ev)
+				local opts = { buffer = ev.buf, silent = true }
+
+				opts.desc = "Show LSP references"
+				vim.keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
+
+				opts.desc = "Go to declaration"
+				vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+
+				opts.desc = "Show LSP definitions"
+				vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
+
+				opts.desc = "Show LSP implementations"
+				vim.keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
+
+				opts.desc = "Show LSP type definitions"
+				vim.keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
+
+				opts.desc = "See available code actions"
+				vim.keymap.set({ "n", "v" }, "<leader>vca", function()
+					vim.lsp.buf.code_action()
+				end, opts)
+
+				opts.desc = "Smart rename"
+				vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+
+				opts.desc = "Show buffer diagnostics"
+				vim.keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
+
+				opts.desc = "Show line diagnostics"
+				vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
+
+				opts.desc = "Show documentation for what is under cursor"
+				vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+
+				opts.desc = "Restart LSP"
+				vim.keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts)
+
+				vim.keymap.set("i", "<C-h>", function()
+					vim.lsp.buf.signature_help()
+				end, opts)
+			end,
+		})
+
+		-- ======================================================================
+		-- Diagnostics
+		-- ======================================================================
+		local signs = {
+			[vim.diagnostic.severity.ERROR] = " ",
+			[vim.diagnostic.severity.WARN] = " ",
+			[vim.diagnostic.severity.HINT] = "󰠠 ",
+			[vim.diagnostic.severity.INFO] = " ",
+		}
+
+		vim.diagnostic.config({
+			signs = {
+				text = signs,
+			},
+			virtual_text = true,
+			underline = true,
+			update_in_insert = false,
+		})
+	end,
 }

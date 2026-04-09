@@ -104,7 +104,7 @@ invert = true
 # secrets_filter = true
 
 ## immediately execute command on enter (press tab to edit instead)
-enter_accept = true
+enter_accept = false
 
 ## startup keymap mode: emacs, vim-insert, vim-normal, or auto
 keymap_mode = "vim-insert"
