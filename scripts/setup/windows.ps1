@@ -32,6 +32,7 @@ $SYMLINK_MAP = @{
     "television\.config\television" = "$env:USERPROFILE\.config\television"
     "atuin\.config\atuin"         = "$env:USERPROFILE\.config\atuin"
     "fastfetch\.config\fastfetch" = "$env:USERPROFILE\.config\fastfetch"
+    "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 }
 
 # Scoop packages to install
@@ -228,6 +229,11 @@ function Install-Symlinks {
         New-DotfileSymlink -Source $entry.Key -Target $entry.Value
     }
 
+    # Also link profile for Windows PowerShell 5.1
+    New-DotfileSymlink `
+        -Source "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" `
+        -Target "$env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+
     Write-Ok "All symlinks created"
 }
 
@@ -351,6 +357,28 @@ function Test-Installation {
 }
 
 # ==============================================================================
+# PowerShell Modules
+# ==============================================================================
+function Install-PsModules {
+    Write-Section "PowerShell Modules"
+
+    $modules = @("PSReadLine", "PSFzf", "Terminal-Icons")
+    foreach ($mod in $modules) {
+        if (Get-Module -ListAvailable $mod -ErrorAction SilentlyContinue) {
+            Write-Ok "$mod (already installed)"
+        } else {
+            Write-Step "Installing $mod..."
+            try {
+                Install-Module $mod -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+                Write-Ok "$mod installed"
+            } catch {
+                Write-Fail "$mod failed: $_"
+            }
+        }
+    }
+}
+
+# ==============================================================================
 # Main
 # ==============================================================================
 function Main {
@@ -393,11 +421,16 @@ function Main {
         Write-Step "Skipping symlink creation (-SkipSymlinks)"
     }
 
-    # Step 3: Neovim
+    # Step 3: PowerShell modules
+    if (-not $SkipPackages) {
+        Install-PsModules
+    }
+
+    # Step 4: Neovim
     Install-NeovimPlugins
     Install-GuiConfig
 
-    # Step 4: Health check
+    # Step 5: Health check
     Test-Installation
 
     Write-Banner "Setup Complete!"
@@ -406,6 +439,7 @@ function Main {
     Write-Host "    2. Run 'nvim' to install plugins (lazy.nvim will bootstrap)"
     Write-Host "    3. Inside nvim, run ':checkhealth' to verify"
     Write-Host "    4. Install a Nerd Font in your terminal (JetBrainsMono NF recommended)"
+    Write-Host "    5. Reload your PowerShell profile: . `$PROFILE"
     Write-Host ""
 }
 

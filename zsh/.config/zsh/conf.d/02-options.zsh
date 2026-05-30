@@ -58,7 +58,6 @@ setopt magic_equal_subst
 setopt nonomatch
 setopt notify
 setopt numeric_glob_sort
-setopt print_exit_value
 setopt prompt_subst
 setopt no_flow_control
 setopt list_packed
