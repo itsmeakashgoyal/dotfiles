@@ -131,11 +131,11 @@ return {
                 desc = "Fast Rename Current File",
             },
             {
-                "<leader>dB",
+                "<leader>bd",
                 function()
                     require("snacks").bufdelete()
                 end,
-                desc = "Delete or Close Buffer  (Confirm)",
+                desc = "Delete or Close Buffer (Confirm)",
             },
 
             -- Snacks Picker

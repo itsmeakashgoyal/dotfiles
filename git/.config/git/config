@@ -25,6 +25,10 @@
 	name = Akash Goyal
 	email = ag.akgoyal@gmail.com
 
+# Personal repos: any repo cloned under ~/personal/ uses gmail
+[includeIf "gitdir:~/personal/"]
+	path = ~/.config/git/config-personal
+
 # ============================================================================
 # Aliases
 # ============================================================================

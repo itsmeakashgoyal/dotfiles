@@ -206,6 +206,22 @@ packages: ## Check installed packages against Brewfile
 diagnose: ## Run all diagnostic tools
 	@bash scripts/verify/check.sh --all || true
 
+##@ Windows
+
+.PHONY: windows
+windows: ## Show Windows setup instructions
+	@echo "$(BLUE)Windows Setup$(CLR)"
+	@echo ""
+	@echo "  Run in PowerShell (as Admin or with Developer Mode enabled):"
+	@echo ""
+	@echo "  $(GREEN)Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser$(CLR)"
+	@echo "  $(GREEN).\\install.ps1$(CLR)"
+	@echo ""
+	@echo "  Or run the setup script directly:"
+	@echo "  $(GREEN)powershell -ExecutionPolicy Bypass -File scripts\\setup\\windows.ps1$(CLR)"
+	@echo ""
+	@echo "  Flags: -Force (overwrite existing), -SkipPackages, -SkipSymlinks"
+
 ##@ Aliases (shortcuts)
 
 up: update      ## Alias for update

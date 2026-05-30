@@ -42,6 +42,7 @@ return {
 				"pyright",
 				"bashls",
 				"lua_ls",
+				"gopls",
 			},
 			automatic_enable = false, -- we call vim.lsp.enable() ourselves
 		})
@@ -56,6 +57,10 @@ return {
 				"shfmt", -- Shell formatter
 				"shellcheck", -- Shell linter
 				"stylua", -- Lua formatter
+				"debugpy", -- Python debugger
+				"goimports", -- Go import organizer
+				"gofumpt", -- Go formatter
+				"rust-analyzer", -- Rust language server
 			},
 		})
 
@@ -120,8 +125,21 @@ return {
 			filetypes = { "sh", "bash", "zsh" },
 		})
 
+		-- Go Language Server
+		vim.lsp.config("gopls", {
+			settings = {
+				gopls = {
+					analyses = {
+						unusedparams = true,
+					},
+					staticcheck = true,
+					gofumpt = true,
+				},
+			},
+		})
+
 		-- Enable all configured servers
-		vim.lsp.enable({ "lua_ls", "clangd", "pyright", "bashls" })
+		vim.lsp.enable({ "lua_ls", "clangd", "pyright", "bashls", "gopls" })
 
 		-- ======================================================================
 		-- LSP Keymaps (on attach)
@@ -151,14 +169,16 @@ return {
 					vim.lsp.buf.code_action()
 				end, opts)
 
-				opts.desc = "Smart rename"
-				vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+				opts.desc = "Smart rename (incremental)"
+				vim.keymap.set("n", "<leader>rn", function()
+					return ":IncRename " .. vim.fn.expand("<cword>")
+				end, { expr = true, buffer = ev.buf, desc = "Incremental rename" })
 
 				opts.desc = "Show buffer diagnostics"
 				vim.keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
 
 				opts.desc = "Show line diagnostics"
-				vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
+				vim.keymap.set("n", "<leader>ld", vim.diagnostic.open_float, opts)
 
 				opts.desc = "Show documentation for what is under cursor"
 				vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)

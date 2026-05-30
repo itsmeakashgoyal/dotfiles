@@ -18,8 +18,7 @@ vim.keymap.set("v", ">", ">gv", opts)
 -- the how it be paste
 vim.keymap.set("x", "<leader>p", [["_dP]])
 
--- remember yanked
-vim.keymap.set("v", "p", '"_dp', opts)
+-- yanky.nvim handles visual paste behavior
 
 -- Copies or Yank to system clipboard
 vim.keymap.set("n", "<leader>Y", [["+Y]], opts)
