@@ -132,28 +132,28 @@ dutils diff
 ```
 
 **Features:**
-- 🔍 **Interactive file selection** with fzf
+- 🔍 **Interactive file selection** with television (tv)
 - 🎨 **Syntax-highlighted diffs** (if diff-so-fancy is installed)
 - 👀 **Live watching** - automatically updates when files change
 - 🧹 **Clean interface** with clear screen between updates
 
 **Dependencies:**
-- **Required:** `fzf`, `diff`, `entr`
+- **Required:** `tv` (television), `diff`, `entr`
 - **Optional:** `diff-so-fancy` (for prettier output)
 
 **Installation:**
 ```bash
 # macOS
-brew install fzf entr diff-so-fancy
+brew install television entr diff-so-fancy
 
-# Linux (Debian/Ubuntu)
-sudo apt-get install fzf entr
+# Linux (Debian/Ubuntu) - television installed via .deb, see packages/install.sh
+sudo apt-get install entr
 ```
 
 **Usage:**
 1. Run `dutils diff`
-2. Select first file from fzf menu
-3. Select second file from fzf menu
+2. Select first file from tv picker
+3. Select second file from tv picker
 4. View diff (updates automatically when files change)
 5. Press `Ctrl+C` to exit
 

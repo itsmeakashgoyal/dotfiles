@@ -31,4 +31,5 @@ tmux/.config/tmux/plugins/*
 
 # Private Information
 private/*
-zsh/.config/zsh/conf.d/private.zsh
+zsh/.config/zsh/conf.d/99-private.zsh
+.claude/

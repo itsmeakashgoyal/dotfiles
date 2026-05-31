@@ -105,7 +105,7 @@ COMMANDS: dict[str, tuple] = {
     "cleanup":        (cmd_cleanup,        "Clean up dotfiles, Homebrew, Neovim, tmux"),
     "ssh-keygen":     (cmd_ssh_keygen,     "Generate SSH keys with custom names/types"),
     "detect-os":      (cmd_detect_os,      "Detect current OS and architecture"),
-    "diff":           (cmd_diff,           "Interactive file diff with fzf and live watching"),
+    "diff":           (cmd_diff,           "Interactive file diff with tv and live watching"),
     "install-nvim":   (cmd_install_nvim,   "Install latest Neovim (Linux only)"),
     "list-functions": (cmd_list_functions, "List all custom zsh functions"),
     "debug":          (cmd_debug,          "Run a script with debug tracing (bash -x)"),

@@ -58,7 +58,6 @@ setopt magic_equal_subst
 setopt nonomatch
 setopt notify
 setopt numeric_glob_sort
-setopt print_exit_value
 setopt prompt_subst
 setopt no_flow_control
 setopt list_packed
@@ -144,22 +143,6 @@ gv=36:                   # Renamed
 Dockerfile=38;5;222:    # Docker files
 docker-compose.yml=38;5;222:
 "
-
-# ------------------------------------------------------------------------------
-# FZF-TAB Configuration
-# ------------------------------------------------------------------------------
-zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup      # Use tmux popup for fzf UI
-zstyle ':fzf-tab:*' popup-min-size 50 8             # Minimum popup size (cols, rows)
-zstyle ':fzf-tab:*' popup-pad 30 0                  # Horizontal padding for popup
-zstyle ':fzf-tab:*' fzf-flags '--color=bg+:23'      # Custom color tweak for highlight
-zstyle ':fzf-tab:*' continuous-trigger 'ctrl-space' # Trigger fzf-tab repeatedly with Ctrl+Space
-
-# Previews for various completion types
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --tree --icons --level=2 --color=always $realpath'
-zstyle ':fzf-tab:complete:nvim:*' fzf-preview 'bat --color=always --style=numbers $realpath'
-zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' \
-  fzf-preview 'echo ${(P)word}'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
 
 # ------------------------------------------------------------------------------
 # Basic Completion Settings

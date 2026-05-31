@@ -1,0 +1,153 @@
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ atuin/.config/atuin/config.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+# ░░░░░░░░░░
+#
+# Atuin shell history configuration
+# https://docs.atuin.sh/configuration/config/
+
+## where to store your database, default is your system data directory
+# db_path = "~/.local/share/atuin/history.db"
+
+## where to store your encryption key
+# key_path = "~/.local/share/atuin/key"
+
+## where to store your auth session token
+# session_path = "~/.local/share/atuin/session"
+
+## date format used, either "us" or "uk"
+# dialect = "us"
+
+## default timezone
+# timezone = "local"
+
+## enable or disable automatic sync
+# auto_sync = true
+
+## enable or disable automatic update checks
+# update_check = true
+
+## address of the sync server
+# sync_address = "https://api.atuin.sh"
+
+## how often to sync history
+# sync_frequency = "10m"
+
+## which search mode to use
+## possible values: prefix, fulltext, fuzzy, skim
+search_mode = "fuzzy"
+
+## which filter mode to use
+## possible values: global, host, session, directory
+# filter_mode = "global"
+
+## workspace filtering (filter within git repo tree)
+# workspaces = false
+
+## which filter mode for shell up-key binding
+# filter_mode_shell_up_key_binding = "global"
+
+## which search mode for shell up-key binding
+# search_mode_shell_up_key_binding = "fuzzy"
+
+## which style to use
+## possible values: auto, full, compact
+# style = "auto"
+
+## the maximum number of lines the interface should take up
+## set to 0 for full screen
+inline_height = 20
+
+## put the search bar at the top
+invert = true
+
+## show a preview of the selected command
+# show_preview = true
+
+## what to do when escape is pressed
+# exit_mode = "return-original"
+
+## word jump mode: emacs or subl
+# word_jump_mode = "emacs"
+
+## number of context lines when scrolling by pages
+# scroll_context_lines = 1
+
+## use ctrl instead of alt for numerical shortcuts
+# ctrl_n_shortcuts = false
+
+## default history list format
+# history_format = "{time}\t{command}\t{duration}"
+
+## prevent commands matching these regexes from being saved
+# history_filter = [
+#   "^secret-cmd",
+#   "^innocuous-cmd .*--secret=.+",
+# ]
+
+## prevent commands in these directories from being saved
+# cwd_filter = [
+#   "^/very/secret/area",
+# ]
+
+## maximum height of the preview
+# max_preview_height = 4
+
+## show help row with version and keymap hints
+# show_help = true
+
+## show tabs for search and inspect
+# show_tabs = true
+
+## filter out secrets (AWS keys, GitHub PATs, Slack tokens, etc.)
+# secrets_filter = true
+
+## immediately execute command on enter (press tab to edit instead)
+enter_accept = false
+
+## startup keymap mode: emacs, vim-insert, vim-normal, or auto
+keymap_mode = "vim-insert"
+
+## cursor style per keymap mode
+# keymap_cursor = { emacs = "blink-block", vim_insert = "blink-block", vim_normal = "steady-block" }
+
+# network_connect_timeout = 5
+# network_timeout = 5
+
+## timeout for local database connection (sqlite)
+# local_timeout = 5
+
+## minimize UI motion (timers won't update live, etc.)
+# prefers_reduced_motion = false
+
+[stats]
+## commands where subcommand should be considered for stats
+# common_subcommands = [
+#   "apt", "cargo", "docker", "git", "go", "kubectl",
+#   "nix", "npm", "pnpm", "systemctl", "tmux", "yarn",
+# ]
+
+## commands to strip from stats
+# common_prefix = ["sudo"]
+
+## commands to ignore completely
+# ignored_commands = ["cd", "ls", "vi"]
+
+[keys]
+## whether up/down exits the TUI when scrolled past first/last entry
+# scroll_exits = true
+
+[sync]
+## enable sync v2
+records = true
+
+[preview]
+## preview strategy: auto or static
+# strategy = "auto"
+
+[daemon]
+## enable daemon-based sync
+# enabled = false
+## how often the daemon should sync (seconds)
+# sync_frequency = 300

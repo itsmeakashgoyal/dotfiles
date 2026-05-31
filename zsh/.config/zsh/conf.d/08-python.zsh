@@ -23,6 +23,8 @@
 alias python="python3" # Use Python 3 by default
 alias pip="pip3"       # Use pip3 by default
 
+alias py3="/opt/anaconda3/bin/python3"
+
 # Python environment variables
 export PYTHONIOENCODING='UTF-8'  # Ensure UTF-8 encoding
 export PYTHONDONTWRITEBYTECODE=1 # Prevent Python from writing .pyc files

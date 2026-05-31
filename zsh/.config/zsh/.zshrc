@@ -63,7 +63,7 @@ autoload -U select-word-style
 select-word-style bash  # only alphanumeric chars are considered WORDCHARS
 
 # exports.zsh must run before compinit — it extends fpath with custom completions.
-source "$ZDOTDIR/conf.d/exports.zsh"
+source "$ZDOTDIR/conf.d/01-exports.zsh"
 
 # p10k config must be sourced before the theme plugin loads.
 [[ -f "$ZDOTDIR/.p10k.zsh" ]] && source "$ZDOTDIR/.p10k.zsh"
@@ -78,13 +78,11 @@ zinit lucid light-mode for \
     zsh-users/zsh-completions
 
 # --- 6b. Completion system init (compinit + tab/title hooks) -----------------
-# startup.zsh must run after zsh-completions but before fzf-tab.
-source "$ZDOTDIR/conf.d/startup.zsh"
+source "$ZDOTDIR/conf.d/03-startup.zsh"
 
 # --- 6c. Core interactive plugins (synchronous) ------------------------------
 zinit lucid light-mode for \
-    zsh-users/zsh-autosuggestions \
-    Aloxaf/fzf-tab
+    zsh-users/zsh-autosuggestions
 
 # --- 6d. Syntax highlighting — must be the last synchronous plugin -----------
 zinit light zsh-users/zsh-syntax-highlighting
@@ -104,7 +102,7 @@ zinit light romkatv/powerlevel10k
 # (N) glob qualifier silently skips if the dir is empty or pattern has no match.
 # ==============================================================================
 for _config in "$ZDOTDIR/conf.d"/*.zsh(N); do
-    [[ "$_config" == */exports.zsh || "$_config" == */startup.zsh ]] && continue
+    [[ "$_config" == */01-exports.zsh || "$_config" == */03-startup.zsh ]] && continue
     source "$_config"
 done
 unset _config

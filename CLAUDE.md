@@ -39,15 +39,32 @@ shfmt -d scripts/                   # Check shell formatting
 
 ### Stow Packages
 Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create the directory and add it to that list.
-- `git/` → `~/.config/git/` — Git config, aliases (40+), delta diff viewer
+- `git/` → `~/.config/git/` — Git config, aliases (40+), delta diff viewer, GPG signing
 - `zsh/` → `~/.zshenv` + `~/.config/zsh/` — Shell config with Zinit plugin manager
-- `nvim/` → `~/.config/nvim/` — Neovim with Lazy.nvim
+- `nvim/` → `~/.config/nvim/` — Neovim with Lazy.nvim + Harpoon
 - `tmux/` → `~/.config/tmux/` — Tmux config
+- `television/` → `~/.config/television/` — Fuzzy finder with channels
+- `bin/` → `~/.local/bin/` — Custom scripts (yank, zoxide-edit)
+- `atuin/` → `~/.config/atuin/` — Shell history search
+- `fastfetch/` → `~/.config/fastfetch/` — System info display
+
 
 ### Zsh Configuration Layout
-`zsh/.config/zsh/conf.d/` contains modular config files sourced alphabetically:
-- `aliases.zsh`, `exports.zsh`, `functions.zsh`, `fzf.zsh`, `git.zsh`, `docker.zsh`, `options.zsh`, `python.zsh`, `startup.zsh`
-- `private.zsh` — Machine-local overrides, gitignored
+`zsh/.config/zsh/conf.d/` contains numbered modular config files sourced in order:
+- `00-logo.zsh` — ASCII art startup greeting (guards: non-tmux, non-p10k)
+- `01-exports.zsh` — PATH, environment variables (sourced early in .zshrc)
+- `02-options.zsh` — Shell options, history, completion settings
+- `03-startup.zsh` — Completion system init (sourced early in .zshrc)
+- `04-aliases.zsh` — Command aliases (eza, bat, tmux, docker, system)
+- `05-functions.zsh` — Utility functions (navigation, docker, network, archives)
+- `06-git.zsh` — Git aliases and interactive functions (uses television)
+- `07-docker.zsh` — Docker container/image management
+- `08-python.zsh` — Python, pyenv, venv management
+- `09-television.zsh` — Television fuzzy finder setup (Ctrl+T, Tab)
+- `10-atuin.zsh` — Atuin shell history (Ctrl+R)
+- `11-colored-man-pages.zsh` — Colored man page output
+- `12-prompt-styles.zsh` — Pure ZSH prompt alternatives (minimal/classic/dual/ascii/arrows/ninja)
+- `99-private.zsh` — Machine-local overrides, gitignored
 
 ### Scripts Layout
 - `scripts/lib/core.sh` — Shared library for logging, OS detection, command checking; sourced by all install scripts

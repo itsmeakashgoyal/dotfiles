@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ bin/.local/bin/yank
+# ░▓▓▓▓▓▓▓▓▓▓
+# ░░░░░░░░░░
+#
+# Universal clipboard script — pushes to every clipboard backend it can find.
+# Supports: pbcopy, xsel, xclip, reattach-to-user-namespace, tmux, OSC 52.
+# Adapted from xero's dotfiles (https://github.com/xero/dotfiles)
+
+set -eu
+
+# get data either from stdin or from a file
+buf=$(cat -- "$@")
+
+# check if a command exists
+installed() {
+    type "$1" &>/dev/null
+}
+
+# resolve local clipboard backend
+copy_backend=""
+if installed pbcopy; then
+    copy_backend="pbcopy"
+elif installed reattach-to-user-namespace; then
+    copy_backend="reattach-to-user-namespace pbcopy"
+elif [ -n "${DISPLAY-}" ] && installed xsel; then
+    copy_backend="xsel -i"
+elif [ -n "${DISPLAY-}" ] && installed xclip; then
+    copy_backend="xclip -i -f -selection primary | xclip -i -selection clipboard"
+elif [ -n "${copy_backend_remote_tunnel_port-}" ] && [ "$(ss -n -4 state listening "( sport = $copy_backend_remote_tunnel_port )" | tail -n +2 | wc -l)" -eq 1 ]; then
+    copy_backend="nc localhost $copy_backend_remote_tunnel_port"
+fi
+
+# copy to local clipboard if backend found
+[ -n "$copy_backend" ] && printf "%b" "$buf" | eval "$copy_backend"
+
+# ---------------------------------------------------------------------------
+# OSC 52 ANSI escape sequence — copy to controlling terminal's clipboard.
+# Works over SSH, tmux, and iPad terminals (Blink Shell, etc.).
+# https://sunaku.github.io/tmux-yank-osc52.html
+#
+# Max OSC 52 length: 100,000 bytes (7 header + 1 footer + 99,992 base64 = 74,994 raw)
+# ---------------------------------------------------------------------------
+maxlen=74994
+buflen=$(printf %s "$buf" | wc -c)
+
+if [ "$buflen" -gt "$maxlen" ]; then
+    printf "input is %d bytes too long\n" "$((buflen - maxlen))" >&2
+fi
+
+# build the OSC 52 escape sequence
+esc="\033]52;c;$(printf "%b" "$buf" | head -c $maxlen | base64 | tr -d '\r\n')\a"
+
+# wrap for tmux if running inside a session
+if (tmux has-session 2>/dev/null); then
+    esc="\033Ptmux;\033$esc\033\\"
+    # send to all connected terminals
+    for pts in /dev/pts/[0-9]; do
+        printf "%b" "$esc" >"$pts"
+    done
+else
+    printf "%b" "$esc"
+fi

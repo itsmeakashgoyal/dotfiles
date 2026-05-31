@@ -219,6 +219,7 @@ return {
             },
             -- autocompletion sources
             sources = cmp.config.sources({
+                { name = "lazydev", group_index = 0 }, -- Neovim Lua API completions
                 { name = "nvim_lsp" }, -- LSP completion
                 { name = "luasnip" }, -- snippets
                 { name = "buffer" }, -- text within current buffer

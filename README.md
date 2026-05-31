@@ -19,7 +19,7 @@
  ░░░░░░░░  ░░░░░░     ░░░░░   ░░░░░     ░░░░░ ░░░░░  ░░░░░░  ░░░░░░
 ```
 
-A comprehensive, automated dotfiles setup for **macOS** and **Linux**, featuring Neovim, Zsh, Tmux, Git, and modern CLI tools -- all managed with [GNU Stow](https://www.gnu.org/software/stow/).
+A comprehensive, automated dotfiles setup for **macOS**, **Linux**, and **Windows**, featuring Neovim, Zsh/PowerShell, Tmux, Git, and modern CLI tools -- managed with [GNU Stow](https://www.gnu.org/software/stow/) on Unix and native symlinks on Windows.
 
 > **Warning:** These dotfiles are personalized and will overwrite existing configurations.
 > Fork the repo and review the scripts before running on your machine.
@@ -28,7 +28,7 @@ A comprehensive, automated dotfiles setup for **macOS** and **Linux**, featuring
 
 ## What's Included
 
-- **Zsh** -- Modular config via `conf.d/`, Zinit plugin manager, Powerlevel10k prompt, fzf integration
+- **Zsh** -- Modular config via `conf.d/`, Zinit plugin manager, Powerlevel10k prompt, television fuzzy finder
 - **Neovim** -- Lazy.nvim, LSP, Treesitter, Telescope, autocompletions
 - **Git** -- 40+ aliases, delta diff viewer, XDG-compliant config
 - **Tmux** -- TPM plugin manager, vim-aware pane switching, session persistence
@@ -39,13 +39,13 @@ A comprehensive, automated dotfiles setup for **macOS** and **Linux**, featuring
 
 ## Quick Start
 
-### One-liner Bootstrap (fresh machines)
+### macOS / Linux — one-liner bootstrap
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/bootstrap.sh)"
 ```
 
-### Standard Install
+### macOS / Linux — standard install
 
 ```bash
 git clone https://github.com/itsmeakashgoyal/dotfiles.git ~/dotfiles
@@ -55,6 +55,57 @@ exec zsh
 ```
 
 > For prerequisites, platform-specific notes, and what the installer does, see **[Installation Guide](docs/INSTALLATION.md)**.
+
+### Windows — one-click install
+
+**Prerequisites:** PowerShell 5.1+ (built-in) or [PowerShell 7+](https://aka.ms/pscore6). No other tools needed — the script installs everything.
+
+**Option A — fresh machine (run in PowerShell):**
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/install.ps1 | iex
+```
+
+**Option B — already cloned:**
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+cd ~\dotfiles
+.\install.ps1
+```
+
+**What it installs automatically:**
+
+| Step | What happens |
+| --- | --- |
+| **Scoop** | Package manager bootstrapped if missing |
+| **CLI tools** | ripgrep, fzf, bat, eza, fd, zoxide, neovim, lazygit, delta, … |
+| **PS modules** | `PSReadLine` (Vi mode), `PSFzf` (fzf integration), `Terminal-Icons` |
+| **Symlinks** | PowerShell profile, nvim, git, tmux, television, atuin, fastfetch |
+| **Neovim** | Config linked; lazy.nvim bootstraps on first `nvim` launch |
+
+> **Symlinks require** either Administrator privileges or [Developer Mode](ms-settings:developers) enabled (`Settings → System → For Developers`).
+
+**PowerShell profile features:**
+
+| Shortcut / Alias | What it does |
+| --- | --- |
+| `Ctrl+T` | fzf file picker |
+| `Ctrl+R` | fzf history search |
+| `Alt+C` | fzf cd into directory |
+| `ls` / `ll` / `la` / `lt` | eza with icons and git status |
+| `cat` | bat with syntax highlighting |
+| `grep` | ripgrep (`rg`) |
+| `find` | fd |
+| `z <dir>` | zoxide smart jump |
+| `rm -rf <path>` | recursive force delete |
+| `rmdir <dir>` | remove directory (with `-p` for empty parents) |
+| `touch` / `mkcd` | create file / mkdir + cd |
+| `gs` / `gc` / `gp` / `glog` | git shortcuts |
+| `glf` | interactive git log with fzf |
+| `rgf` | ripgrep → fzf → open in editor |
+| `jk` / `kj` | exit Vi insert mode (mirrors zsh config) |
 
 ---
 
@@ -82,10 +133,12 @@ dotfiles/
 ├── zsh/                       → ~/.config/zsh/          Zsh shell configuration
 ├── nvim/                      → ~/.config/nvim/         Neovim editor setup
 ├── tmux/                      → ~/.config/tmux/         Tmux multiplexer
+├── powershell/                → ~/Documents/PowerShell/ PowerShell profile (Windows)
 ├── packages/                  Brewfile & install script
 ├── scripts/                   Setup, verification, utilities
 ├── settings/                  App preferences (iTerm, Sublime)
-├── install.sh                 Main installer
+├── install.sh                 Main installer (macOS/Linux)
+├── install.ps1                Main installer (Windows)
 ├── bootstrap.sh               One-liner bootstrap for fresh machines
 └── Makefile                   Stow management & diagnostics
 ```

@@ -27,7 +27,7 @@ Modular configs live in `zsh/.config/zsh/conf.d/`. Every `*.zsh` file in that di
 | `aliases.zsh` | Command aliases (`l`, `ll`, `gs`, `gc`, etc.) |
 | `exports.zsh` | `PATH` and environment variables |
 | `functions.zsh` | Custom shell functions |
-| `fzf.zsh` | Fuzzy finder key bindings and options |
+| `television.zsh` | Television fuzzy finder, smart autocomplete, key bindings |
 | `git.zsh` | Git-specific aliases and functions |
 | `options.zsh` | Zsh options, history, completion settings |
 | `private.zsh` | Machine-local overrides (gitignored) |
