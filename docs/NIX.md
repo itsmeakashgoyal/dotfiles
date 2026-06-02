@@ -71,21 +71,88 @@ verifies your `$USER` is in the flake's `users` list before doing anything.
 | Roll back a bad change | `home-manager generations` then activate an older one |
 | List installed | `home-manager packages` |
 
-### Adding a package
+## Installing & uninstalling individual packages
 
-1. Find its attribute name at <https://search.nixos.org/packages>.
-2. Add it to the `home.packages` list in [`nix/home.nix`](../nix/home.nix).
-3. `make nix-switch`.
+This setup is **declarative**: you don't run `nix install <pkg>` imperatively.
+Instead you edit the package list in [`nix/home.nix`](../nix/home.nix) and apply
+it. Adding a line installs a package; removing the line uninstalls it. This keeps
+your machine reproducible — the file is the single source of truth.
 
-Example — add `dust` and `procs`:
+### Install a package
 
-```nix
-home.packages = with pkgs; [
-  # … existing …
-  dust
-  procs
-];
+1. Find its attribute name at <https://search.nixos.org/packages>
+   (search the tool, e.g. "dust", and copy the **package name**).
+2. Add it to the `home.packages` list in `nix/home.nix`:
+
+   ```nix
+   home.packages = with pkgs; [
+     # … existing tools …
+     dust          # du replacement
+     procs         # ps replacement
+   ];
+   ```
+
+3. Apply the change:
+
+   ```bash
+   make nix-switch
+   ```
+
+4. The new commands are immediately available (open a new shell if a freshly
+   added tool isn't found):
+
+   ```bash
+   dust --version
+   ```
+
+### Uninstall a package
+
+1. Delete (or comment out) its line in `home.packages`:
+
+   ```nix
+   home.packages = with pkgs; [
+     # … existing tools …
+     # dust        # ← removed
+     procs
+   ];
+   ```
+
+2. Apply the change — Home Manager removes it from your profile:
+
+   ```bash
+   make nix-switch
+   ```
+
+   `dust` is now gone from `PATH`. Nothing else is affected.
+
+### Try a package without installing it permanently
+
+To run a tool **once** (or test it) without editing `home.nix`, use an ad-hoc
+shell — it's available only for that session and leaves no trace:
+
+```bash
+nix shell nixpkgs#dust          # drops you in a shell with `dust` available
+dust                            # use it
+exit                            # gone — not installed
+
+# or run a single command directly:
+nix run nixpkgs#dust -- --help
 ```
+
+### Imperative install (not recommended here)
+
+Nix also supports imperatively installing into your profile:
+
+```bash
+nix profile install nixpkgs#dust     # install
+nix profile list                     # see what's installed
+nix profile remove dust              # uninstall
+```
+
+This works, but packages added this way **aren't tracked in `home.nix`**, so they
+won't reproduce on another machine and won't show in version control. Prefer the
+declarative `home.nix` + `make nix-switch` flow above; reserve `nix shell` /
+`nix run` for one-off experimentation.
 
 ---
 
