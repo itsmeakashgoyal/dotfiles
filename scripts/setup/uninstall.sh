@@ -12,24 +12,22 @@
 #   2. Unstows every Stow package (removes the dotfile symlinks)
 #   3. Sweeps any dangling symlinks that still point into the repo
 #   4. Clears generated caches (zcompdump, stow backups)
-#   6. Uninstalls Homebrew COMPLETELY — brew itself + every package it
-#      installed (not just the Brewfile entries). Runs everywhere, incl. CI.
+#   5. If Nix is installed: removes Home Manager packages, then Nix itself
+#   6. If Homebrew is installed: removes all its packages, then brew itself
 #
-# What it does ONLY if you opt in (prompted, default No):
-#   5. Removes Nix + Home Manager (Linux) — isolated to /nix
+# Both package managers are removed PACKAGES-FIRST, then the manager, so
+# nothing is left half-broken. Each is a no-op if not installed.
 #
 # What it NEVER touches:
 #   • The repo itself (your dotfiles stay on disk)
 #   • Your data: shell history, ~/.ssh, ~/.gitconfig content, etc.
-#   • Nix, unless you explicitly opt in (REMOVE_NIX=1 or the prompt)
 #
 # Usage:
-#   make uninstall                 # interactive (removes Homebrew entirely)
+#   make uninstall                 # interactive
 #   make uninstall dry=1           # show what would happen, change nothing
 #   make uninstall force=1         # skip the initial confirm
-#   REMOVE_NIX=1 make uninstall    # also remove Nix non-interactively
 #
-# WARNING: Homebrew removal is now MANDATORY and total. If you installed
+# WARNING: Removal of Nix AND Homebrew is MANDATORY and total. If you installed
 # packages outside these dotfiles, they will be removed too. Use dry=1 first
 # if unsure.
 
@@ -50,7 +48,6 @@ trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 # ------------------------------------------------------------------------------
 DRY_RUN="${DRY_RUN:-0}"
 FORCE="${FORCE:-0}"
-REMOVE_NIX="${REMOVE_NIX:-0}"
 
 # Package list — passed from the Makefile to stay a single source of truth.
 # Falls back to a sane default if invoked directly.
@@ -78,19 +75,6 @@ confirm_gate() {
         log::warning "Non-interactive shell and FORCE not set — aborting."
         return 1
     fi
-    local yn
-    read -r -p "$(printf '  %b?%b %s [y/N] ' "$LOG_YELLOW" "$LOG_NC" "$prompt")" yn
-    [[ "$yn" =~ ^[Yy]$ ]]
-}
-
-# Opt-in prompt for destructive package/Nix removal. Default No.
-# Enabled by: matching env flag = 1, or an interactive "y". FORCE never auto-enables.
-ask_optional() {
-    local prompt="$1" envflag="$2"
-    [[ "${!envflag:-0}" == "1" ]] && return 0
-    [[ "$DRY_RUN" == "1" ]] && { log::substep "[dry-run] optional step (set ${envflag}=1 to enable): $prompt"; return 0; }
-    [[ "$FORCE" == "1" ]] && return 1
-    [[ ! -t 0 ]] && return 1
     local yn
     read -r -p "$(printf '  %b?%b %s [y/N] ' "$LOG_YELLOW" "$LOG_NC" "$prompt")" yn
     [[ "$yn" =~ ^[Yy]$ ]]
@@ -233,33 +217,52 @@ clean_generated() {
 # Step 5 — optional: remove Nix + Home Manager (Linux)
 # ------------------------------------------------------------------------------
 remove_nix() {
-    log::section "Step 5/6 — Remove Nix (optional)"
+    log::section "Step 5/6 — Uninstall Nix completely"
 
-    if ! os::is_linux; then
-        log::substep "Not on Linux — skipping Nix removal."
-        return 0
-    fi
-    if ! command_exists nix; then
+    # Detect Nix by command OR the store dir (covers non-login shells where
+    # `nix` isn't on PATH but /nix exists).
+    if ! command_exists nix && [[ ! -e /nix ]]; then
         log::substep "Nix not installed — nothing to remove."
         return 0
     fi
 
-    if ! ask_optional "Remove Nix + Home Manager entirely? (isolated to /nix)" "REMOVE_NIX"; then
-        log::substep "Keeping Nix installed."
+    log::warning "Removing Nix + Home Manager entirely — this deletes /nix and"
+    log::warning "every package Home Manager installed."
+
+    if [[ "$DRY_RUN" == "1" ]]; then
+        log::substep "[dry-run] home-manager uninstall            (removes HM packages first)"
+        log::substep "[dry-run] /nix/nix-installer uninstall ...  (then removes Nix itself)"
+        log::ok "Nix removal step complete (dry-run)."
         return 0
     fi
 
-    # Remove the Home Manager generation first (best-effort), then uninstall Nix.
+    # Make nix / home-manager reachable even from this non-login shell.
+    if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+        # shellcheck disable=SC1091
+        source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    fi
+    export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+
+    # 1) Packages first — cleanly remove the Home Manager profile/generations.
     if command_exists home-manager; then
-        run bash -c "home-manager uninstall || true"
+        log::substep "Removing Home Manager profile (packages)..."
+        home-manager uninstall <<< "y" 2>/dev/null \
+            || log::warn "home-manager uninstall returned non-zero (continuing)."
+    else
+        log::substep "home-manager not on PATH — the Nix uninstaller will remove its packages."
     fi
 
+    # 2) Then the package manager itself.
+    local nc=""
+    [[ -n "${CI:-}" || ! -t 0 ]] && nc="--no-confirm"
     if [[ -x /nix/nix-installer ]]; then
-        log::substep "Using Determinate uninstaller..."
-        run /nix/nix-installer uninstall
+        log::substep "Removing Nix via the Determinate uninstaller..."
+        # shellcheck disable=SC2086
+        /nix/nix-installer uninstall $nc \
+            || log::warn "nix-installer uninstall returned non-zero — Nix may be partially removed."
     else
-        log::warn "/nix/nix-installer not found."
-        log::info "Remove manually per your installer's docs (e.g. official: /nix/var/nix/profiles cleanup)."
+        log::warn "/nix/nix-installer not found — remove Nix manually:"
+        log::info "  https://nix.dev/manual/nix/latest/installation/uninstall"
     fi
     log::ok "Nix removal step complete."
 }
@@ -317,9 +320,9 @@ main() {
 
     log::newline
     log::info "This will reset your login shell, remove dotfile symlinks, clear caches,"
-    log::info "and UNINSTALL HOMEBREW COMPLETELY (brew + all packages it installed)."
+    log::info "and COMPLETELY UNINSTALL both Nix and Homebrew if present"
+    log::info "(all their packages first, then the package manager itself)."
     log::info "Your repo, shell history, and personal data are left untouched."
-    log::info "Nix removal (Linux) stays opt-in (you'll be asked, default No)."
     [[ "$DRY_RUN" != "1" && -z "${CI:-}" ]] && \
         log::warning "Tip: run 'make uninstall dry=1' first to preview every action."
     log::newline

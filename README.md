@@ -125,6 +125,50 @@ Running `stow <package>` from the repo root creates the correct symlinks automat
 
 ---
 
+## Uninstall
+
+To remove the dotfiles setup from your machine, run from the repo root:
+
+```bash
+cd ~/dotfiles
+make uninstall
+```
+
+After one confirmation, it gracefully and completely reverses the install:
+
+1. **Restores your login shell** to the OS default (`/bin/zsh` on macOS, `/bin/bash` on Linux)
+2. **Removes all dotfile symlinks** (unstows every package) and sweeps any leftovers
+3. **Clears generated caches** (zsh compdump, stow backups)
+4. **Uninstalls Nix** if present — removes Home Manager packages first, then Nix itself
+5. **Uninstalls Homebrew** if present — removes all its packages first, then brew itself
+
+> **⚠️ This is a complete removal.** Both package managers are uninstalled
+> entirely, including any packages you installed **outside** these dotfiles.
+> Your repo, shell history, and personal data (`~/.ssh`, git config, etc.) are
+> left untouched.
+
+**Preview first (recommended)** — shows every action without changing anything:
+
+```bash
+make uninstall dry=1
+```
+
+**Skip the confirmation prompt** (e.g. for scripts/CI):
+
+```bash
+make uninstall force=1
+```
+
+The repo itself is left on disk — delete it manually if you want it gone:
+
+```bash
+rm -rf ~/dotfiles
+```
+
+See [docs/NIX.md](docs/NIX.md) for Nix-specific removal notes.
+
+---
+
 ## Repository Structure
 
 ```text

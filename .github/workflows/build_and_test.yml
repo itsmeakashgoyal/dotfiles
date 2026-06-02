@@ -446,10 +446,10 @@ jobs:
           # stow comes from apt (/usr/bin) on Linux now; no brew needed.
           # Homebrew removal is a no-op here (Linux uses Nix); Nix stays intact.
           export CI=1
-          echo "🧹 Uninstalling dotfiles (symlinks + shell; Nix left intact)..."
+          echo "🧹 Uninstalling dotfiles (symlinks, shell, and Nix completely)..."
           make uninstall force=1
 
-      - name: Verify uninstall removed symlinks
+      - name: Verify uninstall
         run: |
           echo "🔍 Verifying dotfile symlinks were removed..."
           fail=0
@@ -461,10 +461,18 @@ jobs:
               echo "  ❌ ~/.config/$d still symlinked after uninstall"; fail=1
             fi
           done
-          if [[ "$fail" -ne 0 ]]; then
-            echo "❌ Uninstall left symlinks behind"; exit 1
+
+          echo "🔍 Verifying Nix was uninstalled..."
+          if command -v nix &> /dev/null || [[ -e /nix ]]; then
+            echo "  ❌ Nix still present after uninstall (/nix or nix on PATH)"; fail=1
+          else
+            echo "  ✅ Nix fully removed"
           fi
-          echo "✅ Uninstall removed all dotfile symlinks"
+
+          if [[ "$fail" -ne 0 ]]; then
+            echo "❌ Uninstall did not fully clean up"; exit 1
+          fi
+          echo "✅ Uninstall verified: symlinks gone, Nix removed"
 
       - name: Upload logs on failure
         if: failure()
