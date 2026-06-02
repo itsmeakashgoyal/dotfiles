@@ -55,6 +55,16 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 
+# zsh-syntax-highlighting
+# The 'path'/'path_prefix' highlighters stat() every path token on EVERY
+# keystroke (`[[ -e ]]`, plus a glob to detect partial paths). On auto-mounting
+# or network roots this is harmful: typing a path under an autofs mount
+# triggers the mount (and resets its idle timer so it never expires), and a
+# stat() into a dead `hard` NFS mount hangs the whole shell while you type.
+# ZSH_HIGHLIGHT_DIRS_BLACKLIST makes the highlighter skip these subtrees
+# entirely (it returns before any filesystem access). Add more roots as needed.
+ZSH_HIGHLIGHT_DIRS_BLACKLIST=(/mnt /net)   # autofs (/mnt/auto, /net) + NFS mounts under /mnt
+
 # ==============================================================================
 # 5. EARLY SETUP (ordering constraints)
 # ==============================================================================

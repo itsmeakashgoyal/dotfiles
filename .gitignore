@@ -29,6 +29,12 @@ Thumbs.db
 # Tmux plugins (managed by TPM)
 tmux/.config/tmux/plugins/*
 
+# Nix build artifacts (NOTE: keep nix/flake.lock tracked — it pins versions)
+result
+result-*
+nix/result
+nix/result-*
+
 # Private Information
 private/*
 zsh/.config/zsh/conf.d/99-private.zsh

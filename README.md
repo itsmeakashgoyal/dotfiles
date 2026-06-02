@@ -33,7 +33,7 @@ A comprehensive, automated dotfiles setup for **macOS**, **Linux**, and **Window
 - **Git** -- 40+ aliases, delta diff viewer, XDG-compliant config
 - **Tmux** -- TPM plugin manager, vim-aware pane switching, session persistence
 - **Oh My Posh** -- Custom prompt theme
-- **100+ CLI tools** -- via Homebrew Brewfile (eza, bat, ripgrep, fd, zoxide, and more)
+- **CLI tools** -- macOS via Homebrew (`packages/Brewfile`); **Linux via Nix + Home Manager** (`nix/`, replaces linuxbrew) -- eza, bat, ripgrep, fd, zoxide, and more. See [docs/NIX.md](docs/NIX.md)
 
 ---
 
@@ -134,7 +134,8 @@ dotfiles/
 ├── nvim/                      → ~/.config/nvim/         Neovim editor setup
 ├── tmux/                      → ~/.config/tmux/         Tmux multiplexer
 ├── powershell/                → ~/Documents/PowerShell/ PowerShell profile (Windows)
-├── packages/                  Brewfile & install script
+├── packages/                  Brewfile & install script (macOS)
+├── nix/                       Home Manager flake — Linux packages (replaces linuxbrew)
 ├── scripts/                   Setup, verification, utilities
 ├── settings/                  App preferences (iTerm, Sublime)
 ├── install.sh                 Main installer (macOS/Linux)
@@ -151,6 +152,7 @@ dotfiles/
 | --- | --- |
 | **[Installation](docs/INSTALLATION.md)** | Prerequisites, platform notes, what the installer does |
 | **[Usage](docs/USAGE.md)** | Makefile commands, updating, adding packages, diagnostics |
+| **[Nix (Linux)](docs/NIX.md)** | Nix + Home Manager package management on Linux (replaces linuxbrew) |
 | **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues, debug workflow, uninstalling |
 | **[Architecture](docs/ARCHITECTURE.md)** | Deep dive: Stow internals, Zsh flow, scripts, CI, XDG |

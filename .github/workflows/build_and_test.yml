@@ -8,8 +8,10 @@ name: Test Dotfiles Setup
       - ".github/workflows/build_and_test*.yml"
       - "install.sh"
       - "bootstrap.sh"
+      - "Makefile"
       - "scripts/**"
       - "packages/**"
+      - "nix/**"
       - "zsh/**"
       - "nvim/**"
       - "tmux/**"
@@ -237,6 +239,36 @@ jobs:
 
           echo "✅ Zsh configuration test complete"
 
+      - name: Uninstall dotfiles
+        run: |
+          cd "$HOME/dotfiles"
+          # Make stow available so unstow runs cleanly (sweep is a fallback anyway)
+          if [[ -x "/opt/homebrew/bin/brew" ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+          elif [[ -x "/usr/local/bin/brew" ]]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+          fi
+          export CI=1
+          echo "🧹 Uninstalling dotfiles (core only — packages/Nix left intact)..."
+          make uninstall force=1
+
+      - name: Verify uninstall removed symlinks
+        run: |
+          echo "🔍 Verifying dotfile symlinks were removed..."
+          fail=0
+          if [[ -L "$HOME/.zshenv" ]]; then
+            echo "  ❌ .zshenv still symlinked after uninstall"; fail=1
+          fi
+          for d in zsh nvim tmux git; do
+            if [[ -L "$HOME/.config/$d" ]]; then
+              echo "  ❌ ~/.config/$d still symlinked after uninstall"; fail=1
+            fi
+          done
+          if [[ "$fail" -ne 0 ]]; then
+            echo "❌ Uninstall left symlinks behind"; exit 1
+          fi
+          echo "✅ Uninstall removed all dotfile symlinks"
+
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v5
@@ -412,6 +444,34 @@ jobs:
           dutils version || echo "dutils version failed"
           dutils detect-os || echo "dutils detect-os failed"
           dutils list-functions || echo "dutils list-functions failed"
+
+      - name: Uninstall dotfiles
+        run: |
+          cd "$HOME/dotfiles"
+          # Make stow available so unstow runs cleanly (sweep is a fallback anyway)
+          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          fi
+          export CI=1
+          echo "🧹 Uninstalling dotfiles (core only — packages/Nix left intact)..."
+          make uninstall force=1
+
+      - name: Verify uninstall removed symlinks
+        run: |
+          echo "🔍 Verifying dotfile symlinks were removed..."
+          fail=0
+          if [[ -L "$HOME/.zshenv" ]]; then
+            echo "  ❌ .zshenv still symlinked after uninstall"; fail=1
+          fi
+          for d in zsh nvim tmux git; do
+            if [[ -L "$HOME/.config/$d" ]]; then
+              echo "  ❌ ~/.config/$d still symlinked after uninstall"; fail=1
+            fi
+          done
+          if [[ "$fail" -ne 0 ]]; then
+            echo "❌ Uninstall left symlinks behind"; exit 1
+          fi
+          echo "✅ Uninstall removed all dotfile symlinks"
 
       - name: Upload logs on failure
         if: failure()
