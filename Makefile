@@ -78,8 +78,14 @@ nix-switch: ## Apply nix/home.nix changes (run after editing the package list)
 		echo "       then open a new shell so the Nix profile is on PATH."; \
 		exit 1; \
 	}
-	@echo "$(BLUE)→$(CLR) Applying $(NIX_FLAKE)#$$USER ..."
-	@home-manager switch -b backup --flake "$(NIX_FLAKE)#$$USER"
+	@sys=$$(uname -m); \
+	case "$$sys" in \
+		x86_64|amd64) sys=x86_64-linux ;; \
+		aarch64|arm64) sys=aarch64-linux ;; \
+		*) echo "$(RED)Error:$(CLR) unsupported arch $$sys"; exit 1 ;; \
+	esac; \
+	echo "$(BLUE)→$(CLR) Applying $(NIX_FLAKE)#$$USER-$$sys ..."; \
+	home-manager switch -b backup --flake "$(NIX_FLAKE)#$$USER-$$sys"
 	@echo "$(GREEN)✓ Home Manager packages applied$(CLR)"
 
 .PHONY: nix-update

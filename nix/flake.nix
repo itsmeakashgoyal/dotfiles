@@ -32,29 +32,43 @@
 
   outputs = { nixpkgs, home-manager, ... }:
     let
+      lib = nixpkgs.lib;
+
       # ════════════════════════════════════════════════════════════════
-      #  EDIT to match your machine(s)
+      #  EDIT: add your Linux `$USER` to this list.
+      #  "runner" is the GitHub CI user. The architecture is auto-detected
+      #  — no `system` line to maintain.
       # ════════════════════════════════════════════════════════════════
-      # Add your Linux `$USER` to this list. "runner" is the GitHub CI user.
       users = [ "akashgoyal" "runner" ];
-      system = "x86_64-linux"; # use "aarch64-linux" on ARM (Pi, ARM VM)
+
+      # Architectures we build for. The tooling (scripts/setup/nix.sh and the
+      # Makefile) picks the one matching the host via `uname -m`.
+      systems = [ "x86_64-linux" "aarch64-linux" ];
       # ════════════════════════════════════════════════════════════════
 
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
-
-      # One Home Manager config per username — same package set for all.
-      mkHome = username: home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+      mkHome = system: username: home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
         modules = [ ./home.nix ];
         extraSpecialArgs = { inherit username; };
       };
     in
     {
-      # Applied via:  home-manager switch --flake ./nix#<username>
-      # e.g.  ./nix#akashgoyal  or  ./nix#runner  (CI)
-      homeConfigurations = nixpkgs.lib.genAttrs users mkHome;
+      # One config per (user, system), named "<user>-<system>", e.g.
+      #   akashgoyal-x86_64-linux   runner-aarch64-linux   …
+      # Applied via:  home-manager switch --flake ./nix#<user>-<system>
+      # `make nix-*` and scripts/setup/nix.sh compute the right name for you.
+      homeConfigurations = builtins.listToAttrs (
+        lib.concatMap
+          (system: map
+            (username: {
+              name = "${username}-${system}";
+              value = mkHome system username;
+            })
+            users)
+          systems
+      );
     };
 }

@@ -33,9 +33,8 @@ deps only) then Nix + Home Manager for all CLI tools:
 cd ~/dotfiles
 
 # 1. Make sure your Linux $USER is in the flake's users list.
-#    Edit nix/flake.nix:
-#      users  = [ "akashgoyal" "runner" "<your $USER>" ];
-#      system = "x86_64-linux";   # or "aarch64-linux" on ARM
+#    Edit nix/flake.nix (architecture is auto-detected — no system line):
+#      users = [ "akashgoyal" "runner" "<your $USER>" ];
 
 # 2. Run the installer (Linux → Nix path automatically)
 make install
@@ -43,6 +42,12 @@ make install
 # 3. Open a new shell so the Nix profile is on PATH
 exec zsh
 ```
+
+> **Architecture is auto-detected.** The flake builds configs for both
+> `x86_64-linux` and `aarch64-linux`, named `<user>-<system>` (e.g.
+> `runner-x86_64-linux`). `make nix-*` and `scripts/setup/nix.sh` pick the
+> right one from `uname -m`, so the same flake works on Intel/AMD and ARM
+> machines and on CI with no edits.
 
 To (re)apply just the Nix package set without the full installer:
 
@@ -52,8 +57,8 @@ make nix-setup     # installs Nix if missing, then home-manager switch
 
 `make nix-setup` uses the [Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer)
 (flakes enabled by default, clean uninstall), then runs `home-manager switch`.
-It refuses to run on macOS and verifies your `$USER` is in the flake's `users`
-list and the `system` matches your arch before doing anything.
+It refuses to run on macOS, auto-detects your architecture from `uname -m`, and
+verifies your `$USER` is in the flake's `users` list before doing anything.
 
 ---
 
@@ -143,8 +148,8 @@ and linuxbrew are unaffected.
 
 When you're ready to unify both machines:
 
-- Add `system = "aarch64-darwin"` (Apple Silicon) and a matching
-  `homeConfigurations` entry, **or** adopt
+- Add `"aarch64-darwin"` (Apple Silicon) to the `systems` list in `flake.nix`
+  — the `<user>-<system>` configs generate automatically — **or** adopt
   [nix-darwin](https://github.com/LnL7/nix-darwin) for system-level macOS bits.
 - The same `home.nix` package list can be shared across both via a small
   refactor (split common vs per-OS packages).
@@ -169,7 +174,9 @@ this automatically) and retry.
 `users = [ "akashgoyal" "runner" "<your $USER>" ];`
 
 **Wrong architecture**
-→ Set `system = "aarch64-linux"` in `flake.nix` on ARM machines.
+→ Auto-detected from `uname -m`; the flake builds for both `x86_64-linux` and
+`aarch64-linux`. If you hit an unsupported arch, add it to the `systems` list in
+`nix/flake.nix`.
 
 **A package isn't found**
 → Search the exact attribute at <https://search.nixos.org/packages>; names

@@ -13,7 +13,7 @@
 #   3. Sweeps any dangling symlinks that still point into the repo
 #   4. Clears generated caches (zcompdump, stow backups)
 #   6. Uninstalls Homebrew COMPLETELY — brew itself + every package it
-#      installed (not just the Brewfile entries). Skipped only in CI.
+#      installed (not just the Brewfile entries). Runs everywhere, incl. CI.
 #
 # What it does ONLY if you opt in (prompted, default No):
 #   5. Removes Nix + Home Manager (Linux) — isolated to /nix
@@ -274,13 +274,6 @@ remove_homebrew() {
 
     if ! command_exists brew; then
         log::substep "Homebrew not installed — nothing to remove."
-        return 0
-    fi
-
-    # CI runners are ephemeral; nuking their Homebrew is slow and pointless, and
-    # the dotfiles-uninstall test only cares about symlink/shell removal.
-    if [[ -n "${CI:-}" ]]; then
-        log::substep "CI detected — skipping Homebrew removal (runner is ephemeral)."
         return 0
     fi
 

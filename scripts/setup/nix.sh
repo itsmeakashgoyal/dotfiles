@@ -42,17 +42,21 @@ if [[ ! -f "$FLAKE_FILE" ]]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Sanity: arch + username must be present in the flake
+# Detect architecture + validate username, then build the flake attribute name
 # ------------------------------------------------------------------------------
-# The flake exposes homeConfigurations for a list of usernames (the `users`
-# line). Your $USER must be one of them, or the switch can't find a config.
-users_line=$(grep -E '^\s*users\s*=' "$FLAKE_FILE" | head -n1)
-configured_system=$(grep -E '^\s*system\s*=' "$FLAKE_FILE" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/')
-
+# The flake exposes homeConfigurations named "<user>-<system>" for every
+# (user, system) combo. We auto-detect the host system here — there is no
+# hardcoded `system` to keep in sync.
 machine_arch=$(uname -m)
-expected_system="x86_64-linux"
-[[ "$machine_arch" == "aarch64" || "$machine_arch" == "arm64" ]] && expected_system="aarch64-linux"
+case "$machine_arch" in
+    x86_64 | amd64) nix_system="x86_64-linux" ;;
+    aarch64 | arm64) nix_system="aarch64-linux" ;;
+    *) log::fatal "Unsupported architecture '$machine_arch' (expected x86_64 or aarch64)." ;;
+esac
+log::info "Detected system: $nix_system"
 
+# Your $USER must be in the flake's `users` list, or the switch can't find a config.
+users_line=$(grep -E '^\s*users\s*=' "$FLAKE_FILE" | head -n1)
 if ! echo "$users_line" | grep -qw "\"$USER\""; then
     log::warning "Your \$USER ('$USER') is not in the flake's users list:"
     log::info "  $users_line"
@@ -60,11 +64,9 @@ if ! echo "$users_line" | grep -qw "\"$USER\""; then
     log::fatal "Username not configured — add it to the list above and re-run."
 fi
 
-if [[ "$configured_system" != "$expected_system" ]]; then
-    log::warning "flake.nix system is '$configured_system' but this machine looks like '$expected_system'."
-    log::info "Edit the 'system' line in $FLAKE_FILE to: system = \"$expected_system\";"
-    log::fatal "System mismatch — fix the one line above and re-run 'make nix-setup'."
-fi
+# The Home Manager config to apply, e.g. "runner-x86_64-linux".
+flake_attr="${USER}-${nix_system}"
+log::info "Using flake config: ${flake_attr}"
 
 # ------------------------------------------------------------------------------
 # Step 1 — install Nix (Determinate Systems installer; enables flakes by default)
@@ -121,7 +123,7 @@ log::info "Applying Home Manager configuration (this may take a few minutes the 
 NIX_FEATURES="--extra-experimental-features nix-command --extra-experimental-features flakes"
 
 # shellcheck disable=SC2086
-if nix $NIX_FEATURES run home-manager/master -- switch -b backup --flake "${NIX_DIR}#${USER}"; then
+if nix $NIX_FEATURES run home-manager/master -- switch -b backup --flake "${NIX_DIR}#${flake_attr}"; then
     log::success "Home Manager applied successfully."
 else
     log::error "home-manager switch failed."
