@@ -359,7 +359,8 @@ jobs:
           fi
           [[ -e "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && \
             source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-          export PATH="$HOME/.nix-profile/bin:$HOME/.local/state/nix/profiles/profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+          hm_bins="$HOME/.nix-profile/bin:$HOME/.local/state/nix/profiles/profile/bin"
+          export PATH="$hm_bins:/nix/var/nix/profiles/default/bin:$PATH"
 
           # Nix should be installed (NOT Homebrew, on Linux)
           if ! command -v nix &> /dev/null; then

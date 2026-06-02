@@ -1,0 +1,14 @@
+---
+# yamllint configuration
+# https://yamllint.readthedocs.io/
+#
+# GitHub Actions workflows embed shell scripts in `run:` blocks, where the
+# default 80-character limit is impractical (PATH exports, command checks).
+# Relax line-length to 120 and keep every other default rule intact.
+
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: error
