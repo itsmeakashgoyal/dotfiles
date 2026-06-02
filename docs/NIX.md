@@ -13,36 +13,47 @@ is still driven by **Zinit + Powerlevel10k**. Nix does not touch any of that.
 
 ```text
 nix/
-├── flake.nix     # inputs (nixpkgs + home-manager) + your username/arch
+├── flake.nix     # inputs (nixpkgs + home-manager) + users list / arch
 ├── home.nix      # the package list — your Brewfile's CLI tools, in Nix
 └── flake.lock    # auto-generated version pins (commit this)
 ```
+
+**This is the default Linux flow.** `make install` on Linux now installs CLI
+tools via Nix (linuxbrew is no longer used on Linux). On macOS, `make install`
+is unchanged and still uses Homebrew.
 
 ---
 
 ## First-time setup (Ubuntu)
 
+The normal installer handles it — on Linux, `make install` runs apt (system
+deps only) then Nix + Home Manager for all CLI tools:
+
 ```bash
 cd ~/dotfiles
 
-# 1. Edit two lines in nix/flake.nix to match your machine:
-#      username = "<your $USER>";
-#      system   = "x86_64-linux";   # or "aarch64-linux" on ARM
+# 1. Make sure your Linux $USER is in the flake's users list.
+#    Edit nix/flake.nix:
+#      users  = [ "akashgoyal" "runner" "<your $USER>" ];
+#      system = "x86_64-linux";   # or "aarch64-linux" on ARM
 
-# 2. Install Nix + apply the package set
-make nix-setup
+# 2. Run the installer (Linux → Nix path automatically)
+make install
 
 # 3. Open a new shell so the Nix profile is on PATH
 exec zsh
 ```
 
-`make nix-setup` uses the [Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer)
-(flakes enabled by default, clean uninstall), then runs the first
-`home-manager switch`. The script refuses to run on macOS and validates your
-username/arch against `flake.nix` before doing anything.
+To (re)apply just the Nix package set without the full installer:
 
-linuxbrew keeps working throughout — this is **additive**. Remove linuxbrew only
-once you're happy (see below).
+```bash
+make nix-setup     # installs Nix if missing, then home-manager switch
+```
+
+`make nix-setup` uses the [Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer)
+(flakes enabled by default, clean uninstall), then runs `home-manager switch`.
+It refuses to run on macOS and verifies your `$USER` is in the flake's `users`
+list and the `system` matches your arch before doing anything.
 
 ---
 
@@ -89,27 +100,29 @@ Brewfile for the Mac.
 
 ---
 
-## How this coexists with the old flow
+## How the install flow splits by OS
 
-`make install` still runs the legacy Linux path (`packages/install.sh` →
-linuxbrew, `scripts/setup/linux.sh` → apt). Nix is **opt-in via `make nix-setup`**
-and does not modify those scripts. The two can run side by side; PATH precedence
-decides which `eza`/`bat`/etc. you get (Nix's `~/.nix-profile/bin` typically wins
-once the HM profile is sourced).
+`install.sh` branches at the package step:
 
-### Once you're happy — retiring linuxbrew on Linux
+| OS | Packages | System deps | Symlinks |
+| --- | --- | --- | --- |
+| **macOS** | Homebrew (`packages/install.sh` + `Brewfile`) | — | Stow |
+| **Linux** | **Nix + Home Manager** (`nix/`) | apt (`scripts/setup/linux.sh`) | Stow |
 
-1. Confirm everything you need is in `nix/home.nix` and on PATH after `exec zsh`.
-2. Uninstall linuxbrew:
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
-   ```
-3. Optionally trim the manual tool installs (`install_eza`, `install_zoxide`,
-   `install_cargo`, television `.deb`) from `scripts/setup/linux.sh`, and gate
-   `packages/install.sh` to macOS only.
+On Linux, `scripts/setup/linux.sh` installs *only* system-level apt deps
+(build-essential, stow, zsh, curl, fontconfig, …); all CLI tools come from Nix.
+linuxbrew is no longer installed on Linux.
 
-> Leave this until Nix has proven itself — there's no rush, and keeping both
-> working is the safe state.
+### Migrating an existing linuxbrew machine
+
+If a machine still has linuxbrew from an older setup, remove it after confirming
+the Nix tools are on PATH (`exec zsh`, then `which eza bat rg`):
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+```
+
+The dotfiles no longer reference it, so this is safe once Nix is active.
 
 ---
 
@@ -152,7 +165,8 @@ Not needed now — the Linux setup stands on its own.
 this automatically) and retry.
 
 **`error: flake output attribute 'homeConfigurations.<name>' does not exist`**
-→ The `username` in `nix/flake.nix` doesn't match `$USER`. Fix that one line.
+→ Your `$USER` isn't in the `users` list in `nix/flake.nix`. Add it:
+`users = [ "akashgoyal" "runner" "<your $USER>" ];`
 
 **Wrong architecture**
 → Set `system = "aarch64-linux"` in `flake.nix` on ARM machines.

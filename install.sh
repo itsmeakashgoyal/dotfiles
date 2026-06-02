@@ -119,9 +119,16 @@ main() {
     fi
     log::success "[STEP 3/8] Sudo setup done"
 
-    # Packages
+    # Packages — macOS uses Homebrew; Linux uses Nix (replaces linuxbrew)
     log::info "[STEP 4/8] Installing packages (DOTFILES_DIR=${DOTFILES_DIR})..."
-    bash "${DOTFILES_DIR}/packages/install.sh"
+    if os::is_mac; then
+        bash "${DOTFILES_DIR}/packages/install.sh"
+    elif os::is_linux; then
+        # 1) apt: system-level deps only (build-essential, stow, zsh, curl, …)
+        run_script "linux"
+        # 2) Nix + Home Manager: all CLI tools (eza, bat, fd, nvim, tv, …)
+        bash "${DOTFILES_DIR}/scripts/setup/nix.sh"
+    fi
     log::success "[STEP 4/8] Packages installed"
 
     # Python 3 (required by dutils scripts)
@@ -149,9 +156,8 @@ main() {
     if os::is_mac; then
         run_script "sublime" || log::warning "Sublime Text setup failed (non-fatal in CI)"
         run_script "iterm" || log::warning "iTerm2 setup failed (non-fatal in CI)"
-    elif os::is_linux; then
-        run_script "linux" || log::warning "Linux setup failed (non-fatal in CI)"
     fi
+    # Linux package + system setup is handled in STEP 4 (apt system deps + Nix).
     log::success "[STEP 7/8] OS-specific setup done"
 
     # Symlinks

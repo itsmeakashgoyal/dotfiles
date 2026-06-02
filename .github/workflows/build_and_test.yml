@@ -301,16 +301,11 @@ jobs:
           echo "Home: $HOME"
           df -h
 
-      - name: Cache Homebrew packages
-        uses: actions/cache@v5
-        continue-on-error: true
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
         with:
-          path: |
-            ~/.cache/Homebrew
-            /home/linuxbrew/.linuxbrew/Homebrew
-          key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
-          restore-keys: |
-            ${{ runner.os }}-homebrew-
+          extra-conf: |
+            experimental-features = nix-command flakes
 
       - name: Install ZSH
         run: |
@@ -347,49 +342,52 @@ jobs:
         run: |
           echo "✅ Verifying installation..."
 
-          # Configure Homebrew PATH for Linux
-          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          # Bring the Nix + Home Manager profile onto PATH
+          if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+            # shellcheck disable=SC1091
+            source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
           fi
+          [[ -e "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && \
+            source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+          export PATH="$HOME/.nix-profile/bin:$HOME/.local/state/nix/profiles/profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
-          # Check if Homebrew is installed
-          if ! command -v brew &> /dev/null; then
-            echo "❌ Homebrew not found"
-            exit 1
+          # Nix should be installed (NOT Homebrew, on Linux)
+          if ! command -v nix &> /dev/null; then
+            echo "❌ nix not found"; exit 1
+          fi
+          echo "✅ nix installed: $(nix --version)"
+
+          # Home Manager profile should exist
+          if [[ -d "$HOME/.nix-profile" ]]; then
+            echo "✅ Home Manager profile present"
           else
-            echo "✅ Homebrew installed: $(brew --version | head -n1)"
+            echo "❌ Home Manager profile missing"; exit 1
           fi
 
-          # Check if zsh is installed
+          # zsh (from apt)
           zsh --version || exit 1
 
-          # Check core packages from Brewfile
-          echo "🔍 Checking core packages..."
-          # Check using actual binary names (format: "binary:package_name")
-          # Compatible with Bash 3.2+ (macOS default)
-          packages=(
-            "bat:bat"
-            "eza:eza"
-            "tv:television"
-            "rg:ripgrep"
-            "nvim:neovim"
-            "delta:git-delta"
-            "lazygit:lazygit"
-          )
+          # Confirm we did NOT install linuxbrew
+          if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+            echo "⚠️  linuxbrew present — expected Nix-only on Linux"
+          else
+            echo "✅ No linuxbrew (Nix-only as intended)"
+          fi
+
+          # Check core CLI tools provided by Nix
+          echo "🔍 Checking Nix-provided tools..."
+          packages=( bat eza tv rg nvim delta lazygit fd zoxide atuin )
           failed=0
-          for pkg in "${packages[@]}"; do
-            binary="${pkg%%:*}"
-            name="${pkg##*:}"
+          for binary in "${packages[@]}"; do
             if command -v "$binary" &> /dev/null; then
-              echo "  ✅ $name"
+              echo "  ✅ $binary"
             else
-              echo "  ⚠️  $name not found"
+              echo "  ⚠️  $binary not found"
               failed=$((failed + 1))
             fi
           done
-
           if [[ $failed -gt 3 ]]; then
-            echo "❌ Too many packages missing ($failed)"
+            echo "❌ Too many tools missing ($failed)"
             exit 1
           fi
 
@@ -400,12 +398,6 @@ jobs:
             echo "⚠️  .zshenv not symlinked"
           fi
 
-          # Check if dutils is accessible
-          if [[ -f "$HOME/.local/bin/dutils" ]]; then
-            echo "✅ dutils installed"
-            "$HOME/.local/bin/dutils" version || true
-          fi
-
           echo "✅ Installation verified successfully"
           echo "ℹ️  Note: Zinit will auto-install on first Zsh launch"
 
@@ -414,10 +406,8 @@ jobs:
         run: |
           echo "🧪 Testing zsh configuration..."
 
-          # Configure Homebrew PATH for Linux
-          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          fi
+          # Nix profile onto PATH
+          export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
           # ZDOTDIR set via stow symlink
           export ZDOTDIR="$HOME/dotfiles/zsh/.config/zsh"
@@ -433,12 +423,7 @@ jobs:
         run: |
           echo "🧪 Testing dutils commands..."
 
-          # Configure Homebrew PATH for Linux
-          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          fi
-
-          export PATH="$HOME/.local/bin:$PATH"
+          export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
 
           dutils help || echo "dutils help failed"
           dutils version || echo "dutils version failed"
@@ -448,10 +433,7 @@ jobs:
       - name: Uninstall dotfiles
         run: |
           cd "$HOME/dotfiles"
-          # Make stow available so unstow runs cleanly (sweep is a fallback anyway)
-          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          fi
+          # stow comes from apt (/usr/bin) on Linux now; no brew needed.
           export CI=1
           echo "🧹 Uninstalling dotfiles (core only — packages/Nix left intact)..."
           make uninstall force=1

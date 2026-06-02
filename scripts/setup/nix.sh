@@ -42,19 +42,22 @@ if [[ ! -f "$FLAKE_FILE" ]]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Sanity: arch + username must match the flake's hardcoded values
+# Sanity: arch + username must be present in the flake
 # ------------------------------------------------------------------------------
-configured_user=$(grep -E '^\s*username\s*=' "$FLAKE_FILE" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/')
+# The flake exposes homeConfigurations for a list of usernames (the `users`
+# line). Your $USER must be one of them, or the switch can't find a config.
+users_line=$(grep -E '^\s*users\s*=' "$FLAKE_FILE" | head -n1)
 configured_system=$(grep -E '^\s*system\s*=' "$FLAKE_FILE" | head -n1 | sed -E 's/.*"([^"]+)".*/\1/')
 
 machine_arch=$(uname -m)
 expected_system="x86_64-linux"
 [[ "$machine_arch" == "aarch64" || "$machine_arch" == "arm64" ]] && expected_system="aarch64-linux"
 
-if [[ "$configured_user" != "$USER" ]]; then
-    log::warning "flake.nix username is '$configured_user' but your \$USER is '$USER'."
-    log::info "Edit the 'username' line in $FLAKE_FILE to: username = \"$USER\";"
-    log::fatal "Username mismatch — fix the one line above and re-run 'make nix-setup'."
+if ! echo "$users_line" | grep -qw "\"$USER\""; then
+    log::warning "Your \$USER ('$USER') is not in the flake's users list:"
+    log::info "  $users_line"
+    log::info "Add it in $FLAKE_FILE, e.g.:  users = [ \"$USER\" \"runner\" ];"
+    log::fatal "Username not configured — add it to the list above and re-run."
 fi
 
 if [[ "$configured_system" != "$expected_system" ]]; then
@@ -82,7 +85,9 @@ if command_exists nix; then
 else
     log::info "Installing Nix via the Determinate Systems installer..."
     log::substep "This enables flakes by default and supports a clean uninstall."
-    if [[ -n "${CI:-}" ]]; then
+    # Use --no-confirm when running unattended (CI, or piped stdin like
+    # `echo y | ./install.sh`) so the installer never blocks on a prompt.
+    if [[ -n "${CI:-}" || ! -t 0 ]]; then
         curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
             | sh -s -- install --no-confirm
     else

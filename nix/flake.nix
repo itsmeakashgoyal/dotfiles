@@ -33,23 +33,28 @@
   outputs = { nixpkgs, home-manager, ... }:
     let
       # ════════════════════════════════════════════════════════════════
-      #  EDIT THESE TWO LINES to match your Ubuntu machine
+      #  EDIT to match your machine(s)
       # ════════════════════════════════════════════════════════════════
-      username = "akashgoyal"; # must match your Linux `$USER`
-      system = "x86_64-linux"; # use "aarch64-linux" on ARM (Raspberry Pi, ARM VM)
+      # Add your Linux `$USER` to this list. "runner" is the GitHub CI user.
+      users = [ "akashgoyal" "runner" ];
+      system = "x86_64-linux"; # use "aarch64-linux" on ARM (Pi, ARM VM)
       # ════════════════════════════════════════════════════════════════
 
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
-    in
-    {
-      # Built/applied via:  home-manager switch --flake ./nix#<username>
-      homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
+
+      # One Home Manager config per username — same package set for all.
+      mkHome = username: home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ ./home.nix ];
         extraSpecialArgs = { inherit username; };
       };
+    in
+    {
+      # Applied via:  home-manager switch --flake ./nix#<username>
+      # e.g.  ./nix#akashgoyal  or  ./nix#runner  (CI)
+      homeConfigurations = nixpkgs.lib.genAttrs users mkHome;
     };
 }

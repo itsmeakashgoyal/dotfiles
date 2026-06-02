@@ -12,22 +12,26 @@
 #   2. Unstows every Stow package (removes the dotfile symlinks)
 #   3. Sweeps any dangling symlinks that still point into the repo
 #   4. Clears generated caches (zcompdump, stow backups)
+#   6. Uninstalls Homebrew COMPLETELY — brew itself + every package it
+#      installed (not just the Brewfile entries). Skipped only in CI.
 #
 # What it does ONLY if you opt in (prompted, default No):
 #   5. Removes Nix + Home Manager (Linux) — isolated to /nix
-#   6. Uninstalls the Brewfile packages (macOS / linuxbrew)
 #
 # What it NEVER touches:
 #   • The repo itself (your dotfiles stay on disk)
 #   • Your data: shell history, ~/.ssh, ~/.gitconfig content, etc.
-#   • Homebrew/Nix as a whole unless you explicitly opt in
+#   • Nix, unless you explicitly opt in (REMOVE_NIX=1 or the prompt)
 #
 # Usage:
-#   make uninstall                 # interactive
+#   make uninstall                 # interactive (removes Homebrew entirely)
 #   make uninstall dry=1           # show what would happen, change nothing
-#   make uninstall force=1         # skip the initial confirm (core steps only)
+#   make uninstall force=1         # skip the initial confirm
 #   REMOVE_NIX=1 make uninstall    # also remove Nix non-interactively
-#   REMOVE_BREW_PKGS=1 make uninstall  # also uninstall Brewfile packages
+#
+# WARNING: Homebrew removal is now MANDATORY and total. If you installed
+# packages outside these dotfiles, they will be removed too. Use dry=1 first
+# if unsure.
 
 set -euo pipefail
 
@@ -47,13 +51,10 @@ trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 DRY_RUN="${DRY_RUN:-0}"
 FORCE="${FORCE:-0}"
 REMOVE_NIX="${REMOVE_NIX:-0}"
-REMOVE_BREW_PKGS="${REMOVE_BREW_PKGS:-0}"
 
 # Package list — passed from the Makefile to stay a single source of truth.
 # Falls back to a sane default if invoked directly.
 STOW_PACKAGES="${STOW_PACKAGES:-git zsh nvim tmux television bin atuin fastfetch}"
-
-readonly BREWFILE="${DOTFILES_DIR}/packages/Brewfile"
 
 # ------------------------------------------------------------------------------
 # Helpers
@@ -264,56 +265,53 @@ remove_nix() {
 }
 
 # ------------------------------------------------------------------------------
-# Step 6 — optional: uninstall Brewfile packages (macOS / linuxbrew)
+# Step 6 — mandatory: uninstall Homebrew COMPLETELY (brew + ALL its packages)
 # ------------------------------------------------------------------------------
-remove_brew_packages() {
-    log::section "Step 6/6 — Uninstall Brewfile packages (optional)"
+# Uses Homebrew's official uninstall script, which removes the brew prefix and
+# every formula/cask it installed — not just the Brewfile entries.
+remove_homebrew() {
+    log::section "Step 6/6 — Uninstall Homebrew completely"
 
     if ! command_exists brew; then
-        log::substep "Homebrew not installed — skipping."
-        return 0
-    fi
-    if [[ ! -f "$BREWFILE" ]]; then
-        log::substep "Brewfile not found — skipping."
+        log::substep "Homebrew not installed — nothing to remove."
         return 0
     fi
 
-    if ! ask_optional "Uninstall the formulae/casks listed in the Brewfile?" "REMOVE_BREW_PKGS"; then
-        log::substep "Keeping Homebrew packages."
-        log::info "To remove Homebrew ENTIRELY later (affects ALL brew packages, not just these):"
-        # shellcheck disable=SC2016  # literal command shown to the user, not expanded
-        log::bullet '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"'
+    # CI runners are ephemeral; nuking their Homebrew is slow and pointless, and
+    # the dotfiles-uninstall test only cares about symlink/shell removal.
+    if [[ -n "${CI:-}" ]]; then
+        log::substep "CI detected — skipping Homebrew removal (runner is ephemeral)."
         return 0
     fi
 
-    # Extract formula and cask names from the Brewfile.
-    local formulae casks
-    formulae="$(grep -E '^\s*brew\s+"' "$BREWFILE" | sed -E 's/.*brew "([^"]+)".*/\1/' || true)"
-    casks="$(grep -E '^\s*cask\s+"' "$BREWFILE" | sed -E 's/.*cask "([^"]+)".*/\1/' || true)"
+    log::warning "Removing Homebrew ENTIRELY — this deletes brew and EVERY package"
+    log::warning "it installed, including any you added outside these dotfiles."
 
-    local n
-    while IFS= read -r f; do
-        [[ -z "$f" ]] && continue
-        n="${f##*/}" # strip tap prefix (e.g. user/tap/pkg -> pkg)
-        log::substep "Uninstalling formula: $n"
-        if [[ "$DRY_RUN" == "1" ]]; then
-            log::substep "[dry-run] brew uninstall $n"
-        else
-            brew uninstall "$n" >/dev/null 2>&1 || log::substep "  (skipped $n — not installed or still depended on)"
+    if [[ "$DRY_RUN" == "1" ]]; then
+        log::substep "[dry-run] would run Homebrew's official uninstall.sh with --force"
+        log::substep "[dry-run]   (removes the brew prefix + all formulae/casks)"
+        log::ok "Homebrew removal step complete (dry-run)."
+        return 0
+    fi
+
+    # Official uninstaller. --force skips its own confirmation prompt (the user
+    # already confirmed at the start of this script).
+    if /bin/bash -c \
+        "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)" \
+        -- --force; then
+        log::ok "Homebrew fully removed."
+    else
+        log::warn "Homebrew uninstaller returned non-zero — it may be partially removed."
+        log::info "You can re-run, or finish manually per https://github.com/homebrew/install#uninstall-homebrew"
+    fi
+
+    # Tidy leftover shellenv lines / empty prefix dirs the uninstaller may leave.
+    for leftover in /opt/homebrew /home/linuxbrew/.linuxbrew; do
+        if [[ -d "$leftover" ]] && [[ -z "$(ls -A "$leftover" 2>/dev/null)" ]]; then
+            log::substep "Removing empty leftover dir: $leftover"
+            run rmdir "$leftover" 2>/dev/null || true
         fi
-    done <<< "$formulae"
-
-    while IFS= read -r c; do
-        [[ -z "$c" ]] && continue
-        log::substep "Uninstalling cask: $c"
-        if [[ "$DRY_RUN" == "1" ]]; then
-            log::substep "[dry-run] brew uninstall --cask $c"
-        else
-            brew uninstall --cask "$c" >/dev/null 2>&1 || log::substep "  (skipped $c — not installed)"
-        fi
-    done <<< "$casks"
-
-    log::ok "Brewfile packages processed (Homebrew itself left installed)."
+    done
 }
 
 # ------------------------------------------------------------------------------
@@ -325,9 +323,12 @@ main() {
     [[ "$DRY_RUN" == "1" ]] && log::warning "DRY-RUN MODE — nothing will actually be changed."
 
     log::newline
-    log::info "This will reset your login shell, remove dotfile symlinks, and clear caches."
+    log::info "This will reset your login shell, remove dotfile symlinks, clear caches,"
+    log::info "and UNINSTALL HOMEBREW COMPLETELY (brew + all packages it installed)."
     log::info "Your repo, shell history, and personal data are left untouched."
-    log::info "Package/Nix removal is opt-in (you'll be asked, default No)."
+    log::info "Nix removal (Linux) stays opt-in (you'll be asked, default No)."
+    [[ "$DRY_RUN" != "1" && -z "${CI:-}" ]] && \
+        log::warning "Tip: run 'make uninstall dry=1' first to preview every action."
     log::newline
 
     if ! confirm_gate "Proceed with uninstall?"; then
@@ -340,7 +341,7 @@ main() {
     sweep_symlinks
     clean_generated
     remove_nix
-    remove_brew_packages
+    remove_homebrew
 
     log::newline
     if [[ "$DRY_RUN" == "1" ]]; then
