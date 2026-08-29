@@ -46,14 +46,19 @@ vim.keymap.set("n", "<F9>", function()
     vim.cmd("wincmd J")
     vim.cmd("resize 15")
     
-    -- Compile and run
+    -- Compile and run. Windows mingw gcc/clang auto-appends .exe to the
+    -- output even when -o names it without one, so the run step must match.
+    local is_win = vim.fn.has("win32") == 1
+    local out_name = filename .. (is_win and ".exe" or "")
+    local run_prefix = is_win and "" or "./"
     local compile_cmd = string.format(
-        "cd %s && %s -Wall -Wextra -std=c11 -O2 %s -o %s && ./%s",
+        "cd %s && %s -Wall -Wextra -std=c11 -O2 %s -o %s && %s%s",
         vim.fn.shellescape(dirpath),
         compiler,
         vim.fn.shellescape(filepath),
-        vim.fn.shellescape(filename),
-        vim.fn.shellescape(filename)
+        vim.fn.shellescape(out_name),
+        run_prefix,
+        vim.fn.shellescape(out_name)
     )
     
     vim.cmd("terminal " .. compile_cmd)
