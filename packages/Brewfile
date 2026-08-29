@@ -40,6 +40,7 @@ brew "fd"                   # Better find (Rust)
 brew "gh"                   # GitHub CLI
 brew "git-delta"            # Better git diff (Rust)
 brew "git-extras"           # Extra git commands
+brew "hyperfine"            # Command-line benchmarking tool (Rust)
 brew "jq"                   # JSON processor
 brew "lazygit"              # Terminal UI for git
 brew "ripgrep"              # Better grep (Rust)

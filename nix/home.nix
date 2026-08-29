@@ -40,6 +40,7 @@
     gh # GitHub CLI
     delta # Better git diff (Homebrew: git-delta)
     git-extras # Extra git commands
+    hyperfine # Command-line benchmarking tool
     jq # JSON processor
     lazygit # Terminal UI for git
     ripgrep # Better grep

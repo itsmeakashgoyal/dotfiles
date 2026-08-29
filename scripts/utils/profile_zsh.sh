@@ -10,7 +10,8 @@ echo "════════════════════════�
 echo ""
 
 # Enable profiling
-cat > /tmp/profile_zshrc.zsh <<'EOF'
+profile_script=$(mktemp -t profile_zshrc.XXXXXX.zsh)
+cat > "$profile_script" <<'EOF'
 zmodload zsh/zprof
 source "${ZDOTDIR:-$HOME/.config/zsh}/.zshrc"
 zprof
@@ -18,6 +19,6 @@ EOF
 
 echo "Running profiled startup..."
 echo ""
-ZDOTDIR="$ZDOTDIR" zsh -c 'source /tmp/profile_zshrc.zsh' 2>&1 | tail -50
+ZDOTDIR="$ZDOTDIR" zsh -c "source $profile_script" 2>&1 | tail -50
 
-rm -f /tmp/profile_zshrc.zsh
+rm -f "$profile_script"

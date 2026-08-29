@@ -253,6 +253,21 @@ packages: ## Check installed packages against Brewfile
 diagnose: ## Run all diagnostic tools
 	@bash scripts/verify/check.sh --all || true
 
+##@ Performance
+
+.PHONY: bench
+bench: ## Benchmark zsh startup time (requires hyperfine)
+	@command -v hyperfine >/dev/null 2>&1 || { \
+		echo "$(RED)Error:$(CLR) hyperfine is not installed."; \
+		echo "$(YELLOW)Install:$(CLR) brew install hyperfine (macOS) or make nix-switch (Linux)"; \
+		exit 1; \
+	}
+	@hyperfine --warmup 5 --shell=none 'zsh -i -c exit'
+
+.PHONY: bench-detail
+bench-detail: ## Profile zsh startup with zprof (function-level breakdown)
+	@zsh scripts/utils/profile_zsh.sh
+
 ##@ Windows
 
 .PHONY: windows
