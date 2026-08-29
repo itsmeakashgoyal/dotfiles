@@ -152,8 +152,6 @@ scripts/
 │   ├── profile_zsh.sh    ← zprof startup profiling (`make bench-detail`)
 │   └── dutils            ← CLI wrapping various helper functions
 │
-├── tmux/                 ← tmux-invoked helper scripts (pane/session utilities)
-│
 └── motd/                 ← Ubuntu /etc/update-motd.d banner scripts — manual
                               install only, see scripts/motd/README.md
 ```
