@@ -106,6 +106,18 @@ zinit wait lucid for \
 zinit ice depth=1
 zinit light romkatv/powerlevel10k
 
+# --- 6g. Starship (optional, opt-in) ------------------------------------------
+# To try it: `stow --dir="$XDG_DOTFILES_DIR" --target="$HOME" starship` (it's
+# not in STOW_PACKAGES yet, so `make stow pkg=starship` won't work), then set
+# DOTFILES_PROMPT=starship in 99-private.zsh (gitignored) and restart your
+# shell. p10k above still initializes either way; this just lets Starship's
+# own init run afterward and take over the actual prompt rendering, so
+# switching back is just unsetting the variable and restarting the shell.
+if [[ "${DOTFILES_PROMPT:-p10k}" == "starship" ]] && command -v starship &>/dev/null; then
+  export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+  eval "$(starship init zsh)"
+fi
+
 # ==============================================================================
 # 7. MODULAR CONFIG (conf.d)
 # exports.zsh and startup.zsh already sourced above (ordering constraints).

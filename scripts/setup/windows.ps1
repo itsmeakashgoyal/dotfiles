@@ -63,6 +63,8 @@ $SCOOP_PACKAGES = @(
     # Git tools
     "lazygit"
     "delta"
+    # Prompt (opt-in — see powershell profile / $PROFILE)
+    "starship"
     # Development
     "nodejs"
     "python"

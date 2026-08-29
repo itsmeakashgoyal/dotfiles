@@ -43,6 +43,7 @@
     hyperfine # Command-line benchmarking tool
     jq # JSON processor
     lazygit # Terminal UI for git
+    starship # Cross-shell prompt (opt-in, see conf.d/.zshrc)
     ripgrep # Better grep
     tree # Directory tree
     television # Fuzzy finder (solves the linuxbrew "no tv" gap cleanly)
