@@ -4,13 +4,15 @@
 
 ---
 
-## `brew` command not found (Linux)
+## Nix-provided tool not found (Linux)
 
-Linuxbrew needs its shell environment loaded. This should happen automatically via `.zshenv`, but if not:
+Linux has no Homebrew/Linuxbrew at all — CLI tools come from Nix + Home Manager instead (see [`NIX.md`](NIX.md)). If a tool from `nix/home.nix` isn't found after `make nix-setup`/`make nix-switch`, the Home Manager profile likely isn't on `PATH` yet in this shell:
 
 ```bash
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+exec zsh   # open a fresh shell so the Nix profile is picked up
 ```
+
+If it's still missing, confirm it actually applied: `home-manager generations`.
 
 ## Stow conflicts with existing files
 

@@ -22,8 +22,8 @@
 #
 # Installs ONLY system-level apt dependencies for Ubuntu/Debian.
 # CLI tools (eza, bat, fd, zoxide, ripgrep, neovim, …) come from Nix +
-# Home Manager — see nix/ and scripts/setup/nix.sh. linuxbrew is no longer
-# used on Linux.
+# Home Manager instead — see nix/ and scripts/setup/nix.sh. No Homebrew or
+# linuxbrew anywhere on Linux.
 # ------------------------------------------------------------------------------
 
 # Load helper functions

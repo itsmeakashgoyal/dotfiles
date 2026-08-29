@@ -6,10 +6,8 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Install Nix (Determinate Systems installer) and apply the standalone
-# Home Manager flake in nix/ — the Linux replacement for linuxbrew.
-#
-# This is ADDITIVE and opt-in: it does not touch your existing Homebrew/
-# Stow flow. linuxbrew keeps working until you decide to remove it.
+# Home Manager flake in nix/ — the only package manager used on Linux.
+# Dotfiles themselves are still symlinked separately by GNU Stow.
 #
 # Run via: make nix-setup
 
@@ -42,33 +40,6 @@ fi
 if [[ ! -f "$FLAKE_FILE" ]]; then
     log::fatal "Flake not found at $FLAKE_FILE"
 fi
-
-# ------------------------------------------------------------------------------
-# Detect architecture + validate username, then build the flake attribute name
-# ------------------------------------------------------------------------------
-# The flake exposes homeConfigurations named "<user>-<system>" for every
-# (user, system) combo. We auto-detect the host system here — there is no
-# hardcoded `system` to keep in sync.
-machine_arch=$(uname -m)
-case "$machine_arch" in
-    x86_64 | amd64) nix_system="x86_64-linux" ;;
-    aarch64 | arm64) nix_system="aarch64-linux" ;;
-    *) log::fatal "Unsupported architecture '$machine_arch' (expected x86_64 or aarch64)." ;;
-esac
-log::info "Detected system: $nix_system"
-
-# Your $USER must be in the flake's `users` list, or the switch can't find a config.
-users_line=$(grep -E '^\s*users\s*=' "$FLAKE_FILE" | head -n1)
-if ! echo "$users_line" | grep -qw "\"$USER\""; then
-    log::warning "Your \$USER ('$USER') is not in the flake's users list:"
-    log::info "  $users_line"
-    log::info "Add it in $FLAKE_FILE, e.g.:  users = [ \"$USER\" \"runner\" ];"
-    log::fatal "Username not configured — add it to the list above and re-run."
-fi
-
-# The Home Manager config to apply, e.g. "runner-x86_64-linux".
-flake_attr="${USER}-${nix_system}"
-log::info "Using flake config: ${flake_attr}"
 
 # ------------------------------------------------------------------------------
 # Step 1 — install Nix (Determinate Systems installer; enables flakes by default)
@@ -122,16 +93,17 @@ fi
 log::info "Applying Home Manager configuration (this may take a few minutes the first time)..."
 
 # Defensive: pass flake features in case the installer didn't enable them globally.
+# --impure: the flake reads $USER and the current system dynamically instead
+# of maintaining a list of them (see nix/flake.nix) — always applies the one
+# "default" config, on any machine or username.
 NIX_FEATURES="--extra-experimental-features nix-command --extra-experimental-features flakes"
 
 # shellcheck disable=SC2086
-if nix $NIX_FEATURES run home-manager/master -- switch -b backup --flake "${NIX_DIR}#${flake_attr}"; then
+if nix $NIX_FEATURES run home-manager/master -- switch -b backup --flake "${NIX_DIR}#default" --impure; then
     log::success "Home Manager applied successfully."
 else
     log::error "home-manager switch failed."
-    log::info "Common fixes:"
-    log::bullet "Open a new shell so 'nix' and the HM profile are on PATH, then re-run."
-    log::bullet "Check the username/system lines in $FLAKE_FILE."
+    log::info "Common fix: open a new shell so 'nix' and the HM profile are on PATH, then re-run."
     exit 1
 fi
 
@@ -150,7 +122,6 @@ cat <<EOF
   │   • Apply changes:   make nix-switch                                 │
   │   • Update versions: make nix-update                                 │
   │                                                                      │
-  │ linuxbrew still works — remove it only once you're happy with Nix.   │
   │ Full guide: docs/NIX.md                                              │
   └──────────────────────────────────────────────────────────────────────┘
 

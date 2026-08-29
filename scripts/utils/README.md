@@ -346,10 +346,8 @@ This is **not an error**. The diff command works without it, but looks better wi
 # macOS
 brew install diff-so-fancy
 
-# Linux
-npm install -g diff-so-fancy
-# or
-brew install diff-so-fancy  # if using Linuxbrew
+# Linux — add `diff-so-fancy` to nix/home.nix and `make nix-switch`,
+# or for a one-off: npm install -g diff-so-fancy
 ```
 
 ---

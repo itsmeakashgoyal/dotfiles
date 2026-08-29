@@ -4,9 +4,9 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 # ░░░░░░░░░░
 #
-# Standalone Home Manager flake — manages CLI *packages* on Linux/Ubuntu.
-# This REPLACES linuxbrew as the package installer. It does NOT manage
-# dotfiles: GNU Stow continues to symlink your zsh/nvim/tmux configs.
+# Standalone Home Manager flake — the only package manager used on Linux (no
+# linuxbrew, no Homebrew). Manages CLI *packages* only: GNU Stow still
+# symlinks your zsh/nvim/tmux configs, this doesn't touch that.
 #
 # macOS is untouched and keeps using Homebrew (packages/Brewfile).
 #
@@ -14,6 +14,14 @@
 #   make nix-setup     # first-time install (installs Nix + applies this)
 #   make nix-switch    # apply changes after editing home.nix
 #   make nix-update    # update package versions (flake update + switch)
+#
+# One dynamic config, not one per (user, system): reads $USER and the
+# current architecture at apply-time instead of maintaining a list of
+# usernames/systems to keep in sync. This needs --impure (already passed by
+# scripts/setup/nix.sh) since flakes otherwise evaluate hermetically — a
+# reasonable trade here, since a personal home-manager config was never
+# meant to be bit-reproducible across machines/users the way a NixOS system
+# config is.
 
 {
   description = "Akash's Home Manager config (Linux CLI packages via Nix)";
@@ -31,44 +39,16 @@
   };
 
   outputs = { nixpkgs, home-manager, ... }:
-    let
-      lib = nixpkgs.lib;
-
-      # ════════════════════════════════════════════════════════════════
-      #  EDIT: add your Linux `$USER` to this list.
-      #  "runner" is the GitHub CI user. The architecture is auto-detected
-      #  — no `system` line to maintain.
-      # ════════════════════════════════════════════════════════════════
-      users = [ "akashgoyal" "runner" ];
-
-      # Architectures we build for. The tooling (scripts/setup/nix.sh and the
-      # Makefile) picks the one matching the host via `uname -m`.
-      systems = [ "x86_64-linux" "aarch64-linux" ];
-      # ════════════════════════════════════════════════════════════════
-
-      mkHome = system: username: home-manager.lib.homeManagerConfiguration {
+    {
+      # Applied via:  home-manager switch --flake ./nix#default --impure
+      # scripts/setup/nix.sh always uses this one name — no per-machine edits.
+      homeConfigurations.default = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs {
-          inherit system;
+          system = builtins.currentSystem;
           config.allowUnfree = true;
         };
         modules = [ ./home.nix ];
-        extraSpecialArgs = { inherit username; };
+        extraSpecialArgs = { username = builtins.getEnv "USER"; };
       };
-    in
-    {
-      # One config per (user, system), named "<user>-<system>", e.g.
-      #   akashgoyal-x86_64-linux   runner-aarch64-linux   …
-      # Applied via:  home-manager switch --flake ./nix#<user>-<system>
-      # `make nix-*` and scripts/setup/nix.sh compute the right name for you.
-      homeConfigurations = builtins.listToAttrs (
-        lib.concatMap
-          (system: map
-            (username: {
-              name = "${username}-${system}";
-              value = mkHome system username;
-            })
-            users)
-          systems
-      );
     };
 }

@@ -61,9 +61,10 @@ iterm: ## Setup iTerm2 preferences
 	@echo "$(YELLOW)Setting up iTerm2...$(CLR)"
 	@bash scripts/setup/iterm.sh
 
-##@ Nix (Linux package manager — replaces linuxbrew)
+##@ Nix (the only package manager used on Linux)
 
-# Flake lives in nix/; the config attribute is your $USER (see nix/flake.nix).
+# Flake lives in nix/; always applies the single "default" config (see
+# nix/flake.nix) — no per-machine username/arch bookkeeping needed here.
 NIX_FLAKE := ./nix
 
 .PHONY: nix-setup
@@ -78,14 +79,8 @@ nix-switch: ## Apply nix/home.nix changes (run after editing the package list)
 		echo "       then open a new shell so the Nix profile is on PATH."; \
 		exit 1; \
 	}
-	@sys=$$(uname -m); \
-	case "$$sys" in \
-		x86_64|amd64) sys=x86_64-linux ;; \
-		aarch64|arm64) sys=aarch64-linux ;; \
-		*) echo "$(RED)Error:$(CLR) unsupported arch $$sys"; exit 1 ;; \
-	esac; \
-	echo "$(BLUE)→$(CLR) Applying $(NIX_FLAKE)#$$USER-$$sys ..."; \
-	home-manager switch -b backup --flake "$(NIX_FLAKE)#$$USER-$$sys"
+	@echo "$(BLUE)→$(CLR) Applying $(NIX_FLAKE)#default ..."
+	@home-manager switch -b backup --flake "$(NIX_FLAKE)#default" --impure
 	@echo "$(GREEN)✓ Home Manager packages applied$(CLR)"
 
 .PHONY: nix-update

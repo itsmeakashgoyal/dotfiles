@@ -30,46 +30,25 @@ readonly BREWFILE="${PACKAGES_DIR}/Brewfile"
 
 # ------------------------------------------------------------------------------
 # Homebrew Functions
+#
+# macOS only: install.sh's OS branch only ever invokes this script when
+# os::is_mac is true (Linux goes through scripts/setup/nix.sh instead, which
+# uses Nix/Home Manager — linuxbrew is not used anywhere in this repo).
 # ------------------------------------------------------------------------------
-install_homebrew_prereqs_linux() {
-    os::is_linux || return 0
-
-    if ! command_exists apt-get; then
-        warning "apt-get not found; skipping Homebrew prerequisites install"
-        return 0
-    fi
-
-    if ! command_exists sudo; then
-        warning "sudo not found; cannot install Homebrew prerequisites automatically"
-        return 0
-    fi
-
-    info "Installing Homebrew prerequisites (Ubuntu/Debian)..."
-    sudo apt-get update
-    sudo apt-get install -y build-essential procps curl file git
-    success "Homebrew prerequisites installed"
-}
-
 install_homebrew() {
     if command_exists brew; then
         success "Homebrew is already installed"
         return 0
     fi
 
-    install_homebrew_prereqs_linux
-
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
     # Configure Homebrew PATH (install script runs in a subshell and does not modify this shell's PATH)
-    if os::is_mac; then
-        if [[ -x "/opt/homebrew/bin/brew" ]]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        elif [[ -x "/usr/local/bin/brew" ]]; then
-            eval "$(/usr/local/bin/brew shellenv)"
-        fi
-    elif os::is_linux; then
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    if [[ -x "/opt/homebrew/bin/brew" ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [[ -x "/usr/local/bin/brew" ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
     fi
 
     # Verify installation
@@ -91,9 +70,7 @@ update_brew() {
     info "Updating Homebrew..."
     brew update
     brew upgrade
-    if os::is_mac; then
-        brew upgrade --cask || true
-    fi
+    brew upgrade --cask || true
     brew cleanup
     success "Homebrew updated"
 }

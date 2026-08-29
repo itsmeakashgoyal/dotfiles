@@ -115,12 +115,14 @@ COMMON_PATHS=(
   "/usr/local/sbin"
 )
 
-# OS-specific Homebrew configuration
+# OS-specific paths. Linux has no Homebrew/linuxbrew at all — CLI tools come
+# from Nix + Home Manager instead (see 15-nix.zsh for its PATH setup).
 if os::is_mac; then
   # macOS Homebrew paths
   HOMEBREW_PREFIX="/opt/homebrew"
   HOMEBREW_CELLAR="/opt/homebrew/Cellar"
   HOMEBREW_REPOSITORY="/opt/homebrew"
+  export HOMEBREW_PREFIX HOMEBREW_CELLAR HOMEBREW_REPOSITORY
 
   # macOS specific paths
   OS_PATHS=(
@@ -132,18 +134,11 @@ if os::is_mac; then
     "${HOME}/.local/bin"
   )
 elif os::is_linux; then
-  # Linux Homebrew paths
-  HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-  HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
-  HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
-
-  # Linux specific paths
+  # Linux specific paths (system-level only; Nix packages are on PATH via
+  # the Home Manager profile, wired up separately by 15-nix.zsh)
   OS_PATHS=(
     "/usr/local/bin"
     "/usr/local/sbin"
-    "/usr/local/compilers/clang15/bin"
-    "/home/linuxbrew/.linuxbrew/bin"
-    "/home/linuxbrew/.linuxbrew/sbin"
     "/usr/lib/jvm/java-11-openjdk-amd64"
     "/usr/local/lib/pkgconfig"
     "/usr/local/lib"
@@ -161,7 +156,6 @@ path=(
 # ------------------------------------------------------------------------------
 # Export Environment Variables
 # ------------------------------------------------------------------------------
-export HOMEBREW_PREFIX HOMEBREW_CELLAR HOMEBREW_REPOSITORY
 export PATH
 
 # Set parallel make flags based on OS
