@@ -102,7 +102,7 @@ fi
 # ------------------------------------------------------------------------------
 # Environment Detection and Base Configuration
 # ------------------------------------------------------------------------------
-OS_TYPE=$(uname)
+source "${XDG_DOTFILES_DIR}/scripts/lib/os-detect.sh"
 ARCH_TYPE=$(uname -m)
 
 # Common paths for both OS types
@@ -116,8 +116,7 @@ COMMON_PATHS=(
 )
 
 # OS-specific Homebrew configuration
-case "$OS_TYPE" in
-"Darwin")
+if os::is_mac; then
   # macOS Homebrew paths
   HOMEBREW_PREFIX="/opt/homebrew"
   HOMEBREW_CELLAR="/opt/homebrew/Cellar"
@@ -132,8 +131,7 @@ case "$OS_TYPE" in
     "/opt/anaconda3/bin"
     "${HOME}/.local/bin"
   )
-  ;;
-"Linux")
+elif os::is_linux; then
   # Linux Homebrew paths
   HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
   HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
@@ -150,8 +148,7 @@ case "$OS_TYPE" in
     "/usr/local/lib/pkgconfig"
     "/usr/local/lib"
   )
-  ;;
-esac
+fi
 
 # Combine the common and OS-specific paths and ensure uniqueness in the final path
 typeset -U path

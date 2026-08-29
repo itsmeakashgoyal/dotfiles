@@ -16,6 +16,9 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import osdetect  # noqa: E402
+
 HOME            = Path.home()
 NVIM_BACKUP_DIR = HOME / "linuxtoolbox" / "backup" / "nvim"
 NVIM_INSTALL_DIR = Path("/opt/nvim")
@@ -90,7 +93,7 @@ def install() -> None:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    if platform.system() != "Linux":
+    if not osdetect.is_linux():
         print("Error: install-nvim is Linux-only.", file=sys.stderr)
         print("On macOS use: brew install neovim", file=sys.stderr)
         sys.exit(1)

@@ -8,11 +8,13 @@
 # Clean up dotfiles, Homebrew, Neovim, tmux configurations.
 
 import argparse
-import platform
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import osdetect  # noqa: E402
 
 HOME = Path.home()
 
@@ -72,7 +74,7 @@ def cleanup_homebrew() -> None:
         subprocess.run(["brew", "remove", "--force"] + formulae, check=False)
 
     # Remove casks (macOS) or remaining packages (Linux)
-    if platform.system() == "Darwin":
+    if osdetect.is_mac():
         result = subprocess.run(["brew", "list", "--cask"], capture_output=True, text=True)
         casks = result.stdout.split()
         if casks:
