@@ -37,7 +37,7 @@ This runs shellcheck and shfmt automatically before each commit.
 
 Each package follows the same pattern — mirror the target path under a top-level directory:
 
-```
+```text
 dotfiles/
 └── <toolname>/
     └── .config/
@@ -45,10 +45,10 @@ dotfiles/
             └── config_file
 ```
 
-Then register it in the `Makefile`:
+Then register it in the `Makefile` (append to the existing list — run `make print-STOW_PACKAGES` to see the current one):
 
 ```makefile
-STOW_PACKAGES := git zsh nvim tmux <toolname>
+STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch <toolname>
 ```
 
 And stow it:
@@ -59,10 +59,12 @@ make stow pkg=<toolname>
 
 #### Modifying Zsh config
 
-- Add aliases → `zsh/.config/zsh/conf.d/aliases.zsh`
-- Add shell functions → `zsh/.config/zsh/conf.d/functions.zsh`
-- Add environment variables → `zsh/.config/zsh/conf.d/exports.zsh`
-- Machine-local changes → `zsh/.config/zsh/conf.d/private.zsh` (gitignored, never commit)
+`conf.d/` files are numbered and sourced in that order (see [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full list):
+
+- Add aliases → `zsh/.config/zsh/conf.d/04-aliases.zsh`
+- Add shell functions → `zsh/.config/zsh/conf.d/05-functions.zsh`
+- Add environment variables → `zsh/.config/zsh/conf.d/01-exports.zsh`
+- Machine-local changes → `zsh/.config/zsh/conf.d/99-private.zsh` (gitignored, never commit)
 
 #### Modifying scripts
 
@@ -75,8 +77,8 @@ All scripts must:
 ### 4. Test locally
 
 ```bash
-# Lint all scripts
-shellcheck -x scripts/**/*.sh install.sh bootstrap.sh
+# Lint all scripts (matches what CI's lint job runs)
+find . -type f \( -name "*.sh" -o -name "dutils" \) ! -path "*/.git/*" -exec shellcheck -x {} +
 
 # Check shell formatting
 shfmt -d scripts/
@@ -92,7 +94,7 @@ make check
 
 Follow conventional commits:
 
-```
+```text
 feat: add ghostty config package
 fix: correct PATH order in exports.zsh
 docs: add vhs recording guide
