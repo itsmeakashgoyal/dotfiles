@@ -7,6 +7,7 @@ name: Test Dotfiles Setup
     paths:
       - ".github/workflows/build_and_test*.yml"
       - "install.sh"
+      - "install.ps1"
       - "bootstrap.sh"
       - "Makefile"
       - "scripts/**"
@@ -15,6 +16,7 @@ name: Test Dotfiles Setup
       - "zsh/**"
       - "nvim/**"
       - "tmux/**"
+      - "powershell/**"
   pull_request:
     branches: ["master", "main"]
   workflow_dispatch:
@@ -232,13 +234,29 @@ jobs:
 
           # Source the zsh config (ZDOTDIR set via stow symlink)
           export ZDOTDIR="$HOME/dotfiles/zsh/.config/zsh"
-          source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
+          source "$HOME/.zshenv" || { echo "::error::Could not source .zshenv"; exit 1; }
+          source "$ZDOTDIR/.zshrc" || { echo "::error::Could not source .zshrc"; exit 1; }
 
-          # Test if basic commands work
+          # Test that core aliases/functions actually loaded. (gco is a repo-native
+          # function defined in 06-git.zsh, not the OMZ git-plugin alias, so it
+          # doesn't depend on Zinit's async turbo-mode timing here.)
           echo "Testing basic commands..."
-          type l ll gs gco 2>/dev/null || echo "Some aliases not loaded"
+          missing=0
+          for cmd in l ll gs gco; do
+            if ! type "$cmd" >/dev/null 2>&1; then
+              echo "::error::'$cmd' is not defined after sourcing the zsh config"
+              missing=1
+            fi
+          done
+          [[ "$missing" -eq 0 ]] || exit 1
 
           echo "✅ Zsh configuration test complete"
+
+      - name: Test Neovim configuration
+        run: |
+          echo "🧪 Testing Neovim plugin config loads cleanly..."
+          nvim --headless "+Lazy! sync" +qa
+          echo "✅ Neovim configuration test complete"
 
       - name: Uninstall dotfiles
         run: |
@@ -422,12 +440,27 @@ jobs:
 
           # ZDOTDIR set via stow symlink
           export ZDOTDIR="$HOME/dotfiles/zsh/.config/zsh"
-          source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
+          source "$HOME/.zshenv" || { echo "::error::Could not source .zshenv"; exit 1; }
+          source "$ZDOTDIR/.zshrc" || { echo "::error::Could not source .zshrc"; exit 1; }
 
           echo "Testing basic commands..."
-          type l ll 2>/dev/null || echo "Some aliases not loaded"
+          missing=0
+          for cmd in l ll; do
+            if ! type "$cmd" >/dev/null 2>&1; then
+              echo "::error::'$cmd' is not defined after sourcing the zsh config"
+              missing=1
+            fi
+          done
+          [[ "$missing" -eq 0 ]] || exit 1
 
           echo "✅ Zsh configuration test complete"
+
+      - name: Test Neovim configuration
+        run: |
+          echo "🧪 Testing Neovim plugin config loads cleanly..."
+          export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+          nvim --headless "+Lazy! sync" +qa
+          echo "✅ Neovim configuration test complete"
 
       - name: Test dutils commands
         if: always()
@@ -483,6 +516,64 @@ jobs:
           path: |
             /tmp/setup_log.txt
           retention-days: 7
+
+  # Job: Test on Windows
+  # Soft-gated while this leg stabilizes: continue-on-error means a failure
+  # here surfaces as a visible check without blocking merges or the summary
+  # job below. Flip continue-on-error off (and add this job to summary's
+  # `needs`) once it's been reliably green for a few commits.
+  test-windows:
+    name: Test on Windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+    needs: lint
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Display system info
+        shell: pwsh
+        run: |
+          [System.Environment]::OSVersion.Version
+          $PSVersionTable.PSVersion
+
+      - name: Setup dotfiles directory
+        shell: pwsh
+        run: |
+          $dest = "$env:USERPROFILE\dotfiles"
+          Write-Host "Setting up dotfiles directory at $dest"
+          Copy-Item -Path "$env:GITHUB_WORKSPACE" -Destination $dest -Recurse -Force
+          Get-ChildItem $dest | Select-Object Name
+
+      - name: Run Windows setup (packages, symlinks, health check)
+        shell: pwsh
+        env:
+          CI: "true"
+        run: |
+          & "$env:USERPROFILE\dotfiles\scripts\setup\windows.ps1"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::windows.ps1 exited with code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+
+      - name: Verify PowerShell profile symlink
+        shell: pwsh
+        run: |
+          $profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+          if (-not (Test-Path $profilePath)) {
+            Write-Host "::error::PowerShell profile not found at $profilePath"
+            exit 1
+          }
+          $item = Get-Item $profilePath -Force
+          if (-not ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            Write-Host "::error::PowerShell profile exists but is not a symlink"
+            exit 1
+          }
+          Write-Host "✅ PowerShell profile symlinked"
 
   # Job 4: Summary and notification
   summary:
