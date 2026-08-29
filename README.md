@@ -148,13 +148,9 @@ cd ~\dotfiles
 Every top-level directory (`git/`, `zsh/`, `nvim/`, `tmux/`, …) is a **Stow package**. Each package
 mirrors the target path relative to `$HOME`:
 
-```text
-dotfiles/nvim/.config/nvim/init.lua
-                │
-    stow nvim   │   creates symlink
-                ▼
-~/.config/nvim  →  ~/dotfiles/nvim/.config/nvim
-```
+<p align="center">
+  <img src="docs/assets/how-it-works.svg" alt="Diagram: 'stow nvim' symlinks ~/.config/nvim into the repo" width="700">
+</p>
 
 Running `stow <package>` from the repo root creates the correct symlinks automatically. Edits in the
 repo take effect immediately — no re-linking needed.

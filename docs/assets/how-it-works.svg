@@ -1,0 +1,42 @@
+<svg width="900" height="240" viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b5cf6"/>
+    </marker>
+    <linearGradient id="cardFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f6f8fa"/>
+    </linearGradient>
+  </defs>
+
+  <g font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+
+    <!-- repo card -->
+    <rect x="24" y="56" width="330" height="112" rx="10" fill="url(#cardFill)" stroke="#d0d7de" stroke-width="1.5"/>
+    <text x="44" y="84" font-size="12" font-weight="700" letter-spacing="1.5" fill="#8250df">STOW PACKAGE</text>
+    <g font-family="SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace" font-size="14" fill="#24292f">
+      <text x="44" y="112">dotfiles/</text>
+      <text x="44" y="133">  nvim/.config/nvim/</text>
+      <text x="44" y="154">    init.lua</text>
+    </g>
+
+    <!-- stow arrow -->
+    <line x1="366" y1="112" x2="514" y2="112" stroke="#8b5cf6" stroke-width="2.5" marker-end="url(#arrow)"/>
+    <rect x="378" y="74" width="124" height="24" rx="12" fill="#f3e8ff" stroke="#c9a6ff"/>
+    <text x="440" y="90" font-family="SFMono-Regular, Consolas, monospace" font-size="12.5" font-weight="600" fill="#6b21d0" text-anchor="middle">stow nvim</text>
+    <text x="440" y="140" font-size="11.5" fill="#57606a" text-anchor="middle">creates a symlink</text>
+
+    <!-- home card -->
+    <rect x="524" y="56" width="352" height="112" rx="10" fill="url(#cardFill)" stroke="#d0d7de" stroke-width="1.5"/>
+    <text x="544" y="84" font-size="12" font-weight="700" letter-spacing="1.5" fill="#1a7f37">$HOME</text>
+    <g font-family="SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace" font-size="14" fill="#24292f">
+      <text x="544" y="112">~/.config/nvim</text>
+      <text x="544" y="133" fill="#57606a">  → ~/dotfiles/nvim/</text>
+      <text x="544" y="154" fill="#57606a">      .config/nvim</text>
+    </g>
+    <!-- footnote -->
+    <text x="450" y="205" font-size="13.5" fill="#57606a" text-anchor="middle">
+      Edits inside the repo take effect immediately — the target is a symlink, not a copy.
+    </text>
+  </g>
+</svg>
