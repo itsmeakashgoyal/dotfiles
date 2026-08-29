@@ -28,6 +28,12 @@ $NVIM_CONFIG = "$env:LOCALAPPDATA\nvim"
 $NVIM_DATA = "$env:LOCALAPPDATA\nvim-data"
 
 # Symlink map: source (relative to $DOTFILES_DIR) -> target
+#
+# Windows doesn't use Stow, so this hashtable is a hand-maintained
+# equivalent of the Makefile's STOW_PACKAGES list (`make print-STOW_PACKAGES`)
+# — keep it in sync by hand when packages are added/removed there. Notably
+# missing today: bin/ (~/.local/bin custom scripts) has no Windows PATH
+# equivalent wired up yet.
 $SYMLINK_MAP = @{
     "nvim\.config\nvim"           = $NVIM_CONFIG
     "git\.config\git"             = "$env:USERPROFILE\.config\git"
