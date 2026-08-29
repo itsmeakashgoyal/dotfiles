@@ -60,7 +60,7 @@ search_mode = "fuzzy"
 inline_height = 20
 
 ## put the search bar at the top
-invert = true
+invert = false
 
 ## show a preview of the selected command
 # show_preview = true
