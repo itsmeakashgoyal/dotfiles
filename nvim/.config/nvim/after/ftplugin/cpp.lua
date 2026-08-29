@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/after/ftplugin/cpp.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- C++: 4-space indentation, compile-and-run/compile-only keymaps (F9/F8),
+-- header/source switching (<leader>h).
 -- C++ specific settings (modernized from cpp.vim)
 local set = vim.opt_local
 

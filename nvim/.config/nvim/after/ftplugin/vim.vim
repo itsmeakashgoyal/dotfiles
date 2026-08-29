@@ -1,3 +1,12 @@
+"
+"  ▓▓▓▓▓▓▓▓▓▓
+" ░▓ author ▓ Akash Goyal
+" ░▓ file   ▓ nvim/.config/nvim/after/ftplugin/vim.vim
+" ░▓▓▓▓▓▓▓▓▓▓
+"
+" Vim script: disable auto-comment continuation, custom folding, K opens
+" :help for the word under the cursor.
+
 " Disable inserting comment leader after hitting o or O or <Enter>
 set formatoptions-=o
 set formatoptions-=r

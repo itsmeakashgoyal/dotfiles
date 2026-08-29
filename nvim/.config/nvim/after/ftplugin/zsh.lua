@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/after/ftplugin/zsh.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Zsh: 2-space indentation, run/shellcheck/chmod+x/source keymaps
+-- (F9/F8/<leader>x/<leader>s).
 -- Zsh script settings
 local set = vim.opt_local
 

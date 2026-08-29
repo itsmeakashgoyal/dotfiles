@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/after/ftplugin/bash.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Bash: 2-space indentation, run/shellcheck/chmod+x keymaps (F9/F8/<leader>x).
 -- Bash-specific settings (inherits most from sh.lua but with bash specifics)
 local set = vim.opt_local
 

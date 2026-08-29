@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/after/ftplugin/markdown.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Markdown: wrap at 80 columns, spell-check on, custom heading highlight
+-- colors (h1-h6).
 local set = vim.opt_local
 
 set.textwidth = 80 -- Wrap text at 80 characters

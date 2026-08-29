@@ -1,3 +1,11 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ .github/workflows/build_and_test.yml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# CI: lint (shellcheck/shfmt/yamllint/py_compile), then full install ->
+# verify -> uninstall on macOS and Ubuntu, plus a soft-gated Windows job.
 ---
 name: Test Dotfiles Setup
 

@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/after/ftplugin/python.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Python: PEP 8 indentation (4-space), 88-col width (Black's default),
+-- run/REPL/quick-run keymaps (F9/F8/<leader>r).
 -- Python-specific settings
 local set = vim.opt_local
 
