@@ -1,6 +1,10 @@
 return {
     "stevearc/oil.nvim",
     -- enabled = false,
+    -- eager on purpose: oil replaces netrw as the directory-buffer handler
+    -- (default_file_explorer = true below), which needs to be registered
+    -- before netrw's own autocmds would otherwise fire.
+    lazy = false,
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
         require("oil").setup({

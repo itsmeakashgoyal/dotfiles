@@ -3,6 +3,7 @@ return {
     {
         "b0o/incline.nvim",
         enabled = true,
+        event = "VeryLazy", -- winbar chrome, not needed on the very first frame
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             local devicons = require("nvim-web-devicons")

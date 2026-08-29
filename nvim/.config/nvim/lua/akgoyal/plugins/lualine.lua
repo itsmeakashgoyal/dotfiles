@@ -1,5 +1,6 @@
 return {
     "nvim-lualine/lualine.nvim",
+    event = "VeryLazy", -- statusline chrome, not needed on the very first frame
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
         local lualine = require("lualine")
