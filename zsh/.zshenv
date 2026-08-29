@@ -36,6 +36,15 @@ export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 export GPG_TTY=$TTY
 
+# A real terminal always sets $TERM; a non-interactive invocation with no
+# controlling tty (CI, `zsh -c '...'`, a Docker build step) does not. Zinit's
+# plugin-install UI shells out to `tput` for its progress display and doesn't
+# degrade gracefully when that fails - it aborts the whole shell startup.
+# Falling back to a sane default here (only when unset) keeps sourcing this
+# config robust in those contexts without affecting real terminal sessions.
+: "${TERM:=xterm-256color}"
+export TERM
+
 # ------------------------------------------------------------------------------
 # Application Paths
 # ------------------------------------------------------------------------------
