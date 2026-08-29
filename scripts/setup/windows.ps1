@@ -65,6 +65,8 @@ $SCOOP_PACKAGES = @(
     "delta"
     # Prompt (opt-in — see powershell profile / $PROFILE)
     "starship"
+    # Runtime version manager (replaces pyenv, which has no Windows support)
+    "mise"
     # Development
     "nodejs"
     "python"

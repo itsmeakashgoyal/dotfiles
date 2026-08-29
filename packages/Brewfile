@@ -43,6 +43,7 @@ brew "git-extras"           # Extra git commands
 brew "hyperfine"            # Command-line benchmarking tool (Rust)
 brew "jq"                   # JSON processor
 brew "lazygit"              # Terminal UI for git
+brew "mise"                 # Runtime version manager (replaces pyenv)
 brew "starship"             # Cross-shell prompt (opt-in, see conf.d/.zshrc)
 brew "ripgrep"              # Better grep (Rust)
 brew "tree"                 # Directory tree

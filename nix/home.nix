@@ -43,6 +43,7 @@
     hyperfine # Command-line benchmarking tool
     jq # JSON processor
     lazygit # Terminal UI for git
+    mise # Runtime version manager (replaces pyenv)
     starship # Cross-shell prompt (opt-in, see conf.d/.zshrc)
     ripgrep # Better grep
     tree # Directory tree

@@ -4,10 +4,10 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # PowerShell profile — Linux/macOS feel on Windows
-# Tools: ripgrep · fzf (PSFzf) · bat · eza · zoxide · PSReadLine
+# Tools: ripgrep · fzf (PSFzf) · bat · eza · zoxide · mise · PSReadLine
 #
 # Install prerequisites once:
-#   scoop install ripgrep fzf bat eza zoxide fd
+#   scoop install ripgrep fzf bat eza zoxide fd mise
 #   Install-Module PSFzf, PSReadLine, Terminal-Icons -Scope CurrentUser
 
 # ==============================================================================
@@ -182,6 +182,14 @@ if (_cmd bat) {
 # ==============================================================================
 if (_cmd zoxide) {
     Invoke-Expression (& { (zoxide init powershell | Out-String) })
+}
+
+# ==============================================================================
+# mise (runtime version manager — replaces pyenv, which has no native
+# Windows support at all)
+# ==============================================================================
+if (_cmd mise) {
+    (& mise activate pwsh) | Out-String | Invoke-Expression
 }
 
 # ==============================================================================
