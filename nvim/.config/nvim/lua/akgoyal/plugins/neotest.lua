@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/neotest.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Neotest: test runner framework (pytest via neotest-python) with run, summary, output, and
+-- DAP-debug integration.
 return {
 	"nvim-neotest/neotest",
 	dependencies = {

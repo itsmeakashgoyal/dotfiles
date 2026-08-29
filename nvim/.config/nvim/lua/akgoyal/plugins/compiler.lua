@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/compiler.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Compiler: build/task runner UI backed by overseer.nvim, for compiling and running project tasks.
 return {
 	"Zeioth/compiler.nvim",
 	cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo", "CompilerStop" },

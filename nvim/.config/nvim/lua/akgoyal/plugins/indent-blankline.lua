@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/indent-blankline.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Indent-blankline: renders indentation guide lines and highlights the current scope.
 return {
 	"lukas-reineke/indent-blankline.nvim",
 	event = { "BufReadPre", "BufNewFile" },

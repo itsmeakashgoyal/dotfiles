@@ -1,9 +1,12 @@
 #compdef eza
-
-# Save this file as _eza in /usr/local/share/zsh/site-functions or in any
-# other folder in $fpath.  E.g. save it in a folder called ~/.zfunc and add a
-# line containing `fpath=(~/.zfunc $fpath)` somewhere before `compinit` in your
-# ~/.zshrc.
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ zsh/.config/zsh/completion/_eza
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Zsh completion for eza. #compdef above must stay the first line — zsh's
+# completion autoload scans for it to know which command this file completes.
 
 __eza() {
     # Give completions using the `_arguments` utility function with

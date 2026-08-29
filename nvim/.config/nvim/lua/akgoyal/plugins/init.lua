@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/init.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Foundational plugins: plenary.nvim (shared Lua utility library) and vim-tmux-navigator (tmux/vim split navigation).
 return {
     { "nvim-lua/plenary.nvim", lazy = true }, -- lua functions that many plugins use; loaded transitively via dependents
 

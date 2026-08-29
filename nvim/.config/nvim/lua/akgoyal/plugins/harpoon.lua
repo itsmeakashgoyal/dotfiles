@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/harpoon.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Harpoon: quick-jump list for frequently-edited files.
 return {
 	"ThePrimeagen/harpoon",
 	branch = "harpoon2",

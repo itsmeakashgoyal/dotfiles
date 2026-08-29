@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ update-motd.d/2-info
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# MOTD banner (host/uptime/CPU/memory/disk info). Manual install — see
+# update-motd.d/README.md.
 MYHOST=$(uname -n)
 UPTIME_DAYS=$(expr `cat /proc/uptime | cut -d '.' -f1` % 31556926 / 86400)
 UPTIME_HOURS=$(expr `cat /proc/uptime | cut -d '.' -f1` % 31556926 % 86400 / 3600)

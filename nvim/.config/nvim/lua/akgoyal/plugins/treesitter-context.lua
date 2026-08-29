@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/treesitter-context.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Treesitter-context: shows a sticky header of the enclosing function/class scope while scrolling.
 return {
 	"nvim-treesitter/nvim-treesitter-context",
 	event = { "BufReadPre", "BufNewFile" },

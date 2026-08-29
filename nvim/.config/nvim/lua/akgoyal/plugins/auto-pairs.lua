@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/auto-pairs.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Auto-pairs: automatically closes brackets and quotes, integrated with nvim-cmp completion.
 return {
     "windwp/nvim-autopairs",
     event = { "InsertEnter" },

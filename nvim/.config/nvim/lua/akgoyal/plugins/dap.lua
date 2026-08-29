@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/dap.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- DAP: Debug Adapter Protocol client for breakpoints and stepping, with dap-ui and mason-nvim-dap integration.
 return {
 	"mfussenegger/nvim-dap",
 	dependencies = {

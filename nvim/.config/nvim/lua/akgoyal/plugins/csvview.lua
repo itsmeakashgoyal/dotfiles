@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/csvview.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Csvview: aligns CSV/TSV columns into a readable table view, toggleable.
 return {
 	"hat0uma/csvview.nvim",
 	ft = { "csv", "tsv" },

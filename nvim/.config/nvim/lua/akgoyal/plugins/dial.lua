@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/dial.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Dial: smart increment/decrement for numbers, dates, and booleans beyond plain integers.
 return {
 	"monaqa/dial.nvim",
 	keys = {

@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/incline.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Incline: floating filename label with file-type icon and modified indicator, shown over each window.
 return {
     -- Adding a filename to the Top Right
     {

@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/telescope.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Telescope: fuzzy finder for files, grep, buffers, help, and diagnostics.
 return {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",

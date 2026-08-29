@@ -1,4 +1,11 @@
 #!/bin/bash
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ update-motd.d/0-logo
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# MOTD banner (ASCII logo). Manual install — see update-motd.d/README.md.
 
 cat <<EndOfText
 

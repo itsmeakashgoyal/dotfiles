@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/yanky.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Yanky: enhanced yank/put with a persistent history ring and a telescope-based yank-history picker.
 return {
 	"gbprod/yanky.nvim",
 	event = { "BufReadPre", "BufNewFile" },

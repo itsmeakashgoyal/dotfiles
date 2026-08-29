@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/kulala.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Kulala: HTTP client for running and replaying requests from .http files.
 return {
 	"mistweaverco/kulala.nvim",
 	ft = "http",

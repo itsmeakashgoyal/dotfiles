@@ -1,3 +1,11 @@
+//
+//  ▓▓▓▓▓▓▓▓▓▓
+// ░▓ author ▓ Akash Goyal
+// ░▓ file   ▓ fastfetch/.config/fastfetch/config.jsonc
+// ░▓▓▓▓▓▓▓▓▓▓
+//
+// Fastfetch system-info display: small logo, core system modules only
+// (no extras like media player / public IP).
 {
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
     "logo": {

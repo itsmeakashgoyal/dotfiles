@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/venv-selector.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Venv-selector: picks a Python virtualenv to use for the LSP, loaded for Python files.
 return {
 	"linux-cultist/venv-selector.nvim",
 	branch = "regexp",

@@ -1,3 +1,11 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ nvim/.config/nvim/Makefile
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Convenience targets for working on this nvim config: `make format` runs
+# stylua over every lua file.
 .DEFAULT: help
 
 .PHONY: help

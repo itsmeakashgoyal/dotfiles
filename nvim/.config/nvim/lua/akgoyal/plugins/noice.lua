@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/noice.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Noice: revamps the UI for LSP hover, signature help, and progress, plus the completion popup menu.
 return {
     {
         "folke/noice.nvim",

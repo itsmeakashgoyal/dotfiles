@@ -1,4 +1,11 @@
 #!/bin/bash
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ update-motd.d/1-welcome
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# MOTD banner (welcome message). Manual install — see update-motd.d/README.md.
 
 cat << EOF
 %+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++%

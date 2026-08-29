@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/mini-comment.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Mini.comment: line/block commenting with treesitter-aware commentstring for embedded languages.
 return {
 	{
 		"JoosepAlviste/nvim-ts-context-commentstring",

@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/oil.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Oil: file explorer that edits directories as regular buffers, replaces netrw.
 return {
     "stevearc/oil.nvim",
     -- enabled = false,
