@@ -26,6 +26,9 @@
 #   make uninstall                 # interactive
 #   make uninstall dry=1           # show what would happen, change nothing
 #   make uninstall force=1         # skip the initial confirm
+#   STEPS=unstow,sweep bash scripts/setup/uninstall.sh   # run only some steps
+#                                                          (shell/unstow/sweep/
+#                                                           caches/nix/homebrew)
 #
 # WARNING: Removal of Nix AND Homebrew is MANDATORY and total. If you installed
 # packages outside these dotfiles, they will be removed too. Use dry=1 first
@@ -51,11 +54,21 @@ trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 DRY_RUN="${DRY_RUN:-0}"
 FORCE="${FORCE:-0}"
 
+# Which of the 6 steps to run — defaults to all of them (today's behavior,
+# unchanged). A caller (e.g. `dutils cleanup`) can pass a comma-separated
+# subset instead: shell,unstow,sweep,caches,nix,homebrew.
+STEPS="${STEPS:-all}"
+
+step_enabled() {
+    [[ "$STEPS" == "all" ]] && return 0
+    [[ ",${STEPS}," == *",$1,"* ]]
+}
+
 # Package list — the Makefile's STOW_PACKAGES is the single source of truth.
 # `make uninstall` passes it via env; a direct invocation queries the
 # Makefile instead, falling back to a snapshot only if that query fails.
 STOW_PACKAGES="${STOW_PACKAGES:-$(make -s -C "${DOTFILES_DIR}" print-STOW_PACKAGES 2>/dev/null || true)}"
-: "${STOW_PACKAGES:=git zsh nvim tmux television bin atuin fastfetch}"
+: "${STOW_PACKAGES:=git zsh nvim tmux television bin atuin fastfetch starship}"
 
 # ------------------------------------------------------------------------------
 # Helpers
@@ -323,12 +336,16 @@ main() {
     [[ "$DRY_RUN" == "1" ]] && log::warning "DRY-RUN MODE — nothing will actually be changed."
 
     log::newline
-    log::info "This will reset your login shell, remove dotfile symlinks, clear caches,"
-    log::info "and COMPLETELY UNINSTALL both Nix and Homebrew if present"
-    log::info "(all their packages first, then the package manager itself)."
-    log::info "Your repo, shell history, and personal data are left untouched."
-    [[ "$DRY_RUN" != "1" && -z "${CI:-}" ]] && \
-        log::warning "Tip: run 'make uninstall dry=1' first to preview every action."
+    if [[ "$STEPS" == "all" ]]; then
+        log::info "This will reset your login shell, remove dotfile symlinks, clear caches,"
+        log::info "and COMPLETELY UNINSTALL both Nix and Homebrew if present"
+        log::info "(all their packages first, then the package manager itself)."
+        log::info "Your repo, shell history, and personal data are left untouched."
+        [[ "$DRY_RUN" != "1" && -z "${CI:-}" ]] && \
+            log::warning "Tip: run 'make uninstall dry=1' first to preview every action."
+    else
+        log::info "Running a subset of steps: ${STEPS}"
+    fi
     log::newline
 
     if ! confirm_gate "Proceed with uninstall?"; then
@@ -336,12 +353,12 @@ main() {
         exit 0
     fi
 
-    restore_shell
-    unstow_packages
-    sweep_symlinks
-    clean_generated
-    remove_nix
-    remove_homebrew
+    step_enabled shell    && restore_shell
+    step_enabled unstow   && unstow_packages
+    step_enabled sweep    && sweep_symlinks
+    step_enabled caches   && clean_generated
+    step_enabled nix      && remove_nix
+    step_enabled homebrew && remove_homebrew
 
     log::newline
     if [[ "$DRY_RUN" == "1" ]]; then
