@@ -4,7 +4,6 @@
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ zsh/.config/zsh/conf.d/00-logo.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # ASCII art greeting on interactive shell startup.
 # Set DOTFILES_NO_LOGO=1 to disable.

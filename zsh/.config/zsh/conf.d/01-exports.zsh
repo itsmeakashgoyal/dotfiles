@@ -1,21 +1,10 @@
 #!/usr/bin/env zsh
-#                     █████
-#                    ░░███
-#   █████████  █████  ░███████
-#  ░█░░░░███  ███░░   ░███░░███
-#  ░   ███░  ░░█████  ░███ ░███
-#    ███░   █ ░░░░███ ░███ ░███
-#   █████████ ██████  ████ █████
-#  ░░░░░░░░░ ░░░░░░  ░░░░ ░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/.config/zsh/conf.d/exports.zsh
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/01-exports.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
-
 function add_to_path() {
   # NOTE: zsh only
 

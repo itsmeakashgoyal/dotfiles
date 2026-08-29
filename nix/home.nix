@@ -1,8 +1,8 @@
+#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ nix/home.nix
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Home Manager module — the Nix equivalent of packages/Brewfile.
 # Mirrors the CLI tools your dotfiles depend on. Edit the list below,

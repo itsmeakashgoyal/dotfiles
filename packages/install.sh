@@ -1,10 +1,10 @@
 #!/bin/bash
+#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ packages/install.sh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
-
+#
 # ------------------------------------------------------------------------------
 # Simple Package Installation Script
 # Installs Homebrew and all packages from Brewfile

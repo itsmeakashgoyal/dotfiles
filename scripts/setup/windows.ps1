@@ -1,3 +1,4 @@
+#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ scripts/setup/windows.ps1

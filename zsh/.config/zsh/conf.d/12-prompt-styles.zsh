@@ -4,7 +4,6 @@
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ zsh/.config/zsh/conf.d/12-prompt-styles.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Pure ZSH prompt styles (no framework needed).
 # Adapted from xero's dotfiles (https://github.com/xero/dotfiles)

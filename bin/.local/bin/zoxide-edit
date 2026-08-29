@@ -4,7 +4,6 @@
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ bin/.local/bin/zoxide-edit
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Search files with zoxide + fd + fzf + bat preview, then open in nvim.
 # Adapted from https://github.com/sethdaily/dotfiles

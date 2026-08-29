@@ -4,7 +4,6 @@
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ bin/.local/bin/yank
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Universal clipboard script — pushes to every clipboard backend it can find.
 # Supports: pbcopy, xsel, xclip, reattach-to-user-namespace, tmux, OSC 52.

@@ -1,8 +1,8 @@
+#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ nix/flake.nix
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Standalone Home Manager flake — the only package manager used on Linux (no
 # linuxbrew, no Homebrew). Manages CLI *packages* only: GNU Stow still

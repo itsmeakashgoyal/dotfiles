@@ -4,7 +4,6 @@
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ zsh/.config/zsh/conf.d/15-nix.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Nix / Home Manager integration (Linux only).
 #

@@ -1,11 +1,9 @@
+#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ Makefile
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
-
 # Stowable packages (directories with dotfiles)
 STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch starship
 
