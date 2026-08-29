@@ -44,7 +44,7 @@
     jq # JSON processor
     lazygit # Terminal UI for git
     mise # Runtime version manager (replaces pyenv)
-    starship # Cross-shell prompt (opt-in, see conf.d/.zshrc)
+    starship # Cross-shell prompt (default, replaced Powerlevel10k)
     ripgrep # Better grep
     tree # Directory tree
     television # Fuzzy finder (solves the linuxbrew "no tv" gap cleanly)

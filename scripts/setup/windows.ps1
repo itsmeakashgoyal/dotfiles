@@ -41,6 +41,7 @@ $SYMLINK_MAP = @{
     "television\.config\television" = "$env:USERPROFILE\.config\television"
     "atuin\.config\atuin"         = "$env:USERPROFILE\.config\atuin"
     "fastfetch\.config\fastfetch" = "$env:USERPROFILE\.config\fastfetch"
+    "starship\.config\starship"   = "$env:USERPROFILE\.config\starship"
     "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 }
 
@@ -63,7 +64,7 @@ $SCOOP_PACKAGES = @(
     # Git tools
     "lazygit"
     "delta"
-    # Prompt (opt-in — see powershell profile / $PROFILE)
+    # Prompt (default — see powershell profile / $PROFILE)
     "starship"
     # Runtime version manager (replaces pyenv, which has no Windows support)
     "mise"

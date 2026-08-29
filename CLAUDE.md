@@ -49,12 +49,13 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `bin/` → `~/.local/bin/` — Custom scripts (yank, zoxide-edit)
 - `atuin/` → `~/.config/atuin/` — Shell history search
 - `fastfetch/` → `~/.config/fastfetch/` — System info display
+- `starship/` → `~/.config/starship/` — Cross-shell prompt (default; replaced Powerlevel10k)
 
 `powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `scripts/setup/windows.ps1`'s own symlink function instead (see Windows section below).
 
 ### Zsh Configuration Layout
 `zsh/.config/zsh/conf.d/` contains numbered modular config files sourced in order:
-- `00-logo.zsh` — ASCII art startup greeting (guards: non-tmux, non-p10k)
+- `00-logo.zsh` — ASCII art startup greeting (guards: interactive, non-tmux)
 - `01-exports.zsh` — PATH, environment variables (sourced early in .zshrc)
 - `02-options.zsh` — Shell options, history, completion settings
 - `03-startup.zsh` — Completion system init (sourced early in .zshrc)

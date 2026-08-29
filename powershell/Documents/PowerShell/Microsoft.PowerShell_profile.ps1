@@ -4,10 +4,10 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # PowerShell profile — Linux/macOS feel on Windows
-# Tools: ripgrep · fzf (PSFzf) · bat · eza · zoxide · mise · PSReadLine
+# Tools: ripgrep · fzf (PSFzf) · bat · eza · zoxide · mise · starship · PSReadLine
 #
 # Install prerequisites once:
-#   scoop install ripgrep fzf bat eza zoxide fd mise
+#   scoop install ripgrep fzf bat eza zoxide fd mise starship
 #   Install-Module PSFzf, PSReadLine, Terminal-Icons -Scope CurrentUser
 
 # ==============================================================================
@@ -190,6 +190,15 @@ if (_cmd zoxide) {
 # ==============================================================================
 if (_cmd mise) {
     (& mise activate pwsh) | Out-String | Invoke-Expression
+}
+
+# ==============================================================================
+# Starship (default prompt — same starship.toml as zsh, replaces Powerlevel10k
+# which could never run on PowerShell in the first place)
+# ==============================================================================
+if (_cmd starship) {
+    $env:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
+    (& starship init powershell) | Out-String | Invoke-Expression
 }
 
 # ==============================================================================

@@ -7,7 +7,7 @@ linuxbrew's glibc friction and shell-startup overhead.
 
 **Scope (deliberately minimal):** Nix manages *packages only*. Your dotfiles
 (zsh, nvim, tmux, …) are still symlinked by **GNU Stow**, and your shell config
-is still driven by **Zinit + Powerlevel10k**. Nix does not touch any of that.
+is still driven by **Zinit + Starship**. Nix does not touch any of that.
 
 **macOS is unchanged** — it keeps using Homebrew (`packages/Brewfile`) and Stow.
 

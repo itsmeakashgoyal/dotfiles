@@ -35,16 +35,17 @@ The Makefile's `STOW_PACKAGES` variable (`make print-STOW_PACKAGES`) is the sing
 dotfiles/
 ├── git/         → ~/.config/git/          Git config, aliases, delta integration
 ├── zsh/         → ~/.zshenv               XDG pointer; sets ZDOTDIR
-│                → ~/.config/zsh/          All Zsh config (conf.d/, .zshrc, .p10k.zsh)
+│                → ~/.config/zsh/          All Zsh config (conf.d/, .zshrc)
 ├── nvim/        → ~/.config/nvim/         Neovim with Lazy.nvim
 ├── tmux/        → ~/.config/tmux/         Tmux config
 ├── television/  → ~/.config/television/   Fuzzy finder + "cable" channel configs
 ├── bin/         → ~/.local/bin/           Custom scripts (yank, zoxide-edit)
 ├── atuin/       → ~/.config/atuin/        Shell history search
-└── fastfetch/   → ~/.config/fastfetch/    System info display
+├── fastfetch/   → ~/.config/fastfetch/    System info display
+└── starship/    → ~/.config/starship/     Cross-shell prompt (default)
 ```
 
-`powershell/` is a ninth package-shaped directory that mirrors this same layout, but is deliberately **not** in `STOW_PACKAGES` — Windows uses its own symlink function instead of Stow (see [Windows](#windows)).
+`powershell/` is a tenth package-shaped directory that mirrors this same layout, but is deliberately **not** in `STOW_PACKAGES` — Windows uses its own symlink function instead of Stow (see [Windows](#windows)).
 
 ---
 
@@ -62,12 +63,13 @@ zsh invoked
      │
      ▼ (interactive shell)
 ~/.config/zsh/.zshrc
-     ├── Powerlevel10k instant prompt (top, before anything else)
      ├── Zinit bootstrap + all plugin declarations (completions, autosuggestions,
-     │   syntax-highlighting, OMZP::git/sudo, powerlevel10k) — plugins are
-     │   declared directly in .zshrc, not in conf.d/
+     │   syntax-highlighting, OMZP::git/sudo) — plugins are declared directly
+     │   in .zshrc, not in conf.d/
+     ├── Starship init (eval "$(starship init zsh)"), reading
+     │   ~/.config/starship/starship.toml — the default prompt
      └── source conf.d/*.zsh  (numeric order, not alphabetical)
-              ├── 00-logo.zsh              ASCII greeting (non-tmux, non-p10k)
+              ├── 00-logo.zsh              ASCII greeting (interactive, non-tmux)
               ├── 01-exports.zsh           PATH, OS detection, env vars
               ├── 02-options.zsh           Shell options, history, completion
               ├── 03-startup.zsh           Completion system init
@@ -75,18 +77,19 @@ zsh invoked
               ├── 05-functions.zsh         Utility functions
               ├── 06-git.zsh               Git aliases + functions (gs, gco, ...)
               ├── 07-docker.zsh            Docker container/image management
-              ├── 08-python.zsh            pyenv/venv management
+              ├── 08-python.zsh            mise/venv management
               ├── 09-television.zsh        Fuzzy finder keybindings
               ├── 10-atuin.zsh             Shell history search (Ctrl+R)
               ├── 11-colored-man-pages.zsh
               ├── 12-prompt-styles.zsh     6 hand-rolled pure-zsh prompt alternatives
+              │                            (zero-dependency fallback to Starship)
               ├── 13-vi-mode.zsh
               ├── 14-abbreviations.zsh
               ├── 15-nix.zsh               Nix/Home Manager PATH (Linux)
               └── 99-private.zsh           ← gitignored, machine-local, last
 ```
 
-**Ordering constraint:** Powerlevel10k instant prompt must be the first thing in `.zshrc`. Any output before it causes a warning. The `conf.d/` files are sourced after all Zinit plugin declarations.
+**Ordering constraint:** the `conf.d/` files are sourced after all Zinit plugin declarations and the Starship init.
 
 ---
 

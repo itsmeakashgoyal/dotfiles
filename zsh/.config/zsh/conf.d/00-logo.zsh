@@ -9,11 +9,10 @@
 # ASCII art greeting on interactive shell startup.
 # Set DOTFILES_NO_LOGO=1 to disable.
 
-# Guards: only in interactive, non-tmux, non-p10k sessions
+# Guards: only in interactive, non-tmux sessions
 [[ -o interactive ]] || return 0
 [[ -n "$TMUX" ]] && return 0
 [[ -n "$DOTFILES_NO_LOGO" ]] && return 0
-[[ -n "$POWERLEVEL9K_INSTANT_PROMPT" ]] && return 0
 
 local _rand=$(( RANDOM % 2 + 1 ))
 case $_rand in
