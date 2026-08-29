@@ -175,3 +175,12 @@ elif command -v sysctl >/dev/null 2>&1; then
     # macOS
     export MAKEFLAGS="-j$(sysctl -n hw.ncpu)"
 fi
+
+# ------------------------------------------------------------------------------
+# Third-Party Toolchain PATH Additions
+# ------------------------------------------------------------------------------
+# rustup (cargo/rustc)
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+
+# uv / other installers that drop a PATH shim in ~/.local/bin
+[[ -f "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"
