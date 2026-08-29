@@ -272,6 +272,23 @@ jobs:
           nvim --headless "+Lazy! sync" +qa
           echo "✅ Neovim configuration test complete"
 
+      - name: Test dutils commands
+        run: |
+          echo "🧪 Testing dutils commands..."
+
+          # Nothing in install.sh creates this symlink - it's a manual,
+          # documented one-time step (scripts/dutils/README.md) - so create it
+          # here the same way a real user following that doc would.
+          mkdir -p "$HOME/.local/bin"
+          ln -sf "$HOME/dotfiles/scripts/dutils/dutils" "$HOME/.local/bin/dutils"
+          export PATH="$HOME/.local/bin:$PATH"
+
+          dutils help
+          dutils version
+          dutils detect-os
+          dutils list-functions
+          echo "✅ dutils commands test complete"
+
       - name: Uninstall dotfiles
         run: |
           cd "$HOME/dotfiles"
@@ -403,14 +420,17 @@ jobs:
           # zsh (from apt)
           zsh --version || exit 1
 
-          # Confirm we did NOT install linuxbrew - this repo's whole point on
-          # Linux is Nix-only, so its presence means something installed it by
-          # mistake, not just a cosmetic difference.
+          # Informational only, not a pass/fail signal: GitHub's ubuntu-latest
+          # runner images ship with Linuxbrew pre-installed as part of the base
+          # toolcache, unrelated to anything this repo does - confirmed none of
+          # our Linux install path invokes brew at all (Nix-only by design), so
+          # this can't distinguish "we broke something" from "the runner image
+          # always has this." A hard fail here would be permanently unfixable
+          # noise, not a real signal.
           if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
-            echo "❌ linuxbrew present — expected Nix-only on Linux"
-            fail=1
+            echo "ℹ️  linuxbrew present (pre-installed on the runner image, not by this repo)"
           else
-            echo "✅ No linuxbrew (Nix-only as intended)"
+            echo "✅ No linuxbrew present"
           fi
 
           # Check core CLI tools provided by Nix. Every one of these is expected
@@ -474,16 +494,22 @@ jobs:
           echo "✅ Neovim configuration test complete"
 
       - name: Test dutils commands
-        if: always()
         run: |
           echo "🧪 Testing dutils commands..."
 
+          # Nothing in install.sh creates this symlink - it's a manual,
+          # documented one-time step (scripts/dutils/README.md) - so create it
+          # here the same way a real user following that doc would, rather
+          # than silently no-op'ing every command below forever.
+          mkdir -p "$HOME/.local/bin"
+          ln -sf "$HOME/dotfiles/scripts/dutils/dutils" "$HOME/.local/bin/dutils"
           export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
 
-          dutils help || echo "dutils help failed"
-          dutils version || echo "dutils version failed"
-          dutils detect-os || echo "dutils detect-os failed"
-          dutils list-functions || echo "dutils list-functions failed"
+          dutils help
+          dutils version
+          dutils detect-os
+          dutils list-functions
+          echo "✅ dutils commands test complete"
 
       - name: Uninstall dotfiles
         run: |
