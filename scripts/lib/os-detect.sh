@@ -11,7 +11,13 @@
 # on source). core.sh sources this file for its bash consumers; zsh sources
 # it directly for the same reason.
 #
-# Guard prevents double-sourcing (readonly below would otherwise error).
+# Guard prevents double-sourcing within the SAME process (readonly below
+# would otherwise error on a second source). Deliberately NOT exported:
+# `exec zsh` replaces the process but preserves its environment, while zsh
+# functions do NOT survive exec (no equivalent of bash's `export -f`) — an
+# exported guard would make the new process wrongly believe os::is_mac etc.
+# were already defined when they never were in *that* process, and skip
+# defining them, leaving `01-exports.zsh` calling undefined functions.
 [[ -n "${OS_DETECT_LOADED:-}" ]] && return 0
 
 OS_TYPE=$(uname)
@@ -43,4 +49,3 @@ fi
 export OS_TYPE
 
 readonly OS_DETECT_LOADED=true
-export OS_DETECT_LOADED
