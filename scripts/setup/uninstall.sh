@@ -33,7 +33,9 @@
 
 set -euo pipefail
 
-CORE="${HOME}/dotfiles/scripts/lib/core.sh"
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+export DOTFILES_DIR
+CORE="${DOTFILES_DIR}/scripts/lib/core.sh"
 if [[ ! -f "$CORE" ]]; then
     echo "Error: core library not found at $CORE" >&2
     exit 1

@@ -27,7 +27,9 @@ if [[ -n "${CI:-}" ]]; then
     exit 0
 fi
 
-SCRIPT_DIR="${HOME}/dotfiles/scripts"
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+export DOTFILES_DIR
+SCRIPT_DIR="${DOTFILES_DIR}/scripts"
 CORE_FILE="${SCRIPT_DIR}/lib/core.sh"
 
 if [[ ! -f "$CORE_FILE" ]]; then
