@@ -20,7 +20,14 @@ function load_local_cache() {
     local -a _mtime=(0)
     [[ -f "$zcompdump" ]] && zstat -A _mtime +mtime "$zcompdump" 2>/dev/null
     if [[ ! -f "$zcompdump" || $(( EPOCHSECONDS - _mtime[1] )) -gt 86400 ]]; then
-        compinit_args=()
+        # -u: auto-answer "yes" to compinit's insecure-directories prompt
+        # instead of leaving it unanswered. Without this, a first run on a
+        # machine where any $fpath entry looks group/other-writable (some
+        # package managers install completions that way) hangs forever
+        # waiting on a TTY that doesn't exist in a non-interactive context
+        # (CI, `zsh -c`, etc.) - and even in a real terminal it's a scary
+        # prompt on someone's very first shell launch.
+        compinit_args=(-u)
         mkdir -p "${zcompdump:h}"
     fi
     
