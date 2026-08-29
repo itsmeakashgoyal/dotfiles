@@ -191,6 +191,10 @@ check-stow: ## Verify stow is installed
 		exit 1; \
 	}
 
+.PHONY: print-%
+print-%: ## Print a Makefile variable's value (usage: make print-STOW_PACKAGES)
+	@echo $($*)
+
 .PHONY: list
 list: ## List all available stow packages
 	@echo "$(BLUE)Available stow packages:$(CLR)"

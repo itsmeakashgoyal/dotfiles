@@ -49,9 +49,11 @@ trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 DRY_RUN="${DRY_RUN:-0}"
 FORCE="${FORCE:-0}"
 
-# Package list — passed from the Makefile to stay a single source of truth.
-# Falls back to a sane default if invoked directly.
-STOW_PACKAGES="${STOW_PACKAGES:-git zsh nvim tmux television bin atuin fastfetch}"
+# Package list — the Makefile's STOW_PACKAGES is the single source of truth.
+# `make uninstall` passes it via env; a direct invocation queries the
+# Makefile instead, falling back to a snapshot only if that query fails.
+STOW_PACKAGES="${STOW_PACKAGES:-$(make -s -C "${DOTFILES_DIR}" print-STOW_PACKAGES 2>/dev/null || true)}"
+: "${STOW_PACKAGES:=git zsh nvim tmux television bin atuin fastfetch}"
 
 # ------------------------------------------------------------------------------
 # Helpers

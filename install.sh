@@ -66,8 +66,6 @@ _ensure_python3() {
 }
 
 _stow_packages() {
-    local packages=(git zsh nvim tmux)
-
     log::info "Cleaning up old symlinks..."
     local old_links=("$HOME/.zshenv" "$HOME/.config/nvim" "$HOME/.config/tmux"
                       "$HOME/.config/git" "$HOME/.config/zsh")
@@ -78,11 +76,10 @@ _stow_packages() {
         fi
     done
 
+    # Delegate to `make run` so the Makefile's STOW_PACKAGES list stays the
+    # single source of truth for which packages get stowed.
     log::info "Stowing dotfile packages..."
-    for pkg in "${packages[@]}"; do
-        log::substep "Stowing $pkg..."
-        stow --restow --dir="${DOTFILES_DIR}" --target="$HOME" "$pkg"
-    done
+    make -s -C "${DOTFILES_DIR}" run
     log::success "All packages stowed."
 }
 
