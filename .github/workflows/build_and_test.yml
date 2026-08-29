@@ -69,11 +69,18 @@ jobs:
 
       - name: Run shellcheck on all scripts
         run: |
-          echo "🔍 Checking bash/shell scripts..."
-          find . -type f \( -name "*.sh" -o -name "dutils" \) \
+          echo "🔍 Checking bash/zsh-family scripts..."
+          # scripts/dutils/dutils is Python and profile_zsh.sh is zsh - neither is
+          # a shellcheck-supported shell, so both are excluded rather than matched
+          # and then ignored (matching them produced two permanent SC1071 "error"
+          # findings that masked whether a real error existed underneath).
+          find . -type f -name "*.sh" \
             ! -path "*/node_modules/*" \
             ! -path "*/.git/*" \
-            -exec shellcheck -x {} + || echo "⚠️  Shellcheck found issues"
+            ! -name "profile_zsh.sh" \
+            -print0 | xargs -0 shellcheck -x --severity=error
+          echo "✅ No shellcheck errors (warnings/info are non-fatal - run shellcheck"
+          echo "   locally without --severity for the full report)"
 
       - name: Check file permissions
         run: |
@@ -90,12 +97,16 @@ jobs:
       - name: Validate YAML files
         run: |
           sudo apt-get install -y yamllint
-          yamllint .github/workflows/*.yml || true
+          yamllint .github/workflows/*.yml
 
       - name: Syntax-check Python scripts
         run: |
           echo "🐍 Checking Python syntax..."
-          python3 -m py_compile scripts/verify/check.py
+          find . -type f -name "*.py" \
+            ! -path "*/node_modules/*" \
+            ! -path "*/.git/*" \
+            -print0 | xargs -0 -n1 python3 -m py_compile
+          python3 -m py_compile scripts/dutils/dutils
           echo "✅ Python syntax OK"
 
   # Job 2: Test on macOS
@@ -140,14 +151,6 @@ jobs:
           rsync -av --exclude='.git' . "$HOME/dotfiles/"
           ls -la "$HOME/dotfiles"
 
-      - name: Make scripts executable
-        run: |
-          cd "$HOME/dotfiles"
-          echo "🔧 Making scripts executable..."
-          chmod +x install.sh bootstrap.sh
-          find scripts -type f -name "*.sh" -exec chmod +x {} +
-          chmod +x scripts/dutils/dutils
-
       - name: Run dotfiles installation
         run: |
           cd "$HOME/dotfiles"
@@ -160,6 +163,7 @@ jobs:
       - name: Verify installation
         run: |
           echo "✅ Verifying installation..."
+          fail=0
 
           # Configure Homebrew PATH for macOS
           if [[ -x "/opt/homebrew/bin/brew" ]]; then
@@ -182,7 +186,10 @@ jobs:
             exit 1
           fi
 
-          # Check core packages from Brewfile
+          # Check core packages from Brewfile. Every one of these is expected to
+          # be present after a real `brew bundle` run - a missing one means a
+          # first-time user's install silently dropped a package, so this fails
+          # the job rather than just warning.
           echo "🔍 Checking core packages..."
           # Check using actual binary names (format: "binary:package_name")
           # Compatible with Bash 3.2+ (macOS default)
@@ -195,36 +202,35 @@ jobs:
             "delta:git-delta"
             "lazygit:lazygit"
           )
-          failed=0
           for pkg in "${packages[@]}"; do
             binary="${pkg%%:*}"
             name="${pkg##*:}"
             if command -v "$binary" &> /dev/null; then
               echo "  ✅ $name"
             else
-              echo "  ⚠️  $name not found"
-              failed=$((failed + 1))
+              echo "  ❌ $name not found"
+              fail=1
             fi
           done
 
-          if [[ $failed -gt 3 ]]; then
-            echo "❌ Too many packages missing ($failed)"
-            exit 1
-          fi
-
-          # Check if symlinks were created
+          # Symlinks are the entire point of this repo - not creating one is a
+          # real failure, not a warning.
           if [[ -L "$HOME/.zshenv" ]]; then
             echo "✅ .zshenv symlinked"
           else
-            echo "⚠️  .zshenv not symlinked"
+            echo "❌ .zshenv not symlinked"
+            fail=1
           fi
 
-          # Check if dutils is accessible
+          # dutils is documented as a manual, one-time symlink step (see
+          # scripts/dutils/README.md) - install.sh doesn't create it, so its
+          # absence here isn't a failure, just informational.
           if [[ -f "$HOME/.local/bin/dutils" ]]; then
-            echo "✅ dutils installed"
+            echo "✅ dutils manually symlinked"
             "$HOME/.local/bin/dutils" version || true
           fi
 
+          [[ "$fail" -eq 0 ]] || { echo "❌ Installation verification failed"; exit 1; }
           echo "✅ Installation verified successfully"
           echo "ℹ️  Note: Zinit will auto-install on first Zsh launch"
 
@@ -357,14 +363,6 @@ jobs:
           rsync -av --exclude='.git' . "$HOME/dotfiles/"
           ls -la "$HOME/dotfiles"
 
-      - name: Make scripts executable
-        run: |
-          cd "$HOME/dotfiles"
-          echo "🔧 Making scripts executable..."
-          chmod +x install.sh bootstrap.sh
-          find scripts -type f -name "*.sh" -exec chmod +x {} +
-          chmod +x scripts/dutils/dutils
-
       - name: Run dotfiles installation
         run: |
           cd "$HOME/dotfiles"
@@ -377,6 +375,7 @@ jobs:
       - name: Verify installation
         run: |
           echo "✅ Verifying installation..."
+          fail=0
 
           # Bring the Nix + Home Manager profile onto PATH
           if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
@@ -404,37 +403,41 @@ jobs:
           # zsh (from apt)
           zsh --version || exit 1
 
-          # Confirm we did NOT install linuxbrew
+          # Confirm we did NOT install linuxbrew - this repo's whole point on
+          # Linux is Nix-only, so its presence means something installed it by
+          # mistake, not just a cosmetic difference.
           if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
-            echo "⚠️  linuxbrew present — expected Nix-only on Linux"
+            echo "❌ linuxbrew present — expected Nix-only on Linux"
+            fail=1
           else
             echo "✅ No linuxbrew (Nix-only as intended)"
           fi
 
-          # Check core CLI tools provided by Nix
+          # Check core CLI tools provided by Nix. Every one of these is expected
+          # to be present after a real `home-manager switch` run - a missing one
+          # means a first-time user's install silently dropped a tool, so this
+          # fails the job rather than just warning.
           echo "🔍 Checking Nix-provided tools..."
           packages=( bat eza tv rg nvim delta lazygit fd zoxide atuin )
-          failed=0
           for binary in "${packages[@]}"; do
             if command -v "$binary" &> /dev/null; then
               echo "  ✅ $binary"
             else
-              echo "  ⚠️  $binary not found"
-              failed=$((failed + 1))
+              echo "  ❌ $binary not found"
+              fail=1
             fi
           done
-          if [[ $failed -gt 3 ]]; then
-            echo "❌ Too many tools missing ($failed)"
-            exit 1
-          fi
 
-          # Check if symlinks were created
+          # Symlinks are the entire point of this repo - not creating one is a
+          # real failure, not a warning.
           if [[ -L "$HOME/.zshenv" ]]; then
             echo "✅ .zshenv symlinked"
           else
-            echo "⚠️  .zshenv not symlinked"
+            echo "❌ .zshenv not symlinked"
+            fail=1
           fi
 
+          [[ "$fail" -eq 0 ]] || { echo "❌ Installation verification failed"; exit 1; }
           echo "✅ Installation verified successfully"
           echo "ℹ️  Note: Zinit will auto-install on first Zsh launch"
 
