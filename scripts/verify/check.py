@@ -726,7 +726,7 @@ class DotfilesVerifier:
             return 0 if FullVerification().run().failed() == 0 else 1
 
         if mode in ("--packages", "packages"):
-            brewfile = self.DOTFILES_DIR / "packages" / "Brewfile"
+            brewfile = self.DOTFILES_DIR / "brew" / "Brewfile"
             return 0 if PackageChecker(brewfile).run().failed() == 0 else 1
 
         if mode in ("--system", "system"):
@@ -741,7 +741,7 @@ class DotfilesVerifier:
             if FullVerification().run().failed() > 0:
                 rc = 1
             print()
-            brewfile = self.DOTFILES_DIR / "packages" / "Brewfile"
+            brewfile = self.DOTFILES_DIR / "brew" / "Brewfile"
             if PackageChecker(brewfile).run().failed() > 0:
                 rc = 1
             print()

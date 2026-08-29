@@ -121,7 +121,7 @@ main() {
     # Packages — macOS uses Homebrew; Linux uses Nix (no linuxbrew anywhere)
     log::info "[STEP 4/8] Installing packages (DOTFILES_DIR=${DOTFILES_DIR})..."
     if os::is_mac; then
-        bash "${DOTFILES_DIR}/packages/install.sh"
+        bash "${DOTFILES_DIR}/scripts/setup/macos.sh"
     elif os::is_linux; then
         # 1) apt: system-level deps only (build-essential, stow, zsh, curl, …)
         run_script "linux"

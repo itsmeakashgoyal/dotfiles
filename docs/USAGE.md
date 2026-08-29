@@ -46,10 +46,10 @@ exec zsh
 
 ## Adding Homebrew Packages
 
-Edit `packages/Brewfile`, then:
+Edit `brew/Brewfile`, then:
 
 ```bash
-brew bundle --file=~/dotfiles/packages/Brewfile
+brew bundle --file=~/dotfiles/brew/Brewfile
 ```
 
 ---

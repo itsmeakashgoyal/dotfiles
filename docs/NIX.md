@@ -9,7 +9,7 @@ linuxbrew's glibc friction and shell-startup overhead.
 (zsh, nvim, tmux, …) are still symlinked by **GNU Stow**, and your shell config
 is still driven by **Zinit + Starship**. Nix does not touch any of that.
 
-**macOS is unchanged** — it keeps using Homebrew (`packages/Brewfile`) and Stow.
+**macOS is unchanged** — it keeps using Homebrew (`brew/Brewfile`) and Stow.
 
 ```text
 nix/
@@ -174,7 +174,7 @@ Brewfile for the Mac.
 
 | OS | Packages | System deps | Symlinks |
 | --- | --- | --- | --- |
-| **macOS** | Homebrew (`packages/install.sh` + `Brewfile`) | — | Stow |
+| **macOS** | Homebrew (`scripts/setup/macos.sh` + `Brewfile`) | — | Stow |
 | **Linux** | **Nix + Home Manager** (`nix/`) | apt (`scripts/setup/linux.sh`) | Stow |
 
 On Linux, `scripts/setup/linux.sh` installs *only* system-level apt deps

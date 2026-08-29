@@ -45,7 +45,7 @@ dotfiles/
 └── starship/    → ~/.config/starship/     Cross-shell prompt (default)
 ```
 
-`powershell/` is a tenth package-shaped directory that mirrors this same layout, but is deliberately **not** in `STOW_PACKAGES` — Windows uses its own symlink function instead of Stow (see [Windows](#windows)).
+`powershell/`, `brew/`, and `nix/` are top-level directories too, but none are Stow packages: `powershell/` mirrors the same package-shaped layout but is deliberately **not** in `STOW_PACKAGES` (Windows uses its own symlink function instead of Stow — see [Windows](#windows)); `brew/` and `nix/` are plain package-manager manifests (`brew/Brewfile`, `nix/home.nix`) consumed by `scripts/setup/macos.sh`/`nix.sh`, not directories Stow ever touches.
 
 ---
 
@@ -103,7 +103,7 @@ install.sh
      ├── 1. Self-locate DOTFILES_DIR (BASH_SOURCE-based), source scripts/lib/core.sh
      ├── 2. Set default shell → zsh
      ├── 3. OS branch:
-     │        macOS  → packages/install.sh   (Homebrew + Brewfile bundle)
+     │        macOS  → scripts/setup/macos.sh   (Homebrew + Brewfile bundle)
      │        Linux  → scripts/setup/linux.sh (apt system deps)
      │                 + scripts/setup/nix.sh (Nix + Home Manager: CLI tools)
      ├── 4. macOS only: scripts/setup/sublime.sh, scripts/setup/iterm.sh (settings/)
@@ -113,7 +113,7 @@ install.sh
 
 Linux does **not** use Linuxbrew — that was retired in favor of Nix + Home Manager (`nix/home.nix`) for CLI tools, with `apt` handling only system-level build dependencies. See [`NIX.md`](NIX.md) for details.
 
-There is no `scripts/setup/macos.sh` — macOS system-preference tweaks aren't currently automated; only Sublime Text and iTerm2 settings deployment are (`sublime.sh`, `iterm.sh`).
+`scripts/setup/macos.sh` only installs Homebrew and the `brew/Brewfile` bundle — macOS system-preference tweaks (Finder, Dock, keyboard) aren't automated; only Sublime Text and iTerm2 settings deployment are (`sublime.sh`, `iterm.sh`).
 
 ---
 
@@ -132,6 +132,7 @@ scripts/
 │   └── osdetect.py       ← same API, for the Python scripts below
 │
 ├── setup/
+│   ├── macos.sh          ← Homebrew + brew/Brewfile bundle install (macOS)
 │   ├── linux.sh          ← apt system deps only (Ubuntu/Debian)
 │   ├── nix.sh            ← installs Nix + applies nix/home.nix (Linux CLI tools)
 │   ├── sublime.sh        ← Sublime Text config deployment (macOS)

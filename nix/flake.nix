@@ -8,7 +8,7 @@
 # linuxbrew, no Homebrew). Manages CLI *packages* only: GNU Stow still
 # symlinks your zsh/nvim/tmux configs, this doesn't touch that.
 #
-# macOS is untouched and keeps using Homebrew (packages/Brewfile).
+# macOS is untouched and keeps using Homebrew (brew/Brewfile).
 #
 # Usage:
 #   make nix-setup     # first-time install (installs Nix + applies this)

@@ -19,7 +19,7 @@ name: Test Dotfiles Setup
       - "bootstrap.sh"
       - "Makefile"
       - "scripts/**"
-      - "packages/**"
+      - "brew/**"
       - "nix/**"
       - "zsh/**"
       - "nvim/**"

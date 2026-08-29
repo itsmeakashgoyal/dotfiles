@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ packages/install.sh
+# ░▓ file   ▓ scripts/setup/macos.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # ------------------------------------------------------------------------------
@@ -13,7 +13,7 @@
 set -euo pipefail
 
 # Load shared library
-DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 export DOTFILES_DIR
 CORE="${DOTFILES_DIR}/scripts/lib/core.sh"
 if [[ ! -f "$CORE" ]]; then
@@ -25,8 +25,8 @@ source "$CORE"
 # ------------------------------------------------------------------------------
 # Configuration
 # ------------------------------------------------------------------------------
-readonly PACKAGES_DIR="${DOTFILES_DIR}/packages"
-readonly BREWFILE="${PACKAGES_DIR}/Brewfile"
+readonly BREW_DIR="${DOTFILES_DIR}/brew"
+readonly BREWFILE="${BREW_DIR}/Brewfile"
 
 # ------------------------------------------------------------------------------
 # Homebrew Functions

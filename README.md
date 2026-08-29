@@ -33,7 +33,7 @@ A comprehensive, automated dotfiles setup for **macOS**, **Linux**, and **Window
 - **Git** -- 40+ aliases, delta diff viewer, XDG-compliant config
 - **Tmux** -- TPM plugin manager, vim-aware pane switching, session persistence
 - **Oh My Posh** -- Custom prompt theme
-- **CLI tools** -- macOS via Homebrew (`packages/Brewfile`); **Linux via Nix + Home Manager** (`nix/`, replaces linuxbrew) -- eza, bat, ripgrep, fd, zoxide, and more. See [docs/NIX.md](docs/NIX.md)
+- **CLI tools** -- macOS via Homebrew (`brew/Brewfile`); **Linux via Nix + Home Manager** (`nix/`, replaces linuxbrew) -- eza, bat, ripgrep, fd, zoxide, and more. See [docs/NIX.md](docs/NIX.md)
 
 ---
 
@@ -178,7 +178,7 @@ dotfiles/
 ├── nvim/                      → ~/.config/nvim/         Neovim editor setup
 ├── tmux/                      → ~/.config/tmux/         Tmux multiplexer
 ├── powershell/                → ~/Documents/PowerShell/ PowerShell profile (Windows)
-├── packages/                  Brewfile & install script (macOS)
+├── brew/                      Brewfile — Homebrew package manifest (macOS)
 ├── nix/                       Home Manager flake — Linux packages (replaces linuxbrew)
 ├── scripts/                   Setup, verification, utilities
 ├── settings/                  App preferences (iTerm, Sublime)

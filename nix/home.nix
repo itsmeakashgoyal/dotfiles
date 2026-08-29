@@ -4,7 +4,7 @@
 # ░▓ file   ▓ nix/home.nix
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Home Manager module — the Nix equivalent of packages/Brewfile.
+# Home Manager module — the Nix equivalent of brew/Brewfile.
 # Mirrors the CLI tools your dotfiles depend on. Edit the list below,
 # then run `make nix-switch` to apply.
 #
@@ -27,7 +27,7 @@
   programs.home-manager.enable = true;
 
   # ──────────────────────────────────────────────────────────────────
-  # Packages — mirrors the CLI tools in packages/Brewfile
+  # Packages — mirrors the CLI tools in brew/Brewfile
   # Search names at https://search.nixos.org/packages
   # ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [

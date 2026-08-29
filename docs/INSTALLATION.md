@@ -75,7 +75,7 @@ The installer runs through these stages in order:
 | Stage | What happens |
 | --- | --- |
 | **Default shell** | Adds `zsh` to `/etc/shells` if missing, then sets it as your login shell via `chsh`. |
-| **Package manager (macOS)** | Installs Homebrew, updates it, then installs every formula and cask listed in `packages/Brewfile`. |
+| **Package manager (macOS)** | Installs Homebrew, updates it, then installs every formula and cask listed in `brew/Brewfile`. |
 | **Package manager (Linux)** | Runs `scripts/setup/linux.sh` (apt system deps only), then `scripts/setup/nix.sh` (installs Nix + applies `nix/home.nix` via Home Manager for CLI tools — Homebrew/Linuxbrew is **not** used on Linux). |
 | **macOS-only extras** | `scripts/setup/sublime.sh` and `scripts/setup/iterm.sh` deploy settings from `settings/` (skipped in CI). |
 | **Stow** | Removes any old manual symlinks, then runs `make run` to stow every package listed in `STOW_PACKAGES` (`make print-STOW_PACKAGES` to see the current list — 8 packages as of this writing). |
