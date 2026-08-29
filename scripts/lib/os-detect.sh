@@ -12,13 +12,18 @@
 # it directly for the same reason.
 #
 # Guard prevents double-sourcing within the SAME process (readonly below
-# would otherwise error on a second source). Deliberately NOT exported:
-# `exec zsh` replaces the process but preserves its environment, while zsh
-# functions do NOT survive exec (no equivalent of bash's `export -f`) — an
-# exported guard would make the new process wrongly believe os::is_mac etc.
-# were already defined when they never were in *that* process, and skip
-# defining them, leaving `01-exports.zsh` calling undefined functions.
-[[ -n "${OS_DETECT_LOADED:-}" ]] && return 0
+# would otherwise error on a second source). Deliberately NOT exported
+# going forward (see git history for why), but also deliberately not
+# trusted on its own: also verify os::is_mac is actually a function in
+# *this* process before skipping. A shell that already had
+# OS_DETECT_LOADED=true exported into its environment before this fix —
+# then kept it via one or more `exec zsh` calls, which preserve the
+# environment indefinitely even though zsh functions never survive exec —
+# would otherwise see a stale "already loaded" guard and skip defining
+# anything, forever, until that whole process tree ends. Checking the
+# function directly makes an already-affected shell self-heal on its very
+# next source, instead of requiring a brand new terminal session.
+[[ -n "${OS_DETECT_LOADED:-}" ]] && type os::is_mac >/dev/null 2>&1 && return 0
 
 OS_TYPE=$(uname)
 readonly OS_TYPE
