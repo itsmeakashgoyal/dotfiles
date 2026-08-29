@@ -5,12 +5,13 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # VHS script that records docs/assets/demo.gif, embedded in README.md.
-# Regenerate with (from the repo root):
-#   vhs docs/assets/demo.tape
-#   ffmpeg -y -i docs/assets/demo.gif -vf \
-#     "fps=15,scale=1000:-1:flags=lanczos,split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse=dither=bayer" \
-#     docs/assets/demo.gif
-# (the ffmpeg pass halves the file size via a shared color palette + lower fps/width)
+# Regenerate with: vhs docs/assets/demo.tape (run from the repo root).
+#
+# Don't re-encode the output afterward (e.g. via ffmpeg palettegen with a
+# lower fps/width and dithering) to shave file size - it visibly degrades
+# text sharpness on this kind of flat-color terminal content for little
+# actual size win, since VHS's own ffmpeg-based GIF encoder is already
+# well-optimized. Ship VHS's raw output as-is.
 
 Output docs/assets/demo.gif
 
