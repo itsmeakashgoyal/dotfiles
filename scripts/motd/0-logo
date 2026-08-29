@@ -2,10 +2,10 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ update-motd.d/0-logo
+# ░▓ file   ▓ scripts/motd/0-logo
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# MOTD banner (ASCII logo). Manual install — see update-motd.d/README.md.
+# MOTD banner (ASCII logo). Manual install — see scripts/motd/README.md.
 
 cat <<EndOfText
 

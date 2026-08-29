@@ -152,7 +152,10 @@ scripts/
 │   ├── profile_zsh.sh    ← zprof startup profiling (`make bench-detail`)
 │   └── dutils            ← CLI wrapping various helper functions
 │
-└── tmux/                 ← tmux-invoked helper scripts (pane/session utilities)
+├── tmux/                 ← tmux-invoked helper scripts (pane/session utilities)
+│
+└── motd/                 ← Ubuntu /etc/update-motd.d banner scripts — manual
+                              install only, see scripts/motd/README.md
 ```
 
 There is a single verification implementation (`check.py`), not several separate scripts — `make health`, `make check`, `make sysinfo`, `make packages`, and `make diagnose` all dispatch into it with different mode flags.
