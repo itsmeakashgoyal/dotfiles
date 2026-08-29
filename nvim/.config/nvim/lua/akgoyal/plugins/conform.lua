@@ -22,7 +22,7 @@ return {
 	opts = {
 		formatters_by_ft = {
 			lua = { "stylua" },
-			python = { "isort", "black" },
+			python = { "ruff_organize_imports", "ruff_fix", "ruff_format" },
 			c = { "clang-format" },
 			cpp = { "clang-format" },
 			sh = { "shfmt" },

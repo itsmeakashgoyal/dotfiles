@@ -4,8 +4,8 @@
 -- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/lsp/mason.lua
 -- ░▓▓▓▓▓▓▓▓▓▓
 --
--- Mason: LSP/DAP/formatter/linter installer, plus native LSP server config (clangd, pyright,
--- lua_ls) and on-attach keymaps.
+-- Mason: LSP/DAP/formatter/linter installer, plus native LSP server config (clangd, basedpyright,
+-- ruff, lua_ls) and on-attach keymaps.
 return {
 	"williamboman/mason.nvim",
 	lazy = false,
@@ -45,7 +45,8 @@ return {
 		mason_lspconfig.setup({
 			ensure_installed = {
 				"clangd",
-				"pyright",
+				"basedpyright",
+				"ruff",
 				"lua_ls",
 			},
 			automatic_enable = false, -- we call vim.lsp.enable() ourselves
@@ -55,9 +56,6 @@ return {
 			ensure_installed = {
 				"clang-format", -- C/C++ formatter
 				"codelldb", -- C/C++ debugger
-				"black", -- Python formatter
-				"isort", -- Python import sorter
-				"pylint", -- Python linter
 				"shfmt", -- Shell formatter
 				"shellcheck", -- Shell linter
 				"stylua", -- Lua formatter
@@ -102,22 +100,28 @@ return {
 			single_file_support = true,
 		})
 
-		-- Pyright (Python)
-		vim.lsp.config("pyright", {
+		-- Basedpyright (Python types/hover/completion) - pip-installed, unlike
+		-- pyright/bashls which need Node.js (not provisioned by this repo on
+		-- macOS/Ubuntu, only Windows) - see brew/Brewfile vs. windows.ps1.
+		vim.lsp.config("basedpyright", {
 			settings = {
-				python = {
+				basedpyright = {
 					analysis = {
 						typeCheckingMode = "basic",
-						autoSearchPaths = true,
-						useLibraryCodeForTypes = true,
 						diagnosticMode = "workspace",
 					},
 				},
 			},
 		})
 
+		-- Ruff (Python lint + format, via LSP) - prebuilt binary, no Node/pip
+		-- toolchain needed either. Replaces black+isort+pylint (conform.lua);
+		-- pylint was installed but never wired to any linter, so this is a
+		-- strict improvement, not just a swap.
+		vim.lsp.config("ruff", {})
+
 		-- Enable all configured servers
-		vim.lsp.enable({ "lua_ls", "clangd", "pyright" })
+		vim.lsp.enable({ "lua_ls", "clangd", "basedpyright", "ruff" })
 
 		-- ======================================================================
 		-- LSP Keymaps (on attach)
