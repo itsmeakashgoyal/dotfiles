@@ -1,4 +1,11 @@
-# config for stylua, ref: https://github.com/JohnnyMorganz/StyLua
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ nvim/.config/nvim/stylua.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Stylua formatter settings for this nvim config's Lua files.
+# Ref: https://github.com/JohnnyMorganz/StyLua
 column_width = 120
 line_endings = "Unix"
 indent_type = "Spaces"
