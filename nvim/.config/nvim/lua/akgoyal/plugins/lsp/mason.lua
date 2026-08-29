@@ -12,7 +12,6 @@ return {
 	dependencies = {
 		"williamboman/mason-lspconfig.nvim",
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
-		"hrsh7th/cmp-nvim-lsp",
 		"neovim/nvim-lspconfig",
 		{ "antosha417/nvim-lsp-file-operations", config = true },
 		{
@@ -29,7 +28,6 @@ return {
 		local mason = require("mason")
 		local mason_lspconfig = require("mason-lspconfig")
 		local mason_tool_installer = require("mason-tool-installer")
-		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
 		-- ======================================================================
 		-- Mason setup (binary installer)
@@ -70,11 +68,6 @@ return {
 		-- ======================================================================
 		-- Native LSP configuration (Neovim 0.12+)
 		-- ======================================================================
-
-		-- Global capabilities for all servers (nvim-cmp integration)
-		vim.lsp.config("*", {
-			capabilities = cmp_nvim_lsp.default_capabilities(),
-		})
 
 		-- Lua Language Server (with Neovim-specific settings)
 		vim.lsp.config("lua_ls", {
@@ -133,6 +126,14 @@ return {
 			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
 				local opts = { buffer = ev.buf, silent = true }
+
+				-- Native LSP completion (Neovim 0.12+) - replaces nvim-cmp.
+				vim.lsp.completion.enable(true, ev.data.client_id, ev.buf, { autotrigger = true })
+
+				opts.desc = "Trigger completion manually"
+				vim.keymap.set("i", "<C-Space>", function()
+					vim.lsp.completion.get()
+				end, opts)
 
 				opts.desc = "Show LSP references"
 				vim.keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
