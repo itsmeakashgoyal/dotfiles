@@ -257,7 +257,12 @@ run_script() {
 # ==============================================================================
 # Environment Constants
 # ==============================================================================
-readonly DOTFILES_DIR="${HOME}/dotfiles"
+# Preserve a caller-provided DOTFILES_DIR (callers self-locate via
+# BASH_SOURCE before sourcing this file, since they need this path to find
+# core.sh in the first place). Falls back to the legacy default for anyone
+# sourcing this directly without that self-location step.
+DOTFILES_DIR="${DOTFILES_DIR:-${HOME}/dotfiles}"
+readonly DOTFILES_DIR
 readonly CONFIG_DIR="${HOME}/.config"
 readonly BACKUP_DIR="${HOME}/linuxtoolbox"
 export DOTFILES_DIR CONFIG_DIR BACKUP_DIR
