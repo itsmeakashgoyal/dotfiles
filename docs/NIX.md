@@ -13,7 +13,7 @@ is still driven by **Zinit + Starship**. Nix does not touch any of that.
 
 ```text
 nix/
-├── flake.nix     # inputs (nixpkgs + home-manager) + users list / arch
+├── flake.nix     # inputs (nixpkgs + home-manager) + one dynamic home config
 ├── home.nix      # the package list — your Brewfile's CLI tools, in Nix
 └── flake.lock    # auto-generated version pins (commit this)
 ```
@@ -32,22 +32,19 @@ deps only) then Nix + Home Manager for all CLI tools:
 ```bash
 cd ~/dotfiles
 
-# 1. Make sure your Linux $USER is in the flake's users list.
-#    Edit nix/flake.nix (architecture is auto-detected — no system line):
-#      users = [ "akashgoyal" "runner" "<your $USER>" ];
-
-# 2. Run the installer (Linux → Nix path automatically)
+# Run the installer (Linux → Nix path automatically) — no config edits needed
 make install
 
-# 3. Open a new shell so the Nix profile is on PATH
+# Open a new shell so the Nix profile is on PATH
 exec zsh
 ```
 
-> **Architecture is auto-detected.** The flake builds configs for both
-> `x86_64-linux` and `aarch64-linux`, named `<user>-<system>` (e.g.
-> `runner-x86_64-linux`). `make nix-*` and `scripts/setup/nix.sh` pick the
-> right one from `uname -m`, so the same flake works on Intel/AMD and ARM
-> machines and on CI with no edits.
+> **No per-machine or per-user edits, ever.** The flake exposes a single
+> `homeConfigurations.default`, applied with `--impure` so it reads your
+> `$USER` and current architecture dynamically at apply-time
+> (`builtins.getEnv "USER"` / `builtins.currentSystem`) instead of requiring
+> a hardcoded list of usernames/systems to keep in sync. The same flake
+> works unmodified on Intel/AMD, ARM, your machine, and CI.
 
 To (re)apply just the Nix package set without the full installer:
 
@@ -57,8 +54,7 @@ make nix-setup     # installs Nix if missing, then home-manager switch
 
 `make nix-setup` uses the [Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer)
 (flakes enabled by default, clean uninstall), then runs `home-manager switch`.
-It refuses to run on macOS, auto-detects your architecture from `uname -m`, and
-verifies your `$USER` is in the flake's `users` list before doing anything.
+It refuses to run on macOS.
 
 ---
 
@@ -215,9 +211,9 @@ and linuxbrew are unaffected.
 
 When you're ready to unify both machines:
 
-- Add `"aarch64-darwin"` (Apple Silicon) to the `systems` list in `flake.nix`
-  — the `<user>-<system>` configs generate automatically — **or** adopt
-  [nix-darwin](https://github.com/LnL7/nix-darwin) for system-level macOS bits.
+- `builtins.currentSystem` already resolves to `aarch64-darwin`/`x86_64-darwin`
+  on a Mac, so `homeConfigurations.default` would work there unmodified — **or**
+  adopt [nix-darwin](https://github.com/LnL7/nix-darwin) for system-level macOS bits.
 - The same `home.nix` package list can be shared across both via a small
   refactor (split common vs per-OS packages).
 - Decide then whether to also move dotfiles from Stow → Home Manager
@@ -236,14 +232,10 @@ Not needed now — the Linux setup stands on its own.
 → Flakes only read git-tracked files. Run `git add nix/` (the setup script does
 this automatically) and retry.
 
-**`error: flake output attribute 'homeConfigurations.<name>' does not exist`**
-→ Your `$USER` isn't in the `users` list in `nix/flake.nix`. Add it:
-`users = [ "akashgoyal" "runner" "<your $USER>" ];`
-
-**Wrong architecture**
-→ Auto-detected from `uname -m`; the flake builds for both `x86_64-linux` and
-`aarch64-linux`. If you hit an unsupported arch, add it to the `systems` list in
-`nix/flake.nix`.
+**`error: flake output attribute 'homeConfigurations.default' does not exist`**
+→ Make sure you're passing `--impure` (both `scripts/setup/nix.sh` and
+`make nix-switch` already do) — without it, `builtins.getEnv`/
+`builtins.currentSystem` can't evaluate and the config never gets built.
 
 **A package isn't found**
 → Search the exact attribute at <https://search.nixos.org/packages>; names
