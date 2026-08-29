@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/recent-files.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# List recently modified files (via git or filesystem)
 [metadata]
 name = "recent-files"
 description = "List recently modified files (via git or filesystem)"

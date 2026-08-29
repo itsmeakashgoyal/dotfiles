@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/path.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Investigate PATH contents
 [metadata]
 name = "path"
 description = "Investigate PATH contents"

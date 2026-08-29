@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/zoxide.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Browse zoxide directory history
 [metadata]
 name = "zoxide"
 description = "Browse zoxide directory history"

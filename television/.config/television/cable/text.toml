@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/text.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# A channel to find and select text from files
 [metadata]
 name = "text"
 description = "A channel to find and select text from files"

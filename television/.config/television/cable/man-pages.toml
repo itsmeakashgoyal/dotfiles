@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/man-pages.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Browse and preview system manual pages
 [metadata]
 name = "man-pages"
 description = "Browse and preview system manual pages"

@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/git-reflog.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# A channel to select from git reflog entries
 [metadata]
 name = "git-reflog"
 description = "A channel to select from git reflog entries"

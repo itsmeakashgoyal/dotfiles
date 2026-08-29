@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/gh-prs.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# List GitHub PRs for the current repo
 [metadata]
 name = "gh-prs"
 description = "List GitHub PRs for the current repo"

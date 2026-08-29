@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/tmux-sessions.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# List and manage tmux sessions
 [metadata]
 name = "tmux-sessions"
 description = "List and manage tmux sessions"

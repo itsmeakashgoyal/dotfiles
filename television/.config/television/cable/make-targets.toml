@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/make-targets.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# List and run Makefile targets
 [metadata]
 name = "make-targets"
 description = "List and run Makefile targets"

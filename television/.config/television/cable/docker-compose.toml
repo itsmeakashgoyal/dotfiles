@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/docker-compose.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Manage Docker Compose services
 [metadata]
 name = "docker-compose"
 description = "Manage Docker Compose services"
