@@ -8,15 +8,14 @@
 # Clean up dotfiles, Homebrew, Neovim, tmux configurations.
 
 import argparse
+import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
-import osdetect  # noqa: E402
-
 HOME = Path.home()
+UNINSTALL_SH = Path(__file__).resolve().parent.parent / "setup" / "uninstall.sh"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -36,67 +35,33 @@ def _confirm(prompt: str) -> bool:
         if answer in ("n", "no", ""):
             return False
 
+def _run_uninstall(steps: str, force: bool) -> None:
+    """Delegate to scripts/setup/uninstall.sh for the given steps.
+
+    Resolved by path, not by sourcing DOTFILES_DIR/XDG_DOTFILES_DIR from the
+    caller's environment - uninstall.sh's own BASH_SOURCE-based self-location
+    figures out the repo root correctly on its own once invoked this way.
+    """
+    env = os.environ.copy()
+    env["STEPS"] = steps
+    if force:
+        env["FORCE"] = "1"
+    subprocess.run(["bash", str(UNINSTALL_SH)], env=env, check=False)
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Cleanup Functions
 # ──────────────────────────────────────────────────────────────────────────────
 
-def cleanup_dotfiles() -> None:
+def cleanup_dotfiles(force: bool = False) -> None:
     print("Removing dotfile symlinks...")
-    symlinks = [
-        HOME / ".zshenv",
-        HOME / ".config" / "nvim",
-        HOME / ".config" / "tmux",
-        HOME / ".config" / "git",
-        HOME / ".config" / "zsh",
-    ]
-    for link in symlinks:
-        if link.is_symlink():
-            link.unlink()
-            _ok(f"Removed symlink: {link}")
-        else:
-            _info(f"Skipping (not a symlink): {link}")
+    _run_uninstall("unstow,sweep", force)
 
 
-def cleanup_homebrew() -> None:
+def cleanup_homebrew(force: bool = False) -> None:
     if shutil.which("brew") is None:
         _info("Homebrew not found, skipping.")
         return
-
-    print("This will uninstall Homebrew and all installed packages.")
-    if not _confirm("Uninstall Homebrew and all packages?"):
-        print("Skipping Homebrew cleanup.")
-        return
-
-    # Remove all formulae
-    result = subprocess.run(["brew", "list", "--formula"], capture_output=True, text=True)
-    formulae = result.stdout.split()
-    if formulae:
-        subprocess.run(["brew", "remove", "--force"] + formulae, check=False)
-
-    # Remove casks (macOS) or remaining packages (Linux)
-    if osdetect.is_mac():
-        result = subprocess.run(["brew", "list", "--cask"], capture_output=True, text=True)
-        casks = result.stdout.split()
-        if casks:
-            subprocess.run(["brew", "remove", "--cask", "--force"] + casks, check=False)
-    else:
-        result = subprocess.run(["brew", "list"], capture_output=True, text=True)
-        pkgs = result.stdout.split()
-        if pkgs:
-            subprocess.run(["brew", "remove", "--force"] + pkgs, check=False)
-
-    # Uninstall Homebrew itself
-    subprocess.run(
-        ["/bin/bash", "-c",
-         'NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"'],
-        check=False,
-    )
-
-    linuxbrew = Path("/home/linuxbrew/.linuxbrew")
-    if linuxbrew.exists():
-        subprocess.run(["sudo", "rm", "-rf", str(linuxbrew)], check=False)
-
-    _ok("Homebrew uninstalled successfully")
+    _run_uninstall("homebrew", force)
 
 
 def cleanup_nvim() -> None:
@@ -188,9 +153,15 @@ def main() -> None:
         if not _confirm("Continue?"):
             sys.exit(0)
 
-    # Execute
+    # Execute. dotfiles/homebrew delegate to uninstall.sh and take the -y flag
+    # as their own FORCE (skips uninstall.sh's confirm too); nvim/tmux don't
+    # shell out to anything, so they have nothing to force-skip.
     for component in components:
-        COMPONENTS[component][0]()
+        fn = COMPONENTS[component][0]
+        if component in ("dotfiles", "homebrew"):
+            fn(args.yes)
+        else:
+            fn()
 
     print("\n\033[32m✓\033[0m Cleanup completed!")
 
