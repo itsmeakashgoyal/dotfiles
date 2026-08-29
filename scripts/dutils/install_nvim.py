@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/install_nvim.py
+# ░▓ file   ▓ scripts/dutils/install_nvim.py
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Install the latest Neovim from GitHub releases (Linux only).

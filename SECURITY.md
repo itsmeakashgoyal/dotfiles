@@ -51,7 +51,7 @@ pre-commit install
 
 ## SSH Key Hardening
 
-The included `scripts/utils/_setup_ssh.sh` generates **Ed25519** keys (preferred over RSA). After generation:
+The included `scripts/dutils/setup_ssh.sh` generates **Ed25519** keys (preferred over RSA). After generation:
 
 1. Add a passphrase to your key
 2. Use `ssh-agent` or macOS Keychain to avoid re-entering it

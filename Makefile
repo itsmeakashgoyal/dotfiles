@@ -259,7 +259,7 @@ bench: ## Benchmark zsh startup time (requires hyperfine)
 
 .PHONY: bench-detail
 bench-detail: ## Profile zsh startup with zprof (function-level breakdown)
-	@zsh scripts/utils/profile_zsh.sh
+	@zsh scripts/dutils/profile_zsh.sh
 
 ##@ Windows
 

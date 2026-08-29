@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/print_functions.py
+# ░▓ file   ▓ scripts/dutils/print_functions.py
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # List all custom zsh functions with their descriptions.
@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 FUNCTIONS_FILE = (
-    Path.home() / "dotfiles" / "zsh" / ".config" / "zsh" / "conf.d" / "functions.zsh"
+    Path.home() / "dotfiles" / "zsh" / ".config" / "zsh" / "conf.d" / "05-functions.zsh"
 )
 
 # ──────────────────────────────────────────────────────────────────────────────

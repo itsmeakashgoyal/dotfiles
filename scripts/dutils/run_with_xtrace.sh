@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/_run_with_xtrace.sh
+# ░▓ file   ▓ scripts/dutils/run_with_xtrace.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # The set -e option instructs bash to immediately exit if any command has a non-zero exit status

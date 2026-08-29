@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/_setup_ssh.sh
+# ░▓ file   ▓ scripts/dutils/setup_ssh.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # ------------------------------

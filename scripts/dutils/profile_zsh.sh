@@ -2,10 +2,10 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/profile_zsh.sh
+# ░▓ file   ▓ scripts/dutils/profile_zsh.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Profile zsh startup time. Usage: zsh ./scripts/utils/profile_zsh.sh
+# Profile zsh startup time. Usage: zsh ./scripts/dutils/profile_zsh.sh
 
 ZDOTDIR="${ZDOTDIR:-$HOME/.config/zsh}"
 

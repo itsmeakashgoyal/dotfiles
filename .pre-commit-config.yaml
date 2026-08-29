@@ -29,7 +29,7 @@ repos:
     hooks:
       - id: shellcheck
         args: ["-x", "--severity=warning"]
-        files: "\\.sh$|^scripts/utils/dutils$"
+        files: "\\.sh$|^scripts/dutils/dutils$"
 
   # Shell script formatting
   - repo: https://github.com/scop/pre-commit-shfmt

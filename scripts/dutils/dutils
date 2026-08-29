@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/dutils
+# ░▓ file   ▓ scripts/dutils/dutils
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Unified dotfiles utility tool — single entry point for all utility scripts.
@@ -45,7 +45,7 @@ def cmd_cleanup(args: list[str]) -> None:
 
 
 def cmd_ssh_keygen(args: list[str]) -> None:
-    _exec_shell("_setup_ssh.sh", args)
+    _exec_shell("setup_ssh.sh", args)
 
 
 def cmd_detect_os(_args: list[str]) -> None:
@@ -79,7 +79,7 @@ def cmd_detect_os(_args: list[str]) -> None:
 
 
 def cmd_diff(args: list[str]) -> None:
-    _exec_shell("_diff_files_interactive.sh", args)
+    _exec_shell("diff_files_interactive.sh", args)
 
 
 def cmd_install_nvim(args: list[str]) -> None:
@@ -95,7 +95,7 @@ def cmd_list_functions(args: list[str]) -> None:
 
 
 def cmd_debug(args: list[str]) -> None:
-    _exec_shell("_run_with_xtrace.sh", args)
+    _exec_shell("run_with_xtrace.sh", args)
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Registry

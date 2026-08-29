@@ -114,7 +114,7 @@ Generate and configure SSH keys for GitHub or other services.
 ### Usage
 
 ```bash
-./scripts/utils/_setup_ssh.sh -e EMAIL [-t KEY_TYPE]
+./scripts/dutils/setup_ssh.sh -e EMAIL [-t KEY_TYPE]
 ```
 
 | Flag | Description | Default |
@@ -127,10 +127,10 @@ Generate and configure SSH keys for GitHub or other services.
 
 ```bash
 # Generate an Ed25519 key (recommended)
-./scripts/utils/_setup_ssh.sh -e you@example.com
+./scripts/dutils/setup_ssh.sh -e you@example.com
 
 # Generate an RSA key (for legacy systems that don't support Ed25519)
-./scripts/utils/_setup_ssh.sh -e you@example.com -t rsa
+./scripts/dutils/setup_ssh.sh -e you@example.com -t rsa
 ```
 
 ### What it does

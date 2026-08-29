@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/cleanup.py
+# ░▓ file   ▓ scripts/dutils/cleanup.py
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Clean up dotfiles, Homebrew, Neovim, tmux configurations.

@@ -78,7 +78,7 @@ jobs:
       - name: Check file permissions
         run: |
           echo "🔐 Checking executable permissions..."
-          scripts="install.sh bootstrap.sh scripts/**/*.sh scripts/utils/dutils"
+          scripts="install.sh bootstrap.sh scripts/**/*.sh scripts/dutils/dutils"
           for script in $scripts; do
             if [[ -f "$script" ]] && [[ ! -x "$script" ]]; then
               echo "❌ Missing execute permission: $script"
@@ -146,7 +146,7 @@ jobs:
           echo "🔧 Making scripts executable..."
           chmod +x install.sh bootstrap.sh
           find scripts -type f -name "*.sh" -exec chmod +x {} +
-          chmod +x scripts/utils/dutils
+          chmod +x scripts/dutils/dutils
 
       - name: Run dotfiles installation
         run: |
@@ -363,7 +363,7 @@ jobs:
           echo "🔧 Making scripts executable..."
           chmod +x install.sh bootstrap.sh
           find scripts -type f -name "*.sh" -exec chmod +x {} +
-          chmod +x scripts/utils/dutils
+          chmod +x scripts/dutils/dutils
 
       - name: Run dotfiles installation
         run: |
