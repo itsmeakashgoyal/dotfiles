@@ -354,6 +354,14 @@ function Test-Installation {
 
     Write-Host ""
     Write-Host "  Score: $passed/$total checks passed" -ForegroundColor $(if ($passed -eq $total) { "Green" } else { "Yellow" })
+
+    # In CI, an incomplete health check is a real failure, not just a status
+    # line — mirrors install.sh's `[[ -n "$CI" ]]` strictness convention.
+    # Interactive/personal runs stay lenient (report and continue).
+    if ($env:CI -and $passed -ne $total) {
+        Write-Host "::error::Health check incomplete: $passed/$total" -ForegroundColor Red
+        exit 1
+    }
 }
 
 # ==============================================================================
