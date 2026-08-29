@@ -73,7 +73,10 @@ def cleanup_nvim() -> None:
         HOME / ".cache" / "nvim",
     ]
     for d in dirs:
-        if d.exists():
+        if d.is_symlink():
+            d.unlink()
+            _ok(f"Removed symlink: {d}")
+        elif d.exists():
             shutil.rmtree(d)
             _ok(f"Removed: {d}")
 
@@ -85,7 +88,10 @@ def cleanup_tmux() -> None:
         HOME / ".tmux",
     ]
     for d in dirs:
-        if d.exists():
+        if d.is_symlink():
+            d.unlink()
+            _ok(f"Removed symlink: {d}")
+        elif d.exists():
             shutil.rmtree(d)
             _ok(f"Removed: {d}")
 
