@@ -5,7 +5,7 @@
 -- ░▓▓▓▓▓▓▓▓▓▓
 --
 -- Mason: LSP/DAP/formatter/linter installer, plus native LSP server config (clangd, pyright,
--- bashls, lua_ls, gopls) and on-attach keymaps.
+-- lua_ls) and on-attach keymaps.
 return {
 	"williamboman/mason.nvim",
 	lazy = false,
@@ -48,9 +48,7 @@ return {
 			ensure_installed = {
 				"clangd",
 				"pyright",
-				"bashls",
 				"lua_ls",
-				"gopls",
 			},
 			automatic_enable = false, -- we call vim.lsp.enable() ourselves
 		})
@@ -66,9 +64,6 @@ return {
 				"shellcheck", -- Shell linter
 				"stylua", -- Lua formatter
 				"debugpy", -- Python debugger
-				"goimports", -- Go import organizer
-				"gofumpt", -- Go formatter
-				"rust-analyzer", -- Rust language server
 			},
 		})
 
@@ -128,26 +123,8 @@ return {
 			},
 		})
 
-		-- Bash Language Server
-		vim.lsp.config("bashls", {
-			filetypes = { "sh", "bash", "zsh" },
-		})
-
-		-- Go Language Server
-		vim.lsp.config("gopls", {
-			settings = {
-				gopls = {
-					analyses = {
-						unusedparams = true,
-					},
-					staticcheck = true,
-					gofumpt = true,
-				},
-			},
-		})
-
 		-- Enable all configured servers
-		vim.lsp.enable({ "lua_ls", "clangd", "pyright", "bashls", "gopls" })
+		vim.lsp.enable({ "lua_ls", "clangd", "pyright" })
 
 		-- ======================================================================
 		-- LSP Keymaps (on attach)

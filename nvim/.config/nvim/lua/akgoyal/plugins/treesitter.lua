@@ -43,13 +43,6 @@ return {
                     "json",        -- JSON files
                     "yaml",        -- YAML files
                     "toml",        -- TOML files (Python configs)
-                    "go",          -- Go language
-                    "gomod",       -- Go modules
-                    "gowork",      -- Go workspaces
-                    "gosum",       -- Go checksums
-                    "rust",        -- Rust language
-                    "sql",         -- SQL queries
-                    "http",        -- HTTP requests
                 },
                 incremental_selection = {
                     enable = true,

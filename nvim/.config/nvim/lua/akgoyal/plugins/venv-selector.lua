@@ -7,7 +7,6 @@
 -- Venv-selector: picks a Python virtualenv to use for the LSP, loaded for Python files.
 return {
 	"linux-cultist/venv-selector.nvim",
-	branch = "regexp",
 	ft = "python",
 	dependencies = {
 		"neovim/nvim-lspconfig",
