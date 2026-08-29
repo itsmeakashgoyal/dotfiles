@@ -1,6 +1,11 @@
 #!/usr/bin/env zsh
-# Profile zsh startup time
-# Usage: zsh ./scripts/utils/profile_zsh.sh
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ scripts/utils/profile_zsh.sh
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Profile zsh startup time. Usage: zsh ./scripts/utils/profile_zsh.sh
 
 ZDOTDIR="${ZDOTDIR:-$HOME/.config/zsh}"
 

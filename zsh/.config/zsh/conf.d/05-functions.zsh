@@ -1,6 +1,11 @@
-# ------------------------------------------------------------------------------
-# Custom Functions
-# ------------------------------------------------------------------------------
+#!/usr/bin/env zsh
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/05-functions.zsh
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Utility functions: navigation, docker, network, archives.
 
 # cd and list directory contents
 cx() { cd "$@" && l; }

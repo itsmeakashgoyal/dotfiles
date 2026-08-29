@@ -1,17 +1,12 @@
-# CONFIGURATION FILE LOCATION ON YOUR SYSTEM:
-# -------------------------------------------
-# Defaults:
-# ---------
-#  Linux:   `$HOME/.config/television/config.toml`
-#  macOS:   `$HOME/.config/television/config.toml`
-#  Windows: `%LocalAppData%\television\config.toml`
 #
-# XDG dirs:
-# ---------
-# You may use XDG_CONFIG_HOME if set on your system.
-# In that case, television will expect the configuration file to be in:
-# `$XDG_CONFIG_HOME/television/config.toml`
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/config.toml
+# ░▓▓▓▓▓▓▓▓▓▓
 #
+# Television (tv) settings — the shell's sole fuzzy finder (see
+# zsh/.config/zsh/conf.d/09-television.zsh). Channel definitions live in
+# the sibling cable/ directory.
 
 # General settings
 # ----------------------------------------------------------------------------

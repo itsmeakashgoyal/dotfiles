@@ -1,13 +1,15 @@
 #!/usr/bin/env zsh
-# ------------------------------------------------------------------------------
-# Television Configuration — sole fuzzy finder
-# https://github.com/alexpasmantier/television
-# ------------------------------------------------------------------------------
-# Replaces fzf entirely. Provides:
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/09-television.zsh
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Television (https://github.com/alexpasmantier/television) — sole fuzzy
+# finder, replaces fzf entirely. Provides:
 #   Ctrl+T  — smart autocomplete (context-aware: files/dirs/branches)
 #   Ctrl+R  — shell history search
 #   Tab     — tv after space, zsh built-in completion mid-word
-# ------------------------------------------------------------------------------
 
 # Initialize zoxide if available
 if command -v zoxide >/dev/null 2>&1; then

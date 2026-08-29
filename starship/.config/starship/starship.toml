@@ -1,3 +1,9 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ starship/.config/starship/starship.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
 # Minimal prompt mirroring the repo's previous Powerlevel10k "lean" style:
 # line 1 = os icon, directory, git branch/status, time (right-aligned);
 # line 2 = a colored prompt character. No background pills — matches p10k's

@@ -1,4 +1,11 @@
 #!/usr/bin/env zsh
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/02-options.zsh
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Shell options, history, and completion settings.
 
 # ------------------------------------------------------------------------------
 # OS-Specific Configuration

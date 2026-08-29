@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/core/keymaps.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Global key bindings (leader key, visual-mode line moves, centered scrolling).
 local opts = { noremap = true, silent = true }
 
 vim.g.mapleader = " "

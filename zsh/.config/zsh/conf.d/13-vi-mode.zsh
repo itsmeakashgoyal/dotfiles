@@ -1,9 +1,13 @@
 #!/usr/bin/env zsh
-# ------------------------------------------------------------------------------
-# Vi Mode — vim keybindings in the shell
-# Loaded before atuin (10) and television (09) which re-bind Ctrl+R / Ctrl+T,
-# so those shortcuts keep working even with vi mode active.
-# ------------------------------------------------------------------------------
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/13-vi-mode.zsh
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Vi keybindings in the shell. Loaded before atuin (10) and television (09)
+# which re-bind Ctrl+R / Ctrl+T, so those shortcuts keep working even with
+# vi mode active.
 
 bindkey -v
 

@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/lazy.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Bootstraps lazy.nvim and loads every plugin spec under plugins/ and
+-- plugins/lsp/.
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
     vim.fn.system({
