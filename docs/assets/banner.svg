@@ -1,0 +1,74 @@
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="18%" cy="15%" r="90%">
+      <stop offset="0%" stop-color="#2a2440"/>
+      <stop offset="45%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#131320"/>
+    </radialGradient>
+    <radialGradient id="glowA" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cba6f7" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#cba6f7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#89b4fa" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#89b4fa" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="termFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1e2e" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#181825" stop-opacity="0.85"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <clipPath id="round"><rect width="1200" height="400" rx="0"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#round)">
+    <rect width="1200" height="400" fill="url(#bg)"/>
+    <rect width="1200" height="400" fill="url(#grid)"/>
+    <circle cx="1010" cy="30" r="210" fill="url(#glowA)"/>
+    <circle cx="440" cy="430" r="220" fill="url(#glowB)"/>
+
+    <!-- platform chips -->
+    <g font-family="SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace" font-size="13" font-weight="500">
+      <rect x="1074" y="42" width="86" height="30" rx="15" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="1090" cy="57" r="4" fill="#a6e3a1"/>
+      <text x="1101" y="61" fill="#cdd6f4">macOS</text>
+
+      <rect x="1080" y="80" width="80" height="30" rx="15" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="1096" cy="95" r="4" fill="#fab387"/>
+      <text x="1107" y="99" fill="#cdd6f4">Linux</text>
+
+      <rect x="1066" y="118" width="94" height="30" rx="15" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="1082" cy="133" r="4" fill="#89b4fa"/>
+      <text x="1093" y="137" fill="#cdd6f4">Windows</text>
+    </g>
+
+    <!-- terminal window -->
+    <g>
+      <rect x="64" y="46" width="720" height="128" rx="10" fill="url(#termFill)" stroke="#ffffff" stroke-opacity="0.08"/>
+      <line x1="64" y1="82" x2="784" y2="82" stroke="#ffffff" stroke-opacity="0.06"/>
+      <circle cx="86" cy="64" r="5.5" fill="#f38ba8"/>
+      <circle cx="104" cy="64" r="5.5" fill="#f9e2af"/>
+      <circle cx="122" cy="64" r="5.5" fill="#a6e3a1"/>
+      <text x="148" y="68" font-family="SFMono-Regular, Consolas, monospace" font-size="12" fill="#6c7086">zsh — ~/dotfiles</text>
+
+      <g font-family="SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace" font-size="14">
+        <text x="86" y="106" fill="#89b4fa">&gt;</text>
+        <text x="102" y="106" fill="#cdd6f4">make install</text>
+        <text x="86" y="128" fill="#6c7086">stowing git zsh nvim tmux television bin atuin fastfetch starship...</text>
+        <text x="86" y="150" fill="#a6e3a1">&#10003;</text>
+        <text x="102" y="150" fill="#6c7086">17 checks passed &#183; 89% healthy</text>
+        <text x="86" y="172" fill="#89b4fa">&gt;</text>
+        <rect x="102" y="159" width="8" height="15" fill="#cba6f7"/>
+      </g>
+    </g>
+
+    <!-- headline -->
+    <g>
+      <text x="64" y="288" font-family="SFMono-Regular, Consolas, monospace" font-size="13" font-weight="600" letter-spacing="3" fill="#a6e3a1">AKASH GOYAL</text>
+      <text x="64" y="352" font-family="SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace" font-size="58" font-weight="800" letter-spacing="-1.5" fill="#f5f5fb">dot<tspan fill="#cba6f7">files</tspan></text>
+      <text x="64" y="384" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#a6adc8">One repo, every machine — Neovim, Zsh, Tmux &amp; modern CLI tools, stowed in seconds.</text>
+    </g>
+  </g>
+</svg>
