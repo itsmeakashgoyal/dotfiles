@@ -32,7 +32,7 @@ readonly BREWFILE="${PACKAGES_DIR}/Brewfile"
 # Homebrew Functions
 # ------------------------------------------------------------------------------
 install_homebrew_prereqs_linux() {
-    [[ "$OS_TYPE" == "Linux" ]] || return 0
+    os::is_linux || return 0
 
     if ! command_exists apt-get; then
         warning "apt-get not found; skipping Homebrew prerequisites install"
@@ -62,18 +62,15 @@ install_homebrew() {
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
     # Configure Homebrew PATH (install script runs in a subshell and does not modify this shell's PATH)
-    case "$OS_TYPE" in
-    "Darwin")
+    if os::is_mac; then
         if [[ -x "/opt/homebrew/bin/brew" ]]; then
             eval "$(/opt/homebrew/bin/brew shellenv)"
         elif [[ -x "/usr/local/bin/brew" ]]; then
             eval "$(/usr/local/bin/brew shellenv)"
         fi
-        ;;
-    "Linux")
+    elif os::is_linux; then
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        ;;
-    esac
+    fi
 
     # Verify installation
     if ! command_exists brew; then
@@ -94,7 +91,9 @@ update_brew() {
     info "Updating Homebrew..."
     brew update
     brew upgrade
-    [[ "$OS_TYPE" == "Darwin" ]] && brew upgrade --cask || true
+    if os::is_mac; then
+        brew upgrade --cask || true
+    fi
     brew cleanup
     success "Homebrew updated"
 }
@@ -108,28 +107,6 @@ install_brewfile_packages() {
     info "Installing packages from Brewfile..."
     brew bundle --file="$BREWFILE"
     success "All packages installed from Brewfile"
-}
-
-# Install television on Linux via .deb (Homebrew may not have it on Linux)
-install_television_linux() {
-    [[ "$OS_TYPE" == "Linux" ]] || return 0
-    command_exists tv && { success "television is already installed"; return 0; }
-
-    info "Installing television (tv) from GitHub releases..."
-    local ver
-    ver=$(curl -s "https://api.github.com/repos/alexpasmantier/television/releases/latest" \
-        | grep '"tag_name":' | sed -E 's/.*"tag_name": "([^"]+)".*/\1/')
-
-    if [[ -z "$ver" ]]; then
-        warning "Could not determine latest television version"
-        return 1
-    fi
-
-    local deb="tv-${ver}-x86_64-unknown-linux-musl.deb"
-    curl -LO "https://github.com/alexpasmantier/television/releases/download/${ver}/${deb}"
-    sudo dpkg -i "$deb"
-    rm -f "$deb"
-    success "television ${ver} installed"
 }
 
 # ------------------------------------------------------------------------------
@@ -150,9 +127,6 @@ main() {
 
     # Install all packages from Brewfile
     install_brewfile_packages || exit 1
-
-    # Install television on Linux (may not be in Homebrew)
-    install_television_linux
 
     # Final cleanup
     update_brew

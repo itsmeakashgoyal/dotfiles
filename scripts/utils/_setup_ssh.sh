@@ -81,7 +81,7 @@ generate_ssh_key() {
     cat "${key_path}.pub"
 
     # Copy to clipboard based on OS
-    if [ "$OS_TYPE" = "Darwin" ]; then # macOS
+    if os::is_mac; then # macOS
         cat "${key_path}.pub" | pbcopy
         success "Public key copied to clipboard!"
     elif command_exists xclip; then # Linux with xclip
