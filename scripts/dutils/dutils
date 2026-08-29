@@ -13,7 +13,15 @@ import sys
 from pathlib import Path
 
 VERSION    = "2.0.0"
-SCRIPT_DIR = Path(__file__).parent.resolve()
+# Resolve the symlink itself first, then take its parent - not the other way
+# around. `dutils` is meant to be symlinked from ~/.local/bin (see README),
+# and that directory is *itself* a symlink into this repo's bin/.local/bin/
+# once the `bin` Stow package is applied (Stow symlinks the whole directory
+# when the target doesn't exist yet, not just the files inside it). Resolving
+# .parent first would follow that outer symlink instead of this file's own,
+# landing SCRIPT_DIR in the wrong directory entirely (bin/.local/bin instead
+# of scripts/dutils) and breaking every sibling-script lookup below.
+SCRIPT_DIR = Path(__file__).resolve().parent
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Dispatch helpers
