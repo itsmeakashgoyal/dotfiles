@@ -20,7 +20,10 @@ $ErrorActionPreference = "Stop"
 # ==============================================================================
 # Configuration
 # ==============================================================================
-$DOTFILES_DIR = "$env:USERPROFILE\dotfiles"
+# This script lives at <repo>\scripts\setup\windows.ps1, so the repo root is
+# two levels up from $PSScriptRoot. Falls back to the historical default if
+# $PSScriptRoot is ever empty (e.g. dot-sourced in an unusual context).
+$DOTFILES_DIR = if ($PSScriptRoot) { Split-Path (Split-Path $PSScriptRoot -Parent) -Parent } else { "$env:USERPROFILE\dotfiles" }
 $NVIM_CONFIG = "$env:LOCALAPPDATA\nvim"
 $NVIM_DATA = "$env:LOCALAPPDATA\nvim-data"
 

@@ -23,7 +23,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$DOTFILES_DIR = "$env:USERPROFILE\dotfiles"
+# $PSScriptRoot is empty when run via the `irm | iex` one-liner (no file on
+# disk to locate), so fall back to the historical default in that case.
+$DOTFILES_DIR = if ($PSScriptRoot) { $PSScriptRoot } else { "$env:USERPROFILE\dotfiles" }
 $REPO_URL = "https://github.com/itsmeakashgoyal/dotfiles.git"
 
 # ==============================================================================
