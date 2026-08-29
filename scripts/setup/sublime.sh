@@ -1,22 +1,10 @@
 #!/usr/bin/env bash
-#                    █████
-#                   ░░███
-#   █████   ██████  ███████   █████ ████ ████████
-#  ███░░   ███░░███░░░███░   ░░███ ░███ ░░███░░███
-# ░░█████ ░███████   ░███     ░███ ░███  ░███ ░███
-#  ░░░░███░███░░░    ░███ ███ ░███ ░███  ░███ ░███
-#  ██████ ░░██████   ░░█████  ░░████████ ░███████
-# ░░░░░░   ░░░░░░     ░░░░░    ░░░░░░░░  ░███░░░
-#                                        ░███
-#                                        █████
-#                                       ░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ scripts/setup/sublime.sh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
-
+#
 # ------------------------------------------------------------------------------
 # Sublime Text Setup Script for macOS
 # Installs Package Control and configures Sublime Text settings
@@ -29,7 +17,9 @@ if [[ -n "${CI:-}" ]]; then
 fi
 
 # Load helper functions
-SCRIPT_DIR="${HOME}/dotfiles/scripts"
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+export DOTFILES_DIR
+SCRIPT_DIR="${DOTFILES_DIR}/scripts"
 CORE_FILE="${SCRIPT_DIR}/lib/core.sh"
 
 if [[ ! -f "$CORE_FILE" ]]; then

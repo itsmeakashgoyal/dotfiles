@@ -1,1 +1,8 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ git/.config/git/ignore
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Global gitignore (applies to every repo, via core.excludesFile).
 **/.claude/settings.local.json

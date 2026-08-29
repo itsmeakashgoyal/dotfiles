@@ -1,5 +1,11 @@
-" GUI-specific settings for nvim-qt and Neovide
-" This file is only loaded by GUI frontends, not terminal Neovim.
+"
+"  ▓▓▓▓▓▓▓▓▓▓
+" ░▓ author ▓ Akash Goyal
+" ░▓ file   ▓ nvim/.config/nvim/ginit.vim
+" ░▓▓▓▓▓▓▓▓▓▓
+"
+" GUI-specific settings for nvim-qt and Neovide. Only loaded by GUI
+" frontends, not terminal Neovim.
 
 if exists('g:GuiLoaded')
     " ── nvim-qt ──────────────────────────────────────────

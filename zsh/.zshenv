@@ -1,21 +1,10 @@
 #!/usr/bin/env zsh
-
-#                     █████
-#                    ░░███
-#   █████████  █████  ░███████    ██████  ████████   █████ █████
-#  ░█░░░░███  ███░░   ░███░░███  ███░░███░░███░░███ ░░███ ░░███
-#  ░   ███░  ░░█████  ░███ ░███ ░███████  ░███ ░███  ░███  ░███
-#    ███░   █ ░░░░███ ░███ ░███ ░███░░░   ░███ ░███  ░░███ ███
-#   █████████ ██████  ████ █████░░██████  ████ █████  ░░█████
-#  ░░░░░░░░░ ░░░░░░  ░░░░ ░░░░░  ░░░░░░  ░░░░ ░░░░░    ░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ zsh/.zshenv
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
 # ------------------------------------------------------------------------------
 # Zsh Environment Configuration
 # ------------------------------------------------------------------------------
@@ -35,7 +24,12 @@ export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 export XDG_RUNTIME_DIR="${HOME}/.runtime"
-export XDG_DOTFILES_DIR="${HOME}/dotfiles"
+# Self-locate via the currently-sourced file's real path (%x) rather than
+# hardcoding ~/dotfiles, so this still resolves correctly if the repo lives
+# somewhere else. :A resolves the ~/.zshenv symlink to its real target
+# (.../dotfiles/zsh/.zshenv); :h:h walks up past zsh/ and .zshenv to the
+# repo root.
+export XDG_DOTFILES_DIR="${${${(%):-%x}:A}:h:h}"
 
 # Locale and TTY (safe in all shells)
 export LANG="en_US.UTF-8"

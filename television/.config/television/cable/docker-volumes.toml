@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/docker-volumes.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# List and manage Docker volumes
 [metadata]
 name = "docker-volumes"
 description = "List and manage Docker volumes"

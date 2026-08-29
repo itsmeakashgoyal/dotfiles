@@ -1,39 +1,69 @@
-# Modern Development Environment Dotfiles
+# dotfiles
 
-[![CI](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml)
-[![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
-[![macOS](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple)](https://www.apple.com/macos/)
-[![Linux](https://img.shields.io/badge/Linux-Ubuntu%2FDebian-orange?logo=linux)](https://ubuntu.com/)
-[![Shell](https://img.shields.io/badge/Shell-Zsh-informational?logo=gnu-bash)](https://www.zsh.org/)
-[![Neovim](https://img.shields.io/badge/Neovim-0.10%2B-green?logo=neovim)](https://neovim.io/)
-[![Last Commit](https://img.shields.io/github/last-commit/itsmeakashgoyal/dotfiles)](https://github.com/itsmeakashgoyal/dotfiles/commits/master)
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="dotfiles — Akash Goyal" width="100%">
+</p>
 
-```text
-     █████           █████       ██████   ███  ████
-    ░░███           ░░███       ███░░███ ░░░  ░░███
-  ███████   ██████  ███████    ░███ ░░░  ████  ░███   ██████   █████
- ███░░███  ███░░███░░░███░    ███████   ░░███  ░███  ███░░███ ███░░
-░███ ░███ ░███ ░███  ░███    ░░░███░     ░███  ░███ ░███████ ░░█████
-░███ ░███ ░███ ░███  ░███ ███  ░███      ░███  ░███ ░███░░░   ░░░░███
-░░████████░░██████   ░░█████   █████     █████ █████░░██████  ██████
- ░░░░░░░░  ░░░░░░     ░░░░░   ░░░░░     ░░░░░ ░░░░░  ░░░░░░  ░░░░░░
-```
+<p align="center">
+  <a href="https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml"><img src="https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg" alt="CI"></a>
+  <a href="https://opensource.org/licenses/BSD-2-Clause"><img src="https://img.shields.io/badge/License-BSD_2--Clause-orange.svg" alt="License"></a>
+  <a href="https://www.apple.com/macos/"><img src="https://img.shields.io/badge/macOS-14%2B-blue?logo=apple" alt="macOS"></a>
+  <a href="https://ubuntu.com/"><img src="https://img.shields.io/badge/Linux-Ubuntu%2FDebian-orange?logo=linux" alt="Linux"></a>
+  <a href="https://learn.microsoft.com/powershell/"><img src="https://img.shields.io/badge/Windows-PowerShell-blue?logo=windowsterminal" alt="Windows"></a>
+  <a href="https://www.zsh.org/"><img src="https://img.shields.io/badge/Shell-Zsh-informational?logo=gnu-bash" alt="Shell"></a>
+  <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-0.10%2B-green?logo=neovim" alt="Neovim"></a>
+  <a href="https://starship.rs/"><img src="https://img.shields.io/badge/Prompt-Starship-DD0B78?logo=starship" alt="Starship"></a>
+  <a href="https://github.com/itsmeakashgoyal/dotfiles/commits/master"><img src="https://img.shields.io/github/last-commit/itsmeakashgoyal/dotfiles" alt="Last Commit"></a>
+</p>
 
-A comprehensive, automated dotfiles setup for **macOS**, **Linux**, and **Windows**, featuring Neovim, Zsh/PowerShell, Tmux, Git, and modern CLI tools -- managed with [GNU Stow](https://www.gnu.org/software/stow/) on Unix and native symlinks on Windows.
+<p align="center">
+  A single, automated dotfiles repo for <b>macOS</b>, <b>Linux</b>, and <b>Windows</b> — Neovim, Zsh/PowerShell,
+  Tmux, Git, and a modern CLI toolchain, managed with <a href="https://www.gnu.org/software/stow/">GNU Stow</a>
+  on Unix and native symlinks on Windows. Clone it, run one command, get the same environment everywhere.
+</p>
 
 > **Warning:** These dotfiles are personalized and will overwrite existing configurations.
 > Fork the repo and review the scripts before running on your machine.
 
 ---
 
+## Preview
+
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="Terminal demo: zsh startup banner, eza listings, the dutils CLI, and Neovim" width="850">
+</p>
+
+<p align="center">
+  <sub>Real recording of this repo's actual setup — the startup banner, <code>eza</code>-powered
+  listings, the custom <code>dutils</code> CLI, and Neovim, captured with
+  <a href="https://github.com/charmbracelet/vhs">VHS</a>.</sub>
+</p>
+
+---
+
+## Contents
+
+- [What's Included](#whats-included)
+- [Quick Start](#quick-start)
+- [How It Works](#how-it-works)
+- [Uninstall](#uninstall)
+- [Repository Structure](#repository-structure)
+- [Documentation](#documentation)
+- [Resources](#resources)
+- [License](#license)
+
+---
+
 ## What's Included
 
-- **Zsh** -- Modular config via `conf.d/`, Zinit plugin manager, Powerlevel10k prompt, television fuzzy finder
-- **Neovim** -- Lazy.nvim, LSP, Treesitter, Telescope, autocompletions
-- **Git** -- 40+ aliases, delta diff viewer, XDG-compliant config
-- **Tmux** -- TPM plugin manager, vim-aware pane switching, session persistence
-- **Oh My Posh** -- Custom prompt theme
-- **100+ CLI tools** -- via Homebrew Brewfile (eza, bat, ripgrep, fd, zoxide, and more)
+| | |
+| --- | --- |
+| **Zsh** | Modular config via `conf.d/`, Zinit plugin manager, Starship prompt, television fuzzy finder |
+| **Neovim** | Lazy.nvim, LSP, Treesitter, Telescope, autocompletions |
+| **Git** | 40+ aliases, delta diff viewer, XDG-compliant config |
+| **Tmux** | TPM plugin manager, vim-aware pane switching, session persistence |
+| **`dutils`** | One CLI for cleanup, SSH keygen, OS detection, interactive diffing, and more |
+| **CLI tools** | macOS via Homebrew (`brew/Brewfile`); **Linux via Nix + Home Manager** (`nix/`, replaces linuxbrew) — eza, bat, ripgrep, fd, zoxide, and more. See [docs/NIX.md](docs/NIX.md) |
 
 ---
 
@@ -85,9 +115,11 @@ cd ~\dotfiles
 | **Symlinks** | PowerShell profile, nvim, git, tmux, television, atuin, fastfetch |
 | **Neovim** | Config linked; lazy.nvim bootstraps on first `nvim` launch |
 
-> **Symlinks require** either Administrator privileges or [Developer Mode](ms-settings:developers) enabled (`Settings → System → For Developers`).
+> **Symlinks require** either Administrator privileges or [Developer Mode](ms-settings:developers)
+> enabled (`Settings → System → For Developers`).
 
-**PowerShell profile features:**
+<details>
+<summary><b>PowerShell profile features</b></summary>
 
 | Shortcut / Alias | What it does |
 | --- | --- |
@@ -107,21 +139,65 @@ cd ~\dotfiles
 | `rgf` | ripgrep → fzf → open in editor |
 | `jk` / `kj` | exit Vi insert mode (mirrors zsh config) |
 
+</details>
+
 ---
 
 ## How It Works
 
-Every top-level directory (`git/`, `zsh/`, `nvim/`, `tmux/`) is a **Stow package**. Each package mirrors the target path relative to `$HOME`:
+Every top-level directory (`git/`, `zsh/`, `nvim/`, `tmux/`, …) is a **Stow package**. Each package
+mirrors the target path relative to `$HOME`:
 
-```text
-dotfiles/nvim/.config/nvim/init.lua
-                │
-    stow nvim   │   creates symlink
-                ▼
-~/.config/nvim  →  ~/dotfiles/nvim/.config/nvim
+<p align="center">
+  <img src="docs/assets/how-it-works.svg" alt="Diagram: 'stow nvim' symlinks ~/.config/nvim into the repo" width="700">
+</p>
+
+Running `stow <package>` from the repo root creates the correct symlinks automatically. Edits in the
+repo take effect immediately — no re-linking needed.
+
+---
+
+## Uninstall
+
+To remove the dotfiles setup from your machine, run from the repo root:
+
+```bash
+cd ~/dotfiles
+make uninstall
 ```
 
-Running `stow <package>` from the repo root creates the correct symlinks automatically. Edits in the repo take effect immediately -- no re-linking needed.
+After one confirmation, it gracefully and completely reverses the install:
+
+1. **Restores your login shell** to the OS default (`/bin/zsh` on macOS, `/bin/bash` on Linux)
+2. **Removes all dotfile symlinks** (unstows every package) and sweeps any leftovers
+3. **Clears generated caches** (zsh compdump, stow backups)
+4. **Uninstalls Nix** if present — removes Home Manager packages first, then Nix itself
+5. **Uninstalls Homebrew** if present — removes all its packages first, then brew itself
+
+> **⚠️ This is a complete removal.** Both package managers are uninstalled
+> entirely, including any packages you installed **outside** these dotfiles.
+> Your repo, shell history, and personal data (`~/.ssh`, git config, etc.) are
+> left untouched.
+
+**Preview first (recommended)** — shows every action without changing anything:
+
+```bash
+make uninstall dry=1
+```
+
+**Skip the confirmation prompt** (e.g. for scripts/CI):
+
+```bash
+make uninstall force=1
+```
+
+The repo itself is left on disk — delete it manually if you want it gone:
+
+```bash
+rm -rf ~/dotfiles
+```
+
+See [docs/NIX.md](docs/NIX.md) for Nix-specific removal notes.
 
 ---
 
@@ -134,9 +210,11 @@ dotfiles/
 ├── nvim/                      → ~/.config/nvim/         Neovim editor setup
 ├── tmux/                      → ~/.config/tmux/         Tmux multiplexer
 ├── powershell/                → ~/Documents/PowerShell/ PowerShell profile (Windows)
-├── packages/                  Brewfile & install script
-├── scripts/                   Setup, verification, utilities
+├── brew/                      Brewfile — Homebrew package manifest (macOS)
+├── nix/                       Home Manager flake — Linux packages (replaces linuxbrew)
+├── scripts/                   Setup, verification, and the dutils CLI
 ├── settings/                  App preferences (iTerm, Sublime)
+├── docs/                      Guides + this README's banner/demo assets
 ├── install.sh                 Main installer (macOS/Linux)
 ├── install.ps1                Main installer (Windows)
 ├── bootstrap.sh               One-liner bootstrap for fresh machines
@@ -151,6 +229,7 @@ dotfiles/
 | --- | --- |
 | **[Installation](docs/INSTALLATION.md)** | Prerequisites, platform notes, what the installer does |
 | **[Usage](docs/USAGE.md)** | Makefile commands, updating, adding packages, diagnostics |
+| **[Nix (Linux)](docs/NIX.md)** | Nix + Home Manager package management on Linux (replaces linuxbrew) |
 | **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues, debug workflow, uninstalling |
 | **[Architecture](docs/ARCHITECTURE.md)** | Deep dive: Stow internals, Zsh flow, scripts, CI, XDG |
@@ -164,7 +243,8 @@ dotfiles/
 - [GNU Stow](https://www.gnu.org/software/stow/) -- Symlink farm manager
 - [Homebrew](https://brew.sh/) -- Package manager for macOS and Linux
 - [Neovim](https://neovim.io/) -- Hyperextensible text editor
-- [VHS](https://github.com/charmbracelet/vhs) -- Terminal demo recorder
+- [Starship](https://starship.rs/) -- Cross-shell prompt used by default here
+- [VHS](https://github.com/charmbracelet/vhs) -- Terminal demo recorder (used for the preview above)
 - [Awesome Dotfiles](https://github.com/webpro/awesome-dotfiles) -- Community dotfiles resources
 
 ---
@@ -175,4 +255,4 @@ BSD 2-Clause License. See [LICENSE](LICENSE) for details.
 
 ---
 
-**Akash Goyal** -- [@itsmeakashgoyal](https://github.com/itsmeakashgoyal)
+<p align="center"><b>Akash Goyal</b> — <a href="https://github.com/itsmeakashgoyal">@itsmeakashgoyal</a></p>

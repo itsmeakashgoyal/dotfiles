@@ -1,4 +1,12 @@
 #!/usr/bin/env zsh
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/03-startup.zsh
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Completion system init (compinit + caching) and terminal tab/window title
+# hooks.
 
 # Completion system (lazy loading with caching)
 function load_local_cache() {

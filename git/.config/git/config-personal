@@ -1,3 +1,11 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ git/.config/git/config-personal
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Personal-repo identity override, applied via config's
+# includeIf "gitdir:~/personal/" — keeps the work email as the global default.
 [user]
 	name = Akash Goyal
 	email = ag.akgoyal@gmail.com

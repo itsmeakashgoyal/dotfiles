@@ -1,6 +1,22 @@
-# ------------------------------------------------------------------------------
-# Custom Functions
-# ------------------------------------------------------------------------------
+#!/usr/bin/env zsh
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/05-functions.zsh
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Utility functions: navigation, docker, network, archives.
+
+# cd and list directory contents
+cx() { cd "$@" && l; }
+
+# Find file with tv and open in nvim
+fv() { nvim "$(fd --type f --hidden --exclude .git | tv)" }
+
+# Search files across zoxide-tracked dirs with fzf + bat preview, open in nvim
+# Usage: nzo           (files in current dir)
+#        nzo <pattern> (search across zoxide dirs)
+alias nzo='zoxide-edit'
 
 # cd and list directory contents
 cx() { cd "$@" && l; }

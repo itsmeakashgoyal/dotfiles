@@ -1,13 +1,14 @@
+#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # PowerShell profile — Linux/macOS feel on Windows
-# Tools: ripgrep · fzf (PSFzf) · bat · eza · zoxide · PSReadLine
+# Tools: ripgrep · fzf (PSFzf) · bat · eza · zoxide · mise · starship · PSReadLine
 #
 # Install prerequisites once:
-#   scoop install ripgrep fzf bat eza zoxide fd
+#   scoop install ripgrep fzf bat eza zoxide fd mise starship
 #   Install-Module PSFzf, PSReadLine, Terminal-Icons -Scope CurrentUser
 
 # ==============================================================================
@@ -182,6 +183,23 @@ if (_cmd bat) {
 # ==============================================================================
 if (_cmd zoxide) {
     Invoke-Expression (& { (zoxide init powershell | Out-String) })
+}
+
+# ==============================================================================
+# mise (runtime version manager — replaces pyenv, which has no native
+# Windows support at all)
+# ==============================================================================
+if (_cmd mise) {
+    (& mise activate pwsh) | Out-String | Invoke-Expression
+}
+
+# ==============================================================================
+# Starship (default prompt — same starship.toml as zsh, replaces Powerlevel10k
+# which could never run on PowerShell in the first place)
+# ==============================================================================
+if (_cmd starship) {
+    $env:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
+    (& starship init powershell) | Out-String | Invoke-Expression
 }
 
 # ==============================================================================

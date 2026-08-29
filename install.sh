@@ -12,7 +12,9 @@ set -euo pipefail
 # ------------------------------------------------------------------------------
 # Bootstrap: load shared library
 # ------------------------------------------------------------------------------
-CORE="${HOME}/dotfiles/scripts/lib/core.sh"
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+export DOTFILES_DIR
+CORE="${DOTFILES_DIR}/scripts/lib/core.sh"
 if [[ ! -f "$CORE" ]]; then
     echo "Error: core library not found at $CORE" >&2
     exit 1
@@ -66,8 +68,6 @@ _ensure_python3() {
 }
 
 _stow_packages() {
-    local packages=(git zsh nvim tmux)
-
     log::info "Cleaning up old symlinks..."
     local old_links=("$HOME/.zshenv" "$HOME/.config/nvim" "$HOME/.config/tmux"
                       "$HOME/.config/git" "$HOME/.config/zsh")
@@ -78,11 +78,10 @@ _stow_packages() {
         fi
     done
 
+    # Delegate to `make run` so the Makefile's STOW_PACKAGES list stays the
+    # single source of truth for which packages get stowed.
     log::info "Stowing dotfile packages..."
-    for pkg in "${packages[@]}"; do
-        log::substep "Stowing $pkg..."
-        stow --restow --dir="${DOTFILES_DIR}" --target="$HOME" "$pkg"
-    done
+    make -s -C "${DOTFILES_DIR}" run
     log::success "All packages stowed."
 }
 
@@ -119,9 +118,16 @@ main() {
     fi
     log::success "[STEP 3/8] Sudo setup done"
 
-    # Packages
+    # Packages — macOS uses Homebrew; Linux uses Nix (no linuxbrew anywhere)
     log::info "[STEP 4/8] Installing packages (DOTFILES_DIR=${DOTFILES_DIR})..."
-    bash "${DOTFILES_DIR}/packages/install.sh"
+    if os::is_mac; then
+        bash "${DOTFILES_DIR}/scripts/setup/macos.sh"
+    elif os::is_linux; then
+        # 1) apt: system-level deps only (build-essential, stow, zsh, curl, …)
+        run_script "linux"
+        # 2) Nix + Home Manager: all CLI tools (eza, bat, fd, nvim, tv, …)
+        bash "${DOTFILES_DIR}/scripts/setup/nix.sh"
+    fi
     log::success "[STEP 4/8] Packages installed"
 
     # Python 3 (required by dutils scripts)
@@ -149,9 +155,8 @@ main() {
     if os::is_mac; then
         run_script "sublime" || log::warning "Sublime Text setup failed (non-fatal in CI)"
         run_script "iterm" || log::warning "iTerm2 setup failed (non-fatal in CI)"
-    elif os::is_linux; then
-        run_script "linux" || log::warning "Linux setup failed (non-fatal in CI)"
     fi
+    # Linux package + system setup is handled in STEP 4 (apt system deps + Nix).
     log::success "[STEP 7/8] OS-specific setup done"
 
     # Symlinks

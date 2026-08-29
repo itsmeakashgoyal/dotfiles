@@ -1,3 +1,11 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ .github/workflows/build_and_test.yml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# CI: lint (shellcheck/shfmt/yamllint/py_compile), then full install ->
+# verify -> uninstall on macOS and Ubuntu, plus a soft-gated Windows job.
 ---
 name: Test Dotfiles Setup
 
@@ -7,12 +15,16 @@ name: Test Dotfiles Setup
     paths:
       - ".github/workflows/build_and_test*.yml"
       - "install.sh"
+      - "install.ps1"
       - "bootstrap.sh"
+      - "Makefile"
       - "scripts/**"
-      - "packages/**"
+      - "brew/**"
+      - "nix/**"
       - "zsh/**"
       - "nvim/**"
       - "tmux/**"
+      - "powershell/**"
   pull_request:
     branches: ["master", "main"]
   workflow_dispatch:
@@ -66,7 +78,7 @@ jobs:
       - name: Check file permissions
         run: |
           echo "🔐 Checking executable permissions..."
-          scripts="install.sh bootstrap.sh scripts/**/*.sh scripts/utils/dutils"
+          scripts="install.sh bootstrap.sh scripts/**/*.sh scripts/dutils/dutils"
           for script in $scripts; do
             if [[ -f "$script" ]] && [[ ! -x "$script" ]]; then
               echo "❌ Missing execute permission: $script"
@@ -90,7 +102,8 @@ jobs:
   test-macos:
     name: Test on macOS
     runs-on: macos-latest
-    timeout-minutes: 30
+    # Higher cap: the uninstall step now removes Homebrew + all packages/casks.
+    timeout-minutes: 40
     needs: lint
 
     steps:
@@ -133,7 +146,7 @@ jobs:
           echo "🔧 Making scripts executable..."
           chmod +x install.sh bootstrap.sh
           find scripts -type f -name "*.sh" -exec chmod +x {} +
-          chmod +x scripts/utils/dutils
+          chmod +x scripts/dutils/dutils
 
       - name: Run dotfiles installation
         run: |
@@ -229,13 +242,68 @@ jobs:
 
           # Source the zsh config (ZDOTDIR set via stow symlink)
           export ZDOTDIR="$HOME/dotfiles/zsh/.config/zsh"
-          source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
+          source "$HOME/.zshenv" || { echo "::error::Could not source .zshenv"; exit 1; }
+          source "$ZDOTDIR/.zshrc" || { echo "::error::Could not source .zshrc"; exit 1; }
 
-          # Test if basic commands work
+          # Test that core aliases/functions actually loaded. (gco is a repo-native
+          # function defined in 06-git.zsh, not the OMZ git-plugin alias, so it
+          # doesn't depend on Zinit's async turbo-mode timing here.)
           echo "Testing basic commands..."
-          type l ll gs gco 2>/dev/null || echo "Some aliases not loaded"
+          missing=0
+          for cmd in l ll gs gco; do
+            if ! type "$cmd" >/dev/null 2>&1; then
+              echo "::error::'$cmd' is not defined after sourcing the zsh config"
+              missing=1
+            fi
+          done
+          [[ "$missing" -eq 0 ]] || exit 1
 
           echo "✅ Zsh configuration test complete"
+
+      - name: Test Neovim configuration
+        run: |
+          echo "🧪 Testing Neovim plugin config loads cleanly..."
+          nvim --headless "+Lazy! sync" +qa
+          echo "✅ Neovim configuration test complete"
+
+      - name: Uninstall dotfiles
+        run: |
+          cd "$HOME/dotfiles"
+          # Make stow available so unstow runs cleanly (sweep is a fallback anyway)
+          if [[ -x "/opt/homebrew/bin/brew" ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+          elif [[ -x "/usr/local/bin/brew" ]]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+          fi
+          export CI=1
+          echo "🧹 Uninstalling dotfiles (removes symlinks, restores shell,"
+          echo "    and uninstalls Homebrew completely)..."
+          make uninstall force=1
+
+      - name: Verify uninstall
+        run: |
+          echo "🔍 Verifying dotfile symlinks were removed..."
+          fail=0
+          if [[ -L "$HOME/.zshenv" ]]; then
+            echo "  ❌ .zshenv still symlinked after uninstall"; fail=1
+          fi
+          for d in zsh nvim tmux git; do
+            if [[ -L "$HOME/.config/$d" ]]; then
+              echo "  ❌ ~/.config/$d still symlinked after uninstall"; fail=1
+            fi
+          done
+
+          echo "🔍 Verifying Homebrew was uninstalled..."
+          if command -v brew &> /dev/null || [[ -x /opt/homebrew/bin/brew ]] || [[ -x /usr/local/bin/brew ]]; then
+            echo "  ❌ brew still present after uninstall"; fail=1
+          else
+            echo "  ✅ Homebrew fully removed"
+          fi
+
+          if [[ "$fail" -ne 0 ]]; then
+            echo "❌ Uninstall did not fully clean up"; exit 1
+          fi
+          echo "✅ Uninstall verified: symlinks gone, Homebrew removed"
 
       - name: Upload logs on failure
         if: failure()
@@ -269,16 +337,11 @@ jobs:
           echo "Home: $HOME"
           df -h
 
-      - name: Cache Homebrew packages
-        uses: actions/cache@v5
-        continue-on-error: true
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
         with:
-          path: |
-            ~/.cache/Homebrew
-            /home/linuxbrew/.linuxbrew/Homebrew
-          key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
-          restore-keys: |
-            ${{ runner.os }}-homebrew-
+          extra-conf: |
+            experimental-features = nix-command flakes
 
       - name: Install ZSH
         run: |
@@ -300,7 +363,7 @@ jobs:
           echo "🔧 Making scripts executable..."
           chmod +x install.sh bootstrap.sh
           find scripts -type f -name "*.sh" -exec chmod +x {} +
-          chmod +x scripts/utils/dutils
+          chmod +x scripts/dutils/dutils
 
       - name: Run dotfiles installation
         run: |
@@ -315,49 +378,53 @@ jobs:
         run: |
           echo "✅ Verifying installation..."
 
-          # Configure Homebrew PATH for Linux
-          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          # Bring the Nix + Home Manager profile onto PATH
+          if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+            # shellcheck disable=SC1091
+            source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
           fi
+          [[ -e "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]] && \
+            source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+          hm_bins="$HOME/.nix-profile/bin:$HOME/.local/state/nix/profiles/profile/bin"
+          export PATH="$hm_bins:/nix/var/nix/profiles/default/bin:$PATH"
 
-          # Check if Homebrew is installed
-          if ! command -v brew &> /dev/null; then
-            echo "❌ Homebrew not found"
-            exit 1
+          # Nix should be installed (NOT Homebrew, on Linux)
+          if ! command -v nix &> /dev/null; then
+            echo "❌ nix not found"; exit 1
+          fi
+          echo "✅ nix installed: $(nix --version)"
+
+          # Home Manager profile should exist
+          if [[ -d "$HOME/.nix-profile" ]]; then
+            echo "✅ Home Manager profile present"
           else
-            echo "✅ Homebrew installed: $(brew --version | head -n1)"
+            echo "❌ Home Manager profile missing"; exit 1
           fi
 
-          # Check if zsh is installed
+          # zsh (from apt)
           zsh --version || exit 1
 
-          # Check core packages from Brewfile
-          echo "🔍 Checking core packages..."
-          # Check using actual binary names (format: "binary:package_name")
-          # Compatible with Bash 3.2+ (macOS default)
-          packages=(
-            "bat:bat"
-            "eza:eza"
-            "tv:television"
-            "rg:ripgrep"
-            "nvim:neovim"
-            "delta:git-delta"
-            "lazygit:lazygit"
-          )
+          # Confirm we did NOT install linuxbrew
+          if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+            echo "⚠️  linuxbrew present — expected Nix-only on Linux"
+          else
+            echo "✅ No linuxbrew (Nix-only as intended)"
+          fi
+
+          # Check core CLI tools provided by Nix
+          echo "🔍 Checking Nix-provided tools..."
+          packages=( bat eza tv rg nvim delta lazygit fd zoxide atuin )
           failed=0
-          for pkg in "${packages[@]}"; do
-            binary="${pkg%%:*}"
-            name="${pkg##*:}"
+          for binary in "${packages[@]}"; do
             if command -v "$binary" &> /dev/null; then
-              echo "  ✅ $name"
+              echo "  ✅ $binary"
             else
-              echo "  ⚠️  $name not found"
+              echo "  ⚠️  $binary not found"
               failed=$((failed + 1))
             fi
           done
-
           if [[ $failed -gt 3 ]]; then
-            echo "❌ Too many packages missing ($failed)"
+            echo "❌ Too many tools missing ($failed)"
             exit 1
           fi
 
@@ -368,12 +435,6 @@ jobs:
             echo "⚠️  .zshenv not symlinked"
           fi
 
-          # Check if dutils is accessible
-          if [[ -f "$HOME/.local/bin/dutils" ]]; then
-            echo "✅ dutils installed"
-            "$HOME/.local/bin/dutils" version || true
-          fi
-
           echo "✅ Installation verified successfully"
           echo "ℹ️  Note: Zinit will auto-install on first Zsh launch"
 
@@ -382,36 +443,78 @@ jobs:
         run: |
           echo "🧪 Testing zsh configuration..."
 
-          # Configure Homebrew PATH for Linux
-          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          fi
+          # Nix profile onto PATH
+          export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
           # ZDOTDIR set via stow symlink
           export ZDOTDIR="$HOME/dotfiles/zsh/.config/zsh"
-          source "$HOME/.zshenv" || echo "⚠️  Could not source .zshenv"
+          source "$HOME/.zshenv" || { echo "::error::Could not source .zshenv"; exit 1; }
+          source "$ZDOTDIR/.zshrc" || { echo "::error::Could not source .zshrc"; exit 1; }
 
           echo "Testing basic commands..."
-          type l ll 2>/dev/null || echo "Some aliases not loaded"
+          missing=0
+          for cmd in l ll; do
+            if ! type "$cmd" >/dev/null 2>&1; then
+              echo "::error::'$cmd' is not defined after sourcing the zsh config"
+              missing=1
+            fi
+          done
+          [[ "$missing" -eq 0 ]] || exit 1
 
           echo "✅ Zsh configuration test complete"
+
+      - name: Test Neovim configuration
+        run: |
+          echo "🧪 Testing Neovim plugin config loads cleanly..."
+          export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+          nvim --headless "+Lazy! sync" +qa
+          echo "✅ Neovim configuration test complete"
 
       - name: Test dutils commands
         if: always()
         run: |
           echo "🧪 Testing dutils commands..."
 
-          # Configure Homebrew PATH for Linux
-          if [[ -f "/home/linuxbrew/.linuxbrew/bin/brew" ]]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          fi
-
-          export PATH="$HOME/.local/bin:$PATH"
+          export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
 
           dutils help || echo "dutils help failed"
           dutils version || echo "dutils version failed"
           dutils detect-os || echo "dutils detect-os failed"
           dutils list-functions || echo "dutils list-functions failed"
+
+      - name: Uninstall dotfiles
+        run: |
+          cd "$HOME/dotfiles"
+          # stow comes from apt (/usr/bin) on Linux now; no brew needed.
+          # Homebrew removal is a no-op here (Linux uses Nix); Nix stays intact.
+          export CI=1
+          echo "🧹 Uninstalling dotfiles (symlinks, shell, and Nix completely)..."
+          make uninstall force=1
+
+      - name: Verify uninstall
+        run: |
+          echo "🔍 Verifying dotfile symlinks were removed..."
+          fail=0
+          if [[ -L "$HOME/.zshenv" ]]; then
+            echo "  ❌ .zshenv still symlinked after uninstall"; fail=1
+          fi
+          for d in zsh nvim tmux git; do
+            if [[ -L "$HOME/.config/$d" ]]; then
+              echo "  ❌ ~/.config/$d still symlinked after uninstall"; fail=1
+            fi
+          done
+
+          echo "🔍 Verifying Nix was uninstalled..."
+          if command -v nix &> /dev/null || [[ -e /nix ]]; then
+            echo "  ❌ Nix still present after uninstall (/nix or nix on PATH)"; fail=1
+          else
+            echo "  ✅ Nix fully removed"
+          fi
+
+          if [[ "$fail" -ne 0 ]]; then
+            echo "❌ Uninstall did not fully clean up"; exit 1
+          fi
+          echo "✅ Uninstall verified: symlinks gone, Nix removed"
 
       - name: Upload logs on failure
         if: failure()
@@ -421,6 +524,64 @@ jobs:
           path: |
             /tmp/setup_log.txt
           retention-days: 7
+
+  # Job: Test on Windows
+  # Soft-gated while this leg stabilizes: continue-on-error means a failure
+  # here surfaces as a visible check without blocking merges or the summary
+  # job below. Flip continue-on-error off (and add this job to summary's
+  # `needs`) once it's been reliably green for a few commits.
+  test-windows:
+    name: Test on Windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+    needs: lint
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Display system info
+        shell: pwsh
+        run: |
+          [System.Environment]::OSVersion.Version
+          $PSVersionTable.PSVersion
+
+      - name: Setup dotfiles directory
+        shell: pwsh
+        run: |
+          $dest = "$env:USERPROFILE\dotfiles"
+          Write-Host "Setting up dotfiles directory at $dest"
+          Copy-Item -Path "$env:GITHUB_WORKSPACE" -Destination $dest -Recurse -Force
+          Get-ChildItem $dest | Select-Object Name
+
+      - name: Run Windows setup (packages, symlinks, health check)
+        shell: pwsh
+        env:
+          CI: "true"
+        run: |
+          & "$env:USERPROFILE\dotfiles\scripts\setup\windows.ps1"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::windows.ps1 exited with code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+
+      - name: Verify PowerShell profile symlink
+        shell: pwsh
+        run: |
+          $profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+          if (-not (Test-Path $profilePath)) {
+            Write-Host "::error::PowerShell profile not found at $profilePath"
+            exit 1
+          }
+          $item = Get-Item $profilePath -Force
+          if (-not ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            Write-Host "::error::PowerShell profile exists but is not a symlink"
+            exit 1
+          }
+          Write-Host "✅ PowerShell profile symlinked"
 
   # Job 4: Summary and notification
   summary:

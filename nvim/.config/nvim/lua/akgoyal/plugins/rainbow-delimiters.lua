@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/rainbow-delimiters.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Rainbow-delimiters: highlights nested brackets/delimiters in a rotating rainbow of colors.
 return {
 	"HiPhish/rainbow-delimiters.nvim",
 	event = "VeryLazy",

@@ -1,22 +1,10 @@
 #!/usr/bin/env bash
-#                    █████
-#                   ░░███
-#   █████   ██████  ███████   █████ ████ ████████
-#  ███░░   ███░░███░░░███░   ░░███ ░███ ░░███░░███
-# ░░█████ ░███████   ░███     ░███ ░███  ░███ ░███
-#  ░░░░███░███░░░    ░███ ███ ░███ ░███  ░███ ░███
-#  ██████ ░░██████   ░░█████  ░░████████ ░███████
-# ░░░░░░   ░░░░░░     ░░░░░    ░░░░░░░░  ░███░░░
-#                                        ░███
-#                                        █████
-#                                       ░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ scripts/setup/iterm.sh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
-
+#
 # ------------------------------------------------------------------------------
 # iTerm2 Setup Script for macOS
 # Points iTerm2 at the dotfiles settings folder so preferences stay in sync.
@@ -27,7 +15,9 @@ if [[ -n "${CI:-}" ]]; then
     exit 0
 fi
 
-SCRIPT_DIR="${HOME}/dotfiles/scripts"
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+export DOTFILES_DIR
+SCRIPT_DIR="${DOTFILES_DIR}/scripts"
 CORE_FILE="${SCRIPT_DIR}/lib/core.sh"
 
 if [[ ! -f "$CORE_FILE" ]]; then

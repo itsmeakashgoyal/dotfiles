@@ -1,6 +1,27 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/telescope.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Telescope: fuzzy finder for files, grep, buffers, help, and diagnostics.
 return {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
+    -- bare-string triggers: lazy.nvim intercepts the key, loads the plugin
+    -- (which sets up the real keymap.set calls below via config()), then
+    -- replays the keypress so the real handler fires.
+    keys = {
+        "<leader>sf",
+        "<leader>sg",
+        "<leader>sw",
+        "<leader>sb",
+        "<leader>sh",
+        "<leader>sd",
+        "<leader>sr",
+        "<leader>sc",
+        "<leader>/",
+    },
     dependencies = {
         "nvim-lua/plenary.nvim",
         { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },

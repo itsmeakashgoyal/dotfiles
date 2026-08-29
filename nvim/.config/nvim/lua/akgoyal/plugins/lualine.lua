@@ -1,5 +1,13 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/lualine.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Lualine: statusline showing mode, git branch/diff, filename, and pending lazy.nvim plugin updates.
 return {
     "nvim-lualine/lualine.nvim",
+    event = "VeryLazy", -- statusline chrome, not needed on the very first frame
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
         local lualine = require("lualine")

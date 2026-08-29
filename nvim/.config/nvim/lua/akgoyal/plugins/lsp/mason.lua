@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/lsp/mason.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Mason: LSP/DAP/formatter/linter installer, plus native LSP server config (clangd, pyright,
+-- bashls, lua_ls, gopls) and on-attach keymaps.
 return {
 	"williamboman/mason.nvim",
 	lazy = false,

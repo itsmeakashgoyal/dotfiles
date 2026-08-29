@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/todo-comments.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Find TODO, FIXME, HACK, and XXX comments in codebase
 [metadata]
 name = "todo-comments"
 description = "Find TODO, FIXME, HACK, and XXX comments in codebase"

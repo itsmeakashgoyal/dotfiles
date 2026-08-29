@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/docker-containers.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# List and manage Docker containers
 [metadata]
 name = "docker-containers"
 description = "List and manage Docker containers"

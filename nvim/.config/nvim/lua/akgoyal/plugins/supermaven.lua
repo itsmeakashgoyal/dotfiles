@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/supermaven.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Supermaven: AI-powered inline code completion suggestions.
 return {
 	"supermaven-inc/supermaven-nvim",
 	event = "InsertEnter",

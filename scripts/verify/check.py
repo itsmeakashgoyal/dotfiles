@@ -32,6 +32,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import osdetect  # noqa: E402
+
 
 # ==============================================================================
 # Colors
@@ -517,7 +520,7 @@ class PackageChecker(SystemChecker):
 
         self._check_taps(parsed.get("tap", []))
         self._check_formulae(parsed.get("brew", []))
-        if platform.system() == "Darwin":
+        if osdetect.is_mac():
             self._check_casks(parsed.get("cask", []))
 
         report = self.build_report("PACKAGE SUMMARY")
@@ -621,7 +624,7 @@ class SystemInfo:
         log.kvp("Kernel", platform.release())
         log.kvp("Shell", os.environ.get("SHELL", "unknown"))
 
-        if platform.system() == "Darwin":
+        if osdetect.is_mac():
             log.kvp(
                 "macOS",
                 self._sh("sw_vers -productVersion") + " (" + self._sh("sw_vers -buildVersion") + ")",
@@ -636,7 +639,7 @@ class SystemInfo:
             except (ValueError, ZeroDivisionError):
                 log.kvp("Memory", "unknown")
 
-        elif platform.system() == "Linux":
+        elif osdetect.is_linux():
             os_release = Path("/etc/os-release")
             if os_release.is_file():
                 info: dict[str, str] = {}
@@ -674,13 +677,7 @@ class SystemInfo:
             log.kvp(f"{label} symlink", "✓ linked" if path.is_symlink() else "✗ missing")
 
     def _os_detail(self) -> str:
-        system = platform.system()
-        machine = platform.machine()
-        if system == "Linux":
-            return "Linux (ARM)" if machine in ("aarch64",) or machine.startswith("arm") else "Linux (x86_64)"
-        if system == "Darwin":
-            return "macOS (Apple Silicon)" if machine == "arm64" else "macOS (Intel)"
-        return f"Unknown: {system} on {machine}"
+        return osdetect.detail()
 
     def _version(self, cmd: str) -> str:
         try:
@@ -729,7 +726,7 @@ class DotfilesVerifier:
             return 0 if FullVerification().run().failed() == 0 else 1
 
         if mode in ("--packages", "packages"):
-            brewfile = self.DOTFILES_DIR / "packages" / "Brewfile"
+            brewfile = self.DOTFILES_DIR / "brew" / "Brewfile"
             return 0 if PackageChecker(brewfile).run().failed() == 0 else 1
 
         if mode in ("--system", "system"):
@@ -744,7 +741,7 @@ class DotfilesVerifier:
             if FullVerification().run().failed() > 0:
                 rc = 1
             print()
-            brewfile = self.DOTFILES_DIR / "packages" / "Brewfile"
+            brewfile = self.DOTFILES_DIR / "brew" / "Brewfile"
             if PackageChecker(brewfile).run().failed() > 0:
                 rc = 1
             print()

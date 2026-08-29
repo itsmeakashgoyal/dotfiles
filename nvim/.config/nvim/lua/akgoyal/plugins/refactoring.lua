@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/refactoring.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Refactoring: extract/inline function and variable refactors, with a telescope-based refactor picker.
 return {
 	"ThePrimeagen/refactoring.nvim",
 	dependencies = {

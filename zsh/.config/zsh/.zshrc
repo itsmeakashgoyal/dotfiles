@@ -1,30 +1,12 @@
-#                     █████
-#                    ░░███
-#   █████████  █████  ░███████   ████████   ██████
-#  ░█░░░░███  ███░░   ░███░░███ ░░███░░███ ███░░███
-#  ░   ███░  ░░█████  ░███ ░███  ░███ ░░░ ░███ ░░░
-#    ███░   █ ░░░░███ ░███ ░███  ░███     ░███  ███
-#   █████████ ██████  ████ █████ █████    ░░██████
-#  ░░░░░░░░░ ░░░░░░  ░░░░ ░░░░░ ░░░░░      ░░░░░░
+#!/usr/bin/env zsh
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ zsh/.config/zsh/.zshrc
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
-
 # ==============================================================================
-# 1. POWERLEVEL10K INSTANT PROMPT
-# Must be the very first thing — before any console output.
-# ==============================================================================
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
-# ==============================================================================
-# 2. GLOBAL STATE
+# 1. GLOBAL STATE
 # ==============================================================================
 # Hash table for globally stashing variables without polluting main scope.
 typeset -A __AKASH
@@ -34,7 +16,7 @@ __AKASH[ZSHRC]=$ZDOTDIR/.zshrc
 __AKASH[REAL_ZSHRC]=${__AKASH[ZSHRC]:A}
 
 # ==============================================================================
-# 3. ZINIT — plugin manager bootstrap
+# 2. ZINIT — plugin manager bootstrap
 # ==============================================================================
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 if [[ ! -d "$ZINIT_HOME" ]]; then
@@ -44,7 +26,7 @@ fi
 source "${ZINIT_HOME}/zinit.zsh"
 
 # ==============================================================================
-# 4. PLUGIN CONFIGURATION
+# 3. PLUGIN CONFIGURATION
 # Set before plugins load so each plugin sees its config at init time.
 # ==============================================================================
 # zsh-autosuggestions
@@ -55,8 +37,18 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=30
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 
+# zsh-syntax-highlighting
+# The 'path'/'path_prefix' highlighters stat() every path token on EVERY
+# keystroke (`[[ -e ]]`, plus a glob to detect partial paths). On auto-mounting
+# or network roots this is harmful: typing a path under an autofs mount
+# triggers the mount (and resets its idle timer so it never expires), and a
+# stat() into a dead `hard` NFS mount hangs the whole shell while you type.
+# ZSH_HIGHLIGHT_DIRS_BLACKLIST makes the highlighter skip these subtrees
+# entirely (it returns before any filesystem access). Add more roots as needed.
+ZSH_HIGHLIGHT_DIRS_BLACKLIST=(/mnt /net)   # autofs (/mnt/auto, /net) + NFS mounts under /mnt
+
 # ==============================================================================
-# 5. EARLY SETUP (ordering constraints)
+# 4. EARLY SETUP (ordering constraints)
 # ==============================================================================
 # select-word-style must come before zsh-syntax-highlighting loads.
 autoload -U select-word-style
@@ -65,39 +57,41 @@ select-word-style bash  # only alphanumeric chars are considered WORDCHARS
 # exports.zsh must run before compinit — it extends fpath with custom completions.
 source "$ZDOTDIR/conf.d/01-exports.zsh"
 
-# p10k config must be sourced before the theme plugin loads.
-[[ -f "$ZDOTDIR/.p10k.zsh" ]] && source "$ZDOTDIR/.p10k.zsh"
-
 # ==============================================================================
-# 6. PLUGINS — ordered by load mode
+# 5. PLUGINS — ordered by load mode
 # ==============================================================================
 
-# --- 6a. Completions: extend fpath before compinit ---------------------------
+# --- 5a. Completions: extend fpath before compinit ---------------------------
 zinit lucid light-mode for \
     blockf \
     zsh-users/zsh-completions
 
-# --- 6b. Completion system init (compinit + tab/title hooks) -----------------
+# --- 5b. Completion system init (compinit + tab/title hooks) -----------------
 source "$ZDOTDIR/conf.d/03-startup.zsh"
 
-# --- 6c. Core interactive plugins (synchronous) ------------------------------
+# --- 5c. Core interactive plugins (synchronous) ------------------------------
 zinit lucid light-mode for \
     zsh-users/zsh-autosuggestions
 
-# --- 6d. Syntax highlighting — must be the last synchronous plugin -----------
+# --- 5d. Syntax highlighting — must be the last synchronous plugin -----------
 zinit light zsh-users/zsh-syntax-highlighting
 
-# --- 6e. Turbo plugins — deferred until after first prompt -------------------
+# --- 5e. Turbo plugins — deferred until after first prompt -------------------
 zinit wait lucid for \
     OMZP::git \
     OMZP::sudo
 
-# --- 6f. Theme ---------------------------------------------------------------
-zinit ice depth=1
-zinit light romkatv/powerlevel10k
+# --- 5f. Theme: Starship ------------------------------------------------------
+# Replaced Powerlevel10k (maintainer-declared "life support" since May 2024,
+# and structurally can never run on PowerShell) — one starship.toml now
+# renders identically here and in the native Windows PowerShell profile.
+if command -v starship &>/dev/null; then
+  export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+  eval "$(starship init zsh)"
+fi
 
 # ==============================================================================
-# 7. MODULAR CONFIG (conf.d)
+# 6. MODULAR CONFIG (conf.d)
 # exports.zsh and startup.zsh already sourced above (ordering constraints).
 # (N) glob qualifier silently skips if the dir is empty or pattern has no match.
 # ==============================================================================
@@ -108,12 +102,12 @@ done
 unset _config
 
 # ==============================================================================
-# 8. ZLE TWEAKS
+# 7. ZLE TWEAKS
 # ==============================================================================
 zle_highlight+=(paste:none)  # suppress highlighting of pasted text
 
 # ==============================================================================
-# 9. CONDA (lazy init)
+# 8. CONDA (lazy init)
 # ==============================================================================
 if [[ -f "/opt/anaconda3/bin/conda" ]]; then
     path=("/opt/anaconda3/bin" ${path:#/opt/anaconda3/bin})

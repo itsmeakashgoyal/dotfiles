@@ -1,13 +1,11 @@
+#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ Makefile
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
-
 # Stowable packages (directories with dotfiles)
-STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch
+STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch starship
 
 # Color codes
 YELLOW := \033[33m
@@ -60,6 +58,39 @@ sublime: ## Setup Sublime Text settings
 iterm: ## Setup iTerm2 preferences
 	@echo "$(YELLOW)Setting up iTerm2...$(CLR)"
 	@bash scripts/setup/iterm.sh
+
+##@ Nix (the only package manager used on Linux)
+
+# Flake lives in nix/; always applies the single "default" config (see
+# nix/flake.nix) — no per-machine username/arch bookkeeping needed here.
+NIX_FLAKE := ./nix
+
+.PHONY: nix-setup
+nix-setup: ## Install Nix + apply Home Manager packages (Linux, first-time)
+	@echo "$(YELLOW)Setting up Nix + Home Manager...$(CLR)"
+	@bash scripts/setup/nix.sh
+
+.PHONY: nix-switch
+nix-switch: ## Apply nix/home.nix changes (run after editing the package list)
+	@command -v home-manager >/dev/null 2>&1 || { \
+		echo "$(RED)Error:$(CLR) home-manager not found. Run 'make nix-setup' first,"; \
+		echo "       then open a new shell so the Nix profile is on PATH."; \
+		exit 1; \
+	}
+	@echo "$(BLUE)→$(CLR) Applying $(NIX_FLAKE)#default ..."
+	@home-manager switch -b backup --flake "$(NIX_FLAKE)#default" --impure
+	@echo "$(GREEN)✓ Home Manager packages applied$(CLR)"
+
+.PHONY: nix-update
+nix-update: ## Update package versions (flake update + switch)
+	@command -v nix >/dev/null 2>&1 || { \
+		echo "$(RED)Error:$(CLR) nix not found. Run 'make nix-setup' first."; \
+		exit 1; \
+	}
+	@echo "$(YELLOW)Updating flake inputs...$(CLR)"
+	@nix flake update --flake "$(NIX_FLAKE)"
+	@$(MAKE) nix-switch
+	@echo "$(GREEN)✓ Packages updated$(CLR)"
 
 ##@ Stow Management
 
@@ -138,6 +169,11 @@ delete: check-stow ## Delete all stowed dotfiles
 	done
 	@echo "$(GREEN)✓ Dotfiles removed! ⚡️$(CLR)"
 
+.PHONY: uninstall
+uninstall: ## Gracefully uninstall everything (shell, symlinks, caches; opt-in packages/Nix)
+	@STOW_PACKAGES="$(STOW_PACKAGES)" DRY_RUN="$(dry)" FORCE="$(force)" \
+		bash scripts/setup/uninstall.sh
+
 ##@ Utilities
 
 .PHONY: check-stow
@@ -147,6 +183,10 @@ check-stow: ## Verify stow is installed
 		echo "$(YELLOW)Install:$(CLR) brew install stow (macOS) or apt install stow (Linux)"; \
 		exit 1; \
 	}
+
+.PHONY: print-%
+print-%: ## Print a Makefile variable's value (usage: make print-STOW_PACKAGES)
+	@echo $($*)
 
 .PHONY: list
 list: ## List all available stow packages
@@ -205,6 +245,21 @@ packages: ## Check installed packages against Brewfile
 .PHONY: diagnose
 diagnose: ## Run all diagnostic tools
 	@bash scripts/verify/check.sh --all || true
+
+##@ Performance
+
+.PHONY: bench
+bench: ## Benchmark zsh startup time (requires hyperfine)
+	@command -v hyperfine >/dev/null 2>&1 || { \
+		echo "$(RED)Error:$(CLR) hyperfine is not installed."; \
+		echo "$(YELLOW)Install:$(CLR) brew install hyperfine (macOS) or make nix-switch (Linux)"; \
+		exit 1; \
+	}
+	@hyperfine --warmup 5 --shell=none 'zsh -i -c exit'
+
+.PHONY: bench-detail
+bench-detail: ## Profile zsh startup with zprof (function-level breakdown)
+	@zsh scripts/dutils/profile_zsh.sh
 
 ##@ Windows
 

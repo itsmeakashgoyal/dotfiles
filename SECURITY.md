@@ -51,7 +51,7 @@ pre-commit install
 
 ## SSH Key Hardening
 
-The included `scripts/utils/_setup_ssh.sh` generates **Ed25519** keys (preferred over RSA). After generation:
+The included `scripts/dutils/setup_ssh.sh` generates **Ed25519** keys (preferred over RSA). After generation:
 
 1. Add a passphrase to your key
 2. Use `ssh-agent` or macOS Keychain to avoid re-entering it
@@ -67,6 +67,6 @@ ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 
 ---
 
-## macOS System Preferences Script
+## macOS Package Install Script
 
-`scripts/setup/macos.sh` modifies system preferences (Finder, Dock, keyboard). Review it before running — it is not reversible without a fresh macOS install of those defaults.
+`scripts/setup/macos.sh` installs Homebrew and every formula/cask listed in `brew/Brewfile`. Review the Brewfile before running on a fork — it installs packages system-wide.

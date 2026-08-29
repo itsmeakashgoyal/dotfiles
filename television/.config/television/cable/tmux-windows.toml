@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/tmux-windows.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# List and switch between tmux windows
 [metadata]
 name = "tmux-windows"
 description = "List and switch between tmux windows"

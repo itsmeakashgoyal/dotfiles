@@ -1,3 +1,9 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ .gitignore
+# ░▓▓▓▓▓▓▓▓▓▓
+#
 .DS_Store
 **/.DS_Store
 
@@ -28,6 +34,12 @@ Thumbs.db
 
 # Tmux plugins (managed by TPM)
 tmux/.config/tmux/plugins/*
+
+# Nix build artifacts (NOTE: keep nix/flake.lock tracked — it pins versions)
+result
+result-*
+nix/result
+nix/result-*
 
 # Private Information
 private/*

@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/trouble.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Trouble: unified list UI for diagnostics, quickfix, location list, and todos.
 return {
     "folke/trouble.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons", "folke/todo-comments.nvim" },

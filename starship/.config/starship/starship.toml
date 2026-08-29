@@ -1,0 +1,65 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ starship/.config/starship/starship.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Minimal prompt mirroring the repo's previous Powerlevel10k "lean" style:
+# line 1 = os icon, directory, git branch/status, time (right-aligned);
+# line 2 = a colored prompt character. No background pills — matches p10k's
+# lean style, which uses plain foreground-colored text throughout.
+#
+# Colors below are the exact xterm-256 numbers the old .p10k.zsh used, not
+# approximated hex, so this is a faithful port rather than a re-guess:
+#   directory=31 (blue), git branch/clean=76 (green), git modified=178
+#   (gold), prompt ok=76 (green), prompt error=196 (red), time=66 (teal).
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$os$directory$git_branch$git_status$fill$time
+$character"""
+
+[fill]
+symbol = " "
+
+[os]
+disabled = false
+format = "[$symbol](white) "
+
+[os.symbols]
+Macos = " "
+Linux = " "
+Windows = "󰍲 "
+
+[directory]
+style = "31"
+truncation_length = 0
+truncate_to_repo = false
+format = "[$path]($style) "
+
+[git_branch]
+symbol = " "
+style = "76"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "178"
+format = '([$ahead_behind$stashed$staged$modified$untracked$conflicted]($style))'
+ahead = "⇢"
+behind = "⇠"
+diverged = "⇠⇢"
+stashed = "[*${count}](76)"
+staged = "+${count}"
+modified = "!${count}"
+untracked = "[?${count}](76)"
+conflicted = "~${count}"
+
+[time]
+disabled = false
+format = "[$time](66)"
+time_format = "%I:%M:%S %p"
+
+[character]
+success_symbol = "[❯](76)"
+error_symbol = "[❯](196)"

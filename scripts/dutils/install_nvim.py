@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/install_nvim.py
+# ░▓ file   ▓ scripts/dutils/install_nvim.py
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Install the latest Neovim from GitHub releases (Linux only).
@@ -15,6 +15,9 @@ import sys
 import tempfile
 import urllib.request
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import osdetect  # noqa: E402
 
 HOME            = Path.home()
 NVIM_BACKUP_DIR = HOME / "linuxtoolbox" / "backup" / "nvim"
@@ -90,7 +93,7 @@ def install() -> None:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    if platform.system() != "Linux":
+    if not osdetect.is_linux():
         print("Error: install-nvim is Linux-only.", file=sys.stderr)
         print("On macOS use: brew install neovim", file=sys.stderr)
         sys.exit(1)

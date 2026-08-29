@@ -1,29 +1,23 @@
 #!/usr/bin/env bash
-#                    █████
-#                   ░░███
-#   █████   ██████  ███████   █████ ████ ████████
-#  ███░░   ███░░███░░░███░   ░░███ ░███ ░░███░░███
-# ░░█████ ░███████   ░███     ░███ ░███  ░███ ░███
-#  ░░░░███░███░░░    ░███ ███ ░███ ░███  ░███ ░███
-#  ██████ ░░██████   ░░█████  ░░████████ ░███████
-# ░░░░░░   ░░░░░░     ░░░░░    ░░░░░░░░  ░███░░░
-#                                        ░███
-#                                        █████
-#                                       ░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ scripts/setup/linux.sh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
-
+#
 # ------------------------------------------------------------------------------
 # Linux System Setup Script
-# Installs essential packages and tools for Ubuntu/Debian-based systems
+#
+# Installs ONLY system-level apt dependencies for Ubuntu/Debian.
+# CLI tools (eza, bat, fd, zoxide, ripgrep, neovim, …) come from Nix +
+# Home Manager instead — see nix/ and scripts/setup/nix.sh. No Homebrew or
+# linuxbrew anywhere on Linux.
 # ------------------------------------------------------------------------------
 
 # Load helper functions
-SCRIPT_DIR="${HOME}/dotfiles/scripts"
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+export DOTFILES_DIR
+SCRIPT_DIR="${DOTFILES_DIR}/scripts"
 CORE_FILE="${SCRIPT_DIR}/lib/core.sh"
 
 if [[ ! -f "$CORE_FILE" ]]; then
@@ -70,31 +64,26 @@ update_and_install() {
         sudo apt-get -y upgrade
     fi
 
-    # Core development and utility packages
-    # Only including essential, universally available packages
+    # System-level packages only. Everything else is provided by Nix.
+    # These are the deps needed to install Nix, run Stow, and use zsh.
     local packages=(
-        # Build tools
+        # Build tools + Nix installer prerequisites
         build-essential
-        
-        # Essential utilities
+        ca-certificates
         curl
         wget
-        unzip
-        
-        # Development tools
-        vim
-        tmux
+        xz-utils
+        file
+        procps
+
+        # Core system tools
         git
         stow
-        
-        # Shell tools
-        shellcheck
-        fd-find
-        
-        # Miscellaneous
+        zsh
+        unzip
         fontconfig
     )
-    
+
     # Optional packages (install if available, don't fail if not)
     local optional_packages=(
         figlet
@@ -137,58 +126,6 @@ cleanup() {
 }
 
 # ------------------------------------------------------------------------------
-# Tool Installation Functions
-# ------------------------------------------------------------------------------
-install_eza() {
-    if command_exists eza; then
-        info "eza already installed"
-        return 0
-    fi
-
-    info "Installing eza..."
-    sudo apt-get install -y gpg
-    sudo mkdir -p /etc/apt/keyrings
-    
-    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | \
-        sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-    
-    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | \
-        sudo tee /etc/apt/sources.list.d/gierens.list
-    
-    sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-    sudo apt-get update
-    sudo apt-get install -y eza
-    
-    success "eza installed successfully"
-}
-
-install_cargo() {
-    if command_exists cargo; then
-        info "Cargo already installed"
-        return 0
-    fi
-
-    info "Installing Rust and Cargo..."
-    sudo apt-get install -y cargo
-    success "Cargo installed successfully"
-}
-
-install_zoxide() {
-    if command_exists zoxide; then
-        info "Zoxide already installed"
-        return 0
-    fi
-
-    info "Installing zoxide..."
-    if curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
-        success "Zoxide installed successfully"
-    else
-        error "Zoxide installation failed"
-        return 1
-    fi
-}
-
-# ------------------------------------------------------------------------------
 # Main Function
 # ------------------------------------------------------------------------------
 main() {
@@ -220,16 +157,14 @@ main() {
     success "Ubuntu-based system detected. Proceeding with setup..."
     log_message "Ubuntu-based system confirmed"
 
-    # Run installation steps
+    # Run installation steps (system deps only — CLI tools come from Nix)
     update_and_install
-    install_eza
-    install_cargo
-    install_zoxide
     cleanup
 
     success "
 ###################################################
-#     Linux Setup Completed Successfully!         #
+#     Linux System Deps Installed!                #
+#     CLI tools are managed by Nix (see nix/).     #
 ###################################################
 "
     log_message "Linux setup completed successfully"

@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/which-key.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Which-key: popup showing available keybindings and leader-key groups as you type.
 return {
 	--I got annoyed so I just stopped using it for a bit
 	"folke/which-key.nvim",

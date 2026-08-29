@@ -1,21 +1,10 @@
 #!/usr/bin/env bash
-#              █████     ███  ████
-#             ░░███     ░░░  ░░███
-#  █████ ████ ███████   ████  ░███   █████
-# ░░███ ░███ ░░░███░   ░░███  ░███  ███░░
-#  ░███ ░███   ░███     ░███  ░███ ░░█████
-#  ░███ ░███   ░███ ███ ░███  ░███  ░░░░███
-#  ░░████████  ░░█████  █████ █████ ██████
-#   ░░░░░░░░    ░░░░░  ░░░░░ ░░░░░ ░░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/_run_with_xtrace.sh
+# ░▓ file   ▓ scripts/dutils/run_with_xtrace.sh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
-
 # The set -e option instructs bash to immediately exit if any command has a non-zero exit status
 # The set -u referencing a previously undefined  variable - with the exceptions of $* and $@ - is an error
 # The set -o pipefaile if any command in a pipeline fails, that return code will be used as the return code of the whole pipeline

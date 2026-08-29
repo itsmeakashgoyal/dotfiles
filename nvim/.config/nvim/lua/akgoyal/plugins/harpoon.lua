@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/harpoon.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Harpoon: quick-jump list for frequently-edited files.
 return {
 	"ThePrimeagen/harpoon",
 	branch = "harpoon2",
@@ -5,6 +12,12 @@ return {
 		"nvim-lua/plenary.nvim",
 		"nvim-telescope/telescope.nvim",
 	},
+	-- bare-string triggers, same idea as telescope.lua. <C-i> is deliberately
+	-- omitted: it's terminal-identical to <Tab> (same byte), so including it
+	-- would make lazy.nvim intercept every <Tab> press pre-load. The
+	-- vim.keymap.set("<C-i>", ...) call below still works once harpoon has
+	-- loaded via any of the other triggers.
+	keys = { "<leader>a", "<C-e>", "<C-y>", "<C-n>", "<C-s>", "<C-S-P>", "<C-S-N>" },
 	config = function()
 		local harpoon = require("harpoon")
 

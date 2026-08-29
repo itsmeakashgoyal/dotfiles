@@ -4,7 +4,6 @@
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ zsh/.config/zsh/conf.d/14-abbreviations.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Space-triggered abbreviations — type the trigger then press space to expand.
 # Adapted from Piotr1215/dotfiles

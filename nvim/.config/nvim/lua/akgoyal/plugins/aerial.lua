@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/aerial.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Aerial: code outline / symbol navigation sidebar.
 return {
 	"stevearc/aerial.nvim",
 	dependencies = {

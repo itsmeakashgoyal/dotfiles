@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ scripts/motd/1-welcome
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# MOTD banner (welcome message). Manual install — see scripts/motd/README.md.
+
+cat << EOF
+%+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++%
+!                                                                     !
+!                          Welcome to                                 !
+!                      Akash Goyal's Machine                          !
+!                                                                     !
+%++++++++++++++++++[   Server Info   ]++++++++++++++++++++++++++++++++%
+EOF

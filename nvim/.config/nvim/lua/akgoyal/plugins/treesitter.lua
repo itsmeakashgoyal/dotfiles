@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/treesitter.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Treesitter: syntax highlighting, indentation, and incremental selection via language parsers.
 return {
     {
         "nvim-treesitter/nvim-treesitter",

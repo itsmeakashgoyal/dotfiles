@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/after/ftplugin/sh.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Generic sh: 2-space indentation, run/shellcheck/chmod+x keymaps
+-- (F9/F8/<leader>x).
 -- Shell script settings (sh/bash)
 local set = vim.opt_local
 

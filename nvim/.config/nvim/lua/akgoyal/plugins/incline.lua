@@ -1,8 +1,16 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/incline.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Incline: floating filename label with file-type icon and modified indicator, shown over each window.
 return {
     -- Adding a filename to the Top Right
     {
         "b0o/incline.nvim",
         enabled = true,
+        event = "VeryLazy", -- winbar chrome, not needed on the very first frame
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             local devicons = require("nvim-web-devicons")

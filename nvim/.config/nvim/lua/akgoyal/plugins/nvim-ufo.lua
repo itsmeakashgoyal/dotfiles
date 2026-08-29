@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/nvim-ufo.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Nvim-ufo: improved code folding using treesitter/indent providers, with a custom statuscol fold column.
 return {
 	"kevinhwang91/nvim-ufo",
 	event = { "BufReadPost", "BufNewFile" },

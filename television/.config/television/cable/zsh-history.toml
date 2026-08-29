@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/zsh-history.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# A channel to select from your zsh history
 [metadata]
 name = "zsh-history"
 description = "A channel to select from your zsh history"

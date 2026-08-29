@@ -2,7 +2,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/_diff_files_interactive.sh
+# ░▓ file   ▓ scripts/dutils/diff_files_interactive.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Interactive file diff using tv for selection and entr for live watching.

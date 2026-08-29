@@ -1,4 +1,11 @@
-# Markdownlint configuration
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ .markdownlint.yaml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Markdownlint rule overrides — see .pre-commit-config.yaml for how this
+# gets applied.
 default: true
 
 # Allow longer lines in code blocks and tables

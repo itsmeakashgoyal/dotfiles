@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/diffview.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Diffview: git diff viewer and file-history browser, toggled per-buffer or repo-wide.
 return {
 	"sindrets/diffview.nvim",
 	cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },

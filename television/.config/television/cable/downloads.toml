@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/downloads.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Browse recent files in Downloads folder
 [metadata]
 name = "downloads"
 description = "Browse recent files in Downloads folder"

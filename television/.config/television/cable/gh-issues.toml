@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/gh-issues.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# List GitHub issues for the current repo
 [metadata]
 name = "gh-issues"
 description = "List GitHub issues for the current repo"

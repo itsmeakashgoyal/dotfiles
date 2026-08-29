@@ -4,13 +4,13 @@
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ zsh/.config/zsh/conf.d/12-prompt-styles.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Pure ZSH prompt styles (no framework needed).
 # Adapted from xero's dotfiles (https://github.com/xero/dotfiles)
 #
-# These work as an alternative to Powerlevel10k. To use them:
-#   1. Disable p10k in .zshrc (comment out sections 1, 5 p10k source, and 6f theme)
+# These work as a zero-dependency alternative to Starship (the default — see
+# .zshrc section 5f). To use one instead:
+#   1. Comment out the Starship block in .zshrc (section 5f)
 #   2. Run: prompt_style <name>
 #
 # Available styles: minimal, classic, dual, ascii, arrows, ninja
@@ -20,7 +20,7 @@
 #   prompt_style ninja     # activate ninja prompt
 #
 # This file only DEFINES the function — it does NOT activate any style.
-# Your current prompt (p10k/starship/etc.) remains untouched until you call it.
+# Your current prompt (Starship, by default) remains untouched until you call it.
 
 # ---------------------------------------------------------------------------
 # Git status helper for prompt

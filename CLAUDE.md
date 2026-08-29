@@ -4,11 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A dotfiles repository using **GNU Stow** to manage symlinks. Each top-level directory (e.g., `git/`, `zsh/`, `nvim/`) is a Stow "package" that mirrors the target filesystem structure relative to `$HOME`. Running `stow <pkg>` creates symlinks in `$HOME` pointing into this repo.
+A dotfiles repository using **GNU Stow** to manage symlinks on macOS and Linux. Each top-level directory (e.g., `git/`, `zsh/`, `nvim/`) is a Stow "package" that mirrors the target filesystem structure relative to `$HOME`. Running `stow <pkg>` creates symlinks in `$HOME` pointing into this repo.
 
-```
+```text
 dotfiles/nvim/.config/nvim/init.lua  →  stow nvim  →  ~/.config/nvim/init.lua (symlink)
 ```
+
+**Windows is also supported**, but via a separate, non-Stow path: `install.ps1` + `scripts/setup/windows.ps1` create symlinks with a hand-rolled PowerShell function instead (Stow doesn't run natively on Windows). See the `powershell/` package and the Windows subsection below. The recommended daily-driver path for the actual dev shell is still WSL2, where all the Stow packages work unmodified.
 
 ## Common Commands
 
@@ -31,7 +33,7 @@ make clean            # Remove backup files
 
 **Lint (CI runs this too):**
 ```bash
-shellcheck -x scripts/**/*.sh       # Lint shell scripts (-x follows sourced files)
+find . -type f \( -name "*.sh" -o -name "dutils" \) -exec shellcheck -x {} +  # Lint shell scripts
 shfmt -d scripts/                   # Check shell formatting
 ```
 
@@ -47,11 +49,13 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `bin/` → `~/.local/bin/` — Custom scripts (yank, zoxide-edit)
 - `atuin/` → `~/.config/atuin/` — Shell history search
 - `fastfetch/` → `~/.config/fastfetch/` — System info display
+- `starship/` → `~/.config/starship/` — Cross-shell prompt (default; replaced Powerlevel10k)
 
+`powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `scripts/setup/windows.ps1`'s own symlink function instead (see Windows section below).
 
 ### Zsh Configuration Layout
 `zsh/.config/zsh/conf.d/` contains numbered modular config files sourced in order:
-- `00-logo.zsh` — ASCII art startup greeting (guards: non-tmux, non-p10k)
+- `00-logo.zsh` — ASCII art startup greeting (guards: interactive, non-tmux)
 - `01-exports.zsh` — PATH, environment variables (sourced early in .zshrc)
 - `02-options.zsh` — Shell options, history, completion settings
 - `03-startup.zsh` — Completion system init (sourced early in .zshrc)
@@ -64,21 +68,29 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `10-atuin.zsh` — Atuin shell history (Ctrl+R)
 - `11-colored-man-pages.zsh` — Colored man page output
 - `12-prompt-styles.zsh` — Pure ZSH prompt alternatives (minimal/classic/dual/ascii/arrows/ninja)
+- `13-vi-mode.zsh` — Vi keybindings
+- `14-abbreviations.zsh` — Shell abbreviations
+- `15-nix.zsh` — Nix/Home Manager PATH setup (Linux)
 - `99-private.zsh` — Machine-local overrides, gitignored
 
 ### Scripts Layout
-- `scripts/lib/core.sh` — Shared library for logging, OS detection, command checking; sourced by all install scripts
+- `scripts/lib/core.sh` — Shared library for logging, command checking; sourced by all bash entry-point scripts. Has side effects on source (creates `~/linuxtoolbox`, `/tmp/dotfiles.log`).
+- `scripts/lib/os-detect.sh` — OS detection only (`os::is_mac`/`os::is_linux`/`os::arch`/`os::detail`), split out from `core.sh` specifically because it has none of core.sh's side effects — safe to source from zsh's interactive startup too. `scripts/lib/osdetect.py` mirrors the same API for Python scripts.
 - `scripts/verify/check.sh` → `check.py` — Health/verification checks (`--quick`, `--full`, `--packages`, `--system`)
-- `scripts/setup/` — OS-specific setup: `macos.sh`, `linux.sh`, `sublime.sh`, `iterm.sh`
-- `packages/install.sh` + `packages/Brewfile` — Homebrew bundle installation
+- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh`, `iterm.sh` (macOS), `uninstall.sh`, `windows.ps1` (Windows). There is no `macos.sh`.
+- `scripts/setup/macos.sh` + `brew/Brewfile` — Homebrew bundle installation (macOS only — Linux uses Nix instead, see `nix.sh`/`nix/home.nix`)
 
 ### Installation Flow
-`install.sh` → Homebrew (`packages/install.sh`) → set default shell → OS-specific setup (`scripts/setup/`) → `make run` (stow all) → health verification
+`install.sh` self-locates `DOTFILES_DIR` → sources `core.sh` → set default shell → OS branch (macOS: `scripts/setup/macos.sh`; Linux: `scripts/setup/linux.sh` + `scripts/setup/nix.sh`) → macOS-only `sublime.sh`/`iterm.sh` → `make run` (stow all) → health verification
+
+### Windows
+Separate path, no Stow: `install.ps1` → `scripts/setup/windows.ps1` (Scoop packages, hand-rolled symlinks via `$SYMLINK_MAP`, PowerShell modules, `Test-Installation` health check that exits non-zero under `$env:CI`). Not yet required in CI (`test-windows` job is soft-gated/`continue-on-error`).
 
 ### CI/CD
-`.github/workflows/build_and_test.yml` tests on macOS and Ubuntu:
-1. Lint: shellcheck + file permissions + YAML validation
-2. Platform tests: full install → package verification → zsh config test
+`.github/workflows/build_and_test.yml`:
+1. Lint: shellcheck + file permissions + YAML validation + `py_compile`
+2. `test-macos` / `test-ubuntu` (required): full install → package verification → zsh config test (sources `.zshrc`, asserts real exit codes) → Neovim headless config test → uninstall → verify-uninstall
+3. `test-windows` (soft-gated, informational only for now): `windows.ps1` install → PowerShell profile symlink check
 
 ## Key Conventions
 
@@ -87,5 +99,4 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - XDG Base Directory spec: configs live in `~/.config/`, not `$HOME` directly (except `.zshenv`)
 - `private.zsh` is gitignored and used for machine-local secrets/overrides — don't commit secrets to tracked files
 - Pre-commit hooks (`.pre-commit-config.yaml`) run shellcheck, shfmt, and detect-secrets automatically
-- The `.cursor/rules/security-global/` directory contains security linting rules that apply to code edits
 - Documentation lives in `docs/` — see `docs/ARCHITECTURE.md` for deep technical details

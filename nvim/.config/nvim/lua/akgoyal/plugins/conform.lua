@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/conform.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Conform: formatter dispatcher running per-filetype formatters (stylua, black, clang-format, etc.) on save.
 return {
 	"stevearc/conform.nvim",
 	event = { "BufWritePre" },

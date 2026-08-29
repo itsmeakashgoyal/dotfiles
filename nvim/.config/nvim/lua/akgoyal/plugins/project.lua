@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/project.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Project: detects project roots (git/LSP/patterns) and lists recent projects via a telescope picker.
 return {
 	"ahmedkhalf/project.nvim",
 	event = "VeryLazy",

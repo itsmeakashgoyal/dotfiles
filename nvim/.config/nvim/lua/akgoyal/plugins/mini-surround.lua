@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/mini-surround.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Mini.surround: add, delete, and replace surrounding pairs (quotes, brackets, tags) via sa/sd/sr.
 return {
 	"echasnovski/mini.surround",
 	version = "*",

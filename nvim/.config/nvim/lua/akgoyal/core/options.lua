@@ -1,5 +1,15 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/core/options.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- vim.opt settings: indentation, search, splits, undo, and misc UI tweaks.
 vim.g.loaded_netrw = 1 -- disable netrw
 vim.g.loaded_netrwPlugin = 1
+
+-- separate vim plugins from neovim in case vim still in use
+vim.opt.runtimepath:remove("/usr/share/vim/vimfiles")
 
 local options = {
     backup = false, -- creates a backup file

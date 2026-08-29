@@ -1,21 +1,10 @@
 #!/usr/bin/env zsh
-#                     █████
-#                    ░░███
-#   █████████  █████  ░███████
-#  ░█░░░░███  ███░░   ░███░░███
-#  ░   ███░  ░░█████  ░███ ░███
-#    ███░   █ ░░░░███ ░███ ░███
-#   █████████ ██████  ████ █████
-#  ░░░░░░░░░ ░░░░░░  ░░░░ ░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ zsh/.config/zsh/conf.d/exports.zsh
+# ░▓ file   ▓ zsh/.config/zsh/conf.d/01-exports.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
-
 function add_to_path() {
   # NOTE: zsh only
 
@@ -102,7 +91,7 @@ fi
 # ------------------------------------------------------------------------------
 # Environment Detection and Base Configuration
 # ------------------------------------------------------------------------------
-OS_TYPE=$(uname)
+source "${XDG_DOTFILES_DIR}/scripts/lib/os-detect.sh"
 ARCH_TYPE=$(uname -m)
 
 # Common paths for both OS types
@@ -115,13 +104,14 @@ COMMON_PATHS=(
   "/usr/local/sbin"
 )
 
-# OS-specific Homebrew configuration
-case "$OS_TYPE" in
-"Darwin")
+# OS-specific paths. Linux has no Homebrew/linuxbrew at all — CLI tools come
+# from Nix + Home Manager instead (see 15-nix.zsh for its PATH setup).
+if os::is_mac; then
   # macOS Homebrew paths
   HOMEBREW_PREFIX="/opt/homebrew"
   HOMEBREW_CELLAR="/opt/homebrew/Cellar"
   HOMEBREW_REPOSITORY="/opt/homebrew"
+  export HOMEBREW_PREFIX HOMEBREW_CELLAR HOMEBREW_REPOSITORY
 
   # macOS specific paths
   OS_PATHS=(
@@ -132,26 +122,17 @@ case "$OS_TYPE" in
     "/opt/anaconda3/bin"
     "${HOME}/.local/bin"
   )
-  ;;
-"Linux")
-  # Linux Homebrew paths
-  HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-  HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
-  HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
-
-  # Linux specific paths
+elif os::is_linux; then
+  # Linux specific paths (system-level only; Nix packages are on PATH via
+  # the Home Manager profile, wired up separately by 15-nix.zsh)
   OS_PATHS=(
     "/usr/local/bin"
     "/usr/local/sbin"
-    "/usr/local/compilers/clang15/bin"
-    "/home/linuxbrew/.linuxbrew/bin"
-    "/home/linuxbrew/.linuxbrew/sbin"
     "/usr/lib/jvm/java-11-openjdk-amd64"
     "/usr/local/lib/pkgconfig"
     "/usr/local/lib"
   )
-  ;;
-esac
+fi
 
 # Combine the common and OS-specific paths and ensure uniqueness in the final path
 typeset -U path
@@ -164,7 +145,6 @@ path=(
 # ------------------------------------------------------------------------------
 # Export Environment Variables
 # ------------------------------------------------------------------------------
-export HOMEBREW_PREFIX HOMEBREW_CELLAR HOMEBREW_REPOSITORY
 export PATH
 
 # Set parallel make flags based on OS
@@ -175,3 +155,12 @@ elif command -v sysctl >/dev/null 2>&1; then
     # macOS
     export MAKEFLAGS="-j$(sysctl -n hw.ncpu)"
 fi
+
+# ------------------------------------------------------------------------------
+# Third-Party Toolchain PATH Additions
+# ------------------------------------------------------------------------------
+# rustup (cargo/rustc)
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+
+# uv / other installers that drop a PATH shim in ~/.local/bin
+[[ -f "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"

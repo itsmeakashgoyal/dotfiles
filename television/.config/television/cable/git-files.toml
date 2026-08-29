@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/git-files.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# A channel to list the files currently tracked in the Git repository
 [metadata]
 name = "git-files"
 description = "A channel to list the files currently tracked in the Git repository"

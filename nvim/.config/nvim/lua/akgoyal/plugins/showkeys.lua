@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/showkeys.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Showkeys: displays recently pressed keys on screen, toggled via command.
 return {
     {
         "nvzone/showkeys",

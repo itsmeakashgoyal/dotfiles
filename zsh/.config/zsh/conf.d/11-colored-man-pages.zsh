@@ -4,7 +4,6 @@
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ zsh/.config/zsh/conf.d/11-colored-man-pages.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
 # Colored man pages via LESS_TERMCAP variables.
 # source: https://github.com/imkira/dotfiles/blob/master/.zsh/colored-man-pages.zsh

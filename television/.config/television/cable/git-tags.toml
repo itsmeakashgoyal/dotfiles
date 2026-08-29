@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/git-tags.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Browse and checkout git tags
 [metadata]
 name = "git-tags"
 description = "Browse and checkout git tags"

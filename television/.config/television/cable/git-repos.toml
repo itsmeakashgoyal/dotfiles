@@ -1,3 +1,12 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/git-repos.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# A channel to select from git repositories on your local machine.
+#
+# This channel uses `fd` to find directories that contain a `.git` subdirectory, and then allows you to preview the git log of the selected repository.
 [metadata]
 name = "git-repos"
 requirements = ["fd", "git"]

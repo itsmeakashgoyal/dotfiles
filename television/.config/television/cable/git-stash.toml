@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/git-stash.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Browse and manage git stash entries
 [metadata]
 name = "git-stash"
 description = "Browse and manage git stash entries"

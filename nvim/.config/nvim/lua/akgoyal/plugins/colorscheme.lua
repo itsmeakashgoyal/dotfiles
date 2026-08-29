@@ -1,3 +1,10 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/colorscheme.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Gruvbox: colorscheme setup, applied as the editor's color theme on startup.
 return {
     "ellisonleao/gruvbox.nvim",
     priority = 1000,

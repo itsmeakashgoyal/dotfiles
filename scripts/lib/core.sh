@@ -166,21 +166,11 @@ log_newline() { log::newline; }
 # ==============================================================================
 # OS Detection  (namespace: os::*)
 # ==============================================================================
-readonly OS_TYPE=$(uname)
-
-os::is_mac()   { [[ "$OS_TYPE" == "Darwin" ]]; }
-os::is_linux() { [[ "$OS_TYPE" == "Linux"  ]]; }
-os::arch()     { uname -m; }
-os::detail() {
-    local arch; arch=$(uname -m)
-    case "${OS_TYPE},${arch}" in
-        Linux,arm*|Linux,aarch64) echo "Linux (ARM)" ;;
-        Linux,x86_64|Linux,amd64) echo "Linux (x86_64)" ;;
-        Darwin,arm64)             echo "macOS (Apple Silicon)" ;;
-        Darwin,x86_64)            echo "macOS (Intel)" ;;
-        *)                        echo "Unknown: ${OS_TYPE} on ${arch}" ;;
-    esac
-}
+# Split out into its own side-effect-free file so zsh can source it directly
+# on interactive-shell startup without also getting this file's side effects
+# (backup dir creation, log file setup, below).
+# shellcheck source=scripts/lib/os-detect.sh
+source "${BASH_SOURCE[0]%/*}/os-detect.sh"
 
 # ==============================================================================
 # Utility Functions  (namespace: pkg::* / util::*)
@@ -257,7 +247,12 @@ run_script() {
 # ==============================================================================
 # Environment Constants
 # ==============================================================================
-readonly DOTFILES_DIR="${HOME}/dotfiles"
+# Preserve a caller-provided DOTFILES_DIR (callers self-locate via
+# BASH_SOURCE before sourcing this file, since they need this path to find
+# core.sh in the first place). Falls back to the legacy default for anyone
+# sourcing this directly without that self-location step.
+DOTFILES_DIR="${DOTFILES_DIR:-${HOME}/dotfiles}"
+readonly DOTFILES_DIR
 readonly CONFIG_DIR="${HOME}/.config"
 readonly BACKUP_DIR="${HOME}/linuxtoolbox"
 export DOTFILES_DIR CONFIG_DIR BACKUP_DIR
@@ -287,12 +282,11 @@ export -f info success warning error substep_info substep_success substep_error 
 export -f log_trace log_debug log_info log_success log_warning log_error log_fatal
 export -f log_section log_banner log_box log_substep log_kvp log_ok log_fail log_warn
 export -f log_bullet log_spinner log_progress log_separator log_newline
-export -f os::is_mac os::is_linux os::arch os::detail
 export -f is_verbose print_error run_script sudo_keep_alive
+# os::* functions and OS_TYPE are already exported by os-detect.sh, above.
 # Export variables used by exported functions
 export LOG_RED LOG_YELLOW LOG_GREEN LOG_BLUE LOG_MAGENTA LOG_CYAN LOG_WHITE LOG_BOLD LOG_NC
 export LOG_LEVEL LOG_MIN_LEVEL LOG_FILE LOG_TO_FILE LOG_TIMESTAMP_FORMAT
-export OS_TYPE
 
 readonly CORE_LOADED=true
 export CORE_LOADED

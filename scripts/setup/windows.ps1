@@ -1,3 +1,4 @@
+#
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ scripts/setup/windows.ps1
@@ -20,11 +21,20 @@ $ErrorActionPreference = "Stop"
 # ==============================================================================
 # Configuration
 # ==============================================================================
-$DOTFILES_DIR = "$env:USERPROFILE\dotfiles"
+# This script lives at <repo>\scripts\setup\windows.ps1, so the repo root is
+# two levels up from $PSScriptRoot. Falls back to the historical default if
+# $PSScriptRoot is ever empty (e.g. dot-sourced in an unusual context).
+$DOTFILES_DIR = if ($PSScriptRoot) { Split-Path (Split-Path $PSScriptRoot -Parent) -Parent } else { "$env:USERPROFILE\dotfiles" }
 $NVIM_CONFIG = "$env:LOCALAPPDATA\nvim"
 $NVIM_DATA = "$env:LOCALAPPDATA\nvim-data"
 
 # Symlink map: source (relative to $DOTFILES_DIR) -> target
+#
+# Windows doesn't use Stow, so this hashtable is a hand-maintained
+# equivalent of the Makefile's STOW_PACKAGES list (`make print-STOW_PACKAGES`)
+# — keep it in sync by hand when packages are added/removed there. Notably
+# missing today: bin/ (~/.local/bin custom scripts) has no Windows PATH
+# equivalent wired up yet.
 $SYMLINK_MAP = @{
     "nvim\.config\nvim"           = $NVIM_CONFIG
     "git\.config\git"             = "$env:USERPROFILE\.config\git"
@@ -32,6 +42,7 @@ $SYMLINK_MAP = @{
     "television\.config\television" = "$env:USERPROFILE\.config\television"
     "atuin\.config\atuin"         = "$env:USERPROFILE\.config\atuin"
     "fastfetch\.config\fastfetch" = "$env:USERPROFILE\.config\fastfetch"
+    "starship\.config\starship"   = "$env:USERPROFILE\.config\starship"
     "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 }
 
@@ -54,6 +65,10 @@ $SCOOP_PACKAGES = @(
     # Git tools
     "lazygit"
     "delta"
+    # Prompt (default — see powershell profile / $PROFILE)
+    "starship"
+    # Runtime version manager (replaces pyenv, which has no Windows support)
+    "mise"
     # Development
     "nodejs"
     "python"
@@ -354,6 +369,14 @@ function Test-Installation {
 
     Write-Host ""
     Write-Host "  Score: $passed/$total checks passed" -ForegroundColor $(if ($passed -eq $total) { "Green" } else { "Yellow" })
+
+    # In CI, an incomplete health check is a real failure, not just a status
+    # line — mirrors install.sh's `[[ -n "$CI" ]]` strictness convention.
+    # Interactive/personal runs stay lenient (report and continue).
+    if ($env:CI -and $passed -ne $total) {
+        Write-Host "::error::Health check incomplete: $passed/$total" -ForegroundColor Red
+        exit 1
+    }
 }
 
 # ==============================================================================

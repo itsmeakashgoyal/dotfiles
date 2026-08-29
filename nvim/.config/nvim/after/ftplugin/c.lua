@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/after/ftplugin/c.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- C: K&R-style 4-space indentation, compile-and-run/compile-only keymaps
+-- (F9/F8).
 -- C-specific settings
 local set = vim.opt_local
 

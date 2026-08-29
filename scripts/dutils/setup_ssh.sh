@@ -1,26 +1,17 @@
 #!/usr/bin/env bash
-#              █████     ███  ████
-#             ░░███     ░░░  ░░███
-#  █████ ████ ███████   ████  ░███   █████
-# ░░███ ░███ ░░░███░   ░░███  ░███  ███░░
-#  ░███ ░███   ░███     ░███  ░███ ░░█████
-#  ░███ ░███   ░███ ███ ░███  ░███  ░░░░███
-#  ░░████████  ░░█████  █████ █████ ██████
-#   ░░░░░░░░    ░░░░░  ░░░░░ ░░░░░ ░░░░░░
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/utils/_setup_ssh.sh
+# ░▓ file   ▓ scripts/dutils/setup_ssh.sh
 # ░▓▓▓▓▓▓▓▓▓▓
-# ░░░░░░░░░░
 #
-#█▓▒░
-
 # ------------------------------
 #          INITIALIZE
 # ------------------------------
 # Load Helper functions persistently
-SCRIPT_DIR="${HOME}/dotfiles/scripts"
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+export DOTFILES_DIR
+SCRIPT_DIR="${DOTFILES_DIR}/scripts"
 CORE_FILE="${SCRIPT_DIR}/lib/core.sh"
 
 # Source shared library
@@ -79,7 +70,7 @@ generate_ssh_key() {
     cat "${key_path}.pub"
 
     # Copy to clipboard based on OS
-    if [ "$OS_TYPE" = "Darwin" ]; then # macOS
+    if os::is_mac; then # macOS
         cat "${key_path}.pub" | pbcopy
         success "Public key copied to clipboard!"
     elif command_exists xclip; then # Linux with xclip

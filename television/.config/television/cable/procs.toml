@@ -1,3 +1,10 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ television/.config/television/cable/procs.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# A channel to find and manage running processes
 [metadata]
 name = "procs"
 description = "A channel to find and manage running processes"

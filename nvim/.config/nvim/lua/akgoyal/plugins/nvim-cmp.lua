@@ -1,3 +1,11 @@
+--
+--  ▓▓▓▓▓▓▓▓▓▓
+-- ░▓ author ▓ Akash Goyal
+-- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/nvim-cmp.lua
+-- ░▓▓▓▓▓▓▓▓▓▓
+--
+-- Nvim-cmp: completion engine with LSP/snippet/buffer/path sources, custom smart-tab indentation,
+-- and ghost text.
 return {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
