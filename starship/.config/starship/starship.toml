@@ -5,19 +5,30 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Minimal prompt mirroring the repo's previous Powerlevel10k "lean" style:
-# line 1 = os icon, directory, git branch/status, time (right-aligned);
+# line 1 = os icon, directory, git branch, time (right-aligned);
 # line 2 = a colored prompt character. No background pills — matches p10k's
 # lean style, which uses plain foreground-colored text throughout.
 #
 # Colors below are the exact xterm-256 numbers the old .p10k.zsh used, not
 # approximated hex, so this is a faithful port rather than a re-guess:
-#   directory=31 (blue), git branch/clean=76 (green), git modified=178
-#   (gold), prompt ok=76 (green), prompt error=196 (red), time=66 (teal).
+#   directory=31 (blue), git branch/clean=76 (green), prompt ok=76 (green),
+#   prompt error=196 (red), time=66 (teal).
+#
+# $git_status is deliberately NOT in the format below. Unlike p10k (which
+# renders an instant placeholder prompt and fills in git info async in the
+# background), Starship's `$(starship prompt ...)` runs synchronously inside
+# $PROMPT and blocks the next line until it returns. On a huge repo (measured:
+# a 47k-tracked-file C++ monorepo) git_status alone costs ~85ms per prompt
+# even with core.fsmonitor/untrackedCache on and a warm cache (vs. ~25ms for
+# git_branch alone) — on rapid Enter presses that reads as real input lag,
+# which is exactly what p10k's async model hid. This trades away the inline
+# dirty/staged/modified markers for p10k-level responsiveness; branch name
+# is unaffected.
 
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-$os$directory$git_branch$git_status$fill$time
+$os$directory$git_branch$fill$time
 $character"""
 
 [fill]
@@ -42,28 +53,6 @@ format = "[$path]($style) "
 symbol = " "
 style = "76"
 format = "[$symbol$branch]($style) "
-
-[git_status]
-style = "178"
-# `untracked` is deliberately excluded from the format string, not just
-# hidden - Starship only computes a field when it's actually referenced in
-# `format`, and `untracked` is the one that requires walking the entire
-# working tree against .gitignore. On a small repo that's unnoticeable; on
-# a huge one (e.g. a large C++ monorepo) it can make every single prompt
-# render take ~1s, which is exactly what "shell is slow on Enter" looks
-# like - it's a per-render git-status cost, not a startup cost, so it
-# doesn't show up in `make bench` (which only measures the one-time
-# `zsh -i -c exit` startup path). Everything else here reads the already
-# up-to-date git index (ahead/behind/staged/modified) or a small ref list
-# (stashed), which stays fast regardless of working-tree size.
-format = '([$ahead_behind$stashed$staged$modified$conflicted]($style))'
-ahead = "⇢"
-behind = "⇠"
-diverged = "⇠⇢"
-stashed = "[*${count}](76)"
-staged = "+${count}"
-modified = "!${count}"
-conflicted = "~${count}"
 
 [time]
 disabled = false
