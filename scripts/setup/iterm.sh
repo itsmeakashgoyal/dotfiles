@@ -34,6 +34,8 @@ set -euo pipefail
 readonly ITERM_APP="/Applications/iTerm.app"
 readonly ITERM_PREFS_DIR="${DOTFILES_DIR}/settings/iterm"
 readonly ITERM_PLIST="${ITERM_PREFS_DIR}/com.googlecode.iterm2.plist"
+readonly ITERM_SHELL_INTEGRATION_SRC="${ITERM_APP}/Contents/Resources/iterm2_shell_integration.zsh"
+readonly ITERM_SHELL_INTEGRATION_DEST="${HOME}/.iterm2_shell_integration.zsh"
 
 # ------------------------------------------------------------------------------
 # Main Setup
@@ -66,6 +68,13 @@ main() {
 
     success "iTerm2 preferences folder set to: ${ITERM_PREFS_DIR}"
     info "Changes made in iTerm2 Preferences will save back to the dotfiles repo."
+
+    if [[ -f "${ITERM_SHELL_INTEGRATION_SRC}" ]]; then
+        cp "${ITERM_SHELL_INTEGRATION_SRC}" "${ITERM_SHELL_INTEGRATION_DEST}"
+        success "iTerm2 shell integration installed to ${ITERM_SHELL_INTEGRATION_DEST}"
+    else
+        warning "iTerm2 shell integration script not found in app bundle — skipping"
+    fi
 
     log_message "iTerm2 setup completed successfully"
 }
