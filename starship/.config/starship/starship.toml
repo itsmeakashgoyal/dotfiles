@@ -45,14 +45,24 @@ format = "[$symbol$branch]($style) "
 
 [git_status]
 style = "178"
-format = '([$ahead_behind$stashed$staged$modified$untracked$conflicted]($style))'
+# `untracked` is deliberately excluded from the format string, not just
+# hidden - Starship only computes a field when it's actually referenced in
+# `format`, and `untracked` is the one that requires walking the entire
+# working tree against .gitignore. On a small repo that's unnoticeable; on
+# a huge one (e.g. a large C++ monorepo) it can make every single prompt
+# render take ~1s, which is exactly what "shell is slow on Enter" looks
+# like - it's a per-render git-status cost, not a startup cost, so it
+# doesn't show up in `make bench` (which only measures the one-time
+# `zsh -i -c exit` startup path). Everything else here reads the already
+# up-to-date git index (ahead/behind/staged/modified) or a small ref list
+# (stashed), which stays fast regardless of working-tree size.
+format = '([$ahead_behind$stashed$staged$modified$conflicted]($style))'
 ahead = "⇢"
 behind = "⇠"
 diverged = "⇠⇢"
 stashed = "[*${count}](76)"
 staged = "+${count}"
 modified = "!${count}"
-untracked = "[?${count}](76)"
 conflicted = "~${count}"
 
 [time]
