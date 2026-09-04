@@ -24,7 +24,16 @@ require("lazy").setup({
     { import = "akgoyal.plugins.lsp" },
 }, {
     checker = {
-        enabled = true,
+        -- Disabled (lazy.nvim's own default is also false - this repo had
+        -- opted in). On session start/first-run-past-frequency, the checker
+        -- fires an async git-fetch against every installed plugin's remote;
+        -- if the network is slow that fetch job can still be running when
+        -- you quit, and Neovim's process teardown waits on it, which is
+        -- what made `nvim <any file>` -> `:q` take 10+ seconds with near-zero
+        -- CPU (confirmed via `time nvim --clean` ~2s vs `time nvim` ~16s on
+        -- the same trivial file - the gap disappears once plugins aren't
+        -- loaded at all). Run `:Lazy check` / `:Lazy update` manually instead.
+        enabled = false,
         notify = false,
     },
     change_detection = {
