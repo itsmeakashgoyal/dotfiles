@@ -4,11 +4,11 @@
 # ░▓ file   ▓ ghostty/.config/ghostty/config
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Matches the iTerm2 setup's look (Catppuccin Macchiato + JetBrainsMono Nerd
-# Font, see settings/iterm/) so switching between the two feels consistent,
-# and so Starship's prompt glyphs render correctly here too.
+# Font matches the iTerm2 setup (JetBrainsMono Nerd Font, see settings/iterm/)
+# so Starship's prompt glyphs render correctly here too; theme is Gruvbox
+# Dark by request, independent of iTerm2's Catppuccin Macchiato.
 
-theme = Catppuccin Macchiato
+theme = Gruvbox Dark
 font-family = JetBrainsMono Nerd Font Mono
 font-size = 18
 
@@ -20,3 +20,23 @@ shell-integration = detect
 # Matches the "leave close-confirmation off" choice already made for iTerm2
 # (see settings/iterm/com.googlecode.iterm2.plist's "Prompt Before Closing").
 confirm-close-surface = false
+
+# Quick Terminal: a global hotkey drops down a terminal overlay from any app,
+# no window-switching needed - iTerm2 has the same idea ("Hotkey Window") but
+# it isn't set up in this profile (Has Hotkey = False). Bound to Option+` (not
+# Cmd+`, which macOS already reserves system-wide for cycling windows within
+# the frontmost app - binding over that would break that shortcut everywhere,
+# not just in Ghostty).
+keybind = global:opt+grave_accent=toggle_quick_terminal
+
+# Everything below is a default already active, not a change - noted here so
+# it doesn't look accidental:
+# - Metal-accelerated rendering (this build: renderer.generic.Renderer(Metal))
+#   gives noticeably lower input-to-frame latency than iTerm2's renderer -
+#   directly relevant after this session's Starship/prompt-latency work.
+# - clipboard-paste-protection / clipboard-paste-bracketed-safe guard against
+#   pasted text smuggling in control sequences or looking like more lines of
+#   input than it appears to be - not something iTerm2 does by default.
+# - Config changes reload live (no restart) via the default Cmd+Shift+,
+#   keybind (reload_config action) - no equivalent in iTerm2 without
+#   reopening the affected window/tab.
