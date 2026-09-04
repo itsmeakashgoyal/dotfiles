@@ -1,0 +1,22 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ ghostty/.config/ghostty/config
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Matches the iTerm2 setup's look (Catppuccin Macchiato + JetBrainsMono Nerd
+# Font, see settings/iterm/) so switching between the two feels consistent,
+# and so Starship's prompt glyphs render correctly here too.
+
+theme = Catppuccin Macchiato
+font-family = JetBrainsMono Nerd Font Mono
+font-size = 18
+
+# Shell integration is native (Ghostty injects it itself before exec'ing the
+# shell) - no sourcing required, unlike iTerm2's file-based approach in
+# zsh/.config/zsh/conf.d/16-iterm.zsh. `detect` (the default) autodetects zsh.
+shell-integration = detect
+
+# Matches the "leave close-confirmation off" choice already made for iTerm2
+# (see settings/iterm/com.googlecode.iterm2.plist's "Prompt Before Closing").
+confirm-close-surface = false

@@ -50,6 +50,7 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `atuin/` → `~/.config/atuin/` — Shell history search
 - `fastfetch/` → `~/.config/fastfetch/` — System info display
 - `starship/` → `~/.config/starship/` — Cross-shell prompt (default; replaced Powerlevel10k)
+- `ghostty/` → `~/.config/ghostty/` — Ghostty terminal config (macOS; trying alongside iTerm2, see `settings/iterm/`)
 
 `powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `scripts/setup/windows.ps1`'s own symlink function instead (see Windows section below).
 
