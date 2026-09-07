@@ -63,11 +63,15 @@ zsh invoked
      │
      ▼ (interactive shell)
 ~/.config/zsh/.zshrc
+     ├── Powerlevel10k instant prompt (must run before any console output)
      ├── Zinit bootstrap + all plugin declarations (completions, autosuggestions,
-     │   syntax-highlighting, OMZP::git/sudo) — plugins are declared directly
-     │   in .zshrc, not in conf.d/
-     ├── Starship init (eval "$(starship init zsh)"), reading
-     │   ~/.config/starship/starship.toml — the default prompt
+     │   syntax-highlighting, OMZP::git/sudo, p10k theme) — plugins are declared
+     │   directly in .zshrc, not in conf.d/
+     ├── p10k init (source .p10k.zsh), the default prompt — async gitstatusd
+     │   daemon keeps git status out of the synchronous render path
+     ├── Starship init (eval "$(starship init zsh)"), opt-in via
+     │   DOTFILES_PROMPT=starship in 99-private.zsh, reading
+     │   ~/.config/starship/starship.toml
      └── source conf.d/*.zsh  (numeric order, not alphabetical)
               ├── 00-logo.zsh              ASCII greeting (interactive, non-tmux)
               ├── 01-exports.zsh           PATH, OS detection, env vars
@@ -82,14 +86,14 @@ zsh invoked
               ├── 10-atuin.zsh             Shell history search (Ctrl+R)
               ├── 11-colored-man-pages.zsh
               ├── 12-prompt-styles.zsh     6 hand-rolled pure-zsh prompt alternatives
-              │                            (zero-dependency fallback to Starship)
+              │                            (zero-dependency fallback to p10k)
               ├── 13-vi-mode.zsh
               ├── 14-abbreviations.zsh
               ├── 15-nix.zsh               Nix/Home Manager PATH (Linux)
               └── 99-private.zsh           ← gitignored, machine-local, last
 ```
 
-**Ordering constraint:** the `conf.d/` files are sourced after all Zinit plugin declarations and the Starship init.
+**Ordering constraint:** the `conf.d/` files are sourced after all Zinit plugin declarations and the p10k/Starship init.
 
 ---
 

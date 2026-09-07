@@ -12,7 +12,7 @@
   <a href="https://learn.microsoft.com/powershell/"><img src="https://img.shields.io/badge/Windows-PowerShell-blue?logo=windowsterminal" alt="Windows"></a>
   <a href="https://www.zsh.org/"><img src="https://img.shields.io/badge/Shell-Zsh-informational?logo=gnu-bash" alt="Shell"></a>
   <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-0.10%2B-green?logo=neovim" alt="Neovim"></a>
-  <a href="https://starship.rs/"><img src="https://img.shields.io/badge/Prompt-Starship-DD0B78?logo=starship" alt="Starship"></a>
+  <a href="https://github.com/romkatv/powerlevel10k"><img src="https://img.shields.io/badge/Prompt-Powerlevel10k-yellow" alt="Powerlevel10k"></a>
   <a href="https://github.com/itsmeakashgoyal/dotfiles/commits/master"><img src="https://img.shields.io/github/last-commit/itsmeakashgoyal/dotfiles" alt="Last Commit"></a>
 </p>
 
@@ -58,7 +58,7 @@
 
 | | |
 | --- | --- |
-| **Zsh** | Modular config via `conf.d/`, Zinit plugin manager, Starship prompt, television fuzzy finder |
+| **Zsh** | Modular config via `conf.d/`, Zinit plugin manager, Powerlevel10k prompt, television fuzzy finder |
 | **Neovim** | Lazy.nvim, LSP, Treesitter, Telescope, autocompletions |
 | **Git** | 40+ aliases, delta diff viewer, XDG-compliant config |
 | **Tmux** | TPM plugin manager, vim-aware pane switching, session persistence |
@@ -243,7 +243,7 @@ dotfiles/
 - [GNU Stow](https://www.gnu.org/software/stow/) -- Symlink farm manager
 - [Homebrew](https://brew.sh/) -- Package manager for macOS and Linux
 - [Neovim](https://neovim.io/) -- Hyperextensible text editor
-- [Starship](https://starship.rs/) -- Cross-shell prompt used by default here
+- [Powerlevel10k](https://github.com/romkatv/powerlevel10k) -- Zsh theme used by default here ([Starship](https://starship.rs/) is available as an opt-in alternative)
 - [VHS](https://github.com/charmbracelet/vhs) -- Terminal demo recorder (used for the preview above)
 - [Awesome Dotfiles](https://github.com/webpro/awesome-dotfiles) -- Community dotfiles resources
 
