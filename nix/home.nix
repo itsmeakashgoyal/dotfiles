@@ -44,6 +44,7 @@
     jq # JSON processor
     lazygit # Terminal UI for git
     mise # Runtime version manager (replaces pyenv)
+    uv # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
     starship # Cross-shell prompt (default, replaced Powerlevel10k)
     ripgrep # Better grep
     tree # Directory tree

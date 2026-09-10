@@ -56,12 +56,26 @@ fi
 VENV_DEFAULT_DIR=".venv"
 
 # ------------------------------------------------------------------------------
-# Virtual Environment Management
+# Virtual Environment Management (uv-backed)
 # ------------------------------------------------------------------------------
+# uv creates the venv and manages packages (`uv pip ...`) - mise (above) only
+# decides which Python interpreter is on PATH when `--python` isn't given.
+# See docs/PYTHON.md for the full mise+uv workflow (multiple envs, switching
+# interpreter versions, uv's project mode for lockfile-based reproducibility).
+
 # Create and activate a Python virtual environment
 function mkvenv() {
+    if ! command -v uv &>/dev/null; then
+        echo "Error: uv is not installed (see docs/PYTHON.md)"
+        return 1
+    fi
+
     # Set the environment directory name, default to VENV_DEFAULT_DIR if no name provided
     local env_dir=${1:-$VENV_DEFAULT_DIR}
+    # Optional second arg: a specific Python version/interpreter for uv to use
+    # (e.g. `mkvenv .venv 3.12`) - otherwise uv uses whatever `python` mise
+    # has on PATH.
+    local py_version=$2
 
     # Check if environment already exists
     if [[ -d "$env_dir" ]]; then
@@ -71,7 +85,12 @@ function mkvenv() {
 
     # Create the virtual environment
     echo "Creating new virtual environment '$env_dir'..."
-    if ! python3 -m venv "$env_dir"; then
+    if [[ -n "$py_version" ]]; then
+        if ! uv venv --python "$py_version" "$env_dir"; then
+            echo "Failed to create virtual environment '$env_dir'."
+            return 1
+        fi
+    elif ! uv venv "$env_dir"; then
         echo "Failed to create virtual environment '$env_dir'."
         return 1
     fi
@@ -82,16 +101,10 @@ function mkvenv() {
         return 1
     }
 
-    # Update core packages
-    pip install --upgrade pip wheel setuptools || {
-        echo "Error: Failed to upgrade core packages"
-        return 1
-    }
-
     echo "Virtual environment created and activated successfully"
     echo "Location: $(pwd)/$env_dir"
     echo "Python version: $(python --version)"
-    echo "Pip version: $(pip --version)"
+    echo "Install packages with: uv pip install <package>"
 }
 
 # Remove a Python virtual environment

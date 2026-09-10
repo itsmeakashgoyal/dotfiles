@@ -69,6 +69,9 @@ $SCOOP_PACKAGES = @(
     "starship"
     # Runtime version manager (replaces pyenv, which has no Windows support)
     "mise"
+    # Fast Python venv/package manager (works alongside mise - mise pins the
+    # interpreter version, uv manages venvs/packages using it)
+    "uv"
     # Development
     "nodejs"
     "python"
