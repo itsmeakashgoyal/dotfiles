@@ -84,8 +84,13 @@ cd ~/projects/internal-app && mise use node@20   # per-project
 
 ### Quick workflow (dotfiles helper functions)
 
-This repo's `zsh/.config/zsh/conf.d/08-python.zsh` defines three functions that
-wrap `uv venv` for the common case — create, activate, remove:
+`mkvenv`/`venv`/`rmvenv` work identically on macOS, Linux, and native Windows —
+same names, same arguments, same behavior. `zsh/.config/zsh/conf.d/08-python.zsh`
+defines them for zsh (macOS/Linux/WSL2); `powershell/.../Microsoft.PowerShell_profile.ps1`
+defines the same three for native Windows PowerShell. The only thing that
+differs under the hood is which activation script gets sourced (`bin/activate`
+vs. `Scripts\Activate.ps1`) — uv creates the right one for the OS it's running
+on, and both function sets look for it automatically.
 
 | Command | What it does |
 | --- | --- |
