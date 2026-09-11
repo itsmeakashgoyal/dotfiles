@@ -105,6 +105,10 @@ def cmd_list_functions(args: list[str]) -> None:
 def cmd_debug(args: list[str]) -> None:
     _exec_shell("run_with_xtrace.sh", args)
 
+
+def cmd_yt_download(args: list[str]) -> None:
+    _exec_shell("yt_download.sh", args)
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Registry
 # ──────────────────────────────────────────────────────────────────────────────
@@ -117,6 +121,7 @@ COMMANDS: dict[str, tuple] = {
     "install-nvim":   (cmd_install_nvim,   "Install latest Neovim (Linux only)"),
     "list-functions": (cmd_list_functions, "List all custom zsh functions"),
     "debug":          (cmd_debug,          "Run a script with debug tracing (bash -x)"),
+    "ytd":            (cmd_yt_download,    "Download YouTube videos/playlists in high quality"),
 }
 
 # ──────────────────────────────────────────────────────────────────────────────

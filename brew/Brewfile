@@ -68,6 +68,11 @@ brew "shfmt"                # Shell formatter
 brew "rsync"                # File sync
 brew "tldr"                 # Simplified man pages
 
+# Media / Downloads (used by scripts/dutils/yt_download.sh)
+brew "yt-dlp"               # YouTube / media downloader (Python)
+brew "ffmpeg"               # Audio/video transcode & mux (merges best video+audio)
+brew "atomicparsley"        # MP4 metadata/thumbnail embedding for yt-dlp
+
 #############################################################
 # macOS Specific                                            #
 #############################################################
