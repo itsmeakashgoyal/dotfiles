@@ -33,7 +33,7 @@ make clean            # Remove backup files
 
 **Lint (CI runs this too):**
 ```bash
-find . -type f \( -name "*.sh" -o -name "dutils" \) -exec shellcheck -x {} +  # Lint shell scripts
+find . -type f -name "*.sh" ! -name "profile_zsh.sh" -exec shellcheck -x {} +  # Lint shell scripts (dutils is Python, excluded)
 shfmt -d scripts/                   # Check shell formatting
 ```
 

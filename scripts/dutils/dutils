@@ -52,6 +52,10 @@ def cmd_cleanup(args: list[str]) -> None:
     _exec_python("cleanup.py", args)
 
 
+def cmd_update(args: list[str]) -> None:
+    _exec_python("update.py", args)
+
+
 def cmd_ssh_keygen(args: list[str]) -> None:
     _exec_shell("setup_ssh.sh", args)
 
@@ -115,6 +119,7 @@ def cmd_yt_download(args: list[str]) -> None:
 
 COMMANDS: dict[str, tuple] = {
     "cleanup":        (cmd_cleanup,        "Clean up dotfiles, Homebrew, Neovim, tmux"),
+    "update":         (cmd_update,         "Update Homebrew/Nix/mise/zinit/Neovim packages"),
     "ssh-keygen":     (cmd_ssh_keygen,     "Generate SSH keys with custom names/types"),
     "detect-os":      (cmd_detect_os,      "Detect current OS and architecture"),
     "diff":           (cmd_diff,           "Interactive file diff with tv and live watching"),
@@ -139,6 +144,7 @@ def show_help() -> None:
     print("\nFor command help:  dutils <command> --help")
     print("\nExamples:")
     print("  dutils cleanup nvim")
+    print("  dutils update")
     print("  dutils ssh-keygen -e you@email.com")
     print("  dutils list-functions")
     print("  dutils debug script.sh")

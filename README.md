@@ -62,7 +62,7 @@
 | **Neovim** | Lazy.nvim, LSP, Treesitter, Telescope, autocompletions |
 | **Git** | 40+ aliases, delta diff viewer, XDG-compliant config |
 | **Tmux** | TPM plugin manager, vim-aware pane switching, session persistence |
-| **`dutils`** | One CLI for cleanup, SSH keygen, OS detection, interactive diffing, and more |
+| **`dutils`** | One CLI for cleanup, updates, SSH keygen, OS detection, interactive diffing, and more |
 | **CLI tools** | macOS via Homebrew (`brew/Brewfile`); **Linux via Nix + Home Manager** (`nix/`, replaces linuxbrew) — eza, bat, ripgrep, fd, zoxide, and more. See [docs/NIX.md](docs/NIX.md) |
 
 ---

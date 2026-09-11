@@ -35,11 +35,31 @@ make diagnose             # Run all diagnostics at once
 
 ## Updating Your Dotfiles
 
+`make update` re-stows symlinks (picks up new/renamed files) — it does **not**
+upgrade any installed packages. See below for that.
+
 ```bash
 cd ~/dotfiles
 git pull
 make update
 exec zsh
+```
+
+---
+
+## Updating Installed Packages
+
+`dutils update` upgrades the tools this dotfiles setup actually installed:
+Homebrew formulae + casks (macOS), Nix flake inputs + Home Manager (Linux),
+mise-managed runtime versions, zinit-managed zsh plugins, and Neovim plugins.
+It deliberately does **not** touch macOS system software updates — that stays
+a manual, separate decision (System Settings, or `softwareupdate` yourself),
+since an OS update is a different risk tier and can require a restart.
+
+```bash
+dutils update            # everything applicable to this OS
+dutils update brew mise  # just specific components
+dutils update --help     # full list of components
 ```
 
 ---
