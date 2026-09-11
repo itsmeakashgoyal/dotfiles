@@ -9,6 +9,7 @@
 
 import os
 import platform
+import shutil
 import sys
 from pathlib import Path
 
@@ -22,18 +23,30 @@ VERSION    = "2.0.0"
 # landing SCRIPT_DIR in the wrong directory entirely (bin/.local/bin instead
 # of scripts/dutils) and breaking every sibling-script lookup below.
 SCRIPT_DIR = Path(__file__).resolve().parent
+# Sibling script directories under scripts/ - verification lives in verify/,
+# shared OS-detect/logging libs in lib/. dutils reaches into both rather than
+# duplicating their logic (e.g. detect-os uses lib/osdetect.py; the health/
+# check/diagnose/sysinfo/packages commands all delegate to verify/check.py -
+# the same implementation `make health` etc. use, now reachable on Windows too
+# where there is no make).
+VERIFY_DIR = SCRIPT_DIR.parent / "verify"
+LIB_DIR    = SCRIPT_DIR.parent / "lib"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Dispatch helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
-def _exec_python(script: str, args: list[str]) -> None:
-    """Replace the current process with a Python script in SCRIPT_DIR."""
-    path = SCRIPT_DIR / script
+def _exec_python_at(path: Path, args: list[str]) -> None:
+    """Replace the current process with a Python script at an explicit path."""
     if not path.exists():
         print(f"Error: script not found: {path}", file=sys.stderr)
         sys.exit(1)
     os.execvp(sys.executable, [sys.executable, str(path)] + args)
+
+
+def _exec_python(script: str, args: list[str]) -> None:
+    """Replace the current process with a Python script in SCRIPT_DIR."""
+    _exec_python_at(SCRIPT_DIR / script, args)
 
 
 def _exec_shell(script: str, args: list[str]) -> None:
@@ -61,16 +74,16 @@ def cmd_ssh_keygen(args: list[str]) -> None:
 
 
 def cmd_detect_os(_args: list[str]) -> None:
+    # Use the repo's canonical OS-detect module (scripts/lib/osdetect.py) for
+    # the label rather than re-deriving it here - one source of truth shared
+    # with check.py/cleanup.py/install_nvim.py (see CLAUDE.md).
+    sys.path.insert(0, str(LIB_DIR))
+    import osdetect
+
     system  = platform.system()
     machine = platform.machine()
     version = platform.release()
-
-    if system == "Darwin":
-        label = "macOS (Apple Silicon)" if machine == "arm64" else "macOS (Intel)"
-    elif system == "Linux":
-        label = "Linux (ARM)" if machine in ("aarch64", "arm64") else "Linux (x86_64)"
-    else:
-        label = f"Unknown: {system}"
+    label   = osdetect.detail()
 
     print("Operating System Detection")
     print("==========================")
@@ -113,13 +126,62 @@ def cmd_debug(args: list[str]) -> None:
 def cmd_yt_download(args: list[str]) -> None:
     _exec_shell("yt_download.sh", args)
 
+
+# ── Verification / diagnostics (delegate to scripts/verify/check.py) ──────────
+# These mirror the `make health|check|diagnose|sysinfo|packages` targets, but
+# via dutils they also work on Windows (which has no make). Extra args pass
+# straight through to check.py.
+
+def cmd_health(args: list[str]) -> None:
+    _exec_python_at(VERIFY_DIR / "check.py", ["--quick", *args])
+
+
+def cmd_check(args: list[str]) -> None:
+    _exec_python_at(VERIFY_DIR / "check.py", ["--full", *args])
+
+
+def cmd_diagnose(args: list[str]) -> None:
+    _exec_python_at(VERIFY_DIR / "check.py", ["--all", *args])
+
+
+def cmd_sysinfo(args: list[str]) -> None:
+    _exec_python_at(VERIFY_DIR / "check.py", ["--system", *args])
+
+
+def cmd_packages(args: list[str]) -> None:
+    _exec_python_at(VERIFY_DIR / "check.py", ["--packages", *args])
+
+
+# ── Shell startup performance ─────────────────────────────────────────────────
+
+def cmd_bench(_args: list[str]) -> None:
+    if shutil.which("hyperfine") is None:
+        print("Error: hyperfine is not installed.\n"
+              "Install: brew install hyperfine (macOS) or make nix-switch (Linux)",
+              file=sys.stderr)
+        sys.exit(1)
+    os.execvp("hyperfine", ["hyperfine", "--warmup", "5", "--shell=none", "zsh -i -c exit"])
+
+
+def cmd_profile(_args: list[str]) -> None:
+    # profile_zsh.sh has a zsh shebang and lives alongside this file; exec it
+    # directly (the previous only-via-`make bench-detail` path).
+    _exec_shell("profile_zsh.sh", [])
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Registry
 # ──────────────────────────────────────────────────────────────────────────────
 
 COMMANDS: dict[str, tuple] = {
-    "cleanup":        (cmd_cleanup,        "Clean up dotfiles, Homebrew, Neovim, tmux"),
     "update":         (cmd_update,         "Update Homebrew/Nix/mise/zinit/Neovim packages"),
+    "cleanup":        (cmd_cleanup,        "Clean up dotfiles, Homebrew, Neovim, tmux"),
+    "health":         (cmd_health,         "Quick health check (symlinks, tools, configs)"),
+    "check":          (cmd_check,          "Full installation verification with score"),
+    "diagnose":       (cmd_diagnose,       "Run all diagnostics (health + system + packages)"),
+    "sysinfo":        (cmd_sysinfo,        "Display system information"),
+    "packages":       (cmd_packages,       "Compare installed packages against Brewfile"),
+    "bench":          (cmd_bench,          "Benchmark zsh startup time (needs hyperfine)"),
+    "profile":        (cmd_profile,        "Profile zsh startup with zprof (per-function)"),
     "ssh-keygen":     (cmd_ssh_keygen,     "Generate SSH keys with custom names/types"),
     "detect-os":      (cmd_detect_os,      "Detect current OS and architecture"),
     "diff":           (cmd_diff,           "Interactive file diff with tv and live watching"),
@@ -143,11 +205,11 @@ def show_help() -> None:
     print(f"  \033[36m{'version':<18}\033[0m Show version information")
     print("\nFor command help:  dutils <command> --help")
     print("\nExamples:")
-    print("  dutils cleanup nvim")
     print("  dutils update")
+    print("  dutils health")
+    print("  dutils cleanup nvim")
     print("  dutils ssh-keygen -e you@email.com")
     print("  dutils list-functions")
-    print("  dutils debug script.sh")
 
 
 def show_version() -> None:

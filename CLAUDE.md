@@ -31,6 +31,14 @@ make list             # List available stow packages
 make clean            # Remove backup files
 ```
 
+Verification/diagnostics/benchmark `make` targets (`health`, `check`, `diagnose`,
+`sysinfo`, `packages`, `bench`, `bench-detail`) are thin aliases to the `dutils`
+CLI (`dutils health`, `dutils check`, …). `dutils` is the cross-platform path and
+the single implementation — it also works on Windows, which has no `make`. `make`
+remains the entry point for the install/stow/nix *lifecycle*; `dutils` is the
+day-to-day maintenance/introspection hub (`update`, `cleanup`, verification,
+`bench`, `profile`, `ssh-keygen`, `diff`, …). See `scripts/dutils/dutils`.
+
 **Lint (CI runs this too):**
 ```bash
 find . -type f -name "*.sh" ! -name "profile_zsh.sh" -exec shellcheck -x {} +  # Lint shell scripts (dutils is Python, excluded)

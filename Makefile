@@ -7,6 +7,12 @@
 # Stowable packages (directories with dotfiles)
 STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch starship ghostty
 
+# dutils: the cross-platform maintenance/introspection CLI. The verification,
+# diagnostics, and benchmark targets below are thin aliases to it so there's a
+# single implementation (also reachable on Windows, which has no make). Invoked
+# by path rather than the ~/.local/bin symlink so `make` works pre-stow too.
+DUTILS := python3 scripts/dutils/dutils
+
 # Color codes
 YELLOW := \033[33m
 GREEN := \033[32m
@@ -227,39 +233,34 @@ clean: ## Remove backup files created by stow
 ##@ Verification & Diagnostics
 
 .PHONY: health
-health: ## Run quick health check
-	@bash scripts/verify/check.sh --quick || true
+health: ## Run quick health check (alias for `dutils health`)
+	@$(DUTILS) health || true
 
 .PHONY: check
-check: ## Run full installation verification
-	@bash scripts/verify/check.sh --full || true
+check: ## Run full installation verification (alias for `dutils check`)
+	@$(DUTILS) check || true
 
 .PHONY: sysinfo
-sysinfo: ## Display system information
-	@bash scripts/verify/check.sh --system
+sysinfo: ## Display system information (alias for `dutils sysinfo`)
+	@$(DUTILS) sysinfo
 
 .PHONY: packages
-packages: ## Check installed packages against Brewfile
-	@bash scripts/verify/check.sh --packages || true
+packages: ## Check installed packages against Brewfile (alias for `dutils packages`)
+	@$(DUTILS) packages || true
 
 .PHONY: diagnose
-diagnose: ## Run all diagnostic tools
-	@bash scripts/verify/check.sh --all || true
+diagnose: ## Run all diagnostic tools (alias for `dutils diagnose`)
+	@$(DUTILS) diagnose || true
 
 ##@ Performance
 
 .PHONY: bench
-bench: ## Benchmark zsh startup time (requires hyperfine)
-	@command -v hyperfine >/dev/null 2>&1 || { \
-		echo "$(RED)Error:$(CLR) hyperfine is not installed."; \
-		echo "$(YELLOW)Install:$(CLR) brew install hyperfine (macOS) or make nix-switch (Linux)"; \
-		exit 1; \
-	}
-	@hyperfine --warmup 5 --shell=none 'zsh -i -c exit'
+bench: ## Benchmark zsh startup time (alias for `dutils bench`)
+	@$(DUTILS) bench
 
 .PHONY: bench-detail
-bench-detail: ## Profile zsh startup with zprof (function-level breakdown)
-	@zsh scripts/dutils/profile_zsh.sh
+bench-detail: ## Profile zsh startup with zprof (alias for `dutils profile`)
+	@$(DUTILS) profile
 
 ##@ Windows
 

@@ -89,34 +89,24 @@ nvim ~/dotfiles/tmux/.config/tmux/tmux.conf           # Tmux config
 
 ## Verification & Diagnostics
 
-### Quick Health Check
+These are all available two ways: as `dutils <cmd>` (works on macOS, Linux, **and
+Windows** — the cross-platform path) or as `make <cmd>` (a thin alias to the same
+thing, kept for muscle memory; macOS/Linux only, since Windows has no make).
 
-```bash
-make health
-```
+| What | dutils (any OS) | make (macOS/Linux) |
+| --- | --- | --- |
+| Quick health check | `dutils health` | `make health` |
+| Full verification (scored) | `dutils check` | `make check` |
+| System information | `dutils sysinfo` | `make sysinfo` |
+| Package audit vs Brewfile | `dutils packages` | `make packages` |
+| Everything (health + system + packages) | `dutils diagnose` | `make diagnose` |
+| Benchmark zsh startup | `dutils bench` | `make bench` |
+| Profile zsh startup (per-function) | `dutils profile` | `make bench-detail` |
 
-Checks core components (git, brew, zsh, nvim, tmux), symlinks, and essential CLI tools. Runs in seconds.
-
-### Full Verification
-
-```bash
-make check
-```
-
-Comprehensive check of all 40+ components: directory structure, symlinks, tool versions, git config, plugin managers, and development tools. Outputs a score and saves a report to `/tmp/`.
-
-### System Information
-
-```bash
-bash ~/dotfiles/scripts/verify/check.sh system_info.sh            # Everything
-bash ~/dotfiles/scripts/verify/check.sh system_info.sh --system    # OS & hardware only
-bash ~/dotfiles/scripts/verify/check.sh system_info.sh --dev       # Dev tools only
-```
-
-### Package Audit
-
-```bash
-make packages
-```
-
-Compares installed Homebrew packages against the Brewfile. Shows missing, extra, and outdated packages.
+- **Health check** — core components (git, brew, zsh, nvim, tmux), symlinks, and
+  essential CLI tools. Runs in seconds.
+- **Full verification** — all 40+ components: directory structure, symlinks, tool
+  versions, git config, plugin managers, dev tools. Outputs a score and saves a
+  report to `/tmp/`.
+- **Package audit** — installed Homebrew packages vs the Brewfile (missing, extra,
+  outdated).
