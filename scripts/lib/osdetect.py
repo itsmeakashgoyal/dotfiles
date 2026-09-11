@@ -19,6 +19,10 @@ def is_linux() -> bool:
     return platform.system() == "Linux"
 
 
+def is_windows() -> bool:
+    return platform.system() == "Windows"
+
+
 def detail() -> str:
     system = platform.system()
     machine = platform.machine()
@@ -26,4 +30,7 @@ def detail() -> str:
         return "Linux (ARM)" if machine == "aarch64" or machine.startswith("arm") else "Linux (x86_64)"
     if system == "Darwin":
         return "macOS (Apple Silicon)" if machine == "arm64" else "macOS (Intel)"
+    if system == "Windows":
+        # ARM64 Windows reports "ARM64"; x64 reports "AMD64".
+        return "Windows (ARM)" if machine.upper().startswith("ARM") else "Windows (x86_64)"
     return f"Unknown: {system} on {machine}"

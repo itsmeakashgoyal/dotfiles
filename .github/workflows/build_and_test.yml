@@ -273,8 +273,17 @@ jobs:
           echo "✅ Neovim configuration test complete"
 
       - name: Test dutils commands
+        shell: bash
         run: |
           echo "🧪 Testing dutils commands..."
+
+          # brew onto PATH: `bench` needs hyperfine, and health/check/packages
+          # inspect brew-installed tools.
+          if [[ -x "/opt/homebrew/bin/brew" ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+          elif [[ -x "/usr/local/bin/brew" ]]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+          fi
 
           # Nothing in install.sh creates this symlink - it's a manual,
           # documented one-time step (scripts/dutils/README.md) - so create it
@@ -283,10 +292,40 @@ jobs:
           ln -sf "$HOME/dotfiles/scripts/dutils/dutils" "$HOME/.local/bin/dutils"
           export PATH="$HOME/.local/bin:$PATH"
 
-          dutils help
-          dutils version
-          dutils detect-os
-          dutils list-functions
+          # Dispatch smoke test: fails on a Python crash or an unwired command
+          # ("unknown command"). --strict also requires exit 0 (for commands
+          # where success is guaranteed); otherwise a nonzero exit is tolerated
+          # - e.g. `check` legitimately scores below 100 in a CI environment.
+          smoke() {
+            local strict=0
+            [[ "$1" == "--strict" ]] && { strict=1; shift; }
+            local out rc
+            out="$(dutils "$@" 2>&1)"; rc=$?
+            if grep -qiE "traceback \(most recent call last\)|unknown command '" <<<"$out"; then
+              echo "::error::'dutils $*' crashed or is not wired up (exit $rc):"; echo "$out"; return 1
+            fi
+            if [[ "$strict" -eq 1 && "$rc" -ne 0 ]]; then
+              echo "::error::'dutils $*' expected exit 0, got $rc:"; echo "$out"; return 1
+            fi
+            echo "  ✅ dutils $* (exit $rc)"
+          }
+
+          # Guaranteed exit 0 - proves dispatch + argparse wiring:
+          smoke --strict help
+          smoke --strict version
+          smoke --strict detect-os
+          smoke --strict sysinfo
+          smoke --strict update --help
+          smoke --strict cleanup --help
+          # Read-only checks - run for real; nonzero tolerated (CI misses some):
+          smoke list-functions
+          smoke health
+          smoke packages
+          smoke check
+          smoke diagnose
+          # Performance tools - prove they dispatch and invoke the real backend:
+          smoke bench
+          smoke profile
           echo "✅ dutils commands test complete"
 
       - name: Uninstall dotfiles
@@ -494,8 +533,13 @@ jobs:
           echo "✅ Neovim configuration test complete"
 
       - name: Test dutils commands
+        shell: bash
         run: |
           echo "🧪 Testing dutils commands..."
+
+          # Nix profile onto PATH: `bench` needs hyperfine (in nix/home.nix),
+          # and health/check inspect Nix-provided tools.
+          export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
           # Nothing in install.sh creates this symlink - it's a manual,
           # documented one-time step (scripts/dutils/README.md) - so create it
@@ -503,12 +547,42 @@ jobs:
           # than silently no-op'ing every command below forever.
           mkdir -p "$HOME/.local/bin"
           ln -sf "$HOME/dotfiles/scripts/dutils/dutils" "$HOME/.local/bin/dutils"
-          export PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
+          export PATH="$HOME/.local/bin:$PATH"
 
-          dutils help
-          dutils version
-          dutils detect-os
-          dutils list-functions
+          # Dispatch smoke test: fails on a Python crash or an unwired command
+          # ("unknown command"). --strict also requires exit 0 (for commands
+          # where success is guaranteed); otherwise a nonzero exit is tolerated
+          # - e.g. `check` legitimately scores below 100 in a CI environment.
+          smoke() {
+            local strict=0
+            [[ "$1" == "--strict" ]] && { strict=1; shift; }
+            local out rc
+            out="$(dutils "$@" 2>&1)"; rc=$?
+            if grep -qiE "traceback \(most recent call last\)|unknown command '" <<<"$out"; then
+              echo "::error::'dutils $*' crashed or is not wired up (exit $rc):"; echo "$out"; return 1
+            fi
+            if [[ "$strict" -eq 1 && "$rc" -ne 0 ]]; then
+              echo "::error::'dutils $*' expected exit 0, got $rc:"; echo "$out"; return 1
+            fi
+            echo "  ✅ dutils $* (exit $rc)"
+          }
+
+          # Guaranteed exit 0 - proves dispatch + argparse wiring:
+          smoke --strict help
+          smoke --strict version
+          smoke --strict detect-os
+          smoke --strict sysinfo
+          smoke --strict update --help
+          smoke --strict cleanup --help
+          # Read-only checks - run for real; nonzero tolerated (CI misses some):
+          smoke list-functions
+          smoke health
+          smoke packages
+          smoke check
+          smoke diagnose
+          # Performance tools - prove they dispatch and invoke the real backend:
+          smoke bench
+          smoke profile
           echo "✅ dutils commands test complete"
 
       - name: Uninstall dotfiles
@@ -611,6 +685,50 @@ jobs:
             exit 1
           }
           Write-Host "✅ PowerShell profile symlinked"
+
+      - name: Test dutils commands
+        shell: pwsh
+        run: |
+          Write-Host "🧪 Testing dutils commands (cross-platform, on Windows)..."
+
+          # dutils is invoked by path here (no ~/.local/bin symlink on Windows).
+          $dutils = "$env:USERPROFILE\dotfiles\scripts\dutils\dutils"
+          $env:PATH = "$env:USERPROFILE\scoop\shims;$env:PATH"  # scoop-installed python, if any
+          $py = (Get-Command python -ErrorAction SilentlyContinue).Source
+          if (-not $py) { $py = (Get-Command python3 -ErrorAction SilentlyContinue).Source }
+          if (-not $py) { Write-Host "::error::python not found on Windows"; exit 1 }
+          Write-Host "Using python: $py"
+
+          # Dispatch smoke test: fails on a Python crash or an unwired command
+          # ("unknown command"). -Strict also requires exit 0. This proves the
+          # commands genuinely run on Windows (which has no make) - health uses
+          # the same check.py as macOS/Linux and reports Unix tools as absent
+          # rather than crashing.
+          function Smoke {
+            param([string[]]$CmdArgs, [switch]$Strict)
+            $out = (& $py $dutils @CmdArgs 2>&1 | Out-String)
+            $rc = $LASTEXITCODE
+            if ($out -match "Traceback \(most recent call last\)" -or $out -match "unknown command '") {
+              Write-Host "::error::'dutils $($CmdArgs -join ' ')' crashed or is not wired up (exit ${rc}):"
+              Write-Host $out; exit 1
+            }
+            if ($Strict -and $rc -ne 0) {
+              Write-Host "::error::'dutils $($CmdArgs -join ' ')' expected exit 0, got ${rc}:"
+              Write-Host $out; exit 1
+            }
+            Write-Host "  OK: dutils $($CmdArgs -join ' ') (exit ${rc})"
+          }
+
+          # Guaranteed exit 0 - dispatch, argparse, and cross-platform osdetect:
+          Smoke @('help')             -Strict
+          Smoke @('version')          -Strict
+          Smoke @('detect-os')        -Strict
+          Smoke @('sysinfo')          -Strict
+          Smoke @('update','--help')  -Strict
+          Smoke @('cleanup','--help') -Strict
+          # check.py-backed; reports missing Unix tools but must not crash:
+          Smoke @('health')
+          Write-Host "✅ dutils commands test complete (Windows)"
 
   # Job 4: Summary and notification
   summary:
