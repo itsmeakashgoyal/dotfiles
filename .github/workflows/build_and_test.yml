@@ -300,7 +300,12 @@ jobs:
             local strict=0
             [[ "$1" == "--strict" ]] && { strict=1; shift; }
             local out rc
-            out="$(dutils "$@" 2>&1)"; rc=$?
+            # `if` form, not a bare `out=$(...)` assignment: GitHub runs bash
+            # with `set -e`, under which a failing command substitution in a
+            # plain assignment kills the step before we can inspect $rc. Inside
+            # an `if` condition, set -e is suspended, so a tolerated nonzero
+            # (e.g. `check` scoring < 100) is captured instead of fatal.
+            if out="$(dutils "$@" 2>&1)"; then rc=0; else rc=$?; fi
             if grep -qiE "traceback \(most recent call last\)|unknown command '" <<<"$out"; then
               echo "::error::'dutils $*' crashed or is not wired up (exit $rc):"; echo "$out"; return 1
             fi
@@ -557,7 +562,12 @@ jobs:
             local strict=0
             [[ "$1" == "--strict" ]] && { strict=1; shift; }
             local out rc
-            out="$(dutils "$@" 2>&1)"; rc=$?
+            # `if` form, not a bare `out=$(...)` assignment: GitHub runs bash
+            # with `set -e`, under which a failing command substitution in a
+            # plain assignment kills the step before we can inspect $rc. Inside
+            # an `if` condition, set -e is suspended, so a tolerated nonzero
+            # (e.g. `check` scoring < 100) is captured instead of fatal.
+            if out="$(dutils "$@" 2>&1)"; then rc=0; else rc=$?; fi
             if grep -qiE "traceback \(most recent call last\)|unknown command '" <<<"$out"; then
               echo "::error::'dutils $*' crashed or is not wired up (exit $rc):"; echo "$out"; return 1
             fi
@@ -690,6 +700,12 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "🧪 Testing dutils commands (cross-platform, on Windows)..."
+
+          # dutils forces UTF-8 output (PYTHONIOENCODING) so its glyphs don't
+          # hit Windows' cp1252 encode error; decode that UTF-8 here too so the
+          # captured text is intact and the traceback regex matches correctly.
+          $env:PYTHONIOENCODING = "utf-8"
+          [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
           # dutils is invoked by path here (no ~/.local/bin symlink on Windows).
           $dutils = "$env:USERPROFILE\dotfiles\scripts\dutils\dutils"

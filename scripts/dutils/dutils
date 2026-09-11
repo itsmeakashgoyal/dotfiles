@@ -22,6 +22,19 @@ VERSION    = "2.0.0"
 # .parent first would follow that outer symlink instead of this file's own,
 # landing SCRIPT_DIR in the wrong directory entirely (bin/.local/bin instead
 # of scripts/dutils) and breaking every sibling-script lookup below.
+# Force UTF-8 I/O so the box-drawing / ✓✗ glyphs printed by the verification
+# and update subcommands don't crash on Windows, whose default console encoding
+# (cp1252) can't encode them (UnicodeEncodeError). PYTHONIOENCODING is inherited
+# by the Python scripts we exec below (check.py/update.py/cleanup.py print those
+# glyphs); reconfigure() covers this process's own output. Both are no-ops where
+# UTF-8 is already the default (macOS/Linux).
+os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 # Sibling script directories under scripts/ - verification lives in verify/,
 # shared OS-detect/logging libs in lib/. dutils reaches into both rather than
