@@ -4,85 +4,131 @@
 # ░▓ file   ▓ starship/.config/starship/starship.toml
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Minimal prompt mirroring the repo's previous Powerlevel10k "lean" style:
-# line 1 = os icon, directory, git branch/status, time (right-aligned);
-# line 2 = a colored prompt character. No background pills — matches p10k's
-# lean style, which uses plain foreground-colored text throughout.
-#
-# Colors below are the exact xterm-256 numbers the old .p10k.zsh used, not
-# approximated hex, so this is a faithful port rather than a re-guess:
-#   directory=31 (blue), git branch/clean=76 (green), git modified=178
-#   (gold), prompt ok=76 (green), prompt error=196 (red), time=66 (teal).
-#
-# $git_status was dropped once (see git log) for prompt speed on huge repos,
-# then brought back by request - a branch name alone doesn't say whether the
-# repo has uncommitted changes, which matters more day-to-day than the extra
-# latency. Unlike p10k's async instant-prompt, `$(starship prompt ...)` runs
-# synchronously in $PROMPT, so this module's cost is paid on every Enter
-# press: ~25-30ms on typical repos, but measured up to ~85-90ms per prompt
-# on a 47k-tracked-file C++ monorepo (with core.fsmonitor/untrackedCache on,
-# Starship 1.26+, and git's fsmonitor--daemon already warm for that repo).
-# The first render after that daemon has been idle for a while pays a much
-# bigger one-time cost (measured 500ms-1.3s) while it cold-starts - this is
-# a property of git's fsmonitor itself (raw `git status` shows the identical
-# spike on that repo), not something Starship or this config causes, and it
-# self-heals on the very next render. If a specific huge repo still feels
-# sluggish on every render (not just the first one after a gap), the fix is
-# a per-repo override (e.g. swap STARSHIP_CONFIG based on repo size in a
-# chpwd hook), not silently dropping this again.
-
-"$schema" = 'https://starship.rs/config-schema.json'
+# Default prompt config (Starship). Set DOTFILES_PROMPT=p10k to use
+# Powerlevel10k instead - see zsh/.config/zsh/.zshrc.
 
 format = """
-$os$directory$git_branch$git_status$fill$time
+$directory\
+$git_branch\
+$git_status\
+$fill\
+$python\
+$lua\
+$nodejs\
+$golang\
+$haskell\
+$rust\
+$ruby\
+$aws\
+$docker_context\
+$jobs\
+$cmd_duration\
+$time\
+$line_break\
 $character"""
 
-[fill]
-symbol = " "
-
-[os]
-disabled = false
-format = "[$symbol](white) "
-
-[os.symbols]
-Macos = " "
-Linux = " "
-Windows = "󰍲 "
+add_newline = true
+palette = "nord"
 
 [directory]
-style = "31"
-truncation_length = 0
+style = 'bold fg:dark_blue'
+format = '[$path ]($style)'
+truncation_length = 3
+truncation_symbol = '…/'
 truncate_to_repo = false
-format = "[$path]($style) "
+
+[directory.substitutions]
+'Documents' = '󰈙'
+'Downloads' = ' '
+'Music' = ' '
+'Pictures' = ' '
 
 [git_branch]
-symbol = " "
-style = "76"
-format = "[$symbol$branch]($style) "
+style = 'fg:green'
+symbol = ' '
+format = '[on](white) [$symbol$branch ]($style)'
 
 [git_status]
-style = "178"
-# `untracked` is deliberately excluded from the format string, not just
-# hidden - Starship only computes a field when it's actually referenced in
-# `format`, and `untracked` is the one that requires walking the entire
-# working tree against .gitignore, which is the single most expensive part
-# of this module on a huge repo. Everything else here reads the already
-# up-to-date git index (ahead/behind/staged/modified) or a small ref list
-# (stashed), which stays fast regardless of working-tree size.
-format = '([$ahead_behind$stashed$staged$modified$conflicted]($style))'
-ahead = "⇢"
-behind = "⇠"
-diverged = "⇠⇢"
-stashed = "[*${count}](76)"
-staged = "+${count}"
-modified = "!${count}"
-conflicted = "~${count}"
+style = 'fg:red'
+format = '([$all_status$ahead_behind]($style) )'
 
+[fill]
+symbol = ' '
+
+[python]
+style = 'teal'
+symbol = ' '
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+pyenv_version_name = true
+pyenv_prefix = ''
+
+[lua]
+format = '[$symbol($version )]($style)'
+symbol = ' '
+
+[nodejs]
+style = 'blue'
+symbol = ' '
+
+[golang]
+style = 'blue'
+symbol = ' '
+
+[haskell]
+style = 'blue'
+symbol = ' '
+
+[rust]
+style = 'orange'
+symbol = ' '
+
+[ruby]
+style = 'blue'
+symbol = ' '
+
+[package]
+symbol = '󰏗 '
+
+[aws]
+symbol = ' '
+style = 'yellow'
+format = '[$symbol($profile )(\[$duration\] )]($style)'
+
+[docker_context]
+symbol = ' '
+style = 'fg:#06969A'
+format = '[$symbol]($style) $path'
+detect_files = ['docker-compose.yml', 'docker-compose.yaml', 'Dockerfile']
+detect_extensions = ['Dockerfile']
+
+[jobs]
+symbol = ' '
+style = 'red'
+number_threshold = 1
+format = '[$symbol]($style)'
+
+[cmd_duration]
+min_time = 500
+style = 'fg:gray'
+format = '[$duration ]($style)'
+
+# Right-aligned clock (after $fill), mirroring the old Powerlevel10k 12-hour
+# time. Disabled by default in Starship, so enable it explicitly.
 [time]
 disabled = false
-format = "[$time](66)"
-time_format = "%I:%M:%S %p"
+time_format = '%I:%M:%S %p'
+style = 'fg:teal'
+format = '[$time]($style)'
 
-[character]
-success_symbol = "[❯](76)"
-error_symbol = "[❯](196)"
+[palettes.nord]
+dark_blue = '#5E81AC'
+blue = '#81A1C1'
+teal = '#88C0D0'
+red = '#BF616A'
+orange = '#D08770'
+green = '#A3BE8C'
+yellow = '#EBCB8B'
+purple = '#B48EAD'
+gray = '#434C5E'
+black = '#2E3440'
+white='#E7E7E7'

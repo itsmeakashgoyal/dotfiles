@@ -12,7 +12,7 @@
   <a href="https://learn.microsoft.com/powershell/"><img src="https://img.shields.io/badge/Windows-PowerShell-blue?logo=windowsterminal" alt="Windows"></a>
   <a href="https://www.zsh.org/"><img src="https://img.shields.io/badge/Shell-Zsh-informational?logo=gnu-bash" alt="Shell"></a>
   <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-0.10%2B-green?logo=neovim" alt="Neovim"></a>
-  <a href="https://github.com/romkatv/powerlevel10k"><img src="https://img.shields.io/badge/Prompt-Powerlevel10k-yellow" alt="Powerlevel10k"></a>
+  <a href="https://starship.rs/"><img src="https://img.shields.io/badge/Prompt-Starship-DD0B78?logo=starship" alt="Starship"></a>
   <a href="https://github.com/itsmeakashgoyal/dotfiles/commits/master"><img src="https://img.shields.io/github/last-commit/itsmeakashgoyal/dotfiles" alt="Last Commit"></a>
 </p>
 
@@ -58,12 +58,43 @@
 
 | | |
 | --- | --- |
-| **Zsh** | Modular config via `conf.d/`, Zinit plugin manager, Powerlevel10k prompt, television fuzzy finder |
+| **Zsh** | Modular config via `conf.d/`, Zinit plugin manager, Starship prompt (Powerlevel10k available), television fuzzy finder |
 | **Neovim** | Lazy.nvim, LSP, Treesitter, Telescope, autocompletions |
 | **Git** | 40+ aliases, delta diff viewer, XDG-compliant config |
 | **Tmux** | TPM plugin manager, vim-aware pane switching, session persistence |
 | **`dutils`** | One CLI for cleanup, updates, SSH keygen, OS detection, interactive diffing, and more |
 | **CLI tools** | macOS via Homebrew (`brew/Brewfile`); **Linux via Nix + Home Manager** (`nix/`, replaces linuxbrew) — eza, bat, ripgrep, fd, zoxide, and more. See [docs/NIX.md](docs/NIX.md) |
+
+---
+
+## Switching prompts
+
+Two prompts ship here: **Starship** (default) and **Powerlevel10k**. The choice is
+a single knob, `DOTFILES_PROMPT`, read at the top of `zsh/.config/zsh/.zshrc`.
+Both stay fully wired — switching never removes anything.
+
+**Try one for a single session** (nothing permanent):
+
+```bash
+DOTFILES_PROMPT=p10k exec zsh        # switch to Powerlevel10k
+DOTFILES_PROMPT=starship exec zsh    # switch to Starship
+```
+
+**Make it permanent** — set it as an environment variable so it's defined before
+`.zshrc` runs. Put it in `~/.zshenv` (or edit the default on the
+`: "${DOTFILES_PROMPT:=starship}"` line at the top of `.zshrc`):
+
+```bash
+echo 'export DOTFILES_PROMPT=p10k' >> ~/.zshenv   # or =starship
+exec zsh
+```
+
+> **Note:** `DOTFILES_PROMPT` must be set *before* `.zshrc` loads, so `~/.zshenv`
+> or your environment works — but `conf.d/99-private.zsh` does **not** (it's
+> sourced after the prompt is already up).
+
+Starship's config is `starship/.config/starship/starship.toml`; Powerlevel10k's
+is `zsh/.config/zsh/.p10k.zsh` (regenerate with `p10k configure`).
 
 ---
 
@@ -244,7 +275,7 @@ dotfiles/
 - [GNU Stow](https://www.gnu.org/software/stow/) -- Symlink farm manager
 - [Homebrew](https://brew.sh/) -- Package manager for macOS and Linux
 - [Neovim](https://neovim.io/) -- Hyperextensible text editor
-- [Powerlevel10k](https://github.com/romkatv/powerlevel10k) -- Zsh theme used by default here ([Starship](https://starship.rs/) is available as an opt-in alternative)
+- [Starship](https://starship.rs/) -- Zsh prompt used by default here ([Powerlevel10k](https://github.com/romkatv/powerlevel10k) is available as an alternative — see [Switching prompts](#switching-prompts))
 - [VHS](https://github.com/charmbracelet/vhs) -- Terminal demo recorder (used for the preview above)
 - [Awesome Dotfiles](https://github.com/webpro/awesome-dotfiles) -- Community dotfiles resources
 

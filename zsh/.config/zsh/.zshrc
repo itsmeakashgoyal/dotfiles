@@ -6,10 +6,18 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # ==============================================================================
-# 1. POWERLEVEL10K INSTANT PROMPT
-# Must be the very first thing — before any console output.
+# 1. PROMPT SELECTION
+# One knob for the whole file: "starship" (default) or "p10k". Change the value
+# here, or set DOTFILES_PROMPT in the environment before zsh starts. (It can't
+# be set in 99-private.zsh - that's sourced too late, after the prompt loads.)
+# The three gates below (instant prompt, p10k config, theme) all read this.
 # ==============================================================================
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+: "${DOTFILES_PROMPT:=starship}"
+
+# p10k's instant prompt must be the very first thing, before any output. Only
+# under p10k; Starship has no equivalent.
+if [[ "$DOTFILES_PROMPT" == "p10k" \
+      && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -65,8 +73,8 @@ select-word-style bash  # only alphanumeric chars are considered WORDCHARS
 # exports.zsh must run before compinit — it extends fpath with custom completions.
 source "$ZDOTDIR/conf.d/01-exports.zsh"
 
-# p10k config must be sourced before the theme plugin loads.
-[[ -f "$ZDOTDIR/.p10k.zsh" ]] && source "$ZDOTDIR/.p10k.zsh"
+# p10k config must be sourced before the theme plugin loads (p10k only).
+[[ "$DOTFILES_PROMPT" == "p10k" && -f "$ZDOTDIR/.p10k.zsh" ]] && source "$ZDOTDIR/.p10k.zsh"
 
 # ==============================================================================
 # 6. PLUGINS — ordered by load mode
@@ -92,24 +100,14 @@ zinit wait lucid for \
     OMZP::git \
     OMZP::sudo
 
-# --- 6f. Theme ---------------------------------------------------------------
-zinit ice depth=1
-zinit light romkatv/powerlevel10k
-
-# --- 6g. Starship (optional, opt-in) ------------------------------------------
-# To try it: `make stow pkg=starship` (already in STOW_PACKAGES), then set
-# DOTFILES_PROMPT=starship in 99-private.zsh (gitignored) and restart your
-# shell. p10k above still initializes either way; this just lets Starship's
-# own init run afterward and take over the actual prompt rendering, so
-# switching back is just unsetting the variable and restarting the shell.
-# Reverted from being the default: Starship's `$(starship prompt ...)` runs
-# synchronously inside $PROMPT and blocks on every Enter, while p10k's own
-# gitstatusd daemon computes git status asynchronously - p10k felt faster,
-# especially on large repos (see git log on this file and on
-# starship/.config/starship/starship.toml for the full diagnosis).
-if [[ "${DOTFILES_PROMPT:-p10k}" == "starship" ]] && command -v starship &>/dev/null; then
-  export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
-  eval "$(starship init zsh)"
+# --- 6f. Theme (Starship by default, or Powerlevel10k) -----------------------
+# Selection is the DOTFILES_PROMPT knob from section 1.
+if [[ "$DOTFILES_PROMPT" == "p10k" ]]; then
+    zinit ice depth=1
+    zinit light romkatv/powerlevel10k
+else
+    export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+    eval "$(starship init zsh)"
 fi
 
 # ==============================================================================
