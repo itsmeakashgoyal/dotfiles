@@ -57,8 +57,9 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `bin/` → `~/.local/bin/` — Custom scripts (yank, zoxide-edit)
 - `atuin/` → `~/.config/atuin/` — Shell history search
 - `fastfetch/` → `~/.config/fastfetch/` — System info display
-- `starship/` → `~/.config/starship/` — Cross-shell prompt (opt-in via `DOTFILES_PROMPT=starship`; Powerlevel10k, via `zsh/.config/zsh/.p10k.zsh` + zinit, is the default)
+- `starship/` → `~/.config/starship/` — Cross-shell prompt; **the default** (`starship.toml`). Set `DOTFILES_PROMPT=p10k` to switch back to Powerlevel10k (`zsh/.config/zsh/.p10k.zsh` + zinit), which stays fully wired. The `DOTFILES_PROMPT` knob is at the top of `.zshrc` (section 1); it must be set before `.zshrc` runs (not in `99-private.zsh`, which loads too late)
 - `ghostty/` → `~/.config/ghostty/` — Ghostty terminal config (macOS; trying alongside iTerm2, see `settings/iterm/`)
+- `yazi/` → `~/.config/yazi/` — Yazi terminal file manager (minimal config, built-in theme)
 
 `powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `scripts/setup/windows.ps1`'s own symlink function instead (see Windows section below).
 
@@ -86,7 +87,7 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `scripts/lib/core.sh` — Shared library for logging, command checking; sourced by all bash entry-point scripts. Has side effects on source (creates `~/linuxtoolbox`, `/tmp/dotfiles.log`).
 - `scripts/lib/os-detect.sh` — OS detection only (`os::is_mac`/`os::is_linux`/`os::arch`/`os::detail`), split out from `core.sh` specifically because it has none of core.sh's side effects — safe to source from zsh's interactive startup too. `scripts/lib/osdetect.py` mirrors the same API for Python scripts.
 - `scripts/verify/check.sh` → `check.py` — Health/verification checks (`--quick`, `--full`, `--packages`, `--system`)
-- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh`, `iterm.sh` (macOS), `uninstall.sh`, `windows.ps1` (Windows). There is no `macos.sh`.
+- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh`, `iterm.sh`, `macos-defaults.sh` (curated `defaults write`, run via `make macos-defaults`; not in the default install flow) (macOS), `uninstall.sh`, `windows.ps1` (Windows). There is no `macos.sh`.
 - `scripts/setup/macos.sh` + `brew/Brewfile` — Homebrew bundle installation (macOS only — Linux uses Nix instead, see `nix.sh`/`nix/home.nix`)
 
 ### Installation Flow

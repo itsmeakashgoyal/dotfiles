@@ -49,6 +49,7 @@
     ripgrep # Better grep
     tree # Directory tree
     television # Fuzzy finder (solves the linuxbrew "no tv" gap cleanly)
+    yazi # Terminal file manager
     zoxide # Smart cd
 
     # System monitoring

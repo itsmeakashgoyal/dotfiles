@@ -40,6 +40,7 @@ brew "starship"             # Cross-shell prompt (default, replaced Powerlevel10
 brew "ripgrep"              # Better grep (Rust)
 brew "tree"                 # Directory tree
 brew "television"           # Fuzzy finder with channels (Rust)
+brew "yazi"                 # Terminal file manager (Rust)
 brew "zoxide"               # Smart cd (Rust)
 
 # System Monitoring

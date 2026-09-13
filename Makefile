@@ -5,7 +5,7 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Stowable packages (directories with dotfiles)
-STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch starship ghostty
+STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch starship ghostty yazi
 
 # dutils: the cross-platform maintenance/introspection CLI. The verification,
 # diagnostics, and benchmark targets below are thin aliases to it so there's a
@@ -64,6 +64,11 @@ sublime: ## Setup Sublime Text settings
 iterm: ## Setup iTerm2 preferences
 	@echo "$(YELLOW)Setting up iTerm2...$(CLR)"
 	@bash scripts/setup/iterm.sh
+
+.PHONY: macos-defaults
+macos-defaults: ## Apply curated macOS system defaults (Finder, input, screenshots)
+	@echo "$(YELLOW)Applying macOS defaults...$(CLR)"
+	@bash scripts/setup/macos-defaults.sh
 
 ##@ Nix (the only package manager used on Linux)
 

@@ -21,6 +21,24 @@ shell-integration = detect
 # (see settings/iterm/com.googlecode.iterm2.plist's "Prompt Before Closing").
 confirm-close-surface = false
 
+# Quality-of-life additions (theme/font left as-is):
+# - Hide the mouse cursor while typing so it doesn't sit over text.
+# - A little breathing room around the grid (x = left,right ; y = top,bottom).
+mouse-hide-while-typing = true
+window-padding-x = 4,0
+window-padding-y = 2,0
+
+# CSI-u keybinds so ctrl+enter / shift+enter send distinct sequences instead of
+# a plain newline - TUIs and editors (Neovim, REPLs, Claude Code) can then bind
+# them separately (e.g. shift+enter for a soft newline).
+keybind = ctrl+enter=text:\x1b[13;5u
+keybind = shift+enter=text:\x1b[13;2u
+
+# Opt-in: treat the macOS Option key as a real Alt modifier (enables alt+<key>
+# bindings). Uncomment ONLY if you don't rely on Option to type special
+# characters (é, ©, √, …) - it disables that when on.
+# macos-option-as-alt = true
+
 # Quick Terminal: a global hotkey drops down a terminal overlay from any app,
 # no window-switching needed - iTerm2 has the same idea ("Hotkey Window") but
 # it isn't set up in this profile (Has Hotkey = False). Bound to Option+` (not
