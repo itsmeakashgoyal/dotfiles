@@ -109,6 +109,31 @@ jobs:
           python3 -m py_compile scripts/dutils/dutils
           echo "✅ Python syntax OK"
 
+      - name: Lint PowerShell (PSScriptAnalyzer)
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Linting PowerShell (Error/ParseError gate)..."
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          # Scan tracked files only (git ls-files), so local worktrees under
+          # .claude/ or other ignored dirs never pollute results. Warnings are
+          # informational; the gate is Error + ParseError, mirroring the
+          # shellcheck `--severity=error` gate above. A ParseError here is the
+          # class of bug that would silently break the whole profile on load.
+          $files = git ls-files '*.ps1' '*.psm1' '*.psd1'
+          if (-not $files) { Write-Host "No PowerShell files to lint."; exit 0 }
+          $findings = @()
+          foreach ($f in $files) {
+            $findings += Invoke-ScriptAnalyzer -Path $f -Severity Error,ParseError
+          }
+          if ($findings) {
+            $findings | Format-Table ScriptName,Line,RuleName,Message -AutoSize | Out-String | Write-Host
+            Write-Host "::error::PSScriptAnalyzer found $($findings.Count) error-level issue(s)"
+            exit 1
+          }
+          Write-Host "✅ No PowerShell errors (warnings are non-fatal - run"
+          Write-Host "   Invoke-ScriptAnalyzer without -Severity for the full report)"
+
   # Job 2: Test on macOS
   test-macos:
     name: Test on macOS
