@@ -5,12 +5,10 @@ directory. Each subcommand `exec`s its script directly, so there's no wrapper ov
 
 ## Quick Start
 
-`dutils` isn't symlinked onto your `PATH` by anything in this repo — that's a manual, one-time step:
-
-```bash
-export PATH="$HOME/.local/bin:$PATH"   # add to your shell config if not already there
-ln -sf ~/dotfiles/scripts/dutils/dutils ~/.local/bin/dutils
-```
+`dutils` is exposed on your `PATH` automatically by the `bin` Stow package —
+`bin/.local/bin/dutils` is a symlink into this directory, so `make run` (or
+`make stow pkg=bin`) creates `~/.local/bin/dutils` for you. Just ensure
+`~/.local/bin` is on your `PATH` (it is by default in this repo's zsh config):
 
 ```bash
 dutils help                # list all commands
@@ -106,8 +104,8 @@ not in this directory.
 
 ## Troubleshooting
 
-**`command not found: dutils`** — the symlink from Quick Start above is missing or `~/.local/bin`
-isn't on `PATH`.
+**`command not found: dutils`** — the `bin` package isn't stowed (`make stow pkg=bin`) or
+`~/.local/bin` isn't on `PATH`.
 
 **Permission denied** — `chmod +x ~/dotfiles/scripts/dutils/dutils ~/dotfiles/scripts/dutils/*.sh`.
 

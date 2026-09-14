@@ -54,7 +54,7 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `nvim/` → `~/.config/nvim/` — Neovim with Lazy.nvim + Harpoon
 - `tmux/` → `~/.config/tmux/` — Tmux config
 - `television/` → `~/.config/television/` — Fuzzy finder with channels
-- `bin/` → `~/.local/bin/` — Custom scripts (yank, zoxide-edit)
+- `bin/` → `~/.local/bin/` — Custom scripts (yank, zoxide-edit) + a `dutils` symlink into `scripts/dutils/`, so stowing `bin` puts the `dutils` CLI on `PATH` automatically
 - `atuin/` → `~/.config/atuin/` — Shell history search
 - `fastfetch/` → `~/.config/fastfetch/` — System info display
 - `starship/` → `~/.config/starship/` — Cross-shell prompt; **the default** (`starship.toml`). Set `DOTFILES_PROMPT=p10k` to switch back to Powerlevel10k (`zsh/.config/zsh/.p10k.zsh` + zinit), which stays fully wired. The `DOTFILES_PROMPT` knob is at the top of `.zshrc` (section 1); it must be set before `.zshrc` runs (not in `99-private.zsh`, which loads too late)

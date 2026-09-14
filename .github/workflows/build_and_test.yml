@@ -222,12 +222,15 @@ jobs:
             fail=1
           fi
 
-          # dutils is documented as a manual, one-time symlink step (see
-          # scripts/dutils/README.md) - install.sh doesn't create it, so its
-          # absence here isn't a failure, just informational.
-          if [[ -f "$HOME/.local/bin/dutils" ]]; then
-            echo "✅ dutils manually symlinked"
+          # dutils is exposed by the `bin` Stow package (bin/.local/bin/dutils),
+          # so `make run` during install creates ~/.local/bin/dutils - a missing
+          # one means stow didn't run, which is a real failure.
+          if [[ -x "$HOME/.local/bin/dutils" ]]; then
+            echo "✅ dutils on PATH via stowed bin package"
             "$HOME/.local/bin/dutils" version || true
+          else
+            echo "❌ ~/.local/bin/dutils missing (bin package not stowed?)"
+            fail=1
           fi
 
           [[ "$fail" -eq 0 ]] || { echo "❌ Installation verification failed"; exit 1; }
@@ -285,11 +288,8 @@ jobs:
             eval "$(/usr/local/bin/brew shellenv)"
           fi
 
-          # Nothing in install.sh creates this symlink - it's a manual,
-          # documented one-time step (scripts/dutils/README.md) - so create it
-          # here the same way a real user following that doc would.
-          mkdir -p "$HOME/.local/bin"
-          ln -sf "$HOME/dotfiles/scripts/dutils/dutils" "$HOME/.local/bin/dutils"
+          # dutils is exposed by the stowed `bin` package (install.sh ran
+          # `make run`); just put ~/.local/bin on PATH.
           export PATH="$HOME/.local/bin:$PATH"
 
           # Dispatch smoke test: fails on a Python crash or an unwired command
@@ -546,12 +546,8 @@ jobs:
           # and health/check inspect Nix-provided tools.
           export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
-          # Nothing in install.sh creates this symlink - it's a manual,
-          # documented one-time step (scripts/dutils/README.md) - so create it
-          # here the same way a real user following that doc would, rather
-          # than silently no-op'ing every command below forever.
-          mkdir -p "$HOME/.local/bin"
-          ln -sf "$HOME/dotfiles/scripts/dutils/dutils" "$HOME/.local/bin/dutils"
+          # dutils is exposed by the stowed `bin` package (install.sh ran
+          # `make run`); just put ~/.local/bin on PATH.
           export PATH="$HOME/.local/bin:$PATH"
 
           # Dispatch smoke test: fails on a Python crash or an unwired command
