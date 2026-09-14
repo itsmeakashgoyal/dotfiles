@@ -99,7 +99,7 @@ Separate path, no Stow: `install.ps1` → `scripts/setup/windows.ps1` (Scoop pac
 ### CI/CD
 `.github/workflows/build_and_test.yml`:
 1. Lint: shellcheck + file permissions + YAML validation + `py_compile` + PSScriptAnalyzer (PowerShell, Error/ParseError gate on `git ls-files '*.ps1'`)
-2. `test-macos` / `test-ubuntu` (required): full install → package verification → zsh config test (sources `.zshrc`, asserts real exit codes) → Neovim headless config test → uninstall → verify-uninstall
+2. `test-macos` / `test-ubuntu` (required): full install → package verification → zsh config test (sources `.zshrc`, asserts real exit codes) → Neovim headless config test → uninstall → verify-uninstall. `test-ubuntu` also lints Nix (`nixfmt --check` on `nix/*.nix` + `nix flake check --impure`) right after installing Nix, reusing that install.
 3. `test-windows` (soft-gated, informational only for now): `windows.ps1` install → PowerShell profile symlink check
 
 ## Key Conventions

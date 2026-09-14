@@ -66,6 +66,22 @@ It refuses to run on macOS.
 | Update all versions | `make nix-update` (runs `nix flake update` + switch) |
 | Roll back a bad change | `home-manager generations` then activate an older one |
 | List installed | `home-manager packages` |
+| Format the nix files | `nixfmt nix/*.nix` (CI gates this with `nixfmt --check`) |
+
+## Nix dev tooling
+
+The Linux package set (`nix/home.nix`) includes a few Nix-authoring tools —
+**Linux only**, since none are in Homebrew (macOS keeps using brew):
+
+- **nixfmt-rfc-style** — the formatter. `nixfmt nix/*.nix` (or the flake's
+  `nix fmt`). CI's `test-ubuntu` job runs `nixfmt --check` so drift fails a PR.
+  macOS gets the same tool via `brew "nixfmt"` for editing the files there.
+- **nixd** — the Nix language server. Neovim wires it up automatically **only
+  when the `nixd` binary is present** (so opening a `.nix` file on macOS, which
+  has no Nix, doesn't error) — see `nvim/.config/nvim/lua/akgoyal/plugins/lsp/mason.lua`.
+- **devenv** — reproducible per-project dev environments (pin a project's exact
+  gcc/clang/python/node toolchain declaratively). `cd` into a project, add a
+  `devenv.nix`, run `devenv shell`. See <https://devenv.sh>. Linux/WSL only here.
 
 ## Installing & uninstalling individual packages
 

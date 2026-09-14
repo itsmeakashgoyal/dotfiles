@@ -38,7 +38,8 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs =
+    { nixpkgs, home-manager, ... }:
     {
       # Applied via:  home-manager switch --flake ./nix#default --impure
       # scripts/setup/nix.sh always uses this one name — no per-machine edits.
@@ -48,7 +49,9 @@
           config.allowUnfree = true;
         };
         modules = [ ./home.nix ];
-        extraSpecialArgs = { username = builtins.getEnv "USER"; };
+        extraSpecialArgs = {
+          username = builtins.getEnv "USER";
+        };
       };
     };
 }

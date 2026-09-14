@@ -123,6 +123,15 @@ return {
 		-- Enable all configured servers
 		vim.lsp.enable({ "lua_ls", "clangd", "basedpyright", "ruff" })
 
+		-- nixd (Nix LSP) - not a Mason package; installed via Nix (Linux only,
+		-- see nix/home.nix). Enable it only when the binary is actually present
+		-- so opening a .nix file on a machine without nixd (e.g. macOS, which
+		-- has no Nix) doesn't throw a "client failed to start" error.
+		if vim.fn.executable("nixd") == 1 then
+			vim.lsp.config("nixd", {})
+			vim.lsp.enable({ "nixd" })
+		end
+
 		-- ======================================================================
 		-- LSP Keymaps (on attach)
 		-- ======================================================================

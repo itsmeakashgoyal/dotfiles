@@ -64,6 +64,7 @@ brew "stylua"               # Lua formatter
 # Shell Tools
 brew "shellcheck"           # Shell script linter
 brew "shfmt"                # Shell formatter
+brew "nixfmt"               # Nix formatter (for editing nix/*.nix on macOS; RFC 166 style)
 
 # Other Tools
 brew "rsync"                # File sync

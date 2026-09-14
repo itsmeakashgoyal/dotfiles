@@ -435,6 +435,19 @@ jobs:
           extra-conf: |
             experimental-features = nix-command flakes
 
+      - name: Lint Nix (format + flake eval)
+        run: |
+          echo "🔍 Checking Nix formatting (RFC 166 style)..."
+          # Reuses the Nix just installed above - no extra tool install. Same
+          # formatter as the local `nixfmt` (both RFC-style), so this gates the
+          # same output. The nix/ configs are the only tracked .nix files.
+          nix run nixpkgs#nixfmt-rfc-style -- --check nix/*.nix
+          echo "✅ Nix formatting OK"
+          echo "🔍 Evaluating the flake (catches broken home.nix early)..."
+          # --impure: this flake reads $USER / currentSystem at eval time.
+          nix flake check --impure ./nix
+          echo "✅ Flake evaluates"
+
       - name: Install ZSH
         run: |
           echo "📦 Installing zsh..."

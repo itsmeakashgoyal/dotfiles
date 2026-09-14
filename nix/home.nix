@@ -70,6 +70,11 @@
     shellcheck # Shell linter
     shfmt # Shell formatter
 
+    # Nix tooling (Linux only - not available via Homebrew on macOS)
+    nixfmt-rfc-style # Nix formatter (RFC 166 style; matches the CI check)
+    nixd # Nix language server (for editing home.nix / flake.nix in nvim)
+    devenv # Reproducible per-project dev environments (see docs/NIX.md)
+
     # Misc
     rsync # File sync
     tealdeer # Fast `tldr` client (provides the `tldr` command)
