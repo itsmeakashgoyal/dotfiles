@@ -82,6 +82,18 @@ def cmd_update(args: list[str]) -> None:
     _exec_python("update.py", args)
 
 
+def cmd_sync(args: list[str]) -> None:
+    _exec_python("sync.py", args)
+
+
+def cmd_edit(args: list[str]) -> None:
+    _exec_python("edit.py", args)
+
+
+def cmd_new(args: list[str]) -> None:
+    _exec_python("new.py", args)
+
+
 def cmd_ssh_keygen(args: list[str]) -> None:
     _exec_shell("setup_ssh.sh", args)
 
@@ -187,7 +199,10 @@ def cmd_profile(_args: list[str]) -> None:
 
 COMMANDS: dict[str, tuple] = {
     "update":         (cmd_update,         "Update Homebrew/Nix/mise/zinit/Neovim packages"),
+    "sync":           (cmd_sync,           "Pull latest dotfiles, re-stow, and update"),
     "cleanup":        (cmd_cleanup,        "Clean up dotfiles, Homebrew, Neovim, tmux"),
+    "edit":           (cmd_edit,           "Open a Stow package's config in $EDITOR"),
+    "new":            (cmd_new,            "Scaffold a new Stow package and register it"),
     "health":         (cmd_health,         "Quick health check (symlinks, tools, configs)"),
     "check":          (cmd_check,          "Full installation verification with score"),
     "diagnose":       (cmd_diagnose,       "Run all diagnostics (health + system + packages)"),
@@ -218,11 +233,11 @@ def show_help() -> None:
     print(f"  \033[36m{'version':<18}\033[0m Show version information")
     print("\nFor command help:  dutils <command> --help")
     print("\nExamples:")
+    print("  dutils sync")
     print("  dutils update")
     print("  dutils health")
-    print("  dutils cleanup nvim")
-    print("  dutils ssh-keygen -e you@email.com")
-    print("  dutils list-functions")
+    print("  dutils edit nvim")
+    print("  dutils new <package>")
 
 
 def show_version() -> None:
