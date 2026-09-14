@@ -61,7 +61,7 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `ghostty/` → `~/.config/ghostty/` — Ghostty terminal config (macOS; trying alongside iTerm2, see `settings/iterm/`)
 - `yazi/` → `~/.config/yazi/` — Yazi terminal file manager (minimal config, built-in theme)
 
-`powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `scripts/setup/windows.ps1`'s own symlink function instead (see Windows section below).
+`powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `scripts/setup/windows.ps1`'s own symlink function instead (see Windows section below). The profile is a thin loader that resolves its own symlink and dot-sources `profile.d/*.ps1` (mirroring zsh's `conf.d/`); `profile.d/` lives only in the repo (found via the symlink's target), so it needs no separate symlink.
 
 ### Zsh Configuration Layout
 `zsh/.config/zsh/conf.d/` contains numbered modular config files sourced in order:
