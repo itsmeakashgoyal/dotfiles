@@ -18,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 import osdetect  # noqa: E402
+from dutil import ok as _ok, step as _info  # noqa: E402
 
 HOME            = Path.home()
 NVIM_BACKUP_DIR = HOME / "linuxtoolbox" / "backup" / "nvim"
@@ -34,16 +35,6 @@ ARCH_TARBALL: dict[str, str] = {
     "aarch64": "nvim-linux-arm64.tar.gz",
     "arm64":   "nvim-linux-arm64.tar.gz",
 }
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Helpers
-# ──────────────────────────────────────────────────────────────────────────────
-
-def _ok(msg: str) -> None:
-    print(f"  \033[32m✓\033[0m {msg}")
-
-def _info(msg: str) -> None:
-    print(f"  \033[34m→\033[0m {msg}")
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Steps

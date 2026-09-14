@@ -14,26 +14,15 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from dutil import ok as _ok, info as _info, confirm as _confirm  # noqa: E402
+
 HOME = Path.home()
 UNINSTALL_SH = Path(__file__).resolve().parent.parent / "setup" / "uninstall.sh"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ──────────────────────────────────────────────────────────────────────────────
-
-def _ok(msg: str) -> None:
-    print(f"  \033[32m✓\033[0m {msg}")
-
-def _info(msg: str) -> None:
-    print(f"  \033[34m•\033[0m {msg}")
-
-def _confirm(prompt: str) -> bool:
-    while True:
-        answer = input(f"{prompt} [y/N] ").strip().lower()
-        if answer in ("y", "yes"):
-            return True
-        if answer in ("n", "no", ""):
-            return False
 
 def _run_uninstall(steps: str, force: bool) -> None:
     """Delegate to scripts/setup/uninstall.sh for the given steps.

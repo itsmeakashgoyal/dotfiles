@@ -15,30 +15,13 @@
 import argparse
 import platform
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+from dutil import ok as _ok, info as _info, fail as _fail, run as _run  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Helpers
-# ──────────────────────────────────────────────────────────────────────────────
-
-def _ok(msg: str) -> None:
-    print(f"  \033[32m✓\033[0m {msg}")
-
-def _info(msg: str) -> None:
-    print(f"  \033[34m•\033[0m {msg}")
-
-def _fail(msg: str) -> None:
-    print(f"  \033[31m✗\033[0m {msg}")
-
-def _run(cmd: list[str], **kwargs) -> bool:
-    """Run a command, streaming its output live, returning whether it succeeded."""
-    print(f"  $ {' '.join(cmd)}")
-    result = subprocess.run(cmd, **kwargs)
-    return result.returncode == 0
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Update Functions
