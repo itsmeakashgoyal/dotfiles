@@ -7,8 +7,8 @@
 #
 # OS detection only — no logging, no side effects (no file/dir creation).
 # Safe to source from anywhere, including zsh's interactive-shell startup
-# path, unlike core.sh (which creates ~/linuxtoolbox and /tmp/dotfiles.log
-# on source). core.sh sources this file for its bash consumers; zsh sources
+# path, unlike core.sh (which touches /tmp/dotfiles.log on source). core.sh
+# sources this file for its bash consumers; zsh sources
 # it directly for the same reason.
 #
 # Guard prevents double-sourcing within the SAME process (readonly below

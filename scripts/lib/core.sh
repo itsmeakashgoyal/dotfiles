@@ -110,27 +110,10 @@ log::kvp()     { printf "  %-30s : %s\n" "$1" "$2"; }
 log::sep()     { local w="${1:-70}" c="${2:-─}"; printf '%*s\n' "$w" | tr ' ' "$c"; }
 log::newline() { echo ""; }
 
-log::spinner() {
-    local pid=$1 msg="${2:-Processing}" spin='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏' i=0
-    while kill -0 "$pid" 2>/dev/null; do
-        i=$(( (i+1) % 10 ))
-        printf "\r  ${LOG_BLUE}${spin:$i:1}${LOG_NC} %s..." "$msg"
-        sleep 0.1
-    done
-    printf "\r  ${LOG_GREEN}✓${LOG_NC} %s... Done\n" "$msg"
-}
-
-log::progress() {
-    local cur=$1 tot=$2 w=50
-    local pct=$((cur * 100 / tot)) filled=$((cur * w / tot)) empty=$((w - cur * w / tot))
-    printf "\r  ["; printf "%${filled}s" | tr ' ' '█'; printf "%${empty}s" | tr ' ' '░'
-    printf "] %3d%%" "$pct"
-    if [[ $cur -eq $tot ]]; then echo ""; fi
-}
-
 is_verbose() { [[ "${LOG_LEVEL}" == "DEBUG" || "${LOG_LEVEL}" == "TRACE" ]]; }
 
-# Compatibility aliases — existing scripts can keep calling info(), success(), etc.
+# Compatibility aliases — setup scripts call these bare names (info(), success(),
+# log_message(), …) rather than the log::* namespace.
 info()            { log::info    "$@"; }
 success()         { log::success "$@"; }
 warning()         { log::warning "$@"; }
@@ -140,28 +123,6 @@ substep_success() { log::ok      "$@"; }
 substep_error()   { log::fail    "$@"; }
 section_header()  { log::section "$@"; }
 log_message()     { log::info    "$@"; }
-
-# Legacy log_* names used by existing scripts
-log_trace()   { log::trace   "$@"; }
-log_debug()   { log::debug   "$@"; }
-log_info()    { log::info    "$@"; }
-log_success() { log::success "$@"; }
-log_warning() { log::warning "$@"; }
-log_error()   { log::error   "$@"; }
-log_fatal()   { log::fatal   "$@"; }
-log_section() { log::section "$@"; }
-log_banner()  { log::banner  "$@"; }
-log_box()     { log::box     "$@"; }
-log_substep() { log::substep "$@"; }
-log_kvp()     { log::kvp     "$@"; }
-log_ok()      { log::ok      "$@"; }
-log_fail()    { log::fail    "$@"; }
-log_warn()    { log::warn    "$@"; }
-log_bullet()  { log::bullet  "$@"; }
-log_spinner() { log::spinner "$@"; }
-log_progress(){ log::progress "$@"; }
-log_separator(){ log::sep    "$@"; }
-log_newline() { log::newline; }
 
 # ==============================================================================
 # OS Detection  (namespace: os::*)
@@ -254,17 +215,11 @@ run_script() {
 DOTFILES_DIR="${DOTFILES_DIR:-${HOME}/dotfiles}"
 readonly DOTFILES_DIR
 readonly CONFIG_DIR="${HOME}/.config"
-readonly BACKUP_DIR="${HOME}/linuxtoolbox"
-export DOTFILES_DIR CONFIG_DIR BACKUP_DIR
+export DOTFILES_DIR CONFIG_DIR
 
 # ==============================================================================
 # Initialization Side-effects
 # ==============================================================================
-
-# Ensure backup dir exists
-if [[ ! -d "$BACKUP_DIR" ]]; then
-    mkdir -p "$BACKUP_DIR"
-fi
 
 # Ensure log file is writable
 if [[ "$LOG_TO_FILE" == "true" ]]; then
@@ -276,12 +231,9 @@ fi
 export -f _log _log::level_num
 export -f log::trace log::debug log::info log::success log::warning log::error log::fatal
 export -f log::section log::banner log::box log::substep log::kvp log::sep log::newline
-export -f log::ok log::fail log::warn log::bullet log::spinner log::progress
+export -f log::ok log::fail log::warn log::bullet
 export -f command_exists pkg::exists pkg::version get_version check_command check_required_commands
 export -f info success warning error substep_info substep_success substep_error section_header log_message
-export -f log_trace log_debug log_info log_success log_warning log_error log_fatal
-export -f log_section log_banner log_box log_substep log_kvp log_ok log_fail log_warn
-export -f log_bullet log_spinner log_progress log_separator log_newline
 export -f is_verbose print_error run_script sudo_keep_alive
 # os::* functions and OS_TYPE are already exported by os-detect.sh, above.
 # Export variables used by exported functions
