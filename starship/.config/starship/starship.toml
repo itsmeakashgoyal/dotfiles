@@ -4,131 +4,86 @@
 # ░▓ file   ▓ starship/.config/starship/starship.toml
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Default prompt config (Starship). Set DOTFILES_PROMPT=p10k to use
-# Powerlevel10k instead - see zsh/.config/zsh/.zshrc.
+# Minimal, monochrome prompt: the whole line renders dimmed white, with the
+# directory in bold italic, git status in italic yellow, a `took Xs` command
+# duration, and subtle Nerd Font language icons. No clock / OS icon - kept
+# deliberately spare. Set DOTFILES_PROMPT=p10k to use Powerlevel10k instead
+# (see zsh/.config/zsh/.zshrc).
 
+"$schema" = 'https://starship.rs/config-schema.json'
+
+command_timeout = 100
+add_newline = true
+
+# Explicit module order (dir → commit hash → status → branch → langs → duration)
+# wrapped in `(dimmed white)` so the whole line is muted by default and each
+# module's own style provides the accents - mirroring the reference look:
+#   dotfiles (a1b2c3d) ! on  branch  took 1.2s
 format = """
-$directory\
-$git_branch\
-$git_status\
-$fill\
-$python\
-$lua\
-$nodejs\
-$golang\
-$haskell\
-$rust\
-$ruby\
-$aws\
-$docker_context\
-$jobs\
-$cmd_duration\
-$time\
-$line_break\
+[$directory$git_commit$git_status$git_branch$nodejs$lua$rust$ruby$golang$package$docker_context$nix_shell$cmd_duration](dimmed white)
 $character"""
 
-add_newline = true
-palette = "nord"
-
 [directory]
-style = 'bold fg:dark_blue'
-format = '[$path ]($style)'
-truncation_length = 3
-truncation_symbol = '…/'
-truncate_to_repo = false
+style = "bold italic white"
 
-[directory.substitutions]
-'Documents' = '󰈙'
-'Downloads' = ' '
-'Music' = ' '
-'Pictures' = ' '
+[git_commit]
+# Show a short commit hash on every prompt, not just on a detached HEAD.
+only_detached = false
+format = '[\($hash\)]($style) '
+style = "dimmed white"
 
 [git_branch]
-style = 'fg:green'
-symbol = ' '
-format = '[on](white) [$symbol$branch ]($style)'
+style = "purple"
 
 [git_status]
-style = 'fg:red'
-format = '([$all_status$ahead_behind]($style) )'
-
-[fill]
-symbol = ' '
-
-[python]
-style = 'teal'
-symbol = ' '
-format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
-pyenv_version_name = true
-pyenv_prefix = ''
-
-[lua]
-format = '[$symbol($version )]($style)'
-symbol = ' '
-
-[nodejs]
-style = 'blue'
-symbol = ' '
-
-[golang]
-style = 'blue'
-symbol = ' '
-
-[haskell]
-style = 'blue'
-symbol = ' '
-
-[rust]
-style = 'orange'
-symbol = ' '
-
-[ruby]
-style = 'blue'
-symbol = ' '
-
-[package]
-symbol = '󰏗 '
-
-[aws]
-symbol = ' '
-style = 'yellow'
-format = '[$symbol($profile )(\[$duration\] )]($style)'
-
-[docker_context]
-symbol = ' '
-style = 'fg:#06969A'
-format = '[$symbol]($style) $path'
-detect_files = ['docker-compose.yml', 'docker-compose.yaml', 'Dockerfile']
-detect_extensions = ['Dockerfile']
-
-[jobs]
-symbol = ' '
-style = 'red'
-number_threshold = 1
-format = '[$symbol]($style)'
+style = "italic yellow"
+# `untracked` is deliberately excluded: it walks the whole working tree against
+# .gitignore and is the slow part on a large repo. Everything else reads the
+# already up-to-date git index and stays fast regardless of working-tree size.
+format = "([$ahead_behind$stashed$staged$modified$conflicted]($style) )"
 
 [cmd_duration]
-min_time = 500
-style = 'fg:gray'
-format = '[$duration ]($style)'
+style = "italic"
+format = "took [$duration]($style) "
 
-# Right-aligned clock (after $fill), mirroring the old Powerlevel10k 12-hour
-# time. Disabled by default in Starship, so enable it explicitly.
-[time]
-disabled = false
-time_format = '%I:%M:%S %p'
-style = 'fg:teal'
-format = '[$time]($style)'
+[character]
+success_symbol = "[❯](dimmed white)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold white)"
 
-[palettes.nord]
-dark_blue = '#5E81AC'
-blue = '#81A1C1'
-teal = '#88C0D0'
-red = '#BF616A'
-orange = '#D08770'
-green = '#A3BE8C'
-yellow = '#EBCB8B'
-purple = '#B48EAD'
-gray = '#434C5E'
-black = '#2E3440'
-white='#E7E7E7'
+# Noise off.
+[jobs]
+disabled = true
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Language / tool markers (Nerd Font glyphs, subtle accent colors)
+# ──────────────────────────────────────────────────────────────────────────────
+[lua]
+symbol = "󰢱 "
+
+[ruby]
+symbol = " "
+
+[nodejs]
+symbol = "󰎙 "
+format = "via [$symbol](green)"
+
+[rust]
+symbol = "󱘗 "
+format = "via [$symbol](red)"
+
+[package]
+symbol = "󰏗 "
+format = "is [$symbol](208)$version "
+
+[docker_context]
+symbol = "󰡨 "
+format = "via [$symbol](blue)"
+
+[nix_shell]
+symbol = " "
+format = "via [$symbol](cyan)( $name )"
+
+[aws]
+symbol = "󰸏 "
+format = "on [$symbol](yellow)($profile)"

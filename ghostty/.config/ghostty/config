@@ -4,13 +4,38 @@
 # ░▓ file   ▓ ghostty/.config/ghostty/config
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Font matches the iTerm2 setup (JetBrainsMono Nerd Font, see settings/iterm/)
-# so Starship's prompt glyphs render correctly here too; theme is Gruvbox
-# Dark by request, independent of iTerm2's Catppuccin Macchiato.
+# Zenbones Dark (forced - not tied to the macOS light/dark appearance, so it
+# stays dark like the reference screenshot even when macOS is in light mode).
+theme = Zenbones Dark
 
-theme = Gruvbox Dark
-font-family = JetBrainsMono Nerd Font Mono
-font-size = 18
+# JetBrainsMono Nerd Font with its OpenType stylistic sets + ligatures enabled -
+# ss01-ss10 swap in the alternate letterforms, `zero` slashes the zero, and
+# calt/liga turn on ligatures. font-thicken bolds the strokes slightly. This is
+# what gives the distinctive look (same font family, different glyph shapes).
+font-family   = JetBrainsMono Nerd Font Mono
+font-size     = 18
+font-thicken  = true
+font-feature  = zero
+font-feature  = ss01
+font-feature  = ss02
+font-feature  = ss03
+font-feature  = ss04
+font-feature  = ss05
+font-feature  = ss06
+font-feature  = ss07
+font-feature  = ss08
+font-feature  = ss09
+font-feature  = ss10
+font-feature  = calt
+font-feature  = liga
+
+# A touch more breathing room between lines/cells.
+adjust-cell-height = 15%
+adjust-cell-width  = 2%
+
+# Animated "smear" cursor (shader vendored in this dir; see its header for the
+# upstream author). Relative path resolves against this config's directory.
+custom-shader = cursor.glsl
 
 # Shell integration is native (Ghostty injects it itself before exec'ing the
 # shell) - no sourcing required, unlike iTerm2's file-based approach in
