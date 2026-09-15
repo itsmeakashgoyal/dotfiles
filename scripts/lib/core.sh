@@ -161,9 +161,14 @@ pkg::version() {
 # Legacy alias used by existing scripts
 get_version() { pkg::version "$@"; }
 
-# Ensure required commands exist, exit if any are missing
+# Ensure required commands exist, exit if any are missing.
+# Only `curl` is required up front: it is the single tool the installer needs
+# before the package step runs. `git` is intentionally NOT required here — a
+# fresh machine may not have it, and it is installed by the package step
+# (apt on Linux, Homebrew on macOS). Requiring it here would abort the exact
+# fresh-machine bootstrap flow this installer is meant to support.
 check_required_commands() {
-    local required_commands="curl git"
+    local required_commands="curl"
     for cmd in $required_commands; do
         if ! command_exists "$cmd"; then
             log::fatal "Required command not found: $cmd"

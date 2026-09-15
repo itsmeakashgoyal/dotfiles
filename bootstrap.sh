@@ -10,11 +10,23 @@
 #
 # Usage:
 #   bash <(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/bootstrap.sh)
+#
+# Hands-off (no prompts, e.g. for a one-click / unattended install):
+#   bash <(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/bootstrap.sh) -s -- --yes
 
 set -euo pipefail
 
 readonly REPO="https://github.com/itsmeakashgoyal/dotfiles"
 readonly TARGET="${HOME}/dotfiles"
+
+# -y/--yes runs unattended: assume "yes" for every prompt here and pass the
+# flag through to install.sh so the whole chain is non-interactive.
+ASSUME_YES=""
+for arg in "$@"; do
+    case "$arg" in
+        -y | --yes) ASSUME_YES=1 ;;
+    esac
+done
 
 # Minimal logging before the shared library is available
 _info()    { echo -e "\033[34mINFO:\033[0m  $*"; }
@@ -23,10 +35,20 @@ _warn()    { echo -e "\033[33mWARN:\033[0m  $*"; }
 _error()   { echo -e "\033[31mERROR:\033[0m $*" >&2; }
 
 _confirm() {
+    [[ -n "$ASSUME_YES" ]] && return 0
     local prompt="$1"
     read -rp "$prompt [y/N] " -n 1
     echo
     [[ $REPLY =~ ^[Yy]$ ]]
+}
+
+# Run install.sh, forwarding --yes when unattended.
+_run_install() {
+    if [[ -n "$ASSUME_YES" ]]; then
+        bash "$TARGET/install.sh" --yes
+    else
+        bash "$TARGET/install.sh"
+    fi
 }
 
 # ------------------------------------------------------------------------------
@@ -67,7 +89,7 @@ main() {
                 _error "install.sh not found in existing directory."
                 exit 1
             fi
-            _confirm "Run install.sh now?" && bash "$TARGET/install.sh"
+            _confirm "Run install.sh now?" && _run_install
             exit 0
         fi
     fi
@@ -82,7 +104,7 @@ main() {
 
     echo ""
     if _confirm "Run install.sh now?"; then
-        bash "$TARGET/install.sh"
+        _run_install
         _success "Bootstrap complete!"
     else
         _warn "Skipped. Run manually: bash $TARGET/install.sh"

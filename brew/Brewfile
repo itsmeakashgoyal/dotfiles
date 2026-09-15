@@ -29,6 +29,7 @@ brew "eza"                  # Better ls (Rust)
 brew "fastfetch"            # System info tool (C)
 brew "fd"                   # Better find (Rust)
 brew "gh"                   # GitHub CLI
+brew "git"                  # Real git (macOS ships only a Command Line Tools stub)
 brew "git-delta"            # Better git diff (Rust)
 brew "git-extras"           # Extra git commands
 brew "hyperfine"            # Command-line benchmarking tool (Rust)

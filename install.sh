@@ -28,9 +28,9 @@ export CI="${CI:-}"
 # Helpers
 # ------------------------------------------------------------------------------
 _confirm() {
-    # Skip confirmation in CI
-    [[ -n "$CI" ]] && return 0
-    
+    # Skip confirmation in CI or when a non-interactive run was requested (-y/--yes)
+    { [[ -n "$CI" ]] || [[ -n "${ASSUME_YES:-}" ]]; } && return 0
+
     local prompt="$1"
     echo -n "$prompt [y/n] " >&2
     read -r reply
@@ -89,8 +89,19 @@ _stow_packages() {
 # Main
 # ------------------------------------------------------------------------------
 main() {
+    # Parse flags. -y/--yes enables a hands-off, non-interactive install
+    # (used by `bootstrap.sh --yes` for one-click provisioning).
+    ASSUME_YES=""
+    for arg in "$@"; do
+        case "$arg" in
+            -y | --yes) ASSUME_YES=1 ;;
+            *) log::warning "Unknown argument: $arg" ;;
+        esac
+    done
+
     log::banner "Dotfiles Installer"
     log::info "OS: $(os::detail)"
+    [[ -n "$ASSUME_YES" ]] && log::info "Non-interactive mode (--yes)"
 
     log::info "[STEP 1/8] Checking required commands..."
     check_required_commands
