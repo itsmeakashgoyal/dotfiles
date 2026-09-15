@@ -86,6 +86,29 @@ install_brewfile_packages() {
     success "All packages installed from Brewfile"
 }
 
+# pipx (installed above via Brewfile) manages Python CLI tools that aren't
+# available as Homebrew formulae. `pipx install` exits non-zero when the
+# package is already installed, so guard on the binary existing first to
+# keep this safe to re-run (see docs/OSXPHOTOS.md).
+install_pipx_packages() {
+    if ! command_exists pipx; then
+        warning "pipx not found; skipping osxphotos install"
+        return 0
+    fi
+
+    if command_exists osxphotos; then
+        success "osxphotos is already installed"
+        return 0
+    fi
+
+    info "Installing osxphotos via pipx..."
+    if pipx install osxphotos; then
+        success "osxphotos installed"
+    else
+        warning "Failed to install osxphotos via pipx (see docs/OSXPHOTOS.md)"
+    fi
+}
+
 # ------------------------------------------------------------------------------
 # Main Function
 # ------------------------------------------------------------------------------
@@ -104,6 +127,9 @@ main() {
 
     # Install all packages from Brewfile
     install_brewfile_packages || exit 1
+
+    # Install pipx-managed Python CLI tools not available as brew formulae
+    install_pipx_packages
 
     # Final cleanup
     update_brew

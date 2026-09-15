@@ -87,6 +87,9 @@ if OS.mac?
     # Security
     brew "sshs"             # SSH TUI (Rust)
 
+    # Photos
+    brew "pipx"              # Installs osxphotos (Photos library export CLI, see scripts/setup/macos.sh)
+
     # Nerd Fonts
     cask "font-fira-code-nerd-font"
     cask "font-jetbrains-mono-nerd-font"

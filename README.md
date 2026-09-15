@@ -262,6 +262,7 @@ dotfiles/
 | **[Usage](docs/USAGE.md)** | Makefile commands, updating, adding packages, diagnostics |
 | **[Nix (Linux)](docs/NIX.md)** | Nix + Home Manager package management on Linux (replaces linuxbrew) |
 | **[Python](docs/PYTHON.md)** | mise (interpreter versions) + uv (venvs, packages, lockfiles) |
+| **[OSXPhotos](docs/OSXPHOTOS.md)** | Backing up the macOS Photos library (originals, edits, Live Photos) by month |
 | **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues, debug workflow, uninstalling |
 | **[Architecture](docs/ARCHITECTURE.md)** | Deep dive: Stow internals, Zsh flow, scripts, CI, XDG |
