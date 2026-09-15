@@ -12,15 +12,17 @@
 #   2. Unstows every Stow package (removes the dotfile symlinks)
 #   3. Sweeps any dangling symlinks that still point into the repo
 #   4. Clears generated caches (zcompdump, stow backups)
-#   5. If Nix is installed: removes Home Manager packages, then Nix itself
-#   6. If Homebrew is installed: removes all its packages, then brew itself
+#   5. Removes generated tool data (zinit + plugins, Neovim plugin/state/cache,
+#      ~/linuxtoolbox, the log) and, on macOS, reverts the iTerm2 integration
+#   6. If Nix is installed: removes Home Manager packages, then Nix itself
+#   7. If Homebrew is installed: removes all its packages, then brew itself
 #
 # Both package managers are removed PACKAGES-FIRST, then the manager, so
 # nothing is left half-broken. Each is a no-op if not installed.
 #
 # What it NEVER touches:
 #   • The repo itself (your dotfiles stay on disk)
-#   • Your data: shell history, ~/.ssh, ~/.gitconfig content, etc.
+#   • Your data: shell history, ~/.ssh, ~/.gitconfig content, atuin history, etc.
 #
 # Usage:
 #   make uninstall                 # interactive
@@ -28,7 +30,8 @@
 #   make uninstall force=1         # skip the initial confirm
 #   STEPS=unstow,sweep bash scripts/setup/uninstall.sh   # run only some steps
 #                                                          (shell/unstow/sweep/
-#                                                           caches/nix/homebrew)
+#                                                           caches/tooldata/nix/
+#                                                           homebrew)
 #
 # WARNING: Removal of Nix AND Homebrew is MANDATORY and total. If you installed
 # packages outside these dotfiles, they will be removed too. Use dry=1 first
@@ -54,9 +57,9 @@ trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 DRY_RUN="${DRY_RUN:-0}"
 FORCE="${FORCE:-0}"
 
-# Which of the 6 steps to run — defaults to all of them (today's behavior,
-# unchanged). A caller (e.g. `dutils cleanup`) can pass a comma-separated
-# subset instead: shell,unstow,sweep,caches,nix,homebrew.
+# Which of the 7 steps to run — defaults to all of them. A caller (e.g.
+# `dutils cleanup`) can pass a comma-separated subset instead:
+# shell,unstow,sweep,caches,tooldata,nix,homebrew.
 STEPS="${STEPS:-all}"
 
 step_enabled() {
@@ -110,7 +113,7 @@ get_login_shell() {
 # Step 1 — restore login shell (BEFORE removing any tools that provide it)
 # ------------------------------------------------------------------------------
 restore_shell() {
-    log::section "Step 1/6 — Restore login shell"
+    log::section "Step 1/7 — Restore login shell"
 
     # OS default shell
     local target
@@ -150,7 +153,7 @@ restore_shell() {
 # Step 2 — unstow all packages
 # ------------------------------------------------------------------------------
 unstow_packages() {
-    log::section "Step 2/6 — Remove dotfile symlinks (unstow)"
+    log::section "Step 2/7 — Remove dotfile symlinks (unstow)"
 
     if ! command_exists stow; then
         log::warn "stow not installed — will rely on the dangling-link sweep (Step 3)."
@@ -177,7 +180,7 @@ unstow_packages() {
 # Step 3 — sweep dangling symlinks that point back into the repo
 # ------------------------------------------------------------------------------
 sweep_symlinks() {
-    log::section "Step 3/6 — Sweep leftover symlinks into the repo"
+    log::section "Step 3/7 — Sweep leftover symlinks into the repo"
 
     # Scan $HOME and $HOME/.config (maxdepth 2) for symlinks; the roots overlap,
     # so collect and de-duplicate before processing to avoid double-counting.
@@ -209,7 +212,7 @@ sweep_symlinks() {
 # Step 4 — clear generated caches (NOT user data)
 # ------------------------------------------------------------------------------
 clean_generated() {
-    log::section "Step 4/6 — Clear generated caches"
+    log::section "Step 4/7 — Clear generated caches"
 
     # Zsh completion dump cache
     local cache_zsh="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
@@ -231,10 +234,51 @@ clean_generated() {
 }
 
 # ------------------------------------------------------------------------------
-# Step 5 — optional: remove Nix + Home Manager (Linux)
+# Step 5 — remove generated tool data (plugin managers, editor data) and, on
+# macOS, revert the iTerm2 integration. These are all regenerated on reinstall,
+# so this is safe to wipe - unlike shell/atuin history, which is left intact.
+# ------------------------------------------------------------------------------
+remove_tool_data() {
+    log::section "Step 5/7 — Remove generated tool data & integrations"
+
+    local data_paths=(
+        "${XDG_DATA_HOME:-$HOME/.local/share}/zinit"   # zinit + all plugins
+        "${XDG_DATA_HOME:-$HOME/.local/share}/nvim"    # lazy.nvim plugins
+        "${XDG_STATE_HOME:-$HOME/.local/state}/nvim"   # nvim state (undo/shada/lock)
+        "${XDG_CACHE_HOME:-$HOME/.cache}/nvim"         # nvim cache
+        "$HOME/linuxtoolbox"                           # install_nvim.py backup dir
+        "/tmp/dotfiles.log"                            # core.sh log
+    )
+    for p in "${data_paths[@]}"; do
+        [[ -e "$p" ]] && { log::substep "Removing $p"; run rm -rf "$p"; }
+    done
+
+    # iTerm2 (macOS): the shell-integration file + the prefs that point iTerm at
+    # this repo's settings folder (both set by scripts/setup/iterm.sh).
+    if os::is_mac; then
+        [[ -e "$HOME/.iterm2_shell_integration.zsh" ]] && {
+            log::substep "Removing ~/.iterm2_shell_integration.zsh"
+            run rm -f "$HOME/.iterm2_shell_integration.zsh"
+        }
+        if defaults read com.googlecode.iterm2 PrefsCustomFolder &>/dev/null; then
+            log::substep "Reverting iTerm2 custom-prefs-folder settings"
+            if [[ "$DRY_RUN" == "1" ]]; then
+                log::substep "[dry-run] defaults delete com.googlecode.iterm2 PrefsCustomFolder / LoadPrefsFromCustomFolder"
+            else
+                defaults delete com.googlecode.iterm2 PrefsCustomFolder 2>/dev/null || true
+                defaults delete com.googlecode.iterm2 LoadPrefsFromCustomFolder 2>/dev/null || true
+            fi
+        fi
+    fi
+
+    log::ok "Generated tool data removed."
+}
+
+# ------------------------------------------------------------------------------
+# Step 6 — optional: remove Nix + Home Manager (Linux)
 # ------------------------------------------------------------------------------
 remove_nix() {
-    log::section "Step 5/6 — Uninstall Nix completely"
+    log::section "Step 6/7 — Uninstall Nix completely"
 
     # Detect Nix by command OR the store dir (covers non-login shells where
     # `nix` isn't on PATH but /nix exists).
@@ -285,12 +329,12 @@ remove_nix() {
 }
 
 # ------------------------------------------------------------------------------
-# Step 6 — mandatory: uninstall Homebrew COMPLETELY (brew + ALL its packages)
+# Step 7 — mandatory: uninstall Homebrew COMPLETELY (brew + ALL its packages)
 # ------------------------------------------------------------------------------
 # Uses Homebrew's official uninstall script, which removes the brew prefix and
 # every formula/cask it installed — not just the Brewfile entries.
 remove_homebrew() {
-    log::section "Step 6/6 — Uninstall Homebrew completely"
+    log::section "Step 7/7 — Uninstall Homebrew completely"
 
     if ! command_exists brew; then
         log::substep "Homebrew not installed — nothing to remove."
@@ -338,6 +382,7 @@ main() {
     log::newline
     if [[ "$STEPS" == "all" ]]; then
         log::info "This will reset your login shell, remove dotfile symlinks, clear caches,"
+        log::info "remove generated tool data (zinit/nvim plugins, iTerm2 integration),"
         log::info "and COMPLETELY UNINSTALL both Nix and Homebrew if present"
         log::info "(all their packages first, then the package manager itself)."
         log::info "Your repo, shell history, and personal data are left untouched."
@@ -357,6 +402,7 @@ main() {
     step_enabled unstow   && unstow_packages
     step_enabled sweep    && sweep_symlinks
     step_enabled caches   && clean_generated
+    step_enabled tooldata && remove_tool_data
     step_enabled nix      && remove_nix
     step_enabled homebrew && remove_homebrew
 

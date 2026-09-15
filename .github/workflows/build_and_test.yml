@@ -385,6 +385,14 @@ jobs:
             fi
           done
 
+          echo "🔍 Verifying generated tool data was removed..."
+          for d in "$HOME/.local/share/zinit" "$HOME/.local/share/nvim" \
+                   "$HOME/.local/state/nvim" "$HOME/.cache/nvim"; do
+            if [[ -e "$d" ]]; then
+              echo "  ❌ $d still present after uninstall"; fail=1
+            fi
+          done
+
           echo "🔍 Verifying Homebrew was uninstalled..."
           if command -v brew &> /dev/null || [[ -x /opt/homebrew/bin/brew ]] || [[ -x /usr/local/bin/brew ]]; then
             echo "  ❌ brew still present after uninstall"; fail=1
@@ -648,6 +656,14 @@ jobs:
           for d in zsh nvim tmux git; do
             if [[ -L "$HOME/.config/$d" ]]; then
               echo "  ❌ ~/.config/$d still symlinked after uninstall"; fail=1
+            fi
+          done
+
+          echo "🔍 Verifying generated tool data was removed..."
+          for d in "$HOME/.local/share/zinit" "$HOME/.local/share/nvim" \
+                   "$HOME/.local/state/nvim" "$HOME/.cache/nvim"; do
+            if [[ -e "$d" ]]; then
+              echo "  ❌ $d still present after uninstall"; fail=1
             fi
           done
 
