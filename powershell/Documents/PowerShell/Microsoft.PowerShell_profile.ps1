@@ -29,12 +29,34 @@ $__confd = Join-Path (Split-Path -Parent $__real) 'profile.d'
 
 # `foreach` statement (not ForEach-Object) so each `. $file` dot-sources into
 # THIS profile scope - functions/aliases/vars must persist to the session.
+#
+# Each file is wrapped in try/catch: an uncaught terminating error in one file
+# (e.g. an integration whose binary vanished) would otherwise abort the entire
+# foreach and silently skip every file after it — including starship's prompt
+# init further down the alphabet. Surface the error and keep going instead.
+#
+# Set $env:DOTFILES_PROFILE_DEBUG=1 (before launching pwsh) to print how long
+# each profile.d file took, to find slow startup contributors without
+# guessing.
+$__debug = [bool]$env:DOTFILES_PROFILE_DEBUG
 if (Test-Path $__confd) {
     foreach ($__f in Get-ChildItem -Path $__confd -Filter '*.ps1' | Sort-Object Name) {
-        . $__f.FullName
+        # __fileSw (not __sw) deliberately — profile.d files are dot-sourced
+        # into this same scope and some of them keep their own $__sw for
+        # sub-section timing; a shared name here would get clobbered/removed
+        # by theirs before this loop reads it back.
+        $__fileSw = if ($__debug) { [System.Diagnostics.Stopwatch]::StartNew() }
+        try {
+            . $__f.FullName
+        } catch {
+            Write-Warning "profile.d/$($__f.Name) failed to load: $_"
+        }
+        if ($__debug) {
+            Write-Host ("  [{0,6:N0}ms] {1}" -f $__fileSw.Elapsed.TotalMilliseconds, $__f.Name) -ForegroundColor Magenta
+        }
     }
 }
-Remove-Variable __self, __real, __confd, __f -ErrorAction SilentlyContinue
+Remove-Variable __self, __real, __confd, __f, __debug, __fileSw -ErrorAction SilentlyContinue
 
 # ==============================================================================
 # Startup

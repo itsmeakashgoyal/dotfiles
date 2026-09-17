@@ -10,9 +10,21 @@
 # fzf — PSFzf module
 # Ctrl+T  file picker  |  Ctrl+R  history  |  Alt+C  cd into dir
 # ==============================================================================
+# Import-Module PSFzf throws a terminating error (not just a non-terminating
+# warning) if it can't find the fzf binary on PATH at import time, which would
+# otherwise skip straight past the manual-fallback `elseif` below. Try/catch so
+# any import failure still degrades to the manual Ctrl+R binding.
+$__psfzfImported = $false
 if ((_cmd fzf) -and (Get-Module -ListAvailable PSFzf)) {
-    Import-Module PSFzf
+    try {
+        Import-Module PSFzf -ErrorAction Stop
+        $__psfzfImported = $true
+    } catch {
+        Write-Warning "PSFzf import failed, falling back to manual Ctrl+R: $_"
+    }
+}
 
+if ($__psfzfImported) {
     $env:FZF_DEFAULT_OPTS = @'
 --height=50% --layout=reverse --border=rounded --cycle
 --bind=ctrl-j:down,ctrl-k:up
@@ -35,7 +47,7 @@ if ((_cmd fzf) -and (Get-Module -ListAvailable PSFzf)) {
     Set-PsFzfOption -PSReadlineChordWildcard 'Ctrl+f'
 }
 
-# Fallback: manual Ctrl+R history when PSFzf is absent but fzf binary exists
+# Fallback: manual Ctrl+R history when PSFzf is absent/failed but fzf binary exists
 elseif (_cmd fzf) {
     Set-PSReadLineKeyHandler -Chord 'Ctrl+r' -ScriptBlock {
         $result = Get-History | ForEach-Object { $_.CommandLine } |
@@ -46,3 +58,5 @@ elseif (_cmd fzf) {
         }
     }
 }
+
+Remove-Variable __psfzfImported -ErrorAction SilentlyContinue

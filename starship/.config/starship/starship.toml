@@ -12,7 +12,13 @@
 
 "$schema" = 'https://starship.rs/config-schema.json'
 
-command_timeout = 100
+# 100ms was too tight for git_status on large repos on Windows (git.exe's own
+# process-spawn overhead alone runs ~80-90ms before any actual work starts,
+# per-process EDR/AV scanning on managed machines) — git_status calls were
+# being killed and discarded right before finishing rather than shown. 300ms
+# gives headroom once core.fsmonitor is warmed up for a repo (see
+# git/.config/git/config) without masking a genuinely hung command.
+command_timeout = 300
 add_newline = true
 
 # Explicit module order (dir → commit hash → status → branch → langs → duration)
@@ -34,12 +40,23 @@ style = "dimmed white"
 
 [git_branch]
 style = "purple"
+# Starship's built-in default symbol is a Powerline glyph that renders as a
+# tofu box on fonts without that specific extension (shows up as a stray
+# diamond before the branch name) — drop it rather than depend on font luck.
+symbol = ""
 
 [git_status]
 style = "italic yellow"
-# `untracked` is deliberately excluded: it walks the whole working tree against
-# .gitignore and is the slow part on a large repo. Everything else reads the
-# already up-to-date git index and stays fast regardless of working-tree size.
+# Disabled: staged/modified/conflicted all require a working-tree diff-index
+# scan, which stays 300-650ms on large repos (illustrator, Autobot) even with
+# git's fsmonitor warmed up and process-spawn overhead accounted for — that
+# was the actual source of the per-Enter lag, confirmed by isolating it with
+# `Measure-Command { starship prompt ... }` outside the prompt chain
+# entirely. git_branch/git_commit stay on; they're single ref reads, not a
+# tree walk, and cost ~80-90ms (pure process-spawn overhead, not fixable
+# from here). Re-enable by deleting this line if the dirty-indicator is worth
+# the latency for your workflow.
+disabled = true
 format = "([$ahead_behind$stashed$staged$modified$conflicted]($style) )"
 
 [cmd_duration]

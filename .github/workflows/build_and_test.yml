@@ -802,7 +802,11 @@ jobs:
       - name: Verify PowerShell profile symlink
         shell: pwsh
         run: |
-          $profilePath = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+          # Use $PROFILE itself rather than "$env:USERPROFILE\Documents\..." —
+          # OneDrive Known Folder Move (common on corporate-managed machines)
+          # redirects Documents elsewhere, and $PROFILE is what PowerShell
+          # actually resolves and loads, so it's the only reliable source of truth.
+          $profilePath = $PROFILE.CurrentUserCurrentHost
           if (-not (Test-Path $profilePath)) {
             Write-Host "::error::PowerShell profile not found at $profilePath"
             exit 1

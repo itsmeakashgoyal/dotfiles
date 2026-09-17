@@ -6,6 +6,9 @@
 #
 # CLI tool integrations: ripgrep, eza, bat, zoxide, mise, starship.
 
+$__dbg = [bool]$env:DOTFILES_PROFILE_DEBUG
+$__sw = if ($__dbg) { [System.Diagnostics.Stopwatch]::StartNew() }
+
 # ==============================================================================
 # ripgrep
 # ==============================================================================
@@ -85,15 +88,37 @@ if (_cmd bat) {
 # zoxide (smart cd)
 # ==============================================================================
 if (_cmd zoxide) {
+    if ($__dbg) { $__sw.Restart() }
     Invoke-Expression (& { (zoxide init powershell | Out-String) })
+    if ($__dbg) { Write-Host ("    - {0,6:N0}ms zoxide init" -f $__sw.Elapsed.TotalMilliseconds) -ForegroundColor DarkMagenta }
 }
 
 # ==============================================================================
 # mise (runtime version manager — replaces pyenv, which has no native
 # Windows support at all)
 # ==============================================================================
-if (_cmd mise) {
-    (& mise activate pwsh) | Out-String | Invoke-Expression
+# `mise activate` wraps $function:prompt and re-runs `mise hook-env` on
+# every prompt render / directory change — a subprocess spawn on every
+# Enter — and the initial activation call itself costs ~200ms at shell
+# startup even before that. Same trade-off 08-python.zsh made for mise on
+# the zsh side (see that file's comment for the measurements), just gated
+# differently here since a PowerShell-side deferred/one-shot hook can't be
+# verified as scope-safe the way zsh's precmd hook is. Off by default:
+# `mise` itself is still fully on PATH regardless (`mise use`, `mise
+# install`, `mise exec` all work with zero startup cost) — this only gates
+# the automatic per-directory version switching. Turn it on once you
+# actually need that:
+#   [Environment]::SetEnvironmentVariable('DOTFILES_MISE_ACTIVATE', '1', 'User')
+if ($env:DOTFILES_MISE_ACTIVATE -and (_cmd mise)) {
+    if ($__dbg) { $__sw.Restart() }
+    $__miseInit = (& mise activate pwsh) | Out-String
+    if ($__miseInit.Trim()) {
+        $__miseInit | Invoke-Expression
+    } else {
+        Write-Warning "mise activate produced no output — mise integration skipped"
+    }
+    Remove-Variable __miseInit -ErrorAction SilentlyContinue
+    if ($__dbg) { Write-Host ("    - {0,6:N0}ms mise activate" -f $__sw.Elapsed.TotalMilliseconds) -ForegroundColor DarkMagenta }
 }
 
 # ==============================================================================
@@ -102,5 +127,9 @@ if (_cmd mise) {
 # ==============================================================================
 if (_cmd starship) {
     $env:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
+    if ($__dbg) { $__sw.Restart() }
     (& starship init powershell) | Out-String | Invoke-Expression
+    if ($__dbg) { Write-Host ("    - {0,6:N0}ms starship init" -f $__sw.Elapsed.TotalMilliseconds) -ForegroundColor DarkMagenta }
 }
+
+Remove-Variable __dbg, __sw -ErrorAction SilentlyContinue

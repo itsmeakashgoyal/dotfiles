@@ -262,6 +262,7 @@ dotfiles/
 | **[Usage](docs/USAGE.md)** | Makefile commands, updating, adding packages, diagnostics |
 | **[Nix (Linux)](docs/NIX.md)** | Nix + Home Manager package management on Linux (replaces linuxbrew) |
 | **[Python](docs/PYTHON.md)** | mise (interpreter versions) + uv (venvs, packages, lockfiles) |
+| **[Windows](docs/WINDOWS.md)** | Config toggles (native prompt, mise activation), troubleshooting (OneDrive profile path, slow startup, large-repo git perf) |
 | **[OSXPhotos](docs/OSXPHOTOS.md)** | Backing up the macOS Photos library (originals, edits, Live Photos) by month |
 | **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues, debug workflow, uninstalling |

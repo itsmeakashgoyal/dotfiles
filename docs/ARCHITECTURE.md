@@ -242,6 +242,8 @@ scripts/setup/windows.ps1
 
 `powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1` mirrors the zsh conf.d functionality (aliases, PSReadLine Vi-mode, fzf bindings) for native PowerShell use. The recommended daily-driver path for the actual dev shell (nvim/tmux/zsh/git/television/atuin/fastfetch/bin scripts) is **WSL2** — all 8 Stow packages work there completely unmodified, since WSL2 is just Ubuntu from Stow's point of view.
 
+See [docs/WINDOWS.md](WINDOWS.md) for the config toggles this profile exposes (an opt-in zero-subprocess native prompt, deferred mise activation, startup profiling) and for troubleshooting steps found while hardening this path (OneDrive-redirected `$PROFILE`, `powershell` vs `pwsh` encoding issues, large-repo git/starship performance).
+
 ---
 
 ## XDG Base Directory Compliance

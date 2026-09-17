@@ -60,6 +60,18 @@
 	autocrlf = input
 	safecrlf = warn
 	filemode = false
+	# Built-in filesystem watcher (git >=2.37, no external Watchman needed):
+	# `git status`/diff-index normally stat every tracked file on every call,
+	# which is what makes starship's git_status module slow-to-timeout on
+	# large repos (esp. on Windows, where stats are pricier and AV adds more
+	# overhead per file touched). fsmonitor lets git skip that full walk by
+	# tracking changes incrementally instead.
+	fsmonitor = true
+
+# feature.manyFiles bundles good defaults for large repos (smaller index
+# format, faster index writes) on top of untrackedCache/fsmonitor above.
+[feature]
+	manyFiles = true
 
 [apply]
 	whitespace = fix
