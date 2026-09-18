@@ -67,6 +67,24 @@ ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 
 ---
 
+## Secrets Management
+
+Secrets are kept **encrypted in the repo** with [`age`](https://age-encryption.org),
+using your SSH key as the identity — see [docs/SECRETS.md](docs/SECRETS.md).
+
+- Plaintext never lives in the repo; only `*.age` blobs and public `.recipients`
+  are committed, and `secrets/.gitignore` blocks anything unencrypted.
+- `detect-secrets` (pre-commit) is the backstop that catches secrets
+  accidentally added *outside* `secrets/`.
+
+```bash
+dutils secrets init            # seed recipients from your SSH public key
+dutils secrets add ~/.ssh/config
+dutils secrets decrypt --all   # restore on a new machine
+```
+
+---
+
 ## macOS Package Install Script
 
 `scripts/setup/macos.sh` installs Homebrew and every formula/cask listed in `brew/Brewfile`. Review the Brewfile before running on a fork — it installs packages system-wide.

@@ -23,6 +23,7 @@ end
 #############################################################
 
 # Essential CLI Tools
+brew "age"                  # Modern file encryption (secrets, via dutils secrets)
 brew "atuin"                # Shell history search (Rust)
 brew "bat"                  # Cat with syntax highlighting (Rust)
 brew "eza"                  # Better ls (Rust)

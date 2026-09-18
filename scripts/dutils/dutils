@@ -98,6 +98,10 @@ def cmd_ssh_setup(args: list[str]) -> None:
     _exec_python("ssh_setup.py", args)
 
 
+def cmd_secrets(args: list[str]) -> None:
+    _exec_python("secrets.py", args)
+
+
 def cmd_detect_os(_args: list[str]) -> None:
     # Use the repo's canonical OS-detect module (scripts/lib/osdetect.py) for
     # the label rather than re-deriving it here - one source of truth shared
@@ -212,6 +216,7 @@ COMMANDS: dict[str, tuple] = {
     "profile":        (cmd_profile,        "Profile zsh startup with zprof (per-function)"),
     "ssh-setup":      (cmd_ssh_setup,      "Set up SSH keys + config for personal & work GitHub"),
     "ssh-keygen":     (cmd_ssh_setup,      "Alias of ssh-setup (back-compat)"),
+    "secrets":        (cmd_secrets,        "Manage encrypted secrets (age + your SSH key)"),
     "detect-os":      (cmd_detect_os,      "Detect current OS and architecture"),
     "diff":           (cmd_diff,           "Interactive file diff with tv and live watching"),
     "install-nvim":   (cmd_install_nvim,   "Install latest Neovim (Linux only)"),

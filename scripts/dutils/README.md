@@ -46,6 +46,19 @@ and copies the public key to your clipboard. The `Host` alias is what makes the 
 follow the remote automatically — see [docs/SSH.md](../../docs/SSH.md). `ssh-keygen` is a
 back-compat alias of `ssh-setup`.
 
+### `secrets` — encrypted secrets via age + your SSH key
+
+```bash
+dutils secrets init                 # seed secrets/.recipients from your SSH pubkey
+dutils secrets add  ~/.ssh/config   # encrypt a $HOME file into the repo
+dutils secrets decrypt --all        # restore secrets to $HOME (new machine)
+dutils secrets edit ~/.config/x     # decrypt → $EDITOR → re-encrypt
+dutils secrets list
+```
+
+Secrets are stored encrypted under `secrets/` mirroring `$HOME`; plaintext never
+enters the repo. Full guide: [docs/SECRETS.md](../../docs/SECRETS.md).
+
 ### `detect-os` — print OS/arch detection
 
 ```bash
@@ -94,6 +107,7 @@ scripts/dutils/
 ├── dutils                      # CLI entry point / dispatcher
 ├── cleanup.py                  # cleanup subcommand
 ├── ssh_setup.py                # ssh-setup subcommand (personal & work SSH keys/config, see docs/SSH.md)
+├── secrets.py                  # secrets subcommand (age-encrypted secrets, see docs/SECRETS.md)
 ├── diff_files_interactive.sh   # diff subcommand
 ├── install_nvim.py             # install-nvim subcommand
 ├── print_functions.py          # list-functions subcommand

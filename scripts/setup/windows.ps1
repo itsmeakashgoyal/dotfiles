@@ -53,6 +53,7 @@ $SCOOP_PACKAGES = @(
     "git"
     "curl"
     "wget"
+    "age"           # Modern file encryption (secrets, via dutils secrets)
     # Editor
     "neovim"
     # Search & navigation

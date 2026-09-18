@@ -32,6 +32,7 @@
   # ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [
     # Essential CLI tools
+    age # Modern file encryption (secrets, via dutils secrets)
     atuin # Shell history search
     bat # cat with syntax highlighting
     eza # Better ls
