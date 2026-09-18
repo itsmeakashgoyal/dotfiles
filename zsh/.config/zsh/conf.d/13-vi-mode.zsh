@@ -35,11 +35,22 @@ zle-line-init() {
 }
 zle -N zle-line-init
 
-# Add mode indicator to right prompt (appends; doesn't replace existing RPROMPT)
-_vi_rprompt_hook() {
-    RPROMPT='$(_vi_mode_indicator)'
-}
-add-zsh-hook precmd _vi_rprompt_hook
+# Append the mode indicator to the RIGHT prompt WITHOUT clobbering it.
+#
+# The prompt engine (Starship by default, or p10k) sets $RPROMPT once at init
+# to a `promptsubst` template — Starship's is `$(starship prompt --right ...)`,
+# which renders the conda/venv module. A plain `RPROMPT='$(_vi_mode_indicator)'`
+# (what this used to do, on a precmd hook) overwrote that template every prompt,
+# so the right side went blank. Instead, append our own `$(...)` template once;
+# both re-evaluate on every render and on the `zle reset-prompt` fired by
+# zle-keymap-select below, so the [N] indicator still updates live on mode
+# switch while Starship's right prompt survives.
+#
+# Guarded so re-sourcing the file (e.g. a manual `source ~/.zshrc`) doesn't
+# stack duplicate copies of the indicator.
+if [[ "$RPROMPT" != *_vi_mode_indicator* ]]; then
+    RPROMPT="${RPROMPT:+$RPROMPT }"'$(_vi_mode_indicator)'
+fi
 
 # ------------------------------------------------------------------------------
 # Preserve useful Emacs bindings in insert mode

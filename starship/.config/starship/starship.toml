@@ -29,8 +29,21 @@ format = """
 [$directory$git_commit$git_status$git_branch$nodejs$lua$rust$ruby$golang$package$docker_context$nix_shell$cmd_duration](dimmed white)
 $character"""
 
+# Active Python environment shown on the RIGHT edge of the prompt line instead
+# of stacked below it. Covers both conda envs ($conda) and uv / `python -m venv`
+# virtualenvs (custom.venv). NOTE: conda also needs telling to stop prepending
+# its own "(env)" to $PS1 (that was the "(cclibs)" repeating on every Enter) —
+# run this once, it's a global conda setting, not a repo file:
+#   conda config --set changeps1 false
+right_format = """$conda${custom.venv}"""
+
 [directory]
 style = "bold italic white"
+# Show the full path from ~ (e.g. ~/ws/cc-libraries-panel/app/CSXS) instead of
+# Starship's defaults, which truncate to the last 3 dirs AND cut the path at the
+# git repo root (so you'd only ever see the repo folder and below).
+truncate_to_repo = false
+truncation_length = 0
 
 [git_commit]
 # Show a short commit hash on every prompt, not just on a detached HEAD.
@@ -71,6 +84,28 @@ vimcmd_symbol = "[❮](bold white)"
 # Noise off.
 [jobs]
 disabled = true
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Active Python environment (right side) — see right_format above
+# ──────────────────────────────────────────────────────────────────────────────
+[conda]
+# Triggers whenever a conda env is active, in ANY directory (reads
+# $CONDA_DEFAULT_ENV directly — no subprocess). ignore_base hides the noisy
+# always-on "base" env.
+format = "[$symbol$environment]($style)"
+symbol = " "
+style = "dimmed green"
+ignore_base = true
+
+[custom.venv]
+# uv / `python -m venv` set $VIRTUAL_ENV; show its basename only when one is
+# active (any directory). Cheap single check per render; nothing shows when no
+# venv is active, so the right side stays empty unless there's something to say.
+description = "Active non-conda Python virtualenv"
+when = 'test -n "$VIRTUAL_ENV"'
+command = 'basename "$VIRTUAL_ENV"'
+format = "[ $output]($style)"
+style = "dimmed green"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Language / tool markers (Nerd Font glyphs, subtle accent colors)
