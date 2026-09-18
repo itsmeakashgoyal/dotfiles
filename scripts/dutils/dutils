@@ -106,6 +106,10 @@ def cmd_theme(args: list[str]) -> None:
     _exec_python("theme.py", args)
 
 
+def cmd_init(args: list[str]) -> None:
+    _exec_python("init.py", args)
+
+
 def cmd_detect_os(_args: list[str]) -> None:
     # Use the repo's canonical OS-detect module (scripts/lib/osdetect.py) for
     # the label rather than re-deriving it here - one source of truth shared
@@ -206,6 +210,7 @@ def cmd_profile(_args: list[str]) -> None:
 # ──────────────────────────────────────────────────────────────────────────────
 
 COMMANDS: dict[str, tuple] = {
+    "init":           (cmd_init,           "First-run setup wizard for a new machine"),
     "update":         (cmd_update,         "Update Homebrew/Nix/mise/zinit/Neovim packages"),
     "sync":           (cmd_sync,           "Pull latest dotfiles, re-stow, and update"),
     "cleanup":        (cmd_cleanup,        "Clean up dotfiles, Homebrew, Neovim, tmux"),

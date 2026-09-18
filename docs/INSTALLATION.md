@@ -66,6 +66,16 @@ exec zsh
 
 That's it. Open a new terminal and everything is ready.
 
+### 4. (Optional) Personalize with `dutils init`
+
+A short, idempotent wizard for the per-machine bits the installer can't guess —
+git identity (work vs personal), SSH keys, decrypting secrets, and picking a
+theme:
+
+```bash
+dutils init
+```
+
 ---
 
 ## What the Installer Does

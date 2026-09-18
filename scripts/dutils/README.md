@@ -18,6 +18,17 @@ dutils <command> [options] # run a command
 
 ## Commands
 
+### `init` — first-run setup wizard (new machine)
+
+```bash
+dutils init        # interactive: git identity, SSH keys, secrets, theme, overrides
+dutils init -y     # accept the default action at each step (still asks for values)
+```
+
+Ties the other subcommands together for a fresh machine — sets the work git
+identity (if any), runs `ssh-setup`, decrypts secrets, picks a theme, and seeds
+`99-private.zsh`. Every step is optional and idempotent (safe to re-run).
+
 ### `cleanup` — remove dotfiles/Homebrew/Neovim/tmux configuration
 
 ```bash
@@ -117,6 +128,7 @@ dutils debug my-script.sh arg1 arg2
 ```text
 scripts/dutils/
 ├── dutils                      # CLI entry point / dispatcher
+├── init.py                     # init subcommand (first-run new-machine wizard)
 ├── cleanup.py                  # cleanup subcommand
 ├── ssh_setup.py                # ssh-setup subcommand (personal & work SSH keys/config, see docs/SSH.md)
 ├── secrets.py                  # secrets subcommand (age-encrypted secrets, see docs/SECRETS.md)
