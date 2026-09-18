@@ -15,6 +15,14 @@
 [includeIf "gitdir:~/personal/"]
 	path = ~/.config/git/config-personal
 
+# Personal repos, identified by remote: any repo whose remote uses the
+# `github-private` SSH host alias (see ~/.ssh/config → personal key) commits
+# with the gmail identity, regardless of where it lives on disk. This is what
+# makes ~/dotfiles itself (remote git@github-private:...) use gmail while the
+# work email stays the global default for everything else. Requires git >= 2.36.
+[includeIf "hasconfig:remote.*.url:git@github-private:*/**"]
+	path = ~/.config/git/config-personal
+
 # ============================================================================
 # Aliases
 # ============================================================================
