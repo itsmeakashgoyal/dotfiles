@@ -39,6 +39,12 @@ def main() -> None:
     section("Re-stowing packages")
     results["make run"] = run(["make", "-C", str(REPO), "run"])
 
+    # Best-effort: keep the compiled .zwc in step with any pulled/re-stowed zsh
+    # changes. Not gated — a compile hiccup shouldn't fail the whole sync (zsh
+    # falls back to the plain source anyway).
+    section("Compiling zsh config (faster startup)")
+    run([sys.executable, str(REPO / "scripts" / "dutils" / "zcompile.py")])
+
     if not args.no_update:
         section("Updating packages")
         results["update"] = run([sys.executable, str(REPO / "scripts" / "dutils" / "update.py")])

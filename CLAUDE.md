@@ -37,7 +37,7 @@ CLI (`dutils health`, `dutils check`, …). `dutils` is the cross-platform path 
 the single implementation — it also works on Windows, which has no `make`. `make`
 remains the entry point for the install/stow/nix *lifecycle*; `dutils` is the
 day-to-day maintenance/introspection hub (`update`, `cleanup`, verification,
-`bench`, `profile`, `ssh-setup`, `secrets`, `theme`, `diff`, …). See `scripts/dutils/dutils`.
+`bench`, `profile`, `ssh-setup`, `secrets`, `theme`, `zcompile`, `diff`, …). See `scripts/dutils/dutils`.
 
 **Lint (CI runs this too):**
 ```bash

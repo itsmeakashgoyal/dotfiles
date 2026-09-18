@@ -82,6 +82,18 @@ dutils theme auto       # follow the macOS appearance (default)
 Switches ghostty + Neovim; bat/fzf/delta follow the terminal's ANSI palette so
 they match automatically. Full guide: [docs/THEME.md](../../docs/THEME.md).
 
+### `zcompile` — precompile zsh config for faster startup
+
+```bash
+dutils zcompile        # compile .zshrc + conf.d/*.zsh (+ .p10k.zsh) to .zwc
+```
+
+zsh re-parses its config text on every startup; `.zwc` bytecode skips that. zsh
+auto-prefers a `.zwc` when it's newer than the source and falls back to the
+source otherwise, so a stale `.zwc` is never a correctness risk — re-run after
+editing zsh config (`dutils sync` does it for you). Pairs with the cached
+tool-`init` output (`cached_init` in `01-exports.zsh`).
+
 ### `detect-os` — print OS/arch detection
 
 ```bash
@@ -133,6 +145,7 @@ scripts/dutils/
 ├── ssh_setup.py                # ssh-setup subcommand (personal & work SSH keys/config, see docs/SSH.md)
 ├── secrets.py                  # secrets subcommand (age-encrypted secrets, see docs/SECRETS.md)
 ├── theme.py                    # theme subcommand (coordinated Tokyo Night switch, see docs/THEME.md)
+├── zcompile.py                 # zcompile subcommand (precompile zsh config to .zwc)
 ├── diff_files_interactive.sh   # diff subcommand
 ├── install_nvim.py             # install-nvim subcommand
 ├── print_functions.py          # list-functions subcommand

@@ -51,3 +51,6 @@ git/.config/git/config-local
 
 # Per-machine ghostty theme pin, written by `dutils theme`
 ghostty/.config/ghostty/theme.local
+
+# Compiled zsh bytecode (dutils zcompile) — regenerated per machine
+**/*.zwc

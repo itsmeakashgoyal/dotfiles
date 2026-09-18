@@ -267,6 +267,10 @@ bench: ## Benchmark zsh startup time (alias for `dutils bench`)
 bench-detail: ## Profile zsh startup with zprof (alias for `dutils profile`)
 	@$(DUTILS) profile
 
+.PHONY: zcompile
+zcompile: ## Precompile zsh config to .zwc for faster startup (alias for `dutils zcompile`)
+	@$(DUTILS) zcompile
+
 ##@ Windows
 
 .PHONY: windows
