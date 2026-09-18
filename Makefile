@@ -5,7 +5,7 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Stowable packages (directories with dotfiles)
-STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch starship ghostty yazi
+STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch starship ghostty yazi readline
 
 # dutils: the cross-platform maintenance/introspection CLI. The verification,
 # diagnostics, and benchmark targets below are thin aliases to it so there's a

@@ -63,6 +63,9 @@
 	# Utilities
 	whoami = config user.email
 	contributors = shortlog --summary --numbered
+	# Open the current repo (or the current branch's PRs) in the browser via gh.
+	open = "!gh repo view --web"
+	prs = "!gh pr list --web"
 
 # ============================================================================
 # Core Settings

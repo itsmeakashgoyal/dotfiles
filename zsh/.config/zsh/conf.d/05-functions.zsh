@@ -330,3 +330,35 @@ case "$(uname -s)" in
         }
         ;;
 esac
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Quality-of-life goodies (mkcd / serve / dataurl / cdf)
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Make a directory (and parents) then cd into it.
+mkcd() { mkdir -p -- "$1" && cd -- "$1"; }
+
+# Serve the current directory over HTTP (default port 8000). Great for quickly
+# sharing a folder or previewing static files. Usage: serve [port]
+serve() {
+    local port="${1:-8000}"
+    echo "Serving $(pwd) at http://localhost:${port} (Ctrl-C to stop)"
+    python3 -m http.server "$port"
+}
+
+# Print a data: URL for a file (handy for embedding small images/fonts inline).
+dataurl() {
+    local mime
+    mime=$(file -b --mime-type "$1")
+    [[ "$mime" == text/* ]] && mime="${mime};charset=utf-8"
+    printf 'data:%s;base64,%s\n' "$mime" "$(base64 < "$1" | tr -d '\n')"
+}
+
+# macOS: cd to the directory of the frontmost Finder window.
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    cdf() {
+        local target
+        target=$(osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as alias)')
+        if [[ -n "$target" ]]; then cd "$target"; else echo "No Finder window found."; fi
+    }
+fi

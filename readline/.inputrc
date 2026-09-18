@@ -1,0 +1,33 @@
+# ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ readline/.inputrc
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# GNU Readline config — applies to bash, python, psql, node, irb, gdb and other
+# libreadline REPLs. zsh has its own line editor (zle) and ignores this file;
+# 13-vi-mode.zsh / PSReadLine cover the interactive shells. This just makes the
+# *sub-shells* you drop into behave as nicely as your main shell.
+
+# Pull in the system defaults first, then override. Missing file is ignored.
+$include /etc/inputrc
+
+# Completion: case-insensitive, treat - and _ as the same, show matches on the
+# first Tab instead of requiring a second, and colorize like `ls`.
+set completion-ignore-case on
+set completion-map-case on
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set colored-stats on
+set colored-completion-prefix on
+set menu-complete-display-prefix on
+set mark-symlinked-directories on
+set skip-completed-text on
+set visible-stats on
+
+# No terminal bell.
+set bell-style none
+
+# Up/Down search history by the text already typed (prefix match), like fzf-less
+# history browsing.
+"\e[A": history-search-backward
+"\e[B": history-search-forward

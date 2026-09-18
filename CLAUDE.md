@@ -60,6 +60,7 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `starship/` → `~/.config/starship/` — Cross-shell prompt; **the default** (`starship.toml`). Set `DOTFILES_PROMPT=p10k` to switch back to Powerlevel10k (`zsh/.config/zsh/.p10k.zsh` + zinit), which stays fully wired. The `DOTFILES_PROMPT` knob is at the top of `.zshrc` (section 1); it must be set before `.zshrc` runs (not in `99-private.zsh`, which loads too late)
 - `ghostty/` → `~/.config/ghostty/` — Ghostty terminal config (macOS; trying alongside iTerm2, see `settings/iterm/`)
 - `yazi/` → `~/.config/yazi/` — Yazi terminal file manager (minimal config, built-in theme)
+- `readline/` → `~/.inputrc` — GNU Readline config for bash/python/psql and other libreadline sub-shells (zsh has its own line editor and ignores it)
 
 `powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `scripts/setup/windows.ps1`'s own symlink function instead (see Windows section below). The profile is a thin loader that resolves its own symlink and dot-sources `profile.d/*.ps1` (mirroring zsh's `conf.d/`); `profile.d/` lives only in the repo (found via the symlink's target), so it needs no separate symlink.
 
@@ -81,6 +82,8 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `13-vi-mode.zsh` — Vi keybindings
 - `14-abbreviations.zsh` — Shell abbreviations
 - `15-nix.zsh` — Nix/Home Manager PATH setup (Linux)
+- `16-iterm.zsh` — iTerm2 shell integration (macOS; sources `~/.iterm2_shell_integration.zsh`, regenerated per machine)
+- `17-bookmarks.zsh` — Named directory bookmarks via `hash -d` (`cd ~df`, `~cfg`); machine-specific ones go in `99-private.zsh`
 - `99-private.zsh` — Machine-local overrides, gitignored
 
 ### Scripts Layout

@@ -44,6 +44,7 @@ $SYMLINK_MAP = @{
     "fastfetch\.config\fastfetch" = "$env:USERPROFILE\.config\fastfetch"
     "starship\.config\starship"   = "$env:USERPROFILE\.config\starship"
     "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+    "readline\.inputrc"           = "$env:USERPROFILE\.inputrc"
 }
 
 # Scoop packages to install
