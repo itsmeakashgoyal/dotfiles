@@ -11,6 +11,15 @@
 	name = Akash Goyal
 	email = ag.akgoyal@gmail.com
 
+# Machine-local identity override (gitignored, per-machine; safe to be absent).
+# On a work machine, ~/.config/git/config-local sets the work email as the
+# DEFAULT for normally-cloned repos, so the public repo never has to hardcode a
+# work address and every machine stays generic. Created by `dutils ssh-setup`
+# (work profile). It sits BEFORE the personal includeIfs below on purpose, so
+# personal repos still override back to gmail. Missing file = silently ignored.
+[include]
+	path = ~/.config/git/config-local
+
 # Personal repos: any repo cloned under ~/personal/ uses gmail
 [includeIf "gitdir:~/personal/"]
 	path = ~/.config/git/config-personal

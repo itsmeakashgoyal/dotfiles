@@ -45,3 +45,6 @@ nix/result-*
 private/*
 zsh/.config/zsh/conf.d/99-private.zsh
 .claude/
+
+# Machine-local git identity override (per-machine work email; see git config [include])
+git/.config/git/config-local

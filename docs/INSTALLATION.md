@@ -109,33 +109,19 @@ Many people use both: WSL2 for nvim/tmux/zsh/git day to day, native PowerShell/W
 
 ## (Optional) SSH Key Setup
 
-Generate and configure SSH keys for GitHub or other services.
-
-### Usage
-
-```bash
-./scripts/dutils/setup_ssh.sh -e EMAIL [-t KEY_TYPE]
-```
-
-| Flag | Description | Default |
-| --- | --- | --- |
-| `-e` | Email address for the SSH key (required) | -- |
-| `-t` | Key type: `ed25519` or `rsa` | `ed25519` |
-| `-h` | Show help | -- |
-
-### Examples
+Generate SSH keys and `~/.ssh/config` aliases for separate **personal** and
+**work** GitHub identities (cross-platform):
 
 ```bash
-# Generate an Ed25519 key (recommended)
-./scripts/dutils/setup_ssh.sh -e you@example.com
-
-# Generate an RSA key (for legacy systems that don't support Ed25519)
-./scripts/dutils/setup_ssh.sh -e you@example.com -t rsa
+dutils ssh-setup                       # interactive: personal / work / both
+dutils ssh-setup --profile personal -e you@gmail.com
+dutils ssh-setup --profile work -e you@company.com --name "Your Name"
 ```
 
-### What it does
+Per profile it generates an Ed25519 key (never clobbering an existing one), sets
+`600`/`644` perms, writes an idempotent `Host` alias into `~/.ssh/config`, adds
+the key to `ssh-agent`, and copies the public key to your clipboard. The `Host`
+alias makes the git commit email follow the remote automatically.
 
-1. Generates the key at `~/.ssh/id_<type>` (prompts for a new name if one already exists)
-2. Starts `ssh-agent` and adds the key
-3. Sets correct permissions (`600` for private key, `644` for public key)
-4. Copies the public key to your clipboard (macOS via `pbcopy`, Linux via `xclip`)
+See **[docs/SSH.md](SSH.md)** for the full model (how the identity is chosen per
+repo, `config-local`, enterprise hosts, Windows notes).

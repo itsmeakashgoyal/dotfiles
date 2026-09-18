@@ -32,15 +32,19 @@ Components: `dotfiles` (remove Stow symlinks), `homebrew` (uninstall Homebrew + 
 `homebrew` components delegate to [`scripts/setup/uninstall.sh`](../setup/uninstall.sh) so there's
 one implementation of "how teardown actually works" shared with `make uninstall`.
 
-### `ssh-keygen` — generate an SSH key
+### `ssh-setup` — SSH keys + config for personal & work GitHub
 
 ```bash
-dutils ssh-keygen -e you@example.com            # ed25519 (default)
-dutils ssh-keygen -e you@example.com -t rsa     # rsa
+dutils ssh-setup                                  # interactive: personal / work / both
+dutils ssh-setup --profile personal -e you@gmail.com
+dutils ssh-setup --profile work -e you@company.com --name "Your Name"
 ```
 
-Adds the key to `ssh-agent`, copies the public key to your clipboard, and prompts for a new name
-if one already exists at that path.
+Cross-platform (macOS/Linux/Windows). Per profile it generates an Ed25519 key (never clobbering an
+existing one), writes an idempotent `Host` alias into `~/.ssh/config`, adds the key to `ssh-agent`,
+and copies the public key to your clipboard. The `Host` alias is what makes the git commit identity
+follow the remote automatically — see [docs/SSH.md](../../docs/SSH.md). `ssh-keygen` is a
+back-compat alias of `ssh-setup`.
 
 ### `detect-os` — print OS/arch detection
 
@@ -89,7 +93,7 @@ dutils debug my-script.sh arg1 arg2
 scripts/dutils/
 ├── dutils                      # CLI entry point / dispatcher
 ├── cleanup.py                  # cleanup subcommand
-├── setup_ssh.sh                # ssh-keygen subcommand (also directly runnable, see docs/INSTALLATION.md)
+├── ssh_setup.py                # ssh-setup subcommand (personal & work SSH keys/config, see docs/SSH.md)
 ├── diff_files_interactive.sh   # diff subcommand
 ├── install_nvim.py             # install-nvim subcommand
 ├── print_functions.py          # list-functions subcommand
@@ -118,7 +122,7 @@ Not defined anywhere in this repo — add to your own `.zshrc`/`99-private.zsh` 
 
 ```zsh
 alias dcl='dutils cleanup'
-alias dssh='dutils ssh-keygen'
+alias dssh='dutils ssh-setup'
 alias dos='dutils detect-os'
 alias ddiff='dutils diff'
 alias dlf='dutils list-functions'

@@ -94,8 +94,8 @@ def cmd_new(args: list[str]) -> None:
     _exec_python("new.py", args)
 
 
-def cmd_ssh_keygen(args: list[str]) -> None:
-    _exec_shell("setup_ssh.sh", args)
+def cmd_ssh_setup(args: list[str]) -> None:
+    _exec_python("ssh_setup.py", args)
 
 
 def cmd_detect_os(_args: list[str]) -> None:
@@ -210,7 +210,8 @@ COMMANDS: dict[str, tuple] = {
     "packages":       (cmd_packages,       "Compare installed packages against Brewfile"),
     "bench":          (cmd_bench,          "Benchmark zsh startup time (needs hyperfine)"),
     "profile":        (cmd_profile,        "Profile zsh startup with zprof (per-function)"),
-    "ssh-keygen":     (cmd_ssh_keygen,     "Generate SSH keys with custom names/types"),
+    "ssh-setup":      (cmd_ssh_setup,      "Set up SSH keys + config for personal & work GitHub"),
+    "ssh-keygen":     (cmd_ssh_setup,      "Alias of ssh-setup (back-compat)"),
     "detect-os":      (cmd_detect_os,      "Detect current OS and architecture"),
     "diff":           (cmd_diff,           "Interactive file diff with tv and live watching"),
     "install-nvim":   (cmd_install_nvim,   "Install latest Neovim (Linux only)"),

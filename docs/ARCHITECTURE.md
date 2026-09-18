@@ -155,7 +155,7 @@ scripts/
 │   ├── cleanup.py                  ← symlink/Homebrew cleanup helpers
 │   ├── install_nvim.py             ← manual Neovim installer (Linux fallback)
 │   ├── print_functions.py          ← lists documented zsh functions
-│   ├── setup_ssh.sh                ← Ed25519/RSA SSH key generation
+│   ├── ssh_setup.py                ← SSH keys + ~/.ssh/config for personal & work (see docs/SSH.md)
 │   ├── diff_files_interactive.sh   ← tv-picked, entr-watched file diff
 │   ├── run_with_xtrace.sh          ← runs a script under `bash -x`
 │   └── profile_zsh.sh              ← zprof startup profiling (`make bench-detail`)
