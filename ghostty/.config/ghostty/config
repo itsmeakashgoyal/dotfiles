@@ -4,9 +4,15 @@
 # ░▓ file   ▓ ghostty/.config/ghostty/config
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Zenbones Dark (forced - not tied to the macOS light/dark appearance, so it
-# stays dark like the reference screenshot even when macOS is in light mode).
-theme = Zenbones Dark
+# Tokyo Night, following the macOS light/dark appearance automatically (dark →
+# Night, light → Day). This is the palette the whole toolchain coordinates on;
+# bat/fzf/delta follow the terminal's ANSI colours, and nvim uses tokyonight too.
+theme = dark:TokyoNight Night,light:TokyoNight Day
+
+# Optional per-machine override written by `dutils theme dark|light` (pins the
+# theme instead of following the OS). The `?` makes it silently optional when the
+# file doesn't exist, and being last it overrides the auto line above.
+config-file = ?theme.local
 
 # JetBrainsMono Nerd Font with its OpenType stylistic sets + ligatures enabled -
 # ss01-ss10 swap in the alternate letterforms, `zero` slashes the zero, and

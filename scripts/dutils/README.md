@@ -59,6 +59,18 @@ dutils secrets list
 Secrets are stored encrypted under `secrets/` mirroring `$HOME`; plaintext never
 enters the repo. Full guide: [docs/SECRETS.md](../../docs/SECRETS.md).
 
+### `theme` — switch the coordinated Tokyo Night theme
+
+```bash
+dutils theme            # status
+dutils theme dark       # pin dark / light
+dutils theme toggle     # flip dark <-> light
+dutils theme auto       # follow the macOS appearance (default)
+```
+
+Switches ghostty + Neovim; bat/fzf/delta follow the terminal's ANSI palette so
+they match automatically. Full guide: [docs/THEME.md](../../docs/THEME.md).
+
 ### `detect-os` — print OS/arch detection
 
 ```bash
@@ -108,6 +120,7 @@ scripts/dutils/
 ├── cleanup.py                  # cleanup subcommand
 ├── ssh_setup.py                # ssh-setup subcommand (personal & work SSH keys/config, see docs/SSH.md)
 ├── secrets.py                  # secrets subcommand (age-encrypted secrets, see docs/SECRETS.md)
+├── theme.py                    # theme subcommand (coordinated Tokyo Night switch, see docs/THEME.md)
 ├── diff_files_interactive.sh   # diff subcommand
 ├── install_nvim.py             # install-nvim subcommand
 ├── print_functions.py          # list-functions subcommand

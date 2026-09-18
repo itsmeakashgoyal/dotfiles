@@ -72,7 +72,16 @@ else
 fi
 
 # Bat: https://github.com/sharkdp/bat
-# export BAT_THEME="Squirrelsong Dark"
+# Follow the terminal's ANSI palette (Tokyo Night) so bat matches whatever the
+# terminal is showing in BOTH light and dark, with no vendored theme to keep in
+# sync. `dutils theme` switches the terminal; bat follows automatically.
+export BAT_THEME="ansi"
+
+# fzf: styled with ANSI colour *indices* (0-15, and -1 = terminal default) rather
+# than hex, so the picker likewise follows the terminal palette in light or dark.
+export FZF_DEFAULT_OPTS="--height=50% --layout=reverse --border=rounded --cycle \
+--bind=ctrl-j:down,ctrl-k:up \
+--color=fg:-1,bg:-1,hl:4,fg+:-1,bg+:-1,hl+:4,border:8,prompt:6,pointer:5,marker:2,info:8,spinner:6,header:8"
 
 # Ripgrep config file location
 # export RIPGREP_CONFIG_PATH="$XDG_DOTFILES_DIR/dots/.ripgreprc"
