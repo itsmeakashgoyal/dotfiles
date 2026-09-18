@@ -12,5 +12,5 @@
 # while television keeps Ctrl+T (file search).
 
 if command -v atuin >/dev/null 2>&1; then
-    eval "$(atuin init zsh)"
+    cached_init atuin atuin init zsh
 fi

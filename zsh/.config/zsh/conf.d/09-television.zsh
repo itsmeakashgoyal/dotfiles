@@ -13,7 +13,7 @@
 
 # Initialize zoxide if available
 if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh --cmd cd --hook prompt)"
+    cached_init zoxide zoxide init zsh --cmd cd --hook prompt
 fi
 
 # Clipboard helper (used by other scripts)
@@ -30,7 +30,7 @@ if ! command -v tv >/dev/null 2>&1; then
 fi
 
 # Initialize television shell integration (sets up Ctrl+T and Ctrl+R)
-eval "$(tv init zsh)"
+cached_init tv tv init zsh
 
 # ------------------------------------------------------------------------------
 # Tab Key Override

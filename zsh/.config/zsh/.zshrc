@@ -107,7 +107,7 @@ if [[ "$DOTFILES_PROMPT" == "p10k" ]]; then
     zinit light romkatv/powerlevel10k
 else
     export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
-    eval "$(starship init zsh)"
+    cached_init starship starship init zsh
 fi
 
 # ==============================================================================

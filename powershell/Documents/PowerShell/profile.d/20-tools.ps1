@@ -9,6 +9,31 @@
 $__dbg = [bool]$env:DOTFILES_PROFILE_DEBUG
 $__sw = if ($__dbg) { [System.Diagnostics.Stopwatch]::StartNew() }
 
+# ------------------------------------------------------------------------------
+# Cached tool initialization
+# ------------------------------------------------------------------------------
+# `tool init powershell | iex` spawns the tool on every prompt start — the
+# expensive part on Windows (per-process spawn + EDR/AV overhead). Cache the
+# generated init to a file and dot-source that instead, regenerating only when
+# the tool binary changes. Get-Command / Get-Item are in-process; the spawn only
+# happens on a cache miss. Mirrors cached_init in zsh's 01-exports.zsh.
+function Import-CachedInit {
+    param([string]$Name, [string]$Bin, [scriptblock]$Init)
+    $cmd = Get-Command $Bin -ErrorAction SilentlyContinue
+    if (-not $cmd) { return }
+    $dir = Join-Path $env:LOCALAPPDATA "dotfiles\psinit"
+    $cache = Join-Path $dir "$Name.ps1"
+    $keyFile = Join-Path $dir "$Name.key"
+    $key = "{0}:{1}" -f $cmd.Source, (Get-Item $cmd.Source).LastWriteTimeUtc.Ticks
+    if ((-not (Test-Path $cache)) -or (-not (Test-Path $keyFile)) -or
+        ((Get-Content $keyFile -Raw -ErrorAction SilentlyContinue).Trim() -ne $key)) {
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        (& $Init | Out-String) | Set-Content -Path $cache -Encoding UTF8
+        Set-Content -Path $keyFile -Value $key -Encoding UTF8
+    }
+    . $cache
+}
+
 # ==============================================================================
 # ripgrep
 # ==============================================================================
@@ -89,7 +114,7 @@ if (_cmd bat) {
 # ==============================================================================
 if (_cmd zoxide) {
     if ($__dbg) { $__sw.Restart() }
-    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+    Import-CachedInit -Name zoxide -Bin zoxide -Init { zoxide init powershell }
     if ($__dbg) { Write-Host ("    - {0,6:N0}ms zoxide init" -f $__sw.Elapsed.TotalMilliseconds) -ForegroundColor DarkMagenta }
 }
 
@@ -128,7 +153,7 @@ if ($env:DOTFILES_MISE_ACTIVATE -and (_cmd mise)) {
 if (_cmd starship) {
     $env:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
     if ($__dbg) { $__sw.Restart() }
-    (& starship init powershell) | Out-String | Invoke-Expression
+    Import-CachedInit -Name starship -Bin starship -Init { starship init powershell }
     if ($__dbg) { Write-Host ("    - {0,6:N0}ms starship init" -f $__sw.Elapsed.TotalMilliseconds) -ForegroundColor DarkMagenta }
 }
 

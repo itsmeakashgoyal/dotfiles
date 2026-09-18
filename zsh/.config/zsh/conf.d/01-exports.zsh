@@ -83,6 +83,30 @@ export FZF_DEFAULT_OPTS="--height=50% --layout=reverse --border=rounded --cycle 
 --bind=ctrl-j:down,ctrl-k:up \
 --color=fg:-1,bg:-1,hl:4,fg+:-1,bg+:-1,hl+:4,border:8,prompt:6,pointer:5,marker:2,info:8,spinner:6,header:8"
 
+# ------------------------------------------------------------------------------
+# Cached tool initialization
+# ------------------------------------------------------------------------------
+# `eval "$(tool init zsh)"` spawns the tool on every shell start (starship,
+# zoxide, atuin, tv…). Cache that output once and re-source it instead,
+# regenerating only when the tool's binary changes — keyed by path + mtime via
+# the zstat *builtin* and `command -v` (both in-process), so the hot path spawns
+# nothing. Small win here, big win where process spawns are pricey (Windows).
+zmodload -F zsh/stat b:zstat 2>/dev/null
+_dotfiles_init_cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/init"
+cached_init() {
+    local name="$1"; shift
+    local bin; bin=$(command -v "$1" 2>/dev/null) || return 0
+    local cache="${_dotfiles_init_cache}/${name}.zsh"
+    local -a st; zstat -A st +mtime "$bin" 2>/dev/null
+    local key="${bin}:${st[1]:-0}:${ZSH_VERSION}"
+    if [[ ! -r "$cache" || "$(<"${cache}.key" 2>/dev/null)" != "$key" ]]; then
+        mkdir -p "${_dotfiles_init_cache}"
+        "$@" >| "$cache" 2>/dev/null
+        print -r -- "$key" >| "${cache}.key"
+    fi
+    source "$cache"
+}
+
 # Ripgrep config file location
 # export RIPGREP_CONFIG_PATH="$XDG_DOTFILES_DIR/dots/.ripgreprc"
 
