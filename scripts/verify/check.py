@@ -588,6 +588,11 @@ class PackageChecker(SystemChecker):
             return result
         for line in text.splitlines():
             line = line.strip()
+            # Skip version/platform-gated entries (e.g. `cask "x" if <cond>`):
+            # they're conditionally installed, so they must not count as
+            # "missing" when the condition is false on this machine.
+            if " if " in line or " unless " in line:
+                continue
             for key in ("tap", "brew", "cask"):
                 if line.startswith(f"{key} "):
                     m = re.search(r"""['"]([^'"]+)['"]""", line)

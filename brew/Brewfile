@@ -92,6 +92,13 @@ if OS.mac?
     # Photos
     brew "pipx"              # Installs osxphotos (Photos library export CLI, see scripts/setup/macos.sh)
 
+    # GUI apps
+    # BrewUI — Homebrew's official GUI (Homebrew 7.0+). It's a cask that needs
+    # macOS Tahoe 26+; the version guard makes `brew bundle` install it only
+    # there and silently skip it on older macOS (e.g. Sequoia 15). `to_i` reads
+    # the leading major version from e.g. "26.0" / "15.7.9".
+    cask "homebrew-app" if `sw_vers -productVersion`.to_i >= 26
+
     # Nerd Fonts
     cask "font-fira-code-nerd-font"
     cask "font-jetbrains-mono-nerd-font"
