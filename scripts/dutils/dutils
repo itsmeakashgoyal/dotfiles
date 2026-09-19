@@ -114,6 +114,10 @@ def cmd_zcompile(args: list[str]) -> None:
     _exec_python("zcompile.py", args)
 
 
+def cmd_vulns(args: list[str]) -> None:
+    _exec_python("vulns.py", args)
+
+
 def cmd_detect_os(_args: list[str]) -> None:
     # Use the repo's canonical OS-detect module (scripts/lib/osdetect.py) for
     # the label rather than re-deriving it here - one source of truth shared
@@ -225,6 +229,7 @@ COMMANDS: dict[str, tuple] = {
     "diagnose":       (cmd_diagnose,       "Run all diagnostics (health + system + packages)"),
     "sysinfo":        (cmd_sysinfo,        "Display system information"),
     "packages":       (cmd_packages,       "Compare installed packages against Brewfile"),
+    "vulns":          (cmd_vulns,          "Scan installed Homebrew packages for CVEs (macOS, brew 7+)"),
     "bench":          (cmd_bench,          "Benchmark zsh startup time (needs hyperfine)"),
     "profile":        (cmd_profile,        "Profile zsh startup with zprof (per-function)"),
     "ssh-setup":      (cmd_ssh_setup,      "Set up SSH keys + config for personal & work GitHub"),

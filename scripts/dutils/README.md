@@ -94,6 +94,20 @@ source otherwise, so a stale `.zwc` is never a correctness risk — re-run after
 editing zsh config (`dutils sync` does it for you). Pairs with the cached
 tool-`init` output (`cached_init` in `01-exports.zsh`).
 
+### `vulns` — scan Homebrew packages for known CVEs
+
+```bash
+dutils vulns                    # all findings
+dutils vulns --severity high    # only high+ severity
+dutils vulns openssl            # a single formula
+```
+
+macOS only (Linux uses Nix). Wraps Homebrew 7.0+'s `brew vulns` (OSV.dev-backed
+advisory database). Exit code mirrors brew's (nonzero when findings exist), so
+it's scriptable — but it's intentionally *not* a CI gate (the advisory DB drifts,
+which would fail unrelated builds). `dutils diagnose` also prints a one-line
+summary of findings.
+
 ### `detect-os` — print OS/arch detection
 
 ```bash
@@ -146,6 +160,7 @@ scripts/dutils/
 ├── secrets.py                  # secrets subcommand (age-encrypted secrets, see docs/SECRETS.md)
 ├── theme.py                    # theme subcommand (coordinated Tokyo Night switch, see docs/THEME.md)
 ├── zcompile.py                 # zcompile subcommand (precompile zsh config to .zwc)
+├── vulns.py                    # vulns subcommand (brew vulns CVE scan, macOS)
 ├── diff_files_interactive.sh   # diff subcommand
 ├── install_nvim.py             # install-nvim subcommand
 ├── print_functions.py          # list-functions subcommand

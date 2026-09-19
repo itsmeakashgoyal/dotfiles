@@ -85,6 +85,22 @@ dutils secrets decrypt --all   # restore on a new machine
 
 ---
 
+## Dependency Vulnerability Scanning
+
+On macOS, `dutils vulns` scans installed Homebrew packages for known CVEs using
+Homebrew 7.0+'s built-in `brew vulns` (OSV.dev-backed advisory database).
+
+```bash
+dutils vulns                    # all findings
+dutils vulns --severity high    # only high+ severity
+```
+
+`dutils diagnose` also prints a one-line summary of findings. This is a local,
+on-demand check — deliberately **not** a CI gate, since the advisory database
+changes over time and would fail unrelated builds on newly disclosed CVEs.
+
+---
+
 ## macOS Package Install Script
 
 `scripts/setup/macos.sh` installs Homebrew and every formula/cask listed in `brew/Brewfile`. Review the Brewfile before running on a fork — it installs packages system-wide.

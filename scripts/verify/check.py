@@ -713,6 +713,36 @@ Modes:
 """
 
 
+def brew_vulns_summary() -> None:
+    """Informational Homebrew vulnerability summary (macOS, brew 7.0+).
+
+    Runs in the --all/diagnose flow only; never affects the exit code — the
+    advisory database drifts over time, so a finding here is news to act on, not
+    a broken install. Full report / filtering lives in `dutils vulns`.
+    """
+    import shutil
+    log.section("SECURITY (brew vulns)")
+    if not osdetect.is_mac():
+        log.substep("macOS only (Linux uses Nix, not Homebrew) — skipped")
+        return
+    if shutil.which("brew") is None:
+        log.substep("Homebrew not found — skipped")
+        return
+    if subprocess.run(["brew", "vulns", "--help"], capture_output=True).returncode != 0:
+        log.substep("brew vulns unavailable (needs Homebrew 7.0+) — skipped")
+        return
+    log.substep("Scanning installed formulae against the advisory database…")
+    out = subprocess.run(["brew", "vulns"], capture_output=True, text=True)
+    text = (out.stdout or "") + (out.stderr or "")
+    summary = next((ln.strip() for ln in reversed(text.splitlines())
+                    if ln.strip().startswith("Found ")), None)
+    if summary:
+        log.substep(summary)
+        log.substep("Full report: dutils vulns   (filter: dutils vulns --severity high)")
+    else:
+        log.substep("No known vulnerabilities reported.")
+
+
 class DotfilesVerifier:
     DOTFILES_DIR = Path.home() / "dotfiles"
 
@@ -746,6 +776,8 @@ class DotfilesVerifier:
                 rc = 1
             print()
             SystemInfo().display()
+            print()
+            brew_vulns_summary()
             return rc
 
         if mode in ("--help", "-h", "help"):
