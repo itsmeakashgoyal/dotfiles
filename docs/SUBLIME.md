@@ -13,7 +13,7 @@ editor live.
 | **Editing** | `EditorConfig`, `BracketHighlighter`, `DocBlockr`, `AutoFileName`, format-on-save + organize-imports (via LSP) |
 | **Terminal** | `Terminus` integrated terminal — toggle with `ctrl+alt+t` |
 | **Git** | `GitGutter` (inline diff in the gutter) |
-| **UI** | `A File Icon`, `SideBarEnhancements`, the **gruvbox** theme + color scheme |
+| **UI** | `A File Icon`, `SideBarEnhancements`, built-in Adaptive theme + a **vendored gruvbox** color scheme |
 | **Build/run** | `C++ Single File` (clang++ compile+run, Windows `.exe` variant) and `Python3` build systems |
 | **Search** | Inline highlight of all matches + a Notepad++-style results list (see below) |
 
@@ -75,9 +75,11 @@ directly — no re-copy step.
 
 ## Notes
 
-- Theme is **gruvbox** (the `gruvbox` Package Control package — theme + color
-  scheme), deliberately kept separate from the Tokyo Night palette the terminal
-  toolchain uses.
+- Theme: **gruvbox** colors via a **vendored** color scheme
+  (`settings/sublime/Gruvbox Dark.sublime-color-scheme`) + the built-in Adaptive
+  UI theme — no Package Control theme to resolve, so it works offline / on
+  locked-down networks with no "unable to find colour scheme" errors. Kept
+  separate from the Tokyo Night palette the terminal toolchain uses.
 - `Vintage` (vi mode) stays disabled, matching the current setup.
 - Package list lives in `Package Control.sublime-settings`; add/remove there.
 - **Note on churn:** `Preferences.sublime-settings` and

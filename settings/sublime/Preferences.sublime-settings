@@ -3,14 +3,8 @@
     "font_size": 17,
     "font_options": ["gray_antialias", "subpixel_antialias"],
 
-    "theme": "gruvbox.sublime-theme",
-    "color_scheme": "Packages/gruvbox/gruvbox (Dark) (Medium).sublime-color-scheme",
-    "gruvbox_tabs_s": true,
-    "gruvbox_underline_modified_tabs": true,
-    "gruvbox_underline_modified_tabs_thick": true,
-    "gruvbox_underline_active_tab": true,
-    "gruvbox_underline_active_tab_thick": true,
-    "gruvbox_animate_icons": true,
+    "theme": "Adaptive.sublime-theme",
+    "color_scheme": "Packages/User/Gruvbox Dark.sublime-color-scheme",
 
     "ignored_packages": ["Vintage"],
 
