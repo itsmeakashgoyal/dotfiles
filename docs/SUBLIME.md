@@ -13,8 +13,9 @@ editor live.
 | **Editing** | `EditorConfig`, `BracketHighlighter`, `DocBlockr`, `AutoFileName`, format-on-save + organize-imports (via LSP) |
 | **Terminal** | `Terminus` integrated terminal — toggle with `ctrl+alt+t` |
 | **Git** | `GitGutter` (inline diff in the gutter) |
-| **UI** | `A File Icon`, `SideBarEnhancements`, Adaptive theme + a vendored **Tokyo Night** color scheme (matches the rest of the toolchain) |
+| **UI** | `A File Icon`, `SideBarEnhancements`, the **gruvbox** theme + color scheme |
 | **Build/run** | `C++ Single File` (clang++ compile+run, Windows `.exe` variant) and `Python3` build systems |
+| **Search** | Inline highlight of all matches + a Notepad++-style results list (see below) |
 
 ### Keymap (`Default.sublime-keymap`, all platforms)
 
@@ -24,6 +25,30 @@ editor live.
 | `ctrl+alt+f` | LSP format document |
 | `f2` | LSP rename symbol |
 | `ctrl+alt+r` | LSP find references |
+| `ctrl+alt+shift+f` | Find All in the **current file** → results list (Notepad++ style) |
+
+## Find & "Find All" (Notepad++ equivalent)
+
+Sublime splits this across two features:
+
+- **`Ctrl/Cmd+F` — Find.** Highlights **every** match inline in the file
+  (colour highlighting, like Notepad++'s Mark). The panel's **Find All** button
+  puts a cursor on each match so you can edit them all at once.
+- **`Ctrl/Cmd+Shift+F` — Find in Files.** This is the Notepad++ "Find All"
+  results panel: a **Find Results** view listing every match with its line
+  number, grouped by file, the matched text colour-highlighted; `Enter` or
+  double-click jumps to a match, and `F4` / `Shift+F4` step through them. Set
+  **Where** to `<current file>` to search only the current document, or a
+  folder/`<open files>` for a project-wide search.
+
+The extra keybinding **`ctrl+alt+shift+f`** opens Find in Files already scoped to
+the current file — press `Enter` and you get the results list for just this file,
+matching Notepad++'s "Find All in Current Document".
+
+**Want it docked at the bottom** like Notepad++? The Find Results open as a
+normal tab; drag that tab into a bottom group (View → Layout → *Rows: 2*, or
+`Ctrl/Cmd+Alt+2`) and Sublime keeps future results there. `find_selected_text`
+is on, so the word under the cursor pre-fills the search.
 
 ## Prerequisites (language servers)
 
@@ -50,8 +75,14 @@ directly — no re-copy step.
 
 ## Notes
 
-- The Tokyo Night color scheme is **vendored** (`settings/sublime/Tokyo Night.sublime-color-scheme`)
-  rather than a Package Control theme, so it renders identically on every OS with
-  no package to resolve.
+- Theme is **gruvbox** (the `gruvbox` Package Control package — theme + color
+  scheme), deliberately kept separate from the Tokyo Night palette the terminal
+  toolchain uses.
 - `Vintage` (vi mode) stays disabled, matching the current setup.
 - Package list lives in `Package Control.sublime-settings`; add/remove there.
+- **Note on churn:** `Preferences.sublime-settings` and
+  `Package Control.sublime-settings` are the two files Sublime/Package Control
+  rewrite at runtime (`ignored_packages`, `in_process_packages`) — and since
+  they're symlinked, those writes flow into the repo. This mostly happens once
+  during first-launch package installation and settles afterward; if you toggle
+  packages from the UI later, revert with `git checkout` or keep the change.

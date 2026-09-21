@@ -13,6 +13,7 @@
         "LSP-yaml",
         "Package Control",
         "SideBarEnhancements",
-        "Terminus"
+        "Terminus",
+        "gruvbox"
     ]
 }

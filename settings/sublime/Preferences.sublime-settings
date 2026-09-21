@@ -3,8 +3,14 @@
     "font_size": 17,
     "font_options": ["gray_antialias", "subpixel_antialias"],
 
-    "theme": "Adaptive.sublime-theme",
-    "color_scheme": "Packages/User/Tokyo Night.sublime-color-scheme",
+    "theme": "gruvbox.sublime-theme",
+    "color_scheme": "Packages/gruvbox/gruvbox (Dark) (Medium).sublime-color-scheme",
+    "gruvbox_tabs_s": true,
+    "gruvbox_underline_modified_tabs": true,
+    "gruvbox_underline_modified_tabs_thick": true,
+    "gruvbox_underline_active_tab": true,
+    "gruvbox_underline_active_tab_thick": true,
+    "gruvbox_animate_icons": true,
 
     "ignored_packages": ["Vintage"],
 
@@ -46,6 +52,9 @@
     "match_selection": false,
     "match_tags": false,
     "use_simple_full_screen": true,
+
+    "find_selected_text": true,
+    "highlight_matches": true,
 
     "auto_complete": true,
     "auto_complete_commit_on_tab": true,

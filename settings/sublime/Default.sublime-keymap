@@ -2,5 +2,6 @@
     { "keys": ["ctrl+alt+t"], "command": "toggle_terminus_panel" },
     { "keys": ["ctrl+alt+f"], "command": "lsp_format_document" },
     { "keys": ["f2"], "command": "lsp_symbol_rename" },
-    { "keys": ["ctrl+alt+r"], "command": "lsp_symbol_references" }
+    { "keys": ["ctrl+alt+r"], "command": "lsp_symbol_references" },
+    { "keys": ["ctrl+alt+shift+f"], "command": "show_panel", "args": { "panel": "find_in_files", "where": "<current file>" } }
 ]
