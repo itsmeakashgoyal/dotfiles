@@ -80,6 +80,11 @@ directly — no re-copy step.
   UI theme — no Package Control theme to resolve, so it works offline / on
   locked-down networks with no "unable to find colour scheme" errors. Kept
   separate from the Tokyo Night palette the terminal toolchain uses.
+- Tab bar is restyled via a User theme override
+  (`settings/sublime/Adaptive.sublime-theme`): gruvbox-tinted tabs, a clear
+  active tab (lifted background + bold bright label, inactive tabs muted grey),
+  taller tabs with more padding, and an accent-coloured close button on hover.
+  No package needed — it layers on the built-in Adaptive theme.
 - `Vintage` (vi mode) stays disabled, matching the current setup.
 - Package list lives in `Package Control.sublime-settings`; add/remove there.
 - **Note on churn:** `Preferences.sublime-settings` and

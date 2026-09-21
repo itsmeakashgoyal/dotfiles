@@ -52,6 +52,7 @@ $SYMLINK_MAP = @{
     "settings\sublime\Preferences.sublime-settings"      = "$env:APPDATA\Sublime Text\Packages\User\Preferences.sublime-settings"
     "settings\sublime\LSP.sublime-settings"              = "$env:APPDATA\Sublime Text\Packages\User\LSP.sublime-settings"
     "settings\sublime\Gruvbox Dark.sublime-color-scheme"  = "$env:APPDATA\Sublime Text\Packages\User\Gruvbox Dark.sublime-color-scheme"
+    "settings\sublime\Adaptive.sublime-theme"            = "$env:APPDATA\Sublime Text\Packages\User\Adaptive.sublime-theme"
     "settings\sublime\Default.sublime-keymap"            = "$env:APPDATA\Sublime Text\Packages\User\Default.sublime-keymap"
     "settings\sublime\C++ Single File.sublime-build"     = "$env:APPDATA\Sublime Text\Packages\User\C++ Single File.sublime-build"
     "settings\sublime\Python3.sublime-build"             = "$env:APPDATA\Sublime Text\Packages\User\Python3.sublime-build"
