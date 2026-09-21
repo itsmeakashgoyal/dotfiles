@@ -1,15 +1,18 @@
 {
-  "installed_packages":
-	[
-		"BracketHighlighter",
-		"DocBlockr",
-		"GitGutter",
-		"gruvbox",
-		"Package Control",
-		"python-black",
-		"SideBarEnhancements",
-		"SublimeLinter",
-		"SublimeLinter-cpplint",
-		"SublimeLinter-pylint",
-	]
+    "installed_packages": [
+        "A File Icon",
+        "AutoFileName",
+        "BracketHighlighter",
+        "DocBlockr",
+        "EditorConfig",
+        "GitGutter",
+        "LSP",
+        "LSP-json",
+        "LSP-pyright",
+        "LSP-ruff",
+        "LSP-yaml",
+        "Package Control",
+        "SideBarEnhancements",
+        "Terminus"
+    ]
 }

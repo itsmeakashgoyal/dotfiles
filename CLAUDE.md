@@ -90,11 +90,11 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 - `scripts/lib/core.sh` — Shared library for logging, command checking; sourced by all bash entry-point scripts. Has side effects on source (creates `~/linuxtoolbox`, `/tmp/dotfiles.log`).
 - `scripts/lib/os-detect.sh` — OS detection only (`os::is_mac`/`os::is_linux`/`os::arch`/`os::detail`), split out from `core.sh` specifically because it has none of core.sh's side effects — safe to source from zsh's interactive startup too. `scripts/lib/osdetect.py` mirrors the same API for Python scripts.
 - `scripts/verify/check.sh` → `check.py` — Health/verification checks (`--quick`, `--full`, `--packages`, `--system`)
-- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh`, `iterm.sh`, `macos-defaults.sh` (curated `defaults write`, run via `make macos-defaults`; not in the default install flow) (macOS), `uninstall.sh`, `windows.ps1` (Windows). There is no `macos.sh`.
+- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh` (Sublime Text: symlinks `settings/sublime/` into the per-OS User dir + installs Package Control; **macOS + Linux**, Windows handled by `windows.ps1`), `iterm.sh`, `macos-defaults.sh` (curated `defaults write`, run via `make macos-defaults`; not in the default install flow) (`iterm.sh`/`macos-defaults.sh` are macOS-only), `uninstall.sh`, `windows.ps1` (Windows). There is no `macos.sh`.
 - `scripts/setup/macos.sh` + `brew/Brewfile` — Homebrew bundle installation (macOS only — Linux uses Nix instead, see `nix.sh`/`nix/home.nix`)
 
 ### Installation Flow
-`install.sh` self-locates `DOTFILES_DIR` → sources `core.sh` → set default shell → OS branch (macOS: `scripts/setup/macos.sh`; Linux: `scripts/setup/linux.sh` + `scripts/setup/nix.sh`) → macOS-only `sublime.sh`/`iterm.sh` → `make run` (stow all) → health verification
+`install.sh` self-locates `DOTFILES_DIR` → sources `core.sh` → set default shell → OS branch (macOS: `scripts/setup/macos.sh`; Linux: `scripts/setup/linux.sh` + `scripts/setup/nix.sh`) → `sublime.sh` (macOS + Linux) + macOS-only `iterm.sh` → `make run` (stow all) → health verification
 
 ### Windows
 Separate path, no Stow: `install.ps1` → `scripts/setup/windows.ps1` (Scoop packages, hand-rolled symlinks via `$SYMLINK_MAP`, PowerShell modules, `Test-Installation` health check that exits non-zero under `$env:CI`). Not yet required in CI (`test-windows` job is soft-gated/`continue-on-error`).

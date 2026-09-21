@@ -45,6 +45,16 @@ $SYMLINK_MAP = @{
     "starship\.config\starship"   = "$env:USERPROFILE\.config\starship"
     "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
     "readline\.inputrc"           = "$env:USERPROFILE\.inputrc"
+
+    # Sublime Text — link each settings file into the User packages dir so the
+    # repo stays the live source of truth (Package Control installed separately).
+    "settings\sublime\Package Control.sublime-settings"  = "$env:APPDATA\Sublime Text\Packages\User\Package Control.sublime-settings"
+    "settings\sublime\Preferences.sublime-settings"      = "$env:APPDATA\Sublime Text\Packages\User\Preferences.sublime-settings"
+    "settings\sublime\LSP.sublime-settings"              = "$env:APPDATA\Sublime Text\Packages\User\LSP.sublime-settings"
+    "settings\sublime\Tokyo Night.sublime-color-scheme"  = "$env:APPDATA\Sublime Text\Packages\User\Tokyo Night.sublime-color-scheme"
+    "settings\sublime\Default.sublime-keymap"            = "$env:APPDATA\Sublime Text\Packages\User\Default.sublime-keymap"
+    "settings\sublime\C++ Single File.sublime-build"     = "$env:APPDATA\Sublime Text\Packages\User\C++ Single File.sublime-build"
+    "settings\sublime\Python3.sublime-build"             = "$env:APPDATA\Sublime Text\Packages\User\Python3.sublime-build"
 }
 
 # Scoop packages to install
@@ -283,6 +293,25 @@ function Install-NeovimPlugins {
 # ==============================================================================
 # GUI Configuration
 # ==============================================================================
+function Install-SublimePackageControl {
+    Write-Section "Sublime Text"
+    $installed = "$env:APPDATA\Sublime Text\Installed Packages"
+    $pkg = Join-Path $installed "Package Control.sublime-package"
+    if (Test-Path $pkg) {
+        Write-Ok "Package Control already present"
+        return
+    }
+    New-Item -ItemType Directory -Force -Path $installed | Out-Null
+    $url = "https://github.com/wbond/package_control/releases/latest/download/Package.Control.sublime-package"
+    try {
+        Invoke-WebRequest -Uri $url -OutFile $pkg -UseBasicParsing
+        Write-Ok "Package Control installed — listed packages install on next launch"
+    }
+    catch {
+        Write-Fail "Could not download Package Control: $_"
+    }
+}
+
 function Install-GuiConfig {
     Write-Section "GUI Configuration"
 
@@ -454,9 +483,10 @@ function Main {
         Install-PsModules
     }
 
-    # Step 4: Neovim
+    # Step 4: Neovim + editors
     Install-NeovimPlugins
     Install-GuiConfig
+    Install-SublimePackageControl
 
     # Step 5: Health check
     Test-Installation

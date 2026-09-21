@@ -163,8 +163,10 @@ main() {
 
     # OS-specific setup
     log::info "[STEP 7/8] Running OS-specific setup (OS: $(os::detail))..."
+    # Sublime Text is a cross-platform editor — set it up on macOS and Linux
+    # (the script itself no-ops in CI and picks the per-OS User dir).
+    run_script "sublime" || log::warning "Sublime Text setup failed (non-fatal in CI)"
     if os::is_mac; then
-        run_script "sublime" || log::warning "Sublime Text setup failed (non-fatal in CI)"
         run_script "iterm" || log::warning "iTerm2 setup failed (non-fatal in CI)"
     fi
     # Linux package + system setup is handled in STEP 4 (apt system deps + Nix).

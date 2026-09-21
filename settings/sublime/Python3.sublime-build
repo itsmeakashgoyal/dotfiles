@@ -1,0 +1,10 @@
+{
+    "shell_cmd": "python3 -u \"$file\"",
+    "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+    "selector": "source.python",
+    "working_dir": "$file_path",
+    "env": { "PYTHONIOENCODING": "utf-8" },
+    "windows": {
+        "shell_cmd": "python -u \"$file\""
+    }
+}

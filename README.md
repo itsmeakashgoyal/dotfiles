@@ -266,6 +266,7 @@ dotfiles/
 | **[SSH & Git identity](docs/SSH.md)** | Personal + work SSH keys (`dutils ssh-setup`), per-repo commit identity, cross-platform |
 | **[Secrets](docs/SECRETS.md)** | Encrypted secrets in the repo via `age` + your SSH key (`dutils secrets`) |
 | **[Theming](docs/THEME.md)** | Coordinated Tokyo Night across ghostty/bat/fzf/delta/nvim with a light/dark switch (`dutils theme`) |
+| **[Sublime Text](docs/SUBLIME.md)** | Cross-platform Sublime IDE — LSP (C/C++/Python), Terminus, builds, Tokyo Night; symlinked settings |
 | **[OSXPhotos](docs/OSXPHOTOS.md)** | Backing up the macOS Photos library (originals, edits, Live Photos) by month |
 | **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues, debug workflow, uninstalling |

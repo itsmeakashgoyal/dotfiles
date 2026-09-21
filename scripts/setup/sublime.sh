@@ -1,214 +1,102 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
 # ░▓ file   ▓ scripts/setup/sublime.sh
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# ------------------------------------------------------------------------------
-# Sublime Text Setup Script for macOS
-# Installs Package Control and configures Sublime Text settings
-# ------------------------------------------------------------------------------
+# Sublime Text setup for macOS and Linux: symlink the settings from this repo
+# into Sublime's per-OS User packages dir (so the repo stays the live source of
+# truth), and install Package Control so the packages listed in
+# `Package Control.sublime-settings` auto-install on first launch. Non-interactive.
+# (Windows is handled by scripts/setup/windows.ps1 via $SYMLINK_MAP.)
 
-# Skip in CI environment (before loading anything)
+# Skip in CI (no GUI editor there).
 if [[ -n "${CI:-}" ]]; then
     echo "Skipping Sublime Text setup in CI environment"
     exit 0
 fi
 
-# Load helper functions
 DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 export DOTFILES_DIR
-SCRIPT_DIR="${DOTFILES_DIR}/scripts"
-CORE_FILE="${SCRIPT_DIR}/lib/core.sh"
-
+CORE_FILE="${DOTFILES_DIR}/scripts/lib/core.sh"
 if [[ ! -f "$CORE_FILE" ]]; then
     echo "Error: Core library not found at $CORE_FILE" >&2
     exit 1
 fi
-
+# shellcheck source=/dev/null
 source "$CORE_FILE"
 set -euo pipefail
-
-# ------------------------------------------------------------------------------
-# Configuration
-# ------------------------------------------------------------------------------
-readonly SUBLIME_APP="/Applications/Sublime Text.app"
-readonly SUBLIME_BIN="${SUBLIME_APP}/Contents/SharedSupport/bin/subl"
-readonly CONFIG_PATH="${HOME}/Library/Application Support/Sublime Text"
-readonly USER_PACKAGES_DIR="${CONFIG_PATH}/Packages/User"
-readonly MAX_WAIT=30
-readonly PACKAGE_CONTROL_URL="https://github.com/wbond/package_control/releases/latest/download/Package.Control.sublime-package"
-
-# ------------------------------------------------------------------------------
-# Helper Functions
-# ------------------------------------------------------------------------------
-check_sublime_installed() {
-    if [[ ! -e "${SUBLIME_APP}" ]]; then
-        error "Sublime Text not found at ${SUBLIME_APP}"
-        info "Please install Sublime Text first: https://www.sublimetext.com/"
-        return 1
-    fi
-    return 0
-}
-
-setup_sublime_command() {
-    if command -v subl &>/dev/null; then
-        info "subl command already available"
-        return 0
-    fi
-
-    log_message "Creating 'subl' command symlink..."
-    
-    if [[ ! -e "${SUBLIME_BIN}" ]]; then
-        error "Sublime Text binary not found at ${SUBLIME_BIN}"
-        return 1
-    fi
-
-    sudo ln -sf "${SUBLIME_BIN}" /usr/local/bin/subl
-    success "subl command symlink created"
-}
-
-wait_for_sublime_init() {
-    local waited=0
-    
-    log_message "Waiting for Sublime Text initialization..."
-    
-    until [[ -d "${CONFIG_PATH}/Installed Packages" ]] || ((waited >= MAX_WAIT)); do
-        sleep 1
-        ((waited++))
-    done
-
-    if [[ ! -d "${CONFIG_PATH}/Installed Packages" ]]; then
-        error "Sublime Text initialization timeout after ${MAX_WAIT} seconds"
-        return 1
-    fi
-    
-    success "Sublime Text initialized"
-}
-
-install_package_control() {
-    local install_dir="${CONFIG_PATH}/Installed Packages"
-    local package_file="${install_dir}/Package Control.sublime-package"
-
-    if [[ -f "${package_file}" ]]; then
-        info "Package Control already installed"
-        return 0
-    fi
-
-    log_message "Installing Package Control..."
-    
-    mkdir -p "${install_dir}"
-    
-    if ! curl -fsSL -o "${package_file}" "${PACKAGE_CONTROL_URL}"; then
-        error "Failed to download Package Control"
-        return 1
-    fi
-    
-    success "Package Control installed"
-}
-
-copy_settings() {
-    local settings_source="${DOTFILES_DIR}/settings/sublime"
-
-    if [[ ! -d "${settings_source}" ]]; then
-        warning "Settings directory not found at ${settings_source}"
-        return 0
-    fi
-
-    log_message "Copying Sublime Text settings..."
-    mkdir -p "${USER_PACKAGES_DIR}"
-    
-    local settings=(
-        "Package Control.sublime-settings"
-        "Preferences.sublime-settings"
-        "SublimeLinter.sublime-settings"
-    )
-
-    local copied=0
-    for setting in "${settings[@]}"; do
-        if [[ -f "${settings_source}/${setting}" ]]; then
-            cp "${settings_source}/${setting}" "${USER_PACKAGES_DIR}/${setting}"
-            ((copied++))
-        else
-            warning "Setting file not found: ${setting}"
-        fi
-    done
-
-    if ((copied > 0)); then
-        success "Copied ${copied} setting file(s)"
-    else
-        warning "No settings files were copied"
-    fi
-}
-
-quit_sublime() {
-    osascript -e 'quit app "Sublime Text"' 2>/dev/null || true
-    sleep 1
-}
-
-# ------------------------------------------------------------------------------
-# Main Setup
-# ------------------------------------------------------------------------------
-main() {
-    log_message "Sublime Text setup started"
-    
-    info "
-##############################################
-#      Sublime Text Setup                    #
-##############################################
-"
-
-    # Verify Sublime Text is installed
-    check_sublime_installed || exit 1
-
-    # Setup Homebrew path if needed (for Apple Silicon Macs)
-    if [[ -x "/opt/homebrew/bin/brew" ]] && [[ ":$PATH:" != *":/opt/homebrew/bin:"* ]]; then
-        export PATH="/opt/homebrew/bin:$PATH"
-    fi
-
-    # Setup subl command
-    setup_sublime_command || exit 1
-
-    # Initial launch to initialize config directory
-    info "Launching Sublime Text for initial setup..."
-    subl . &
-    wait_for_sublime_init || exit 1
-    quit_sublime
-
-    # Install Package Control
-    install_package_control || exit 1
-
-    # Copy settings
-    copy_settings
-
-    # Final launch for package installation
-    info "
-##############################################
-#  Sublime Text is now opening.              #
-#  Please wait for packages to install.      #
-##############################################
-"
-    subl . &
-    
-    info "Press Enter after packages are installed..."
-    read
-
-    # Final restart
-    quit_sublime
-    subl . &
-
-    success "
-###################################################
-#     Sublime Text Setup Completed!              #
-#     Remember to activate your license.          #
-###################################################
-"
-    log_message "Sublime Text setup completed successfully"
-}
-
-# Set error trap
 trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
 
-# Run main
+readonly SETTINGS_SRC="${DOTFILES_DIR}/settings/sublime"
+readonly PC_URL="https://github.com/wbond/package_control/releases/latest/download/Package.Control.sublime-package"
+
+# Resolve Sublime's config dir for this OS.
+resolve_config_dir() {
+    if os::is_mac; then
+        echo "${HOME}/Library/Application Support/Sublime Text"
+    elif os::is_linux; then
+        echo "${HOME}/.config/sublime-text"
+    else
+        return 1
+    fi
+}
+
+# macOS: make the `subl` CLI available (best-effort, non-fatal).
+link_subl_cli() {
+    os::is_mac || return 0
+    command_exists subl && return 0
+    local bin="/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl"
+    [[ -e "$bin" ]] || return 0
+    local dir="/usr/local/bin"
+    [[ -d "$dir" ]] || return 0
+    if ln -sf "$bin" "${dir}/subl" 2>/dev/null; then
+        success "Linked 'subl' CLI"
+    fi
+}
+
+main() {
+    log_message "Sublime Text setup started"
+
+    if [[ ! -d "$SETTINGS_SRC" ]]; then
+        warning "Sublime settings not found at ${SETTINGS_SRC} — skipping"
+        exit 0
+    fi
+
+    local config user_dir installed
+    if ! config="$(resolve_config_dir)"; then
+        warning "Unsupported OS for Sublime setup — skipping"
+        exit 0
+    fi
+    user_dir="${config}/Packages/User"
+    installed="${config}/Installed Packages"
+    mkdir -p "$user_dir" "$installed"
+
+    # Install Package Control so the listed packages auto-install on next launch.
+    if [[ ! -f "${installed}/Package Control.sublime-package" ]]; then
+        info "Installing Package Control..."
+        curl -fsSL -o "${installed}/Package Control.sublime-package" "$PC_URL" \
+            && success "Package Control installed" \
+            || warning "Could not download Package Control (install it from the Command Palette)"
+    else
+        info "Package Control already present"
+    fi
+
+    # Symlink every settings file (Preferences, LSP, keymap, builds, theme, …)
+    # so editing the repo updates Sublime live.
+    local linked=0 f
+    for f in "$SETTINGS_SRC"/*; do
+        [[ -f "$f" ]] || continue
+        ln -sf "$f" "${user_dir}/$(basename "$f")"
+        linked=$((linked + 1))
+    done
+    success "Linked ${linked} settings file(s) into ${user_dir}"
+
+    link_subl_cli
+
+    info "Launch Sublime Text — Package Control will install the listed packages."
+    info "For C/C++ LSP, ensure 'clangd' is on PATH; Python LSP (pyright) needs Node."
+}
+
 main
