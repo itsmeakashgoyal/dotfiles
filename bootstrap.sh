@@ -12,7 +12,12 @@
 #   bash <(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/bootstrap.sh)
 #
 # Hands-off (no prompts, e.g. for a one-click / unattended install):
-#   bash <(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/bootstrap.sh) -s -- --yes
+#   bash <(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/bootstrap.sh) --yes
+#
+# Note: pass flags directly. The `-s --` form belongs to `curl ... | sh -s --`,
+# where sh needs to be told the remaining words are script arguments; with
+# process substitution the script is a real file and its arguments are just
+# appended.
 
 set -euo pipefail
 

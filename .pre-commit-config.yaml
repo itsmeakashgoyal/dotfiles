@@ -36,8 +36,32 @@ repos:
     rev: v3.8.0-1
     hooks:
       - id: shfmt
-        args: ["-i", "4", "-ci", "-w"]
+        # -kp (keep padding) preserves this repo's hand-aligned columns — the
+        # aligned `case` arms and one-liner function bodies in core.sh /
+        # os-detect.sh. Without it shfmt collapses every one of them.
+        args: ["-i", "4", "-ci", "-kp", "-w"]
         files: "\\.sh$"
+        # Even with -kp, shfmt rewrites this repo's other deliberate idioms:
+        # `local x; x=$(...)` gets split (and mis-indented), `\`-continued
+        # `&&`/`||` chains get reflowed, and `{ cmd; cmd; }` one-liners get
+        # expanded. These files are hand-aligned for readability, so they are
+        # exempt — everything else still gets formatted. profile_zsh.sh is zsh,
+        # not bash (same reason it's excluded from shellcheck in CI). Verified:
+        # with this exclude list the hook is a no-op on the current tree.
+        exclude: |
+          (?x)^(
+            bootstrap\.sh|
+            install\.sh|
+            scripts/lib/core\.sh|
+            scripts/lib/os-detect\.sh|
+            scripts/dutils/diff_files_interactive\.sh|
+            scripts/dutils/profile_zsh\.sh|
+            scripts/setup/macos\.sh|
+            scripts/setup/macos-defaults\.sh|
+            scripts/setup/nix\.sh|
+            scripts/setup/sublime\.sh|
+            scripts/setup/uninstall\.sh
+          )$
 
   # Secret detection
   - repo: https://github.com/Yelp/detect-secrets
@@ -45,7 +69,10 @@ repos:
     hooks:
       - id: detect-secrets
         args: ["--baseline", ".secrets.baseline"]
-        exclude: "private\\.zsh\\.example|CHANGELOG\\.md"
+        # lazy-lock.json is a lockfile of git commit SHAs — every entry trips
+        # the high-entropy hex detector, so exclude it rather than baseline
+        # hundreds of false positives that hide real findings.
+        exclude: "private\\.zsh\\.example|CHANGELOG\\.md|lazy-lock\\.json"
 
   # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli

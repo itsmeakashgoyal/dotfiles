@@ -67,11 +67,13 @@ step_enabled() {
     [[ ",${STEPS}," == *",$1,"* ]]
 }
 
-# Package list — the Makefile's STOW_PACKAGES is the single source of truth.
-# `make uninstall` passes it via env; a direct invocation queries the
-# Makefile instead, falling back to a snapshot only if that query fails.
+# Package list — packages.toml is the single source of truth (the Makefile's
+# STOW_PACKAGES is generated from it). `make uninstall` passes the list via env;
+# a direct invocation queries the Makefile, then the manifest, and only falls
+# back to a snapshot if both are unavailable.
 STOW_PACKAGES="${STOW_PACKAGES:-$(make -s -C "${DOTFILES_DIR}" print-STOW_PACKAGES 2>/dev/null || true)}"
-: "${STOW_PACKAGES:=git zsh nvim tmux television bin atuin fastfetch starship}"
+STOW_PACKAGES="${STOW_PACKAGES:-$(python3 "${DOTFILES_DIR}/scripts/dutils/manifest.py" stow-packages 2>/dev/null || true)}"
+: "${STOW_PACKAGES:=zsh git nvim tmux television atuin fastfetch starship yazi bin readline ghostty}"
 
 # ------------------------------------------------------------------------------
 # Helpers

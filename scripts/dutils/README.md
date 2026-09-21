@@ -18,6 +18,37 @@ dutils <command> [options] # run a command
 
 ## Commands
 
+### `menu` — interactive picker for every command
+
+```bash
+dutils menu                # fuzzy-pick a command, preview its --help, confirm, run
+dutils menu --dry-run      # print the chosen command instead of running it
+dutils menu --no-tv        # force the numbered prompt
+```
+
+Uses television (`tv`) when it's installed and falls back to a plain numbered
+prompt otherwise, so it works on a fresh machine. The command registry inside
+[`dutils`](dutils) is the only source of truth — a new subcommand shows up in
+the menu automatically. Destructive or long-running commands (`cleanup`,
+`update`, `sync`, `init`, `ssh-setup`, `secrets`, `zcompile`) always confirm
+before running, even with `--no-confirm`.
+
+### `manifest` — regenerate package lists from `packages.toml`
+
+```bash
+dutils manifest generate        # rewrite every generated region
+dutils manifest check           # fail if a region drifted (CI gate)
+dutils manifest list            # what gets installed on each platform
+dutils manifest list --platform windows
+dutils manifest stow-packages   # space-separated Stow list (used by the Makefile)
+```
+
+[`packages.toml`](../../packages.toml) is the single source of truth for every
+tool and Stow package. `generate` renders it into `brew/Brewfile`,
+`nix/home.nix`, `scripts/setup/windows.ps1` (Scoop list + symlink map),
+`scripts/setup/linux.sh` (apt deps) and the `Makefile`'s `STOW_PACKAGES`,
+rewriting only the text between `BEGIN GENERATED` / `END GENERATED` markers.
+
 ### `init` — first-run setup wizard (new machine)
 
 ```bash

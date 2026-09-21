@@ -16,16 +16,21 @@ dotfiles/nvim/.config/nvim/init.lua  →  stow nvim  →  ~/.config/nvim/init.lu
 
 ```bash
 make install          # Full bootstrap: Homebrew, packages, shell setup, stow all
+make install dry=1    # Preview the whole install without changing anything
 make run              # Stow all packages (create symlinks)
 make stow pkg=<name>  # Stow a single package
 make unstow pkg=<name># Remove a package's symlinks
 make update           # Re-stow all packages (picks up new files)
 make delete           # Unstow everything
 
+make menu             # Interactive picker for every dutils command
+make manifest         # Regenerate package lists from packages.toml
+make manifest-check   # Fail if a generated list drifted (CI gate)
+
 make health           # Quick health check (symlinks, tools, configs)
 make check            # Full verification of 40+ components with score
 make diagnose         # Run all diagnostics
-make packages         # Compare installed tools vs Brewfile
+make packages         # Compare installed tools vs packages.toml
 
 make list             # List available stow packages
 make clean            # Remove backup files
@@ -36,19 +41,44 @@ Verification/diagnostics/benchmark `make` targets (`health`, `check`, `diagnose`
 CLI (`dutils health`, `dutils check`, …). `dutils` is the cross-platform path and
 the single implementation — it also works on Windows, which has no `make`. `make`
 remains the entry point for the install/stow/nix *lifecycle*; `dutils` is the
-day-to-day maintenance/introspection hub (`update`, `cleanup`, verification,
+day-to-day maintenance/introspection hub (`menu`, `manifest`, `update`, `cleanup`, verification,
 `bench`, `profile`, `ssh-setup`, `secrets`, `theme`, `zcompile`, `vulns`, `diff`, …). See `scripts/dutils/dutils`.
+`dutils menu` is the interactive entry point: a television-backed picker over the whole command
+registry, with a numbered fallback when `tv` isn't installed.
 
 **Lint (CI runs this too):**
 ```bash
 find . -type f -name "*.sh" ! -name "profile_zsh.sh" -exec shellcheck -x {} +  # Lint shell scripts (dutils is Python, excluded)
-shfmt -d scripts/                   # Check shell formatting
+dutils manifest check               # Generated package lists match packages.toml
 ```
+> `shfmt` is **not** run over this repo — the shell is hand-aligned (see Key Conventions).
 
 ## Architecture
 
+### The package manifest (`packages.toml`)
+**Single source of truth** for every tool installed on every platform, and for the Stow package
+list. The per-manager lists are *generated* from it and delimited by `# BEGIN GENERATED: <id>` /
+`# END GENERATED: <id>` markers — only the text between markers is rewritten:
+
+| Region | Target file |
+| --- | --- |
+| `brew` | `brew/Brewfile` |
+| `nix` | `nix/home.nix` (`home.packages`) |
+| `scoop` / `symlinks` | `scripts/setup/windows.ps1` (`$SCOOP_PACKAGES` / `$SYMLINK_MAP`) |
+| `apt` / `apt-optional` | `scripts/setup/linux.sh` |
+| `stow` | `Makefile` (`STOW_PACKAGES`) |
+
+**Never hand-edit inside the markers.** Edit `packages.toml`, then run `dutils manifest generate`.
+`dutils manifest check` is a CI gate that fails on drift. `scripts/lib/manifest.py` is the loader
+(with a small TOML-subset fallback parser, because `tomllib` needs Python 3.11 and macOS ships 3.9);
+`scripts/dutils/manifest.py` is the renderer/CLI. `scripts/verify/check.py` reads the same manifest,
+so health checks can't drift from what's declared.
+
+Note: `nix/home.nix` must stay `nixfmt --check` clean (CI gate), so the nix renderer emits
+single-space trailing comments rather than aligned columns.
+
 ### Stow Packages
-Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create the directory and add it to that list.
+`STOW_PACKAGES` in the `Makefile` is **generated** from `packages.toml`'s `[[stow]]` entries. To add a package: create the directory, add a `[[stow]]` entry (with `platforms` and, for Windows, an optional `windows_target`), then run `dutils manifest generate` — that updates both the Makefile list and the Windows `$SYMLINK_MAP`. Or use `dutils new`, which scaffolds the directory for you.
 - `git/` → `~/.config/git/` — Git config, aliases (40+), delta diff viewer, GPG signing
 - `zsh/` → `~/.zshenv` + `~/.config/zsh/` — Shell config with Zinit plugin manager
 - `nvim/` → `~/.config/nvim/` — Neovim with Lazy.nvim + Harpoon
@@ -89,8 +119,9 @@ Defined in `Makefile` via `STOW_PACKAGES` variable. To add a new package, create
 ### Scripts Layout
 - `scripts/lib/core.sh` — Shared library for logging, command checking; sourced by all bash entry-point scripts. Has side effects on source (creates `~/linuxtoolbox`, `/tmp/dotfiles.log`).
 - `scripts/lib/os-detect.sh` — OS detection only (`os::is_mac`/`os::is_linux`/`os::arch`/`os::detail`), split out from `core.sh` specifically because it has none of core.sh's side effects — safe to source from zsh's interactive startup too. `scripts/lib/osdetect.py` mirrors the same API for Python scripts.
-- `scripts/verify/check.sh` → `check.py` — Health/verification checks (`--quick`, `--full`, `--packages`, `--system`)
-- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh` (Sublime Text: symlinks `settings/sublime/` into the per-OS User dir + installs Package Control; **macOS + Linux**, Windows handled by `windows.ps1`), `iterm.sh`, `macos-defaults.sh` (curated `defaults write`, run via `make macos-defaults`; not in the default install flow) (`iterm.sh`/`macos-defaults.sh` are macOS-only), `uninstall.sh`, `windows.ps1` (Windows). There is no `macos.sh`.
+- `scripts/verify/check.sh` → `check.py` — Health/verification checks (`--quick`, `--full`, `--packages`, `--system`). Manifest-driven and cross-platform: it resolves the repo via `$DOTFILES_DIR`/its own location (never a hardcoded `~/dotfiles`), and checks the platform's real package manager (brew on macOS, nix on Linux, scoop on Windows) rather than assuming Homebrew.
+- `scripts/lib/manifest.py` — `packages.toml` loader shared by the generator and the verifier
+- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh` (Sublime Text: symlinks `settings/sublime/` into the per-OS User dir + installs Package Control; **macOS + Linux**, Windows handled by `windows.ps1`), `iterm.sh`, `macos-defaults.sh` (curated `defaults write` driven by a `DEFAULTS` data table; snapshots the previous values to `$XDG_STATE_HOME/dotfiles/macos-defaults.snapshot` on first apply so `make macos-defaults undo=1` can revert, and supports `dry=1`; run via `make macos-defaults`, not in the default install flow) (`iterm.sh`/`macos-defaults.sh` are macOS-only), `uninstall.sh`, `windows.ps1` (Windows). There is no `macos.sh`.
 - `scripts/setup/macos.sh` + `brew/Brewfile` — Homebrew bundle installation (macOS only — Linux uses Nix instead, see `nix.sh`/`nix/home.nix`)
 
 ### Installation Flow
@@ -101,7 +132,7 @@ Separate path, no Stow: `install.ps1` → `scripts/setup/windows.ps1` (Scoop pac
 
 ### CI/CD
 `.github/workflows/build_and_test.yml`:
-1. Lint: shellcheck + file permissions + YAML validation + `py_compile` + PSScriptAnalyzer (PowerShell, Error/ParseError gate on `git ls-files '*.ps1'`)
+1. Lint: shellcheck (`--severity=error`) + file permissions + **manifest drift check** (`dutils manifest check`) + YAML validation + `py_compile` + PSScriptAnalyzer (Error/ParseError gate on `git ls-files '*.ps1'`) + markdownlint (*informational*, `continue-on-error` — pre-existing backlog). **shfmt is deliberately not a CI gate**: the shell here is hand-aligned for readability (aligned `case` arms, column-aligned one-liner function bodies in `core.sh`/`os-detect.sh`), and shfmt reflows all of it — see the style note below.
 2. `test-macos` / `test-ubuntu` (required): full install → package verification → zsh config test (sources `.zshrc`, asserts real exit codes) → Neovim headless config test → uninstall → verify-uninstall. `test-ubuntu` also lints Nix (`nixfmt --check` on `nix/*.nix` + `nix flake check --impure`) right after installing Nix, reusing that install.
 3. `test-windows` (soft-gated, informational only for now): `windows.ps1` install → PowerShell profile symlink check
 
@@ -111,5 +142,8 @@ Separate path, no Stow: `install.ps1` → `scripts/setup/windows.ps1` (Scoop pac
 - Use `log_message`, `info`, `success`, `warning`, `error` from `core.sh` for output — never raw `echo` for status messages
 - XDG Base Directory spec: configs live in `~/.config/`, not `$HOME` directly (except `.zshenv`)
 - `private.zsh` is gitignored and used for machine-local secrets/overrides — don't commit secrets to tracked files
-- Pre-commit hooks (`.pre-commit-config.yaml`) run shellcheck, shfmt, and detect-secrets automatically
+- Shell style is **hand-aligned on purpose** — aligned `case` arms, column-aligned one-liner function bodies, and
+  compact `local x; x=$(...)` / `{ cmd; cmd; }` idioms. `shfmt` reflows every one of these, so do **not** bulk-run
+  `shfmt -w` over the repo; match the surrounding style by hand instead
+- Pre-commit hooks (`.pre-commit-config.yaml`) run shellcheck and detect-secrets automatically
 - Documentation lives in `docs/` — see `docs/ARCHITECTURE.md` for deep technical details

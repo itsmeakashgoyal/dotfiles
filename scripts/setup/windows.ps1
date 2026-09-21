@@ -36,15 +36,17 @@ $NVIM_DATA = "$env:LOCALAPPDATA\nvim-data"
 # missing today: bin/ (~/.local/bin custom scripts) has no Windows PATH
 # equivalent wired up yet.
 $SYMLINK_MAP = @{
-    "nvim\.config\nvim"           = $NVIM_CONFIG
-    "git\.config\git"             = "$env:USERPROFILE\.config\git"
-    "tmux\.config\tmux"           = "$env:USERPROFILE\.config\tmux"
-    "television\.config\television" = "$env:USERPROFILE\.config\television"
-    "atuin\.config\atuin"         = "$env:USERPROFILE\.config\atuin"
-    "fastfetch\.config\fastfetch" = "$env:USERPROFILE\.config\fastfetch"
-    "starship\.config\starship"   = "$env:USERPROFILE\.config\starship"
+    # BEGIN GENERATED: symlinks (dutils manifest generate)
+    "git\.config\git"                                                  = "$env:USERPROFILE\.config\git"
+    "nvim\.config\nvim"                                                = "$env:LOCALAPPDATA\nvim"
+    "television\.config\television"                                    = "$env:USERPROFILE\.config\television"
+    "atuin\.config\atuin"                                              = "$env:USERPROFILE\.config\atuin"
+    "fastfetch\.config\fastfetch"                                      = "$env:USERPROFILE\.config\fastfetch"
+    "starship\.config\starship"                                        = "$env:USERPROFILE\.config\starship"
+    "yazi\.config\yazi"                                                = "$env:USERPROFILE\.config\yazi"
+    "readline\.inputrc"                                                = "$env:USERPROFILE\.inputrc"
     "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
-    "readline\.inputrc"           = "$env:USERPROFILE\.inputrc"
+    # END GENERATED: symlinks
 
     # Sublime Text — link each settings file into the User packages dir so the
     # repo stays the live source of truth (Package Control installed separately).
@@ -60,41 +62,56 @@ $SYMLINK_MAP = @{
 
 # Scoop packages to install
 $SCOOP_PACKAGES = @(
-    # Core CLI tools
-    "git"
-    "curl"
-    "wget"
-    "age"           # Modern file encryption (secrets, via dutils secrets)
-    # Editor
-    "neovim"
-    # Search & navigation
-    "ripgrep"
-    "fd"
-    "bat"
-    "eza"
-    "fzf"
-    "zoxide"
-    "television"
-    # Git tools
-    "lazygit"
-    "delta"
-    # Prompt (default — see powershell profile / $PROFILE)
-    "starship"
-    # Runtime version manager (replaces pyenv, which has no Windows support)
-    "mise"
-    # Fast Python venv/package manager (works alongside mise - mise pins the
-    # interpreter version, uv manages venvs/packages using it)
-    "uv"
-    # Development
-    "nodejs"
-    "python"
-    "lua"
-    "stylua"
-    "shellcheck"
-    "make"
-    "gcc"
-    # Neovim dependencies
-    "tree-sitter"
+    # BEGIN GENERATED: scoop (dutils manifest generate)
+    # Essential CLI Tools
+    "git"         # Real git (macOS ships only a Command Line Tools stub)
+    "age"         # Modern file encryption (secrets, via dutils secrets)
+    "atuin"       # Shell history search (Rust)
+    "bat"         # Cat with syntax highlighting (Rust)
+    "eza"         # Better ls (Rust)
+    "fastfetch"   # System info tool (C)
+    "fd"          # Better find (Rust)
+    "gh"          # GitHub CLI
+    "delta"       # Better git diff (Rust)
+    "hyperfine"   # Command-line benchmarking tool (Rust)
+    "jq"          # JSON processor
+    "lazygit"     # Terminal UI for git
+    "mise"        # Runtime version manager (replaces pyenv)
+    "uv"          # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
+    "starship"    # Cross-shell prompt (default, replaced Powerlevel10k)
+    "ripgrep"     # Better grep (Rust)
+    "tree"        # Directory tree
+    "television"  # Fuzzy finder with channels (Rust)
+    "yazi"        # Terminal file manager (Rust)
+    "zoxide"      # Smart cd (Rust)
+
+    # System Monitoring
+    "btop"        # System monitor
+    "procs"       # Better ps (Rust)
+
+    # Editors
+    "neovim"      # Vim-based text editor
+
+    # Lua Toolchain
+    "lua"         # Lua interpreter
+    "stylua"      # Lua formatter
+
+    # Shell Tooling
+    "shellcheck"  # Shell script linter
+    "shfmt"       # Shell formatter
+
+    # Compilers & Build Tools
+    "gcc"         # GNU compiler
+
+    # Windows Only
+    "curl"        # HTTP client
+    "wget"        # HTTP downloader
+    "make"        # Build tool
+    "nodejs"      # Node.js runtime (Neovim providers, LSP servers)
+    "python"      # Python 3 (required by the dutils CLI)
+    "fzf"         # Fuzzy finder (PSReadLine/PSFzf integration on Windows)
+    "tree-sitter" # Neovim treesitter CLI dependency
+    # END GENERATED: scoop
 )
 
 $SCOOP_BUCKET_PACKAGES = @{

@@ -67,35 +67,36 @@ update_and_install() {
     # System-level packages only. Everything else is provided by Nix.
     # These are the deps needed to install Nix, run Stow, and use zsh.
     local packages=(
-        # Build tools + Nix installer prerequisites
-        build-essential
-        ca-certificates
-        curl
-        wget
-        xz-utils
-        file
-        procps
-
-        # Core system tools
-        git
-        stow
-        zsh
-        unzip
-        fontconfig
+        # BEGIN GENERATED: apt (dutils manifest generate)
+        build-essential # Compiler toolchain (Nix installer prerequisite)
+        ca-certificates # TLS roots
+        curl            # HTTP client
+        wget            # HTTP downloader
+        xz-utils        # Nix installer prerequisite
+        file            # Nix installer prerequisite
+        procps          # Nix installer prerequisite
+        git             # Clone the dotfiles repo
+        stow            # Dotfile symlink manager
+        zsh             # The login shell this repo configures
+        unzip           # Archive extraction
+        fontconfig      # Font cache (Nerd Fonts)
+        # END GENERATED: apt
     )
 
     # Optional packages (install if available, don't fail if not)
     local optional_packages=(
-        figlet
-        lolcat
-        entr
-        strace
+        # BEGIN GENERATED: apt-optional (dutils manifest generate)
+        figlet # ASCII art banners
+        lolcat # Rainbow output
+        entr   # Run commands when files change
+        strace # Syscall tracer
+        # END GENERATED: apt-optional
     )
 
     # Install essential packages
     sudo apt-get -y install "${packages[@]}"
     success "Essential packages installed"
-    
+
     # Install optional packages (ignore failures)
     for pkg in "${optional_packages[@]}"; do
         if sudo apt-get -y install "$pkg" 2>/dev/null; then
@@ -104,7 +105,7 @@ update_and_install() {
             warning "⊘ Skipped unavailable package: $pkg"
         fi
     done
-    
+
     success "Package installation complete"
     log_message "Completed system update and package installation"
 }
@@ -116,11 +117,11 @@ cleanup() {
 ##############################################
 "
     log_message "Starting cleanup process"
-    
+
     sudo apt-get -y autoclean
     sudo apt-get -y autoremove
     sudo apt-get -y clean
-    
+
     success "Cleanup completed!"
     log_message "Cleanup completed"
 }
@@ -130,7 +131,7 @@ cleanup() {
 # ------------------------------------------------------------------------------
 main() {
     log_message "Linux setup script started"
-    
+
     info "
 ##############################################
 #        Linux System Setup                  #

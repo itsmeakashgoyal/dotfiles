@@ -4,7 +4,7 @@
 # ░▓ file   ▓ .github/workflows/build_and_test.yml
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# CI: lint (shellcheck/shfmt/yamllint/py_compile), then full install ->
+# CI: lint (shellcheck/yamllint/py_compile/manifest), then full install ->
 # verify -> uninstall on macOS and Ubuntu, plus a soft-gated Windows job.
 ---
 name: Test Dotfiles Setup
@@ -93,6 +93,26 @@ jobs:
             fi
           done
           echo "✅ All scripts have correct permissions"
+
+      - name: Lint Markdown (markdownlint)
+        # Informational for now, like the test-windows job: .markdownlint.yaml
+        # already existed but was enforced only by the local pre-commit hook, so
+        # the repo has a pre-existing backlog (~146 findings, mostly MD013 line
+        # length). Flip this to a hard gate once that backlog is cleared.
+        continue-on-error: true
+        run: |
+          echo "📝 Linting Markdown (informational)..."
+          npm install -g markdownlint-cli@0.41.0
+          markdownlint --config .markdownlint.yaml --ignore CHANGELOG.md \
+            $(git ls-files '*.md')
+          echo "✅ Markdown OK"
+
+      - name: Check package manifest is in sync
+        run: |
+          echo "📦 Checking generated package lists match packages.toml..."
+          # brew/Brewfile, nix/home.nix, windows.ps1 and linux.sh are generated
+          # from packages.toml. This is the gate that stops them drifting.
+          python3 scripts/dutils/manifest.py check
 
       - name: Validate YAML files
         run: |
@@ -347,6 +367,8 @@ jobs:
           smoke --strict sysinfo
           smoke --strict update --help
           smoke --strict cleanup --help
+          smoke --strict manifest check
+          smoke --strict menu --dry-run
           # Read-only checks - run for real; nonzero tolerated (CI misses some):
           smoke list-functions
           smoke health
@@ -626,6 +648,8 @@ jobs:
           smoke --strict sysinfo
           smoke --strict update --help
           smoke --strict cleanup --help
+          smoke --strict manifest check
+          smoke --strict menu --dry-run
           # Read-only checks - run for real; nonzero tolerated (CI misses some):
           smoke list-functions
           smoke health

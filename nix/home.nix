@@ -31,59 +31,59 @@
   # Search names at https://search.nixos.org/packages
   # ──────────────────────────────────────────────────────────────────
   home.packages = with pkgs; [
-    # Essential CLI tools
+    # BEGIN GENERATED: nix (dutils manifest generate)
+    # Essential CLI Tools
+    git # Real git (macOS ships only a Command Line Tools stub)
     age # Modern file encryption (secrets, via dutils secrets)
-    atuin # Shell history search
-    bat # cat with syntax highlighting
-    eza # Better ls
-    fastfetch # System info
-    fd # Better find
+    atuin # Shell history search (Rust)
+    bat # Cat with syntax highlighting (Rust)
+    eza # Better ls (Rust)
+    fastfetch # System info tool (C)
+    fd # Better find (Rust)
     gh # GitHub CLI
-    delta # Better git diff (Homebrew: git-delta)
+    delta # Better git diff (Rust) (Homebrew: git-delta)
     git-extras # Extra git commands
-    hyperfine # Command-line benchmarking tool
+    hyperfine # Command-line benchmarking tool (Rust)
     jq # JSON processor
     lazygit # Terminal UI for git
     mise # Runtime version manager (replaces pyenv)
     uv # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
     starship # Cross-shell prompt (default, replaced Powerlevel10k)
-    ripgrep # Better grep
+    ripgrep # Better grep (Rust)
     tree # Directory tree
-    television # Fuzzy finder (solves the linuxbrew "no tv" gap cleanly)
-    yazi # Terminal file manager
-    zoxide # Smart cd
+    television # Fuzzy finder with channels (Rust)
+    yazi # Terminal file manager (Rust)
+    zoxide # Smart cd (Rust)
 
-    # System monitoring
+    # System Monitoring
     btop # System monitor
     htop # Process viewer
-    procs # Better ps
+    procs # Better ps (Rust)
 
-    # Editor
-    neovim # Vim-based editor
+    # Editors
+    neovim # Vim-based text editor
 
-    # Lua toolchain (for Neovim config / plugins)
-    lua
-    lua-language-server
-    luarocks
+    # Lua Toolchain
+    lua # Lua interpreter
+    lua-language-server # Lua LSP server
+    luarocks # Lua package manager
     stylua # Lua formatter
 
-    # Shell tooling
-    shellcheck # Shell linter
+    # Shell Tooling
+    shellcheck # Shell script linter
     shfmt # Shell formatter
+    nixfmt-rfc-style # Nix formatter (RFC 166 style; matches the CI check) (Homebrew: nixfmt)
 
-    # Nix tooling (Linux only - not available via Homebrew on macOS)
-    nixfmt-rfc-style # Nix formatter (RFC 166 style; matches the CI check)
+    # Nix Tooling
     nixd # Nix language server (for editing home.nix / flake.nix in nvim)
     devenv # Reproducible per-project dev environments (see docs/NIX.md)
 
     # Misc
     rsync # File sync
-    tealdeer # Fast `tldr` client (provides the `tldr` command)
-
-    # Dotfile + build helpers
-    stow # We keep using Stow for dotfile symlinks
-    git # Newer git than Ubuntu ships
-    gettext # GNU i18n utilities (Linux-only in Brewfile)
+    tealdeer # Simplified man pages (Nix provides the tealdeer client) (Homebrew: tldr)
+    stow # Dotfile manager (Windows uses windows.ps1's symlink map instead)
+    gettext # GNU i18n utilities
+    # END GENERATED: nix
   ];
 
   # ──────────────────────────────────────────────────────────────────

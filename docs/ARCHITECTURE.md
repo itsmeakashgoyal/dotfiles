@@ -197,7 +197,7 @@ push / PR to master
         │
         ▼
    ┌─────────┐
-   │  lint   │  shellcheck + shfmt + yamllint + file permissions + py_compile
+   │  lint   │  shellcheck + yamllint + file permissions + py_compile + manifest drift
    └────┬────┘
         │ (parallel)
    ┌────┴──────────────────────────┐

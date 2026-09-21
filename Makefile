@@ -4,8 +4,12 @@
 # ░▓ file   ▓ Makefile
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Stowable packages (directories with dotfiles)
-STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch starship ghostty yazi readline
+# Stowable packages (directories with dotfiles).
+# GENERATED from packages.toml - run `dutils manifest generate` after
+# adding or removing a [[stow]] entry there.
+# BEGIN GENERATED: stow (dutils manifest generate)
+STOW_PACKAGES := zsh git nvim tmux television atuin fastfetch starship yazi bin readline ghostty
+# END GENERATED: stow
 
 # dutils: the cross-platform maintenance/introspection CLI. The verification,
 # diagnostics, and benchmark targets below are thin aliases to it so there's a
@@ -41,13 +45,25 @@ help: ## Show this help message (default)
 ##@ Installation
 
 .PHONY: install
-install: ## Bootstrap and install dotfiles
+install: ## Bootstrap and install dotfiles (preview with: make install dry=1)
 	@echo "$(YELLOW)Running bootstrap to provision the system...$(CLR)"
-	@./install.sh
+	@./install.sh $(if $(dry),--dry-run,)
 	@echo ""
 	@echo "$(GREEN)✓ System provisioning complete!$(CLR)"
 	@echo ""
 	@echo "$(YELLOW)💡 Tip: Run 'make health' anytime to verify your setup$(CLR)"
+
+.PHONY: menu
+menu: ## Interactive picker for every dutils command
+	@$(DUTILS) menu
+
+.PHONY: manifest
+manifest: ## Regenerate package lists from packages.toml
+	@$(DUTILS) manifest generate
+
+.PHONY: manifest-check
+manifest-check: ## Fail if a generated package list drifted from packages.toml
+	@$(DUTILS) manifest check
 
 ##@ App Settings
 
@@ -66,9 +82,9 @@ iterm: ## Setup iTerm2 preferences
 	@bash scripts/setup/iterm.sh
 
 .PHONY: macos-defaults
-macos-defaults: ## Apply curated macOS system defaults (Finder, input, screenshots)
+macos-defaults: ## Apply curated macOS system defaults (undo=1 to revert, dry=1 to preview)
 	@echo "$(YELLOW)Applying macOS defaults...$(CLR)"
-	@bash scripts/setup/macos-defaults.sh
+	@bash scripts/setup/macos-defaults.sh $(if $(undo),--undo,) $(if $(dry),--dry-run,)
 
 ##@ Nix (the only package manager used on Linux)
 

@@ -12,7 +12,7 @@
 #   check.py              # quick health check (default)
 #   check.py --quick      # quick health check
 #   check.py --full       # full installation verification
-#   check.py --packages   # compare installed packages vs Brewfile
+#   check.py --packages   # compare installed packages vs packages.toml
 #   check.py --system     # display system information
 #   check.py --all        # run everything
 #   check.py --help       # show this help
@@ -27,13 +27,75 @@ import platform
 import re
 import shutil
 import subprocess
+import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import manifest as mf  # noqa: E402
 import osdetect  # noqa: E402
+
+
+def repo_root() -> Path:
+    """Locate the dotfiles checkout.
+
+    check.py lives at <repo>/scripts/verify/, so the repo is always three levels
+    up — that works for any clone location, including git worktrees. $DOTFILES_DIR
+    still wins when it's set and valid, so an explicit override is honoured.
+    """
+    env = os.environ.get("DOTFILES_DIR")
+    if env and (Path(env) / "scripts" / "lib" / "core.sh").is_file():
+        return Path(env).resolve()
+    return Path(__file__).resolve().parent.parent.parent
+
+
+def current_platform() -> str:
+    """The manifest platform key for this machine."""
+    if osdetect.is_mac():
+        return "macos"
+    if osdetect.is_windows():
+        return "windows"
+    return "linux"
+
+
+def package_manager() -> tuple[str, str]:
+    """(manager command, human label) that owns packages on this platform.
+
+    macOS uses Homebrew; Linux uses Nix/Home Manager (never linuxbrew); Windows
+    uses Scoop. Checking for `brew` on Linux would be a guaranteed failure.
+    """
+    return {
+        "macos":   ("brew",  "Homebrew"),
+        "linux":   ("nix",   "Nix"),
+        "windows": ("scoop", "Scoop"),
+    }[current_platform()]
+
+
+def stow_target(entry: "mf.StowEntry") -> Path:
+    """Absolute path a Stow entry lands on for this platform."""
+    if not osdetect.is_windows():
+        return Path.home() / entry.target
+
+    target = entry.win_target
+    for var, default in (
+        ("$env:USERPROFILE",  str(Path.home())),
+        ("$env:LOCALAPPDATA", os.environ.get("LOCALAPPDATA", str(Path.home()))),
+        ("$env:APPDATA",      os.environ.get("APPDATA", str(Path.home()))),
+    ):
+        target = target.replace(var, os.environ.get(var.split(":")[1], default))
+    return Path(target.replace("\\", os.sep))
+
+
+def nvim_config_dir() -> Path:
+    for entry in MANIFEST.stow:
+        if entry.package == "nvim":
+            return stow_target(entry)
+    return Path.home() / ".config" / "nvim"
+
+
+MANIFEST = mf.load(repo_root() / "packages.toml")
 
 
 # ==============================================================================
@@ -256,9 +318,13 @@ class SystemChecker:
         try:
             out = subprocess.run([cmd, flag], capture_output=True, text=True, timeout=5)
             combined = out.stdout or out.stderr or ""
-            first_line = combined.splitlines()[0] if combined.splitlines() else ""
-            match = re.search(r"[0-9]+\.[0-9]+(?:\.[0-9]+)?", first_line)
-            return match.group(0) if match else "installed"
+            # Scan the first few lines, not just the first: some tools (eza,
+            # AtomicParsley) lead with a tagline and print the version below it.
+            for line in combined.splitlines()[:3]:
+                match = re.search(r"[0-9]+\.[0-9]+(?:\.[0-9]+)?", line)
+                if match:
+                    return match.group(0)
+            return "installed"
         except Exception:
             return "installed"
 
@@ -332,16 +398,20 @@ class QuickHealthCheck(SystemChecker):
 
     def _check_core(self) -> None:
         log.section("CORE")
-        home = Path.home()
-        dotfiles = home / "dotfiles"
+        dotfiles = repo_root()
         core = dotfiles / "scripts" / "lib" / "core.sh"
-        self.check_condition("Dotfiles directory", dotfiles.is_dir(), critical=True)
+        self.check_condition("Dotfiles directory", dotfiles.is_dir(), critical=True,
+                             detail=str(dotfiles))
         self.check_condition("Core library", core.is_file(), critical=True)
         self.check_cmd("Git", "git", critical=True)
-        self.check_cmd("Homebrew", "brew", critical=True)
+        manager, label = package_manager()
+        self.check_cmd(label, manager, critical=True)
 
     def _check_shell(self) -> None:
         log.section("SHELL")
+        if osdetect.is_windows():
+            self.check_cmd("PowerShell", "pwsh", critical=False)
+            return
         home = Path.home()
         self.check_cmd("Zsh", "zsh", critical=True)
         self.check_condition("Zsh as default", "zsh" in os.environ.get("SHELL", ""))
@@ -349,10 +419,10 @@ class QuickHealthCheck(SystemChecker):
 
     def _check_neovim(self) -> None:
         log.section("NEOVIM")
-        home = Path.home()
+        config = nvim_config_dir()
         self.check_cmd("Neovim", "nvim")
-        self.check_link("Neovim config", str(home / ".config" / "nvim"))
-        self.check_condition("init.lua", (home / ".config" / "nvim" / "init.lua").is_file())
+        self.check_link("Neovim config", str(config))
+        self.check_condition("init.lua", (config / "init.lua").is_file())
 
     def _check_git(self) -> None:
         log.section("GIT")
@@ -367,12 +437,14 @@ class QuickHealthCheck(SystemChecker):
 
     def _check_essential_tools(self) -> None:
         log.section("ESSENTIAL TOOLS")
-        self.check_cmd("Tmux", "tmux")
-        self.check_cmd("television", "tv")
-        self.check_cmd("ripgrep", "rg")
-        self.check_cmd("bat", "bat")
-        self.check_cmd("eza", "eza")
-        self.check_cmd("zoxide", "zoxide")
+        platform_key = current_platform()
+        if platform_key != "windows":
+            self.check_cmd("Tmux", "tmux", flag="-V")
+        # Driven by packages.toml, so a tool added there is checked here with no
+        # code change — and tools that platform doesn't ship are never checked.
+        for pkg in MANIFEST.checks("quick", platform_key):
+            self.check_cmd(pkg.name, pkg.binary, critical=pkg.critical,
+                           flag=pkg.version_flag)
 
 
 # ==============================================================================
@@ -386,17 +458,20 @@ class FullVerification(SystemChecker):
         log.box("Full Installation Verification")
 
         home = Path.home()
+        dotfiles = repo_root()
+        platform_key = current_platform()
 
         log.section("DIRECTORIES")
-        for d in [
-            home / "dotfiles",
-            home / "dotfiles" / "zsh" / ".config" / "zsh",
-            home / "dotfiles" / "nvim" / ".config" / "nvim",
-            home / "dotfiles" / "tmux" / ".config" / "tmux",
-            home / "dotfiles" / "scripts",
-            home / ".config",
-        ]:
-            self.check_condition(f"{d.name}/", d.is_dir(), critical=True)
+        self.check_condition("dotfiles/", dotfiles.is_dir(), critical=True)
+        self.check_condition("scripts/", (dotfiles / "scripts").is_dir(), critical=True)
+        self.check_condition(".config/", (home / ".config").is_dir(), critical=True)
+        # Assert the source each Stow entry points at actually exists. Checking
+        # `exists()` rather than `is_dir()` keeps file entries (.zshenv,
+        # .inputrc) meaningful instead of silently filtering them out — a filter
+        # would make every remaining check tautologically true.
+        for entry in MANIFEST.stow_for(platform_key):
+            source = dotfiles / entry.repo_path
+            self.check_condition(entry.repo_path, source.exists(), critical=True)
 
         log.section("CORE TOOLS")
         self.check_cmd("Git", "git", critical=True)
@@ -405,15 +480,19 @@ class FullVerification(SystemChecker):
         self.check_cmd("Make", "make")
 
         log.section("SHELL")
-        self.check_cmd("Zsh", "zsh", critical=True)
-        self.check_condition("Default shell", "zsh" in os.environ.get("SHELL", ""))
-        self.check_link(".zshenv", str(home / ".zshenv"), critical=True)
-        self.check_condition("Zsh config dir", (home / ".config" / "zsh").is_dir())
+        if platform_key == "windows":
+            self.check_cmd("PowerShell", "pwsh")
+        else:
+            self.check_cmd("Zsh", "zsh", critical=True)
+            self.check_condition("Default shell", "zsh" in os.environ.get("SHELL", ""))
+            self.check_link(".zshenv", str(home / ".zshenv"), critical=True)
+            self.check_condition("Zsh config dir", (home / ".config" / "zsh").is_dir())
 
         log.section("NEOVIM")
+        nvim_config = nvim_config_dir()
         self.check_cmd("Neovim", "nvim")
-        self.check_link("Config link", str(home / ".config" / "nvim"))
-        self.check_condition("init.lua", (home / ".config" / "nvim" / "init.lua").is_file())
+        self.check_link("Config link", str(nvim_config))
+        self.check_condition("init.lua", (nvim_config / "init.lua").is_file())
         self.check_condition(
             "Lazy.nvim",
             (home / ".local" / "share" / "nvim" / "lazy" / "lazy.nvim").is_dir(),
@@ -427,45 +506,47 @@ class FullVerification(SystemChecker):
             r = CheckResult(label, "pass", val) if val else CheckResult(label, "warn", "not set")
             self.results.append(r)
             renderer.render_check(r)
-        self.check_cmd("delta", "delta")
-        self.check_cmd("lazygit", "lazygit")
 
-        log.section("TMUX")
-        self.check_cmd("Tmux", "tmux", flag="-V")
-        self.check_link("Config link", str(home / ".config" / "tmux"))
-        self.check_condition("tmux.conf", (home / ".config" / "tmux" / "tmux.conf").is_file())
+        if platform_key != "windows":
+            log.section("TMUX")
+            self.check_cmd("Tmux", "tmux", flag="-V")
+            self.check_link("Config link", str(home / ".config" / "tmux"))
+            self.check_condition("tmux.conf", (home / ".config" / "tmux" / "tmux.conf").is_file())
 
-        log.section("MODERN CLI TOOLS")
-        for cmd in ["bat", "eza", "rg", "fd", "tv", "zoxide", "jq"]:
-            self.check_cmd(cmd, cmd)
+        # Every tool packages.toml says this platform installs. Adding a package
+        # there is enough — no parallel list to update here.
+        log.section("MANIFEST TOOLS")
+        for pkg in MANIFEST.checks("full", platform_key):
+            self.check_cmd(pkg.name, pkg.binary, critical=pkg.critical, flag=pkg.version_flag)
 
         log.section("DEVELOPMENT TOOLS")
-        self.check_cmd("Homebrew", "brew", critical=True)
+        manager, manager_label = package_manager()
+        self.check_cmd(manager_label, manager, critical=True)
         self.check_cmd("Python3", "python3")
         self.check_cmd("Node.js", "node")
         self.check_cmd("npm", "npm")
-        self.check_cmd("gh", "gh")
 
         log.section("SYMLINKS")
-        for lnk in [
-            home / ".zshenv",
-            home / ".config" / "nvim",
-            home / ".config" / "tmux",
-            home / ".config" / "git",
-            home / ".config" / "zsh",
-        ]:
-            self.check_link(lnk.name, str(lnk))
+        for entry in MANIFEST.stow_for(platform_key):
+            self.check_link(entry.target, str(stow_target(entry)), critical=entry.critical)
 
         report = self.build_report("VERIFICATION SUMMARY")
         renderer.render_report(report)
-        log.substep(f"Report saved: {self._save_report(report)}")
+        saved = self._save_report(report)
+        log.substep(f"Report saved: {saved}" if saved else "Report could not be saved")
         print()
 
         return report
 
-    def _save_report(self, report: Report) -> Path:
+    def _save_report(self, report: Report) -> Path | None:
+        """Write a one-line summary next to the run; None if it couldn't be written.
+
+        Uses the platform temp dir rather than a hardcoded /tmp, which does not
+        exist on Windows — there the write failed silently and the caller still
+        printed a path that was never created.
+        """
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        path = Path(f"/tmp/dotfiles_verify_{ts}.txt")
+        path = Path(tempfile.gettempdir()) / f"dotfiles_verify_{ts}.txt"
         try:
             path.write_text(
                 f"Dotfiles Verification  —  {datetime.now()}\n"
@@ -473,8 +554,9 @@ class FullVerification(SystemChecker):
                 f"Host: {platform.node()}  OS: {platform.system()}\n"
                 f"Pass: {report.passed()}  Warn: {report.warned()}  Fail: {report.failed()}\n"
             )
-        except Exception:
-            pass
+        except OSError as exc:
+            log.warning(f"Could not write report to {path}: {exc}")
+            return None
         return path
 
 
@@ -484,126 +566,152 @@ class FullVerification(SystemChecker):
 
 
 class PackageChecker(SystemChecker):
-    def __init__(self, brewfile: Path) -> None:
+    """Compare what packages.toml says should be installed against reality.
+
+    Works on all three platforms: Homebrew formulae/casks on macOS, the Home
+    Manager profile on Linux, Scoop apps on Windows. Previously this was
+    Homebrew-only and exited 1 outright on Linux/Windows.
+    """
+
+    def __init__(self, manifest: mf.Manifest) -> None:
         super().__init__()
-        self.brewfile = brewfile
+        self.manifest = manifest
+        self.platform = current_platform()
 
     def run(self) -> Report:
         self.reset()
         log.box("Package Verification")
 
-        log.section("HOMEBREW")
-        if not self.command_exists("brew"):
-            log.error("Homebrew not installed — install with:")
-            print(
-                '  /bin/bash -c "$(curl -fsSL'
-                " https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-            )
-            sys.exit(1)
+        manager, label = package_manager()
+        log.section(label.upper())
+        if not self.command_exists(manager):
+            log.error(f"{label} not installed — packages cannot be verified.")
+            log.substep(self._install_hint())
+            # Record the failure *before* building the report, so a missing
+            # package manager is a reported failure rather than an empty
+            # (and therefore "passing") run.
+            self._add(label, "fail", "not installed")
+            return self.build_report("PACKAGE SUMMARY")
 
-        brew_ver = self._run(["brew", "--version"])
-        log.ok(brew_ver.splitlines()[0] if brew_ver else "Homebrew installed")
-
-        outdated = self._run(["brew", "outdated"])
-        if not outdated.strip():
-            log.ok("All packages up to date")
-        else:
-            cnt = len([ln for ln in outdated.strip().splitlines() if ln])
-            log.warning(f"{cnt} package(s) have updates — run: brew upgrade")
+        self._report_manager_version(manager, label)
+        self._check_outdated(manager, label)
         print()
 
-        if not self.brewfile.is_file():
-            log.error(f"Brewfile not found at {self.brewfile}")
-            sys.exit(1)
-
-        parsed = self._parse_brewfile()
-
-        self._check_taps(parsed.get("tap", []))
-        self._check_formulae(parsed.get("brew", []))
-        if osdetect.is_mac():
-            self._check_casks(parsed.get("cask", []))
+        expected = self.manifest.for_platform(self.platform)
+        if self.platform == "macos":
+            self._check_brew(expected)
+        elif self.platform == "linux":
+            self._check_nix(expected)
+        else:
+            self._check_scoop(expected)
 
         report = self.build_report("PACKAGE SUMMARY")
         renderer.render_report(report)
 
         if report.failed() > 0:
-            print(f"  Install missing:  brew bundle --file={self.brewfile}")
+            print(f"  Install missing:  {self._install_missing_hint()}")
             print()
-
-        print("  Maintenance tips:")
-        print("    brew update && brew upgrade   # update all")
-        print("    brew cleanup                  # remove old versions")
-        print("    brew doctor                   # check for issues")
+        print("  Maintenance:  dutils update      # upgrade everything")
+        print("                dutils manifest list   # what should be installed")
         print()
-
         return report
 
-    def _check_taps(self, taps: list[str]) -> None:
-        log.section("TAPS")
-        if not taps:
-            log.substep("No taps in Brewfile")
-            return
-        installed = set(self._run(["brew", "tap"]).splitlines())
-        for tap in taps:
-            if tap in installed:
-                self._add(tap, "pass", "tapped")
-            else:
-                self._add(tap, "fail", "not tapped")
+    # -- helpers ---------------------------------------------------------
 
-    def _check_formulae(self, formulae: list[str]) -> None:
+    def _install_hint(self) -> str:
+        return {
+            "macos":   'Install: /bin/bash -c "$(curl -fsSL '
+                       'https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+            "linux":   "Install: make nix-setup",
+            "windows": "Install: powershell -File scripts/setup/windows.ps1",
+        }[self.platform]
+
+    def _install_missing_hint(self) -> str:
+        return {
+            "macos":   f"brew bundle --file={repo_root() / 'brew' / 'Brewfile'}",
+            "linux":   "make nix-switch",
+            "windows": "powershell -File scripts/setup/windows.ps1",
+        }[self.platform]
+
+    def _report_manager_version(self, manager: str, label: str) -> None:
+        out = self._run([manager, "--version"])
+        log.ok(out.splitlines()[0] if out.strip() else f"{label} installed")
+
+    def _check_outdated(self, manager: str, label: str) -> None:
+        if self.platform == "macos":
+            outdated = [ln for ln in self._run(["brew", "outdated"]).splitlines() if ln.strip()]
+        elif self.platform == "windows":
+            # `scoop status` prints a table; any row past the header is an update.
+            lines = [ln for ln in self._run(["scoop", "status"]).splitlines() if ln.strip()]
+            outdated = lines[2:] if len(lines) > 2 else []
+        else:
+            # Nix pins exact derivations, so "outdated" only means the flake
+            # inputs have moved — `make nix-update` is the answer, not a diff.
+            log.substep("Nix pins exact versions — run `make nix-update` to refresh inputs")
+            return
+
+        if outdated:
+            log.warning(f"{len(outdated)} package(s) have updates — run: dutils update")
+        else:
+            log.ok("All packages up to date")
+
+    # -- per-manager checks ----------------------------------------------
+
+    def _check_brew(self, expected: list[mf.Package]) -> None:
+        formulae = [p for p in expected if not p.cask]
+        casks = [p for p in expected if p.cask]
+
+        installed = set(self._run(["brew", "list", "--formula", "-1"]).split())
         log.section("FORMULAE")
-        if not formulae:
-            log.substep("No formulae in Brewfile")
-            return
-        for f in formulae:
-            result = subprocess.run(
-                ["brew", "list", "--formula", f], capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                ver_parts = self._run(["brew", "list", "--versions", f]).split()
-                ver = ver_parts[1] if len(ver_parts) > 1 else ""
-                self._add(f, "pass", ver)
+        for pkg in sorted(formulae, key=lambda p: p.name):
+            short = pkg.brew.split("/")[-1]
+            if short in installed:
+                ver = self._run(["brew", "list", "--versions", short]).split()
+                self._add(pkg.brew, "pass", ver[1] if len(ver) > 1 else "")
             else:
-                self._add(f, "fail", "missing")
+                self._add(pkg.brew, "fail", "missing")
 
-    def _check_casks(self, casks: list[str]) -> None:
-        log.section("CASKS")
         if not casks:
-            log.substep("No casks in Brewfile")
             return
-        for c in casks:
-            result = subprocess.run(
-                ["brew", "list", "--cask", c], capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                self._add(c, "pass", "installed")
-            else:
-                self._add(c, "fail", "missing")
+        installed_casks = set(self._run(["brew", "list", "--cask", "-1"]).split())
+        log.section("CASKS")
+        for pkg in sorted(casks, key=lambda p: p.name):
+            status = "pass" if pkg.brew in installed_casks else "fail"
+            self._add(pkg.brew, status, "installed" if status == "pass" else "missing")
 
-    def _parse_brewfile(self) -> dict[str, list[str]]:
-        result: dict[str, list[str]] = {"tap": [], "brew": [], "cask": []}
-        try:
-            text = self.brewfile.read_text()
-        except Exception:
-            return result
-        for line in text.splitlines():
-            line = line.strip()
-            # Skip version/platform-gated entries (e.g. `cask "x" if <cond>`):
-            # they're conditionally installed, so they must not count as
-            # "missing" when the condition is false on this machine.
-            if " if " in line or " unless " in line:
+    def _check_nix(self, expected: list[mf.Package]) -> None:
+        log.section("NIX PACKAGES")
+        # Home Manager installs into the user profile, so the reliable signal is
+        # whether the package's binary resolves — `nix profile list` shows the
+        # single `home-manager-path` derivation, not its contents.
+        for pkg in sorted(expected, key=lambda p: p.name):
+            if not pkg.nix:
                 continue
-            for key in ("tap", "brew", "cask"):
-                if line.startswith(f"{key} "):
-                    m = re.search(r"""['"]([^'"]+)['"]""", line)
-                    if m:
-                        result[key].append(m.group(1))
-                    break
-        return result
+            if not pkg.binary:
+                self._add(pkg.nix, "pass", "no binary to verify")
+            elif self.command_exists(pkg.binary):
+                self._add(pkg.nix, "pass", f"v{self.get_version(pkg.binary, pkg.version_flag)}")
+            else:
+                self._add(pkg.nix, "fail", "missing")
+
+    def _check_scoop(self, expected: list[mf.Package]) -> None:
+        log.section("SCOOP APPS")
+        installed = {
+            ln.split()[0]
+            for ln in self._run(["scoop", "list"]).splitlines()
+            if ln.strip() and not ln.startswith(("Name", "----", "Installed"))
+        }
+        for pkg in sorted(expected, key=lambda p: p.name):
+            if pkg.scoop in installed:
+                self._add(pkg.scoop, "pass", "installed")
+            elif pkg.binary and self.command_exists(pkg.binary):
+                self._add(pkg.scoop, "pass", "on PATH (not via scoop)")
+            else:
+                self._add(pkg.scoop, "fail", "missing")
 
     def _run(self, cmd: list[str]) -> str:
         try:
-            return subprocess.run(cmd, capture_output=True, text=True, timeout=30).stdout or ""
+            return subprocess.run(cmd, capture_output=True, text=True, timeout=60).stdout or ""
         except Exception:
             return ""
 
@@ -669,7 +777,7 @@ class SystemInfo:
     def _show_dotfiles(self) -> None:
         log.section("DOTFILES")
         home = Path.home()
-        log.kvp("Dotfiles dir", str(home / "dotfiles"))
+        log.kvp("Dotfiles dir", str(repo_root()))
         log.kvp("Config dir", str(home / ".config"))
         log.kvp("Default shell", os.environ.get("SHELL", "unknown"))
         for path, label in [
@@ -711,7 +819,7 @@ Modes:
   (none)       Quick health check (default)
   --quick      Quick health check
   --full       Full installation verification
-  --packages   Compare installed packages vs Brewfile
+  --packages   Compare installed packages vs packages.toml
   --system     Display system information
   --all        Run all modes
   --help, -h   Show this help
@@ -749,7 +857,7 @@ def brew_vulns_summary() -> None:
 
 
 class DotfilesVerifier:
-    DOTFILES_DIR = Path.home() / "dotfiles"
+    DOTFILES_DIR = repo_root()
 
     def run(self, argv: list[str]) -> int:
         mode = argv[0] if argv else "--quick"
@@ -761,8 +869,7 @@ class DotfilesVerifier:
             return 0 if FullVerification().run().failed() == 0 else 1
 
         if mode in ("--packages", "packages"):
-            brewfile = self.DOTFILES_DIR / "brew" / "Brewfile"
-            return 0 if PackageChecker(brewfile).run().failed() == 0 else 1
+            return 0 if PackageChecker(MANIFEST).run().failed() == 0 else 1
 
         if mode in ("--system", "system"):
             SystemInfo().display()
@@ -776,8 +883,7 @@ class DotfilesVerifier:
             if FullVerification().run().failed() > 0:
                 rc = 1
             print()
-            brewfile = self.DOTFILES_DIR / "brew" / "Brewfile"
-            if PackageChecker(brewfile).run().failed() > 0:
+            if PackageChecker(MANIFEST).run().failed() > 0:
                 rc = 1
             print()
             SystemInfo().display()

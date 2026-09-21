@@ -111,7 +111,8 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles
 ```bash
 git clone https://github.com/itsmeakashgoyal/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-make install
+make install dry=1    # preview every action, change nothing
+make install          # apply
 exec zsh
 ```
 
@@ -241,7 +242,8 @@ dotfiles/
 ├── nvim/                      → ~/.config/nvim/         Neovim editor setup
 ├── tmux/                      → ~/.config/tmux/         Tmux multiplexer
 ├── powershell/                → ~/Documents/PowerShell/ PowerShell profile (Windows)
-├── brew/                      Brewfile — Homebrew package manifest (macOS)
+├── packages.toml              THE package manifest — every tool, every platform
+├── brew/                      Brewfile — generated from packages.toml (macOS)
 ├── nix/                       Home Manager flake — Linux packages (replaces linuxbrew)
 ├── scripts/                   Setup, verification, and the dutils CLI
 ├── settings/                  App preferences (iTerm, Sublime)
@@ -251,6 +253,32 @@ dotfiles/
 ├── bootstrap.sh               One-liner bootstrap for fresh machines
 └── Makefile                   Stow management & diagnostics
 ```
+
+---
+
+## The package manifest
+
+[`packages.toml`](packages.toml) is the single source of truth for every tool this repo installs and
+every Stow package it links. The per-manager lists are **generated** from it:
+
+| Generated region | File |
+| --- | --- |
+| Homebrew formulae & casks | `brew/Brewfile` |
+| Nix packages | `nix/home.nix` |
+| Scoop apps + Windows symlink map | `scripts/setup/windows.ps1` |
+| apt bootstrap deps | `scripts/setup/linux.sh` |
+| `STOW_PACKAGES` | `Makefile` |
+
+```bash
+# add or edit a [[package]] entry in packages.toml, then:
+make manifest          # regenerate every list  (alias: dutils manifest generate)
+make manifest-check    # fail if a list drifted (runs in CI)
+dutils manifest list   # show what gets installed on each platform
+```
+
+The health checks read the same file, so `dutils health` / `dutils check` never drift from what's
+actually declared. Only the text between the `BEGIN GENERATED` / `END GENERATED` markers is
+rewritten — everything else in those files stays hand-written.
 
 ---
 

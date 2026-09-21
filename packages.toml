@@ -1,0 +1,736 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ packages.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# THE package manifest — single source of truth for every tool this repo
+# installs, on every platform, plus the Stow package list.
+#
+# Nothing here is installed directly. Instead, `dutils manifest generate`
+# renders the per-manager package lists into the files that actually run:
+#
+#   brew         -> brew/Brewfile
+#   nix          -> nix/home.nix          (home.packages list)
+#   scoop        -> scripts/setup/windows.ps1  ($SCOOP_PACKAGES)
+#   apt          -> scripts/setup/linux.sh     (system bootstrap deps)
+#   [[stow]]     -> scripts/setup/windows.ps1  ($SYMLINK_MAP) + Makefile
+#
+# Each of those regions is delimited by BEGIN/END GENERATED markers; everything
+# outside the markers stays hand-written. `dutils manifest check` re-renders and
+# diffs, so CI fails if a generated region drifts from this file.
+#
+# ── Adding a tool ─────────────────────────────────────────────────────────────
+# Add one [[package]] entry with the name it has in each package manager, run
+# `dutils manifest generate`, and commit the result. Omit a manager key when the
+# tool isn't available (or isn't wanted) there — e.g. `htop` has no Scoop entry.
+#
+# ── Fields ────────────────────────────────────────────────────────────────────
+#   name      Canonical name (used for sorting, docs and as the default verify)
+#   desc      One-line description; becomes the trailing comment in generated files
+#   category  Groups entries under a heading in the generated output
+#   brew      Homebrew formula name         (macOS; Linux uses Nix, never linuxbrew)
+#   brew_os   Restrict the brew entry to "mac" or "linux" (default: both)
+#   cask      true => emit as `cask` rather than `brew` (macOS only)
+#   nix       nixpkgs attribute name        (Linux)
+#   scoop     Scoop app name                (Windows)
+#   verify    Executable that proves it's installed; defaults to `name`.
+#             Set verify = "" for things that install no command (fonts, libs).
+#   critical  true => a missing binary is a hard FAIL in `dutils health/check`
+#             rather than a warning. Reserve for things the shell needs to work.
+#   check     Health-check tier: "quick" (in `dutils health`), "full" (only in
+#             `dutils check`), or "none". Default: "full".
+#   version_flag  Flag used to read the version; defaults to "--version"
+#
+
+[meta]
+version = 1
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Essential CLI tools — installed everywhere
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "git"
+desc     = "Real git (macOS ships only a Command Line Tools stub)"
+category = "Essential CLI Tools"
+brew     = "git"
+nix      = "git"
+scoop    = "git"
+apt      = "git"
+critical = true
+check    = "none"  # CORE section checks git explicitly
+
+[[package]]
+name     = "age"
+desc     = "Modern file encryption (secrets, via dutils secrets)"
+category = "Essential CLI Tools"
+brew     = "age"
+nix      = "age"
+scoop    = "age"
+
+[[package]]
+name     = "atuin"
+desc     = "Shell history search (Rust)"
+category = "Essential CLI Tools"
+brew     = "atuin"
+nix      = "atuin"
+scoop    = "atuin"
+
+[[package]]
+name     = "bat"
+desc     = "Cat with syntax highlighting (Rust)"
+category = "Essential CLI Tools"
+brew     = "bat"
+nix      = "bat"
+scoop    = "bat"
+check    = "quick"
+
+[[package]]
+name     = "eza"
+desc     = "Better ls (Rust)"
+category = "Essential CLI Tools"
+brew     = "eza"
+nix      = "eza"
+scoop    = "eza"
+check    = "quick"
+
+[[package]]
+name     = "fastfetch"
+desc     = "System info tool (C)"
+category = "Essential CLI Tools"
+brew     = "fastfetch"
+nix      = "fastfetch"
+scoop    = "fastfetch"
+
+[[package]]
+name     = "fd"
+desc     = "Better find (Rust)"
+category = "Essential CLI Tools"
+brew     = "fd"
+nix      = "fd"
+scoop    = "fd"
+
+[[package]]
+name     = "gh"
+desc     = "GitHub CLI"
+category = "Essential CLI Tools"
+brew     = "gh"
+nix      = "gh"
+scoop    = "gh"
+
+[[package]]
+name     = "git-delta"
+desc     = "Better git diff (Rust)"
+category = "Essential CLI Tools"
+brew     = "git-delta"
+nix      = "delta"
+scoop    = "delta"
+verify   = "delta"
+
+[[package]]
+name     = "git-extras"
+desc     = "Extra git commands"
+category = "Essential CLI Tools"
+brew     = "git-extras"
+nix      = "git-extras"
+verify   = "git-extras"
+check    = "none"
+
+[[package]]
+name     = "hyperfine"
+desc     = "Command-line benchmarking tool (Rust)"
+category = "Essential CLI Tools"
+brew     = "hyperfine"
+nix      = "hyperfine"
+scoop    = "hyperfine"
+
+[[package]]
+name     = "jq"
+desc     = "JSON processor"
+category = "Essential CLI Tools"
+brew     = "jq"
+nix      = "jq"
+scoop    = "jq"
+
+[[package]]
+name     = "lazygit"
+desc     = "Terminal UI for git"
+category = "Essential CLI Tools"
+brew     = "lazygit"
+nix      = "lazygit"
+scoop    = "lazygit"
+
+[[package]]
+name     = "mise"
+desc     = "Runtime version manager (replaces pyenv)"
+category = "Essential CLI Tools"
+brew     = "mise"
+nix      = "mise"
+scoop    = "mise"
+
+[[package]]
+name     = "uv"
+desc     = "Fast Python venv/package manager (Rust) - works with mise-pinned interpreters"
+category = "Essential CLI Tools"
+brew     = "uv"
+nix      = "uv"
+scoop    = "uv"
+
+[[package]]
+name     = "starship"
+desc     = "Cross-shell prompt (default, replaced Powerlevel10k)"
+category = "Essential CLI Tools"
+brew     = "starship"
+nix      = "starship"
+scoop    = "starship"
+
+[[package]]
+name     = "ripgrep"
+desc     = "Better grep (Rust)"
+category = "Essential CLI Tools"
+brew     = "ripgrep"
+nix      = "ripgrep"
+scoop    = "ripgrep"
+verify   = "rg"
+
+[[package]]
+name     = "tree"
+desc     = "Directory tree"
+category = "Essential CLI Tools"
+brew     = "tree"
+nix      = "tree"
+scoop    = "tree"
+
+[[package]]
+name     = "television"
+desc     = "Fuzzy finder with channels (Rust)"
+category = "Essential CLI Tools"
+brew     = "television"
+nix      = "television"
+scoop    = "television"
+verify   = "tv"
+check    = "quick"
+
+[[package]]
+name     = "yazi"
+desc     = "Terminal file manager (Rust)"
+category = "Essential CLI Tools"
+brew     = "yazi"
+nix      = "yazi"
+scoop    = "yazi"
+
+[[package]]
+name     = "zoxide"
+desc     = "Smart cd (Rust)"
+category = "Essential CLI Tools"
+brew     = "zoxide"
+nix      = "zoxide"
+scoop    = "zoxide"
+check    = "quick"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# System monitoring
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "btop"
+desc     = "System monitor"
+category = "System Monitoring"
+brew     = "btop"
+nix      = "btop"
+scoop    = "btop"
+
+[[package]]
+name     = "htop"
+desc     = "Process viewer"
+category = "System Monitoring"
+brew     = "htop"
+nix      = "htop"
+
+[[package]]
+name     = "procs"
+desc     = "Better ps (Rust)"
+category = "System Monitoring"
+brew     = "procs"
+nix      = "procs"
+scoop    = "procs"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Editor
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "neovim"
+desc     = "Vim-based text editor"
+category = "Editors"
+brew     = "neovim"
+nix      = "neovim"
+scoop    = "neovim"
+verify   = "nvim"
+check    = "none"  # NEOVIM section checks nvim explicitly
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Lua toolchain (Neovim config / plugins)
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "lua"
+desc     = "Lua interpreter"
+category = "Lua Toolchain"
+brew     = "lua"
+nix      = "lua"
+scoop    = "lua"
+
+[[package]]
+name     = "lua-language-server"
+desc     = "Lua LSP server"
+category = "Lua Toolchain"
+brew     = "lua-language-server"
+nix      = "lua-language-server"
+verify   = "lua-language-server"
+check    = "none"
+
+[[package]]
+name     = "luarocks"
+desc     = "Lua package manager"
+category = "Lua Toolchain"
+brew     = "luarocks"
+nix      = "luarocks"
+
+[[package]]
+name     = "stylua"
+desc     = "Lua formatter"
+category = "Lua Toolchain"
+brew     = "stylua"
+nix      = "stylua"
+scoop    = "stylua"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Shell tooling
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "shellcheck"
+desc     = "Shell script linter"
+category = "Shell Tooling"
+brew     = "shellcheck"
+nix      = "shellcheck"
+scoop    = "shellcheck"
+
+[[package]]
+name     = "shfmt"
+desc     = "Shell formatter"
+category = "Shell Tooling"
+brew     = "shfmt"
+nix      = "shfmt"
+scoop    = "shfmt"
+
+[[package]]
+name     = "nixfmt"
+desc     = "Nix formatter (RFC 166 style; matches the CI check)"
+category = "Shell Tooling"
+brew     = "nixfmt"
+nix      = "nixfmt-rfc-style"
+verify   = "nixfmt"
+check    = "none"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Nix tooling — Linux only (no Homebrew equivalents worth installing on macOS)
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "nixd"
+desc     = "Nix language server (for editing home.nix / flake.nix in nvim)"
+category = "Nix Tooling"
+nix      = "nixd"
+check    = "none"
+
+[[package]]
+name     = "devenv"
+desc     = "Reproducible per-project dev environments (see docs/NIX.md)"
+category = "Nix Tooling"
+nix      = "devenv"
+check    = "none"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Misc
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "rsync"
+desc     = "File sync"
+category = "Misc"
+brew     = "rsync"
+nix      = "rsync"
+
+[[package]]
+name     = "tldr"
+desc     = "Simplified man pages (Nix provides the tealdeer client)"
+category = "Misc"
+brew     = "tldr"
+nix      = "tealdeer"
+verify   = "tldr"
+check    = "none"
+
+[[package]]
+name     = "stow"
+desc     = "Dotfile manager (Windows uses windows.ps1's symlink map instead)"
+category = "Misc"
+brew     = "stow"
+brew_os  = "mac"
+nix      = "stow"
+apt      = "stow"
+
+[[package]]
+name     = "gettext"
+desc     = "GNU i18n utilities"
+category = "Misc"
+brew     = "gettext"
+brew_os  = "linux"
+nix      = "gettext"
+verify   = "gettext"
+check    = "none"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Media / downloads (used by scripts/dutils/yt_download.sh)
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "yt-dlp"
+desc     = "YouTube / media downloader (Python)"
+category = "Media"
+brew     = "yt-dlp"
+check    = "none"
+
+[[package]]
+name     = "ffmpeg"
+desc     = "Audio/video transcode & mux (merges best video+audio)"
+category = "Media"
+brew     = "ffmpeg"
+check    = "none"
+
+[[package]]
+name     = "atomicparsley"
+desc     = "MP4 metadata/thumbnail embedding for yt-dlp"
+category = "Media"
+brew     = "atomicparsley"
+verify   = "AtomicParsley"
+check    = "none"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# macOS-only
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "coreutils"
+desc     = "GNU core utilities"
+category = "macOS Only"
+brew     = "coreutils"
+brew_os  = "mac"
+verify   = "gls"
+check    = "none"
+
+[[package]]
+name     = "gcc"
+desc     = "GNU compiler"
+category = "Compilers & Build Tools"
+brew     = "gcc"
+brew_os  = "mac"
+scoop    = "gcc"
+check    = "none"
+
+[[package]]
+name     = "sshs"
+desc     = "SSH TUI (Rust)"
+category = "macOS Only"
+brew     = "sshs"
+brew_os  = "mac"
+check    = "none"
+
+[[package]]
+name     = "pipx"
+desc     = "Installs osxphotos (Photos library export CLI, see scripts/setup/macos.sh)"
+category = "macOS Only"
+brew     = "pipx"
+brew_os  = "mac"
+check    = "none"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Windows-only — Unix gets these from the OS, Nix or Xcode CLT
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "curl"
+desc     = "HTTP client"
+category = "Windows Only"
+scoop    = "curl"
+apt      = "curl"
+check    = "none"
+
+[[package]]
+name     = "wget"
+desc     = "HTTP downloader"
+category = "Windows Only"
+scoop    = "wget"
+apt      = "wget"
+check    = "none"
+
+[[package]]
+name     = "make"
+desc     = "Build tool"
+category = "Windows Only"
+scoop    = "make"
+check    = "none"
+
+[[package]]
+name     = "nodejs"
+desc     = "Node.js runtime (Neovim providers, LSP servers)"
+category = "Windows Only"
+scoop    = "nodejs"
+verify   = "node"
+check    = "none"
+
+[[package]]
+name     = "python"
+desc     = "Python 3 (required by the dutils CLI)"
+category = "Windows Only"
+scoop    = "python"
+verify   = "python"
+check    = "none"
+
+[[package]]
+name     = "fzf"
+desc     = "Fuzzy finder (PSReadLine/PSFzf integration on Windows)"
+category = "Windows Only"
+scoop    = "fzf"
+check    = "none"
+
+[[package]]
+name     = "tree-sitter"
+desc     = "Neovim treesitter CLI dependency"
+category = "Windows Only"
+scoop    = "tree-sitter"
+check    = "none"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Nerd Fonts (macOS casks; Windows uses the nerd-fonts Scoop bucket)
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[package]]
+name     = "font-fira-code-nerd-font"
+desc     = "FiraCode Nerd Font"
+category = "Fonts"
+brew     = "font-fira-code-nerd-font"
+brew_os  = "mac"
+cask     = true
+verify   = ""
+
+[[package]]
+name     = "font-jetbrains-mono-nerd-font"
+desc     = "JetBrainsMono Nerd Font (Sublime Text + terminal font)"
+category = "Fonts"
+brew     = "font-jetbrains-mono-nerd-font"
+brew_os  = "mac"
+cask     = true
+verify   = ""
+
+[[package]]
+name     = "font-meslo-lg-nerd-font"
+desc     = "MesloLG Nerd Font (Powerlevel10k's recommended font)"
+category = "Fonts"
+brew     = "font-meslo-lg-nerd-font"
+brew_os  = "mac"
+cask     = true
+verify   = ""
+
+[[package]]
+name     = "font-source-code-pro"
+desc     = "Source Code Pro"
+category = "Fonts"
+brew     = "font-source-code-pro"
+brew_os  = "mac"
+cask     = true
+verify   = ""
+
+[[package]]
+name     = "font-ubuntu-mono-nerd-font"
+desc     = "UbuntuMono Nerd Font"
+category = "Fonts"
+brew     = "font-ubuntu-mono-nerd-font"
+brew_os  = "mac"
+cask     = true
+verify   = ""
+
+# ══════════════════════════════════════════════════════════════════════════════
+# apt system bootstrap deps (Linux)
+#
+# These are NOT the CLI toolchain — Nix provides that. This is the minimum apt
+# needs to install Nix, run Stow and switch the login shell to zsh. Entries with
+# `optional = true` are installed best-effort and never fail the install.
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[system]]
+name = "build-essential"
+desc = "Compiler toolchain (Nix installer prerequisite)"
+
+[[system]]
+name = "ca-certificates"
+desc = "TLS roots"
+
+[[system]]
+name = "curl"
+desc = "HTTP client"
+
+[[system]]
+name = "wget"
+desc = "HTTP downloader"
+
+[[system]]
+name = "xz-utils"
+desc = "Nix installer prerequisite"
+
+[[system]]
+name = "file"
+desc = "Nix installer prerequisite"
+
+[[system]]
+name = "procps"
+desc = "Nix installer prerequisite"
+
+[[system]]
+name = "git"
+desc = "Clone the dotfiles repo"
+
+[[system]]
+name = "stow"
+desc = "Dotfile symlink manager"
+
+[[system]]
+name = "zsh"
+desc = "The login shell this repo configures"
+
+[[system]]
+name = "unzip"
+desc = "Archive extraction"
+
+[[system]]
+name = "fontconfig"
+desc = "Font cache (Nerd Fonts)"
+
+[[system]]
+name     = "figlet"
+desc     = "ASCII art banners"
+optional = true
+
+[[system]]
+name     = "lolcat"
+desc     = "Rainbow output"
+optional = true
+
+[[system]]
+name     = "entr"
+desc     = "Run commands when files change"
+optional = true
+
+[[system]]
+name     = "strace"
+desc     = "Syscall tracer"
+optional = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Stow packages
+#
+# `package`  directory in the repo root (also the Stow package name)
+# `target`   path the package lands on, relative to $HOME — used by the health
+#            check and, on Windows, to build $SYMLINK_MAP
+# `source`   path inside the package that `target` points at (defaults to
+#            "<package>/<target>")
+# `platforms` which OSes stow/link this package. Default: all three.
+# `critical` true => a missing symlink is a hard FAIL in `dutils health`
+# ══════════════════════════════════════════════════════════════════════════════
+
+[[stow]]
+package   = "zsh"
+target    = ".zshenv"
+source    = "zsh/.zshenv"
+desc      = "Zsh entrypoint (the rest lives in .config/zsh)"
+platforms = ["macos", "linux"]
+critical  = true
+
+[[stow]]
+package   = "zsh"
+target    = ".config/zsh"
+desc      = "Zsh config (conf.d modules, .zshrc)"
+platforms = ["macos", "linux"]
+critical  = true
+
+[[stow]]
+package  = "git"
+target   = ".config/git"
+desc     = "Git config, aliases, delta, GPG signing"
+critical = true
+
+[[stow]]
+package        = "nvim"
+target         = ".config/nvim"
+desc           = "Neovim (Lazy.nvim + Harpoon)"
+windows_target = '$env:LOCALAPPDATA\nvim'
+
+[[stow]]
+package   = "tmux"
+target    = ".config/tmux"
+desc      = "Tmux config"
+platforms = ["macos", "linux"]
+
+[[stow]]
+package = "television"
+target  = ".config/television"
+desc    = "Television fuzzy finder channels"
+
+[[stow]]
+package = "atuin"
+target  = ".config/atuin"
+desc    = "Atuin shell history"
+
+[[stow]]
+package = "fastfetch"
+target  = ".config/fastfetch"
+desc    = "Fastfetch system info"
+
+[[stow]]
+package = "starship"
+target  = ".config/starship"
+desc    = "Starship prompt (the default prompt)"
+
+[[stow]]
+package = "yazi"
+target  = ".config/yazi"
+desc    = "Yazi terminal file manager"
+
+[[stow]]
+package   = "bin"
+target    = ".local/bin"
+desc      = "Custom scripts + the dutils CLI on PATH"
+platforms = ["macos", "linux"]
+
+[[stow]]
+package = "readline"
+target  = ".inputrc"
+source  = "readline/.inputrc"
+desc    = "GNU Readline config (bash/python/psql)"
+
+[[stow]]
+package   = "ghostty"
+target    = ".config/ghostty"
+desc      = "Ghostty terminal config"
+platforms = ["macos", "linux"]
+
+# Windows has no Stow; windows.ps1 links these with its own symlink function.
+[[stow]]
+package   = "powershell"
+target    = "Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
+source    = "powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
+desc      = "PowerShell profile (thin loader for profile.d/*.ps1)"
+platforms = ["windows"]
+critical  = true

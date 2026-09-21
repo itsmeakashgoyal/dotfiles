@@ -19,97 +19,100 @@ if OS.mac?
 end
 
 #############################################################
-# Core Utilities (Both macOS and Linux)                    #
+# Packages                                                  #
+#                                                           #
+# GENERATED from packages.toml - do not edit between the    #
+# markers below. Add/remove tools in packages.toml, then    #
+# run `dutils manifest generate`.                           #
 #############################################################
-
+# BEGIN GENERATED: brew (dutils manifest generate)
 # Essential CLI Tools
-brew "age"                  # Modern file encryption (secrets, via dutils secrets)
-brew "atuin"                # Shell history search (Rust)
-brew "bat"                  # Cat with syntax highlighting (Rust)
-brew "eza"                  # Better ls (Rust)
-brew "fastfetch"            # System info tool (C)
-brew "fd"                   # Better find (Rust)
-brew "gh"                   # GitHub CLI
-brew "git"                  # Real git (macOS ships only a Command Line Tools stub)
-brew "git-delta"            # Better git diff (Rust)
-brew "git-extras"           # Extra git commands
-brew "hyperfine"            # Command-line benchmarking tool (Rust)
-brew "jq"                   # JSON processor
-brew "lazygit"              # Terminal UI for git
-brew "mise"                 # Runtime version manager (replaces pyenv)
-brew "uv"                   # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
-brew "starship"             # Cross-shell prompt (default, replaced Powerlevel10k)
-brew "ripgrep"              # Better grep (Rust)
-brew "tree"                 # Directory tree
-brew "television"           # Fuzzy finder with channels (Rust)
-brew "yazi"                 # Terminal file manager (Rust)
-brew "zoxide"               # Smart cd (Rust)
+brew "git"                 # Real git (macOS ships only a Command Line Tools stub)
+brew "age"                 # Modern file encryption (secrets, via dutils secrets)
+brew "atuin"               # Shell history search (Rust)
+brew "bat"                 # Cat with syntax highlighting (Rust)
+brew "eza"                 # Better ls (Rust)
+brew "fastfetch"           # System info tool (C)
+brew "fd"                  # Better find (Rust)
+brew "gh"                  # GitHub CLI
+brew "git-delta"           # Better git diff (Rust)
+brew "git-extras"          # Extra git commands
+brew "hyperfine"           # Command-line benchmarking tool (Rust)
+brew "jq"                  # JSON processor
+brew "lazygit"             # Terminal UI for git
+brew "mise"                # Runtime version manager (replaces pyenv)
+brew "uv"                  # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
+brew "starship"            # Cross-shell prompt (default, replaced Powerlevel10k)
+brew "ripgrep"             # Better grep (Rust)
+brew "tree"                # Directory tree
+brew "television"          # Fuzzy finder with channels (Rust)
+brew "yazi"                # Terminal file manager (Rust)
+brew "zoxide"              # Smart cd (Rust)
 
 # System Monitoring
-brew "btop"                 # System monitor
-brew "htop"                 # Process viewer
-brew "procs"                # Better ps (Rust)
+brew "btop"                # System monitor
+brew "htop"                # Process viewer
+brew "procs"               # Better ps (Rust)
 
 # Editors
-brew "neovim"               # Vim-based text editor
+brew "neovim"              # Vim-based text editor
+
+# Lua Toolchain
+brew "lua"                 # Lua interpreter
+brew "lua-language-server" # Lua LSP server
+brew "luarocks"            # Lua package manager
+brew "stylua"              # Lua formatter
+
+# Shell Tooling
+brew "shellcheck"          # Shell script linter
+brew "shfmt"               # Shell formatter
+brew "nixfmt"              # Nix formatter (RFC 166 style; matches the CI check)
+
+# Misc
+brew "rsync"               # File sync
+brew "tldr"                # Simplified man pages (Nix provides the tealdeer client)
+
+# Media
+brew "yt-dlp"              # YouTube / media downloader (Python)
+brew "ffmpeg"              # Audio/video transcode & mux (merges best video+audio)
+brew "atomicparsley"       # MP4 metadata/thumbnail embedding for yt-dlp
+
+if OS.mac?
+    # Misc
+    brew "stow"                          # Dotfile manager (Windows uses windows.ps1's symlink map instead)
+
+    # macOS Only
+    brew "coreutils"                     # GNU core utilities
+    brew "sshs"                          # SSH TUI (Rust)
+    brew "pipx"                          # Installs osxphotos (Photos library export CLI, see scripts/setup/macos.sh)
+
+    # Compilers & Build Tools
+    brew "gcc"                           # GNU compiler
+
+    # Fonts
+    cask "font-fira-code-nerd-font"      # FiraCode Nerd Font
+    cask "font-jetbrains-mono-nerd-font" # JetBrainsMono Nerd Font (Sublime Text + terminal font)
+    cask "font-meslo-lg-nerd-font"       # MesloLG Nerd Font (Powerlevel10k's recommended font)
+    cask "font-source-code-pro"          # Source Code Pro
+    cask "font-ubuntu-mono-nerd-font"    # UbuntuMono Nerd Font
+end
+
+if OS.linux?
+    # Misc
+    brew "gettext" # GNU i18n utilities
+end
+# END GENERATED: brew
 
 #############################################################
-# Development Tools                                         #
-#############################################################
-
-# Language Tools - Lua
-brew "lua"
-brew "lua-language-server"
-brew "luarocks"
-brew "stylua"               # Lua formatter
-
-# Shell Tools
-brew "shellcheck"           # Shell script linter
-brew "shfmt"                # Shell formatter
-brew "nixfmt"               # Nix formatter (for editing nix/*.nix on macOS; RFC 166 style)
-
-# Other Tools
-brew "rsync"                # File sync
-brew "tldr"                 # Simplified man pages
-
-# Media / Downloads (used by scripts/dutils/yt_download.sh)
-brew "yt-dlp"               # YouTube / media downloader (Python)
-brew "ffmpeg"               # Audio/video transcode & mux (merges best video+audio)
-brew "atomicparsley"        # MP4 metadata/thumbnail embedding for yt-dlp
-
-#############################################################
-# macOS Specific                                            #
+# Hand-written macOS extras                                 #
+#                                                           #
+# Kept out of the manifest because they need Ruby           #
+# conditionals the generator doesn't model.                 #
 #############################################################
 if OS.mac?
-    # Core Tools
-    brew "coreutils"        # GNU core utilities
-    brew "gcc"              # GNU compiler
-    brew "stow"             # Dotfile manager
-
-    # Security
-    brew "sshs"             # SSH TUI (Rust)
-
-    # Photos
-    brew "pipx"              # Installs osxphotos (Photos library export CLI, see scripts/setup/macos.sh)
-
-    # GUI apps
-    # BrewUI — Homebrew's official GUI (Homebrew 7.0+). It's a cask that needs
+    # BrewUI - Homebrew's official GUI (Homebrew 7.0+). It's a cask that needs
     # macOS Tahoe 26+; the version guard makes `brew bundle` install it only
     # there and silently skip it on older macOS (e.g. Sequoia 15). `to_i` reads
     # the leading major version from e.g. "26.0" / "15.7.9".
     cask "homebrew-app" if `sw_vers -productVersion`.to_i >= 26
-
-    # Nerd Fonts
-    cask "font-fira-code-nerd-font"
-    cask "font-jetbrains-mono-nerd-font"
-    cask "font-meslo-lg-nerd-font"
-    cask "font-source-code-pro"
-    cask "font-ubuntu-mono-nerd-font"
-end
-
-#############################################################
-# Linux Specific                                            #
-#############################################################
-if OS.linux?
-    brew "gettext"          # GNU i18n utilities
 end
