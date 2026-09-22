@@ -17,6 +17,11 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+# PS 7.3+ treats a native command's stderr output as a terminating error when
+# $ErrorActionPreference is "Stop" (harmless no-op on PS 5.1, which has no such
+# preference). Scoop/git write routine noise to stderr; without this, that
+# noise aborts the whole script instead of hitting the non-fatal handling below.
+$PSNativeCommandUseErrorActionPreference = $false
 
 # ==============================================================================
 # Configuration
@@ -159,6 +164,128 @@ function Write-Section {
 # ==============================================================================
 # Scoop Installation & Packages
 # ==============================================================================
+function Invoke-Scoop {
+    # `scoop` resolves to a .ps1 shim on PATH, so calling it directly runs it
+    # in-process (same PowerShell scope) — when Scoop's own `abort` helper
+    # fires (e.g. hitting a corrupted bucket checkout during its self-update),
+    # it calls `exit`, which kills this whole installer instead of just the
+    # scoop call. Re-launching the same PowerShell executable as a real child
+    # process (via Start-Process) forces a genuine process boundary, so a
+    # scoop-internal exit only ends that child, and Start-Process reports the
+    # child's real exit code (unlike routing through cmd.exe's shim, which
+    # was found to always report 0 regardless of the underlying failure).
+    # Retries absorb the transient "file in use" / "could not lock config
+    # file" failures seen from AV/EDR scanners on managed machines mid-clone.
+    #
+    # Deliberately does NOT redirect stdout: Scoop's table output (used by
+    # the "already installed" checks below) renders empty when redirected,
+    # so this only wraps state-changing calls (bucket add / install) where
+    # we don't need to parse output — read-only queries call scoop directly.
+    param(
+        [Parameter(Mandatory, ValueFromRemainingArguments)]
+        [string[]]$ScoopArgs
+    )
+    $maxAttempts = 3
+    $hostExe = (Get-Process -Id $PID).Path
+    $scoopScript = (Get-Command scoop.ps1 -ErrorAction SilentlyContinue).Source
+    if (-not $scoopScript) { $scoopScript = "$env:USERPROFILE\scoop\shims\scoop.ps1" }
+    $argList = @("-NoProfile", "-NonInteractive", "-File", $scoopScript) + $ScoopArgs
+
+    for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+        # Start-Process itself can fail before the child ever runs (host exe
+        # missing, path not executable, ...). That throws rather than returning
+        # a process, and without the catch the failure surfaced only as three
+        # silent retries and a bare "failed (non-fatal)" — no reason given.
+        $proc = $null
+        try {
+            $proc = Start-Process -FilePath $hostExe -ArgumentList $argList -NoNewWindow -Wait -PassThru
+        }
+        catch {
+            Write-Fail "Could not launch scoop (attempt $attempt/$maxAttempts): $($_.Exception.Message)"
+        }
+        if ($null -ne $proc -and $proc.ExitCode -eq 0) { return $true }
+        if ($attempt -lt $maxAttempts) { Start-Sleep -Seconds 2 }
+    }
+    return $false
+}
+
+function Repair-ScoopBuckets {
+    # A bucket dir can end up with a half-finished .git checkout (missing
+    # HEAD/config, just empty objects/refs) after a network blip or AV/EDR
+    # file-lock mid-clone. Scoop then hard-exits the next time anything
+    # triggers its bucket self-update (e.g. `scoop install git`), taking this
+    # whole script down with it — see Invoke-Scoop above. Fix any broken
+    # bucket up front so self-update never hits that failure.
+    #
+    # Quarantines (renames) the broken dir rather than deleting it outright:
+    # if re-adding the bucket then fails too (offline, disk full, ...), a
+    # *missing* bucket dir is worse than a broken one — Scoop's own manifest
+    # lookups (e.g. `scoop list` for a package from that bucket) throw an
+    # uncaught exception when the dir doesn't exist at all, which — unlike a
+    # merely-broken checkout — takes this script down. So on failure, restore
+    # the quarantined dir to get back to the (still broken, but not missing)
+    # starting state instead.
+    $bucketsRoot = "$env:USERPROFILE\scoop\buckets"
+    if (-not (Test-Path $bucketsRoot)) { return }
+
+    Get-ChildItem $bucketsRoot -Directory | ForEach-Object {
+        $bucket = $_.Name
+        $originalPath = $_.FullName
+        $gitDir = Join-Path $originalPath ".git"
+        $headFile = Join-Path $gitDir "HEAD"
+        # Two ways a bucket ends up unusable, both from the same interrupted
+        # clone: a .git that exists but has no HEAD yet, or a bucket directory
+        # with no .git at all. Checking only the first missed the second, even
+        # though a bucket that isn't a git repo is exactly what makes Scoop's
+        # self-update throw.
+        $brokenCheckout = (Test-Path $gitDir) -and -not (Test-Path $headFile)
+        $notARepo = -not (Test-Path $gitDir)
+        if ($brokenCheckout -or $notARepo) {
+            $why = if ($notARepo) { "no .git directory" } else { "incomplete .git checkout" }
+            Write-Step "Repairing broken bucket: $bucket ($why)"
+            # -NewName takes a NAME, not a path (a path only works because it
+            # happens to resolve to the same parent). Pass leaf names so the
+            # rename and the restore are unambiguous, and so the restore does
+            # not depend on $_.FullName still reporting the pre-rename path.
+            $quarantineName = "$bucket.broken.$(Get-Date -Format 'yyyyMMddHHmmss')"
+            $quarantinePath = Join-Path $bucketsRoot $quarantineName
+            Rename-Item -Path $originalPath -NewName $quarantineName
+            if (Invoke-Scoop bucket add $bucket) {
+                Write-Ok "$bucket bucket repaired"
+                Remove-Item $quarantinePath -Recurse -Force -ErrorAction SilentlyContinue
+            }
+            else {
+                Write-Fail "Could not repair $bucket bucket — restoring previous state (non-fatal, continuing)"
+                Rename-Item -Path $quarantinePath -NewName $bucket
+            }
+        }
+    }
+}
+
+function Test-ScoopPackageInstalled {
+    # Scoop's own internals (core.ps1) have been observed to throw an
+    # uncaught, terminating exception here rather than a catchable non-zero
+    # exit — e.g. `Get-ChildItem` erroring on a bucket path that doesn't
+    # exist. That exception would otherwise propagate through this in-process
+    # `scoop list` call and, with $ErrorActionPreference = "Stop" at script
+    # scope, abort the whole installer. Treat any such failure as "not
+    # installed" and let the normal install path retry it instead.
+    param([string]$Package)
+    try {
+        # -SimpleMatch: the package name is a literal, not a pattern. Without
+        # it, a name containing regex metacharacters (`+`, `.`, `[`) would be
+        # interpreted as a pattern — `notepad++` is the obvious one, and `.`
+        # silently matches any character, which can report a different package
+        # as this one.
+        $result = scoop list $Package 2>$null | Select-String -SimpleMatch -Pattern $Package
+        return [bool]$result
+    }
+    catch {
+        Write-Fail "Could not check install state for $Package ($($_.Exception.Message)) — will attempt install"
+        return $false
+    }
+}
+
 function Install-Scoop {
     if (Get-Command scoop -ErrorAction SilentlyContinue) {
         Write-Ok "Scoop already installed"
@@ -173,26 +300,34 @@ function Install-Scoop {
 function Install-ScoopPackages {
     Write-Section "Installing Scoop Packages"
 
-    # Add required buckets
+    # Fix any bucket left over from a previous interrupted run before we do
+    # anything else that could trigger Scoop's self-update against it.
+    Repair-ScoopBuckets
+
+    # Add required buckets. Checked via the bucket dir on disk rather than
+    # parsing `scoop bucket list`'s table output — that table never matched
+    # the "^$bucket\s" pattern here (rendering/column quirks), so this used
+    # to silently re-attempt adding already-present buckets every run.
     $buckets = @("extras", "nerd-fonts", "versions")
     foreach ($bucket in $buckets) {
-        $existing = scoop bucket list 2>$null | Select-String -Pattern "^$bucket\s"
-        if (-not $existing) {
+        $bucketDir = "$env:USERPROFILE\scoop\buckets\$bucket"
+        if (-not (Test-Path $bucketDir)) {
             Write-Step "Adding bucket: $bucket"
-            scoop bucket add $bucket 2>$null
+            if (-not (Invoke-Scoop bucket add $bucket)) {
+                Write-Fail "Failed to add bucket: $bucket (non-fatal, continuing)"
+            }
         }
     }
 
     # Install main packages
     foreach ($pkg in $SCOOP_PACKAGES) {
-        $installed = scoop list $pkg 2>$null | Select-String -Pattern $pkg
+        $installed = Test-ScoopPackageInstalled -Package $pkg
         if ($installed) {
             Write-Ok "$pkg (already installed)"
         }
         else {
             Write-Step "Installing $pkg..."
-            scoop install $pkg 2>$null
-            if ($LASTEXITCODE -eq 0) {
+            if (Invoke-Scoop install $pkg) {
                 Write-Ok "$pkg installed"
             }
             else {
@@ -204,18 +339,17 @@ function Install-ScoopPackages {
     # Install bucket-specific packages (fonts, etc.)
     foreach ($bucket in $SCOOP_BUCKET_PACKAGES.Keys) {
         foreach ($pkg in $SCOOP_BUCKET_PACKAGES[$bucket]) {
-            $installed = scoop list $pkg 2>$null | Select-String -Pattern $pkg
+            $installed = Test-ScoopPackageInstalled -Package $pkg
             if ($installed) {
                 Write-Ok "$pkg (already installed)"
             }
             else {
                 Write-Step "Installing $pkg from $bucket..."
-                scoop install $pkg 2>$null
-                if ($LASTEXITCODE -eq 0) {
+                if (Invoke-Scoop install $pkg) {
                     Write-Ok "$pkg installed"
                 }
                 else {
-                    Write-Fail "$pkg failed (non-fatal)"
+                    Write-Fail "$pkg failed (non-fatal) — it may be locked by another process (e.g. a font already loaded); close other apps and retry with: scoop install $pkg"
                 }
             }
         }
@@ -262,27 +396,38 @@ function New-DotfileSymlink {
         }
         else {
             Write-Fail "Target exists (use -Force to overwrite): $Target"
-            return
+            return $false
         }
     }
 
     New-Item -ItemType SymbolicLink -Path $Target -Target $sourcePath -Force | Out-Null
     Write-Ok "$Source → $Target"
+    return $true
 }
 
 function Install-Symlinks {
     Write-Section "Creating Symlinks"
 
+    $blocked = 0
+
     foreach ($entry in $SYMLINK_MAP.GetEnumerator()) {
-        New-DotfileSymlink -Source $entry.Key -Target $entry.Value
+        if (-not (New-DotfileSymlink -Source $entry.Key -Target $entry.Value)) { $blocked++ }
     }
 
     # Also link profile for Windows PowerShell 5.1
-    New-DotfileSymlink `
-        -Source "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" `
-        -Target "$env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+    if (-not (New-DotfileSymlink `
+                -Source "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" `
+                -Target "$env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1")) { $blocked++ }
 
-    Write-Ok "All symlinks created"
+    if ($blocked -gt 0) {
+        Write-Host ""
+        Write-Host "  $blocked symlink(s) skipped because a real file/directory is already there." -ForegroundColor Yellow
+        Write-Host "  Re-run with -Force to back up (as <target>.backup.<timestamp>) and replace them:" -ForegroundColor Yellow
+        Write-Host "    .\install.ps1 -Force" -ForegroundColor Yellow
+    }
+    else {
+        Write-Ok "All symlinks created"
+    }
 }
 
 # ==============================================================================
