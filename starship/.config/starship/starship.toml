@@ -21,21 +21,31 @@
 command_timeout = 300
 add_newline = true
 
-# Explicit module order (dir → commit hash → status → branch → langs → duration)
-# wrapped in `(dimmed white)` so the whole line is muted by default and each
-# module's own style provides the accents - mirroring the reference look:
-#   dotfiles (a1b2c3d) ! on  branch  took 1.2s
+# Explicit module order (dir → commit hash → branch → duration) wrapped in
+# `(dimmed white)` so the whole line is muted by default and each module's own
+# style provides the accents:
+#   dotfiles (a1b2c3d) on  branch  took 1.2s
+#
+# DELIBERATELY MINIMAL — every module here is either a plain env/file read or a
+# single git ref read. No language/tool modules ($nodejs, $rust, $golang, …):
+# starship collects a module's version eagerly as soon as the module is in this
+# format string — it is NOT lazy about it, so each triggered module spawns its
+# binary (`node --version`, `rustc --version`, …) on EVERY render. That is
+# ~10-30ms each on macOS and far worse on Windows ARM, where Scoop installs x64
+# builds that run under Prism emulation. The directory name already tells you
+# what kind of project you're in, so the icons were pure cost.
+# To bring one back, add it here and re-add its `[module]` block below.
 format = """
-[$directory$git_commit$git_status$git_branch$nodejs$lua$rust$ruby$golang$package$docker_context$nix_shell$cmd_duration](dimmed white)
+[$directory$git_commit$git_branch$cmd_duration](dimmed white)
 $character"""
 
 # Active Python environment shown on the RIGHT edge of the prompt line instead
-# of stacked below it. Covers both conda envs ($conda) and uv / `python -m venv`
-# virtualenvs (custom.venv). NOTE: conda also needs telling to stop prepending
-# its own "(env)" to $PS1 (that was the "(cclibs)" repeating on every Enter) —
-# run this once, it's a global conda setting, not a repo file:
+# of stacked below it. Both entries are pure environment-variable reads — no
+# subprocess. NOTE: conda also needs telling to stop prepending its own "(env)"
+# to $PS1 (that was the "(cclibs)" repeating on every Enter) — run this once,
+# it's a global conda setting, not a repo file:
 #   conda config --set changeps1 false
-right_format = """$conda${custom.venv}"""
+right_format = """$conda${env_var.venv}"""
 
 [directory]
 style = "bold italic white"
@@ -97,45 +107,30 @@ symbol = " "
 style = "dimmed green"
 ignore_base = true
 
-[custom.venv]
-# uv / `python -m venv` set $VIRTUAL_ENV; show its basename only when one is
-# active (any directory). Cheap single check per render; nothing shows when no
-# venv is active, so the right side stays empty unless there's something to say.
-description = "Active non-conda Python virtualenv"
-when = 'test -n "$VIRTUAL_ENV"'
-command = 'basename "$VIRTUAL_ENV"'
-format = "[ $output]($style)"
+[env_var.venv]
+# uv / `python -m venv` set $VIRTUAL_ENV. This is a plain env-var read — the
+# previous [custom.venv] ran `test -n "$VIRTUAL_ENV"` and then `basename` via
+# a shell on EVERY render, in every directory, which on Windows means spawning
+# sh.exe twice per prompt (emulated x64 on ARM). A fixed "venv" marker costs
+# nothing and says the same thing: the basename is almost always ".venv"
+# anyway, and $directory already shows which project it belongs to.
+variable = "VIRTUAL_ENV"
+format = "[ venv]($style)"
 style = "dimmed green"
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Language / tool markers (Nerd Font glyphs, subtle accent colors)
+# Language / tool markers — intentionally NOT configured
 # ──────────────────────────────────────────────────────────────────────────────
-[lua]
-symbol = "󰢱 "
-
-[ruby]
-symbol = " "
-
-[nodejs]
-symbol = "󰎙 "
-format = "via [$symbol](green)"
-
-[rust]
-symbol = "󱘗 "
-format = "via [$symbol](red)"
-
-[package]
-symbol = "󰏗 "
-format = "is [$symbol](208)$version "
-
-[docker_context]
-symbol = "󰡨 "
-format = "via [$symbol](blue)"
-
-[nix_shell]
-symbol = " "
-format = "via [$symbol](cyan)( $name )"
-
-[aws]
-symbol = "󰸏 "
-format = "on [$symbol](yellow)($profile)"
+# The [lua] [ruby] [nodejs] [rust] [package] [docker_context] [nix_shell] [aws]
+# blocks were removed along with their entries in `format` above. Starship only
+# evaluates modules that appear in `format`, so leaving the blocks here would be
+# dead config — and putting any of them back in `format` re-introduces a
+# per-render subprocess (see the note on `format` at the top of this file).
+#
+# If you want one back, e.g. Node:
+#   1. add $nodejs to `format`
+#   2. add:  [nodejs]
+#            symbol = "󰎙 "
+#            format = "via [$symbol](green)"
+# Prefer doing that only on machines where the spawn cost is acceptable — not
+# on Windows ARM, where every binary Scoop installs is emulated x64.

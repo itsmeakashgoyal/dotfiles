@@ -25,19 +25,22 @@ Then open a new terminal — env vars set this way don't reach already-running p
 
 | Variable | Values | What it does |
 | --- | --- | --- |
-| `DOTFILES_PROMPT` | `native` | Use a zero-subprocess native PowerShell prompt instead of starship. See [Native prompt](#native-prompt-dotfiles_promptnative). |
+| `DOTFILES_PROMPT` | `starship` | Opt **into** starship. The zero-subprocess native prompt is the default on PowerShell — see [Native prompt](#native-prompt-the-default). |
 | `DOTFILES_MISE_ACTIVATE` | `1` | Turn on mise's automatic per-directory Python/Node/etc. version switching (off by default — costs ~200ms at shell startup). See [docs/PYTHON.md](PYTHON.md). |
 | `DOTFILES_PROFILE_DEBUG` | `1` | Print how long each `profile.d/*.ps1` file (and some of their sub-sections) took to load, to `Measure-Command`-out startup slowness instead of guessing. |
 
-### Native prompt (`DOTFILES_PROMPT=native`)
+### Native prompt (the default)
 
-Starship (the default, shared with zsh on macOS/Linux via `starship.toml`) spawns a
-fresh `starship.exe` process on every single prompt render. On a machine with
+**This is the default prompt on PowerShell.** Starship — still the default for zsh on
+macOS/Linux via the shared `starship.toml` — spawns a fresh `starship.exe` process on
+every single prompt render. On a machine with
 real-time EDR/AV scanning every new process, that's not the "a few ms" cost starship
 advertises — measured on this setup: **~130ms with no git repo involved at all**, up
 to **~650ms** in a large repo, before any fsmonitor/timeout tuning (see
 [Prompt is slow / laggy](#prompt-is-slow--laggy-large-repos) below for the git-specific
-half of that).
+half of that). It is worse again on **Windows ARM**: Scoop ships no ARM64 manifests, so
+`starship.exe` is an x64 build running under Prism emulation, and so is every binary a
+language module would spawn.
 
 `powershell/Documents/PowerShell/profile.d/22-native-prompt.ps1` is an alternative
 `function prompt {}` that reads git state directly from `.git`'s own files (`HEAD`,
@@ -53,8 +56,20 @@ Trade-offs versus starship, by design:
   reimplementing git's own status algorithm from scratch.
 - No per-language icons (nodejs/rust/lua/...) — those need marker-file scans that add
   cost for a purely cosmetic win.
-- Windows-only. starship stays the cross-platform default (shared `starship.toml` with
-  zsh on macOS/Linux) — this is an opt-in alternative, not a replacement.
+- PowerShell-only. starship stays the default for zsh on macOS/Linux via the shared
+  `starship.toml`, which is now trimmed to the same minimal module set this prompt
+  renders — so both platforms show the same thing, one with a subprocess and one
+  without.
+
+To go back to starship on PowerShell (e.g. a fast x64 box where you want its extra
+modules):
+
+```powershell
+[Environment]::SetEnvironmentVariable('DOTFILES_PROMPT', 'starship', 'User')
+```
+
+If starship isn't installed, that falls back to this prompt rather than leaving you
+with the bare `PS C:\>` default.
 
 ### mise activation (`DOTFILES_MISE_ACTIVATE=1`)
 

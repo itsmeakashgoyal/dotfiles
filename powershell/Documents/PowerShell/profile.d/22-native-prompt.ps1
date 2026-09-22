@@ -4,27 +4,32 @@
 # ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/22-native-prompt.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Opt-in, zero-subprocess alternative to the starship prompt set up in
-# 20-tools.ps1. Every external-binary prompt (starship, oh-my-posh, ...)
-# pays a per-render process-spawn cost that's ~80-650ms on this kind of
-# managed Windows machine (confirmed by direct measurement — see the git
-# fsmonitor/command_timeout work in starship.toml and git/.config/git/config
-# for the investigation). This reads git state straight out of the .git
-# directory's own files instead of shelling out to git.exe, so a render
+# THE DEFAULT PROMPT on PowerShell — a zero-subprocess prompt that renders the
+# same layout starship.toml now produces. Every external-binary prompt
+# (starship, oh-my-posh, ...) pays a per-render process-spawn cost that's
+# ~80-650ms on this kind of managed Windows machine (confirmed by direct
+# measurement — see the git fsmonitor/command_timeout work in starship.toml and
+# git/.config/git/config for the investigation), and it is worse again on
+# Windows ARM, where Scoop has no ARM64 manifests so starship.exe is an x64
+# build running under Prism emulation. This reads git state straight out of the
+# .git directory's own files instead of shelling out to git.exe, so a render
 # costs low-single-digit ms with no subprocess at all.
 #
-# Feature parity is deliberately narrower than starship: directory, branch
-# name / short commit hash, `took Xs` for slow commands, vi-mode indicator,
-# exit-status coloring. No staged/modified/ahead-behind indicator or
-# language icons — the former is exactly what we already disabled in
-# starship.toml for being too slow to compute without shelling out, so
-# reintroducing it here without git.exe would mean re-implementing git's
-# own status algorithm from scratch; the latter needs per-language marker
-# file scans that add cost for a purely cosmetic win.
+# Feature parity is deliberately narrow, and now matches starship.toml's own
+# minimal format: directory, branch name / short commit hash, `took Xs` for slow
+# commands, vi-mode indicator, exit-status coloring. No staged/modified/
+# ahead-behind indicator or language icons — both were removed from starship.toml
+# for the same reason (a working-tree scan and a per-language binary spawn
+# respectively), so the two prompts show the same thing.
 #
-# Enable with (falls back to starship — set up in 20-tools.ps1 — otherwise):
-#   [Environment]::SetEnvironmentVariable('DOTFILES_PROMPT', 'native', 'User')
-if ($env:DOTFILES_PROMPT -ne 'native') { return }
+# Opt back into starship (e.g. on a fast x64 machine where you want its extra
+# modules) with:
+#   [Environment]::SetEnvironmentVariable('DOTFILES_PROMPT', 'starship', 'User')
+# Anything else — unset, or 'native' — uses this prompt. The `_cmd starship`
+# check matters: without it, asking for starship on a machine where it isn't
+# installed would return here AND be skipped in 20-tools.ps1, leaving the bare
+# default `PS C:\>` prompt. Fall through to this prompt instead.
+if (($env:DOTFILES_PROMPT -eq 'starship') -and (_cmd starship)) { return }
 
 # ==============================================================================
 # Git state, read from .git's own files — no `git` subprocess

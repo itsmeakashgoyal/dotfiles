@@ -147,10 +147,14 @@ if ($env:DOTFILES_MISE_ACTIVATE -and (_cmd mise)) {
 }
 
 # ==============================================================================
-# Starship (default prompt — same starship.toml as zsh, replaces Powerlevel10k
-# which could never run on PowerShell in the first place)
+# Starship (opt-in — 22-native-prompt.ps1 is the default prompt)
 # ==============================================================================
-if (_cmd starship) {
+# Skipped unless DOTFILES_PROMPT=starship, because 22-native-prompt.ps1 would
+# overwrite $function:prompt a moment later anyway — initialising starship here
+# would pay for a prompt nothing renders. Skipping also avoids dot-sourcing the
+# cached init and, on a cache miss, a starship.exe spawn (emulated x64 on
+# Windows ARM) at every shell start.
+if (($env:DOTFILES_PROMPT -eq 'starship') -and (_cmd starship)) {
     $env:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
     if ($__dbg) { $__sw.Restart() }
     Import-CachedInit -Name starship -Bin starship -Init { starship init powershell }
