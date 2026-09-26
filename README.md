@@ -142,8 +142,8 @@ cd ~\dotfiles
 | Step | What happens |
 | --- | --- |
 | **Scoop** | Package manager bootstrapped if missing |
-| **CLI tools** | ripgrep, fzf, bat, eza, fd, zoxide, neovim, lazygit, delta, … |
-| **PS modules** | `PSReadLine` (Vi mode), `PSFzf` (fzf integration), `Terminal-Icons` |
+| **CLI tools** | ripgrep, television, atuin, bat, eza, fd, zoxide, neovim, lazygit, delta, … |
+| **PS modules** | `PSReadLine`, `Terminal-Icons` |
 | **Symlinks** | PowerShell profile, nvim, git, tmux, television, atuin, fastfetch |
 | **Neovim** | Config linked; lazy.nvim bootstraps on first `nvim` launch |
 
@@ -155,9 +155,10 @@ cd ~\dotfiles
 
 | Shortcut / Alias | What it does |
 | --- | --- |
-| `Ctrl+T` | fzf file picker |
-| `Ctrl+R` | fzf history search |
-| `Alt+C` | fzf cd into directory |
+| `Ctrl+T` | television (tv) smart autocomplete — context-aware: files/dirs/branches |
+| `Ctrl+R` | atuin history search |
+| `Alt+C` | tv cd into directory |
+| `Tab` | after a space: tv smart autocomplete; mid-word: native completion |
 | `ls` / `ll` / `la` / `lt` | eza with icons and git status |
 | `cat` | bat with syntax highlighting |
 | `grep` | ripgrep (`rg`) |
@@ -167,9 +168,10 @@ cd ~\dotfiles
 | `rmdir <dir>` | remove directory (with `-p` for empty parents) |
 | `touch` / `mkcd` | create file / mkdir + cd |
 | `gs` / `gc` / `gp` / `glog` | git shortcuts |
-| `glf` | interactive git log with fzf |
-| `rgf` | ripgrep → fzf → open in editor |
-| `jk` / `kj` | exit Vi insert mode (mirrors zsh config) |
+| `gco` / `gcr` / `gbd` | fuzzy checkout local/remote branch, fuzzy delete (plain args still work) |
+| `gpr` / `gct` | fuzzy checkout PR (`gh`) / tag |
+| `logg` | interactive git log with tv, opens selected commit in nvim |
+| `rgf` | ripgrep → tv → open in editor |
 
 </details>
 

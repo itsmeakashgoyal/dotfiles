@@ -98,11 +98,11 @@ done — it's meant for diagnosing a specific slowdown, not left on permanently.
 
 ## Troubleshooting
 
-### Prompt / starship / fzf keybindings don't load at all
+### Prompt / starship / tv / atuin keybindings don't load at all
 
 **Symptom**: the installer reports symlinks created successfully and a health-check
 score, but a new terminal shows the plain default `PS C:\...>` prompt — no starship,
-no `Ctrl+R` fzf history.
+no `Ctrl+R` atuin history.
 
 **Cause**: on a machine where OneDrive's Known Folder Move redirects `Documents`
 (common on corporate-managed machines — `%USERPROFILE%\OneDrive - <Tenant>\Documents`
@@ -168,15 +168,25 @@ What's already been found and fixed on this setup, roughly in order of impact:
   to configure.
 - **`mise activate`** (~200ms) — see [mise activation](#mise-activation-dotfiles_mise_activate1)
   above; off by default now.
-- **`starship init` / `zoxide init`** (~130-650ms each, repo-size / spawn-cost
-  dependent) — now **cached**: `Import-CachedInit` in `20-tools.ps1` runs the tool
-  once, writes the generated init to `%LOCALAPPDATA%\dotfiles\psinit`, and
-  dot-sources that on every later start (regenerating only when the tool binary
-  changes). The subprocess spawn — the expensive part on Windows — happens only
-  on a cache miss. For starship specifically you can also drop the prompt
-  subprocess entirely with [the native prompt option](#native-prompt-the-default).
-- **`PSFzf` import** (~430ms) — real functionality (`Ctrl+T`/`Ctrl+R` fzf
-  bindings); no free win available there.
+- **`starship init` / `zoxide init` / `tv init` / `atuin init`** (~130-650ms
+  each, repo-size / spawn-cost dependent) — now **cached**: `Import-CachedInit`
+  (defined once in the main profile, used by `10-television.ps1`,
+  `11-atuin.ps1`, and `20-tools.ps1`) runs the tool once, writes the generated
+  init to `%LOCALAPPDATA%\dotfiles\psinit`, and dot-sources that on every later
+  start (regenerating only when the tool binary changes). The subprocess spawn
+  — the expensive part on Windows — happens only on a cache miss. For starship
+  specifically you can also drop the prompt subprocess entirely with
+  [the native prompt option](#native-prompt-the-default).
+
+  **If you add a new `Import-CachedInit` call site**: dot-source the call
+  itself — `. Import-CachedInit -Name ... -Bin ... -Init {...}`, not
+  `Import-CachedInit -Name ...`. It's a plain function, so calling it normally
+  traps whatever the cached script defines (functions, `Set-PSReadLineKeyHandler`
+  targets referenced by name, etc.) inside `Import-CachedInit`'s own
+  function-call scope — gone the instant it returns. This was a real,
+  previously-undiscovered bug in the zoxide/starship call sites themselves,
+  found and fixed directly (confirmed `z`/`Invoke-TvSmartAutocomplete` etc. did
+  not survive without the fix, did with it).
 
 ### Prompt is slow / laggy (large repos)
 

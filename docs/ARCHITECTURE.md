@@ -234,13 +234,13 @@ scripts/setup/windows.ps1
      ├── New-DotfileSymlink          ← hand-rolled symlink function per
      │                                  entry in $SYMLINK_MAP (cross-referenced
      │                                  against STOW_PACKAGES, kept in sync by hand)
-     ├── PowerShell modules (PSReadLine, PSFzf, Terminal-Icons)
+     ├── PowerShell modules (PSReadLine, Terminal-Icons)
      ├── Neovim GUI config (ginit.vim for nvim-qt/Neovide)
      └── Test-Installation           ← health check; exits non-zero under
                                         $env:CI when incomplete
 ```
 
-`powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1` mirrors the zsh conf.d functionality (aliases, PSReadLine Vi-mode, fzf bindings) for native PowerShell use. The recommended daily-driver path for the actual dev shell (nvim/tmux/zsh/git/television/atuin/fastfetch/bin scripts) is **WSL2** — all 8 Stow packages work there completely unmodified, since WSL2 is just Ubuntu from Stow's point of view.
+`powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1` mirrors the zsh conf.d functionality (aliases, television/atuin fuzzy-finder bindings) for native PowerShell use — television replaces fzf entirely and atuin provides history search, the same split as `zsh/.config/zsh/conf.d/09-television.zsh`/`10-atuin.zsh`. The recommended daily-driver path for the actual dev shell (nvim/tmux/zsh/git/television/atuin/fastfetch/bin scripts) is **WSL2** — all 8 Stow packages work there completely unmodified, since WSL2 is just Ubuntu from Stow's point of view.
 
 See [docs/WINDOWS.md](WINDOWS.md) for the config toggles this profile exposes (an opt-in zero-subprocess native prompt, deferred mise activation, startup profiling) and for troubleshooting steps found while hardening this path (OneDrive-redirected `$PROFILE`, `powershell` vs `pwsh` encoding issues, large-repo git/starship performance).
 

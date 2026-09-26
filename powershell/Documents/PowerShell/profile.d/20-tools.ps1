@@ -9,30 +9,8 @@
 $__dbg = [bool]$env:DOTFILES_PROFILE_DEBUG
 $__sw = if ($__dbg) { [System.Diagnostics.Stopwatch]::StartNew() }
 
-# ------------------------------------------------------------------------------
-# Cached tool initialization
-# ------------------------------------------------------------------------------
-# `tool init powershell | iex` spawns the tool on every prompt start — the
-# expensive part on Windows (per-process spawn + EDR/AV overhead). Cache the
-# generated init to a file and dot-source that instead, regenerating only when
-# the tool binary changes. Get-Command / Get-Item are in-process; the spawn only
-# happens on a cache miss. Mirrors cached_init in zsh's 01-exports.zsh.
-function Import-CachedInit {
-    param([string]$Name, [string]$Bin, [scriptblock]$Init)
-    $cmd = Get-Command $Bin -ErrorAction SilentlyContinue
-    if (-not $cmd) { return }
-    $dir = Join-Path $env:LOCALAPPDATA "dotfiles\psinit"
-    $cache = Join-Path $dir "$Name.ps1"
-    $keyFile = Join-Path $dir "$Name.key"
-    $key = "{0}:{1}" -f $cmd.Source, (Get-Item $cmd.Source).LastWriteTimeUtc.Ticks
-    if ((-not (Test-Path $cache)) -or (-not (Test-Path $keyFile)) -or
-        ((Get-Content $keyFile -Raw -ErrorAction SilentlyContinue).Trim() -ne $key)) {
-        New-Item -ItemType Directory -Force -Path $dir | Out-Null
-        (& $Init | Out-String) | Set-Content -Path $cache -Encoding UTF8
-        Set-Content -Path $keyFile -Value $key -Encoding UTF8
-    }
-    . $cache
-}
+# Import-CachedInit lives in the main profile now (Microsoft.PowerShell_profile.ps1)
+# — 10-television.ps1/11-atuin.ps1 need it too and load before this file does.
 
 # ==============================================================================
 # ripgrep
@@ -60,13 +38,18 @@ if (_cmd rg) {
         rg @Args
     }
 
-    # Interactive ripgrep → fzf (live search, opens result in $EDITOR)
+    # Interactive ripgrep → television (live search, opens result in $EDITOR).
+    # tv reads stdin as its source when invoked with no channel — confirmed
+    # directly, same usage pattern as fzf's own piping (06-git.zsh's
+    # `... | tv | ...` functions rely on the same thing). No preview pane
+    # here: tv's ad-hoc --preview-command field-splitting/shell-execution
+    # behavior isn't something I could safely verify without risking a hung
+    # interactive session — the field split for jumping to file:line below
+    # is plain PowerShell, unrelated to tv's own templating.
     function rgf {
         param([string]$Query = '')
-        if (-not (_cmd fzf)) { Write-Warning 'fzf not found'; return }
-        $result = rg --line-number --no-heading --color=always --smart-case $Query |
-            fzf --ansi --delimiter=':' --preview 'bat --style=numbers --color=always --highlight-line {2} {1}' `
-                --preview-window 'right:60%:+{2}+3/3'
+        if (-not (_cmd tv)) { Write-Warning 'television (tv) not found'; return }
+        $result = rg --line-number --no-heading --color=always --smart-case $Query | tv --ansi
         if ($result) {
             $parts = $result -split ':', 3
             & ${env:EDITOR:-nvim} "+$($parts[1])" $parts[0]
@@ -114,7 +97,14 @@ if (_cmd bat) {
 # ==============================================================================
 if (_cmd zoxide) {
     if ($__dbg) { $__sw.Restart() }
-    Import-CachedInit -Name zoxide -Bin zoxide -Init { zoxide init powershell }
+    # `.` (dot-source) the call itself, not just what it dot-sources
+    # internally — Import-CachedInit is a plain function, so calling it
+    # normally traps zoxide's `z` function inside Import-CachedInit's own
+    # function-call scope, gone the instant it returns (confirmed directly:
+    # this is the exact bug already fixed elsewhere in this profile for the
+    # mise/starship timing wrapper). Dot-sourcing the call runs it in this
+    # file's scope instead.
+    . Import-CachedInit -Name zoxide -Bin zoxide -Init { zoxide init powershell }
     if ($__dbg) { Write-Host ("    - {0,6:N0}ms zoxide init" -f $__sw.Elapsed.TotalMilliseconds) -ForegroundColor DarkMagenta }
 }
 
@@ -157,7 +147,7 @@ if ($env:DOTFILES_MISE_ACTIVATE -and (_cmd mise)) {
 if (($env:DOTFILES_PROMPT -eq 'starship') -and (_cmd starship)) {
     $env:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
     if ($__dbg) { $__sw.Restart() }
-    Import-CachedInit -Name starship -Bin starship -Init { starship init powershell }
+    . Import-CachedInit -Name starship -Bin starship -Init { starship init powershell }
     if ($__dbg) { Write-Host ("    - {0,6:N0}ms starship init" -f $__sw.Elapsed.TotalMilliseconds) -ForegroundColor DarkMagenta }
 }
 

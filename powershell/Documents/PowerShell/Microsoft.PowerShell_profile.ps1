@@ -5,7 +5,7 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # PowerShell profile — Linux/macOS feel on Windows
-# Tools: ripgrep · fzf (PSFzf) · bat · eza · zoxide · mise · uv · starship · PSReadLine
+# Tools: ripgrep · television (tv) · atuin · bat · eza · zoxide · mise · uv · starship · PSReadLine
 #
 # This profile is intentionally thin: it resolves its own location (it's a
 # symlink into the dotfiles repo, created by scripts/setup/windows.ps1) and
@@ -13,11 +13,35 @@
 # conf.d/*.zsh. Add or edit a section by dropping a NN-name.ps1 in profile.d/.
 #
 # Install prerequisites once:
-#   scoop install ripgrep fzf bat eza zoxide fd mise starship uv
-#   Install-Module PSFzf, PSReadLine, Terminal-Icons -Scope CurrentUser
+#   scoop install ripgrep television atuin bat eza zoxide fd mise starship uv
+#   Install-Module PSReadLine, Terminal-Icons -Scope CurrentUser
 
-# Shared helper used across every section file below.
+# Shared helpers used across every section file below.
 function _cmd { param($Name) [bool](Get-Command $Name -ErrorAction SilentlyContinue) }
+
+# `<tool> init <shell>` spawns the tool on every prompt/shell start — the
+# expensive part on Windows (per-process spawn + EDR/AV overhead). Cache the
+# generated init to a file and dot-source that instead, regenerating only
+# when the tool binary changes. Get-Command/Get-Item are in-process; the
+# spawn only happens on a cache miss. Mirrors cached_init in zsh's
+# 01-exports.zsh. Lives here (not in a later-loading profile.d file) because
+# 10-television.ps1/11-atuin.ps1 need it and load before 20-tools.ps1 does.
+function Import-CachedInit {
+    param([string]$Name, [string]$Bin, [scriptblock]$Init)
+    $cmd = Get-Command $Bin -ErrorAction SilentlyContinue
+    if (-not $cmd) { return }
+    $dir = Join-Path $env:LOCALAPPDATA "dotfiles\psinit"
+    $cache = Join-Path $dir "$Name.ps1"
+    $keyFile = Join-Path $dir "$Name.key"
+    $key = "{0}:{1}" -f $cmd.Source, (Get-Item $cmd.Source).LastWriteTimeUtc.Ticks
+    if ((-not (Test-Path $cache)) -or (-not (Test-Path $keyFile)) -or
+        ((Get-Content $keyFile -Raw -ErrorAction SilentlyContinue).Trim() -ne $key)) {
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        (& $Init | Out-String) | Set-Content -Path $cache -Encoding UTF8
+        Set-Content -Path $keyFile -Value $key -Encoding UTF8
+    }
+    . $cache
+}
 
 # Resolve this profile's real directory. $PROFILE is the symlink in $HOME; its
 # .Target points back into the repo (absolute path), so profile.d/ is found in

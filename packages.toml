@@ -500,13 +500,6 @@ verify   = "python"
 check    = "none"
 
 [[package]]
-name     = "fzf"
-desc     = "Fuzzy finder (PSReadLine/PSFzf integration on Windows)"
-category = "Windows Only"
-scoop    = "fzf"
-check    = "none"
-
-[[package]]
 name     = "tree-sitter"
 desc     = "Neovim treesitter CLI dependency"
 category = "Windows Only"

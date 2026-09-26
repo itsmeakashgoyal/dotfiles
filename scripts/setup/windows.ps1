@@ -114,7 +114,6 @@ $SCOOP_PACKAGES = @(
     "make"        # Build tool
     "nodejs"      # Node.js runtime (Neovim providers, LSP servers)
     "python"      # Python 3 (required by the dutils CLI)
-    "fzf"         # Fuzzy finder (PSReadLine/PSFzf integration on Windows)
     "tree-sitter" # Neovim treesitter CLI dependency
     # END GENERATED: scoop
 )
@@ -644,7 +643,7 @@ function Test-Installation {
 function Install-PsModules {
     Write-Section "PowerShell Modules"
 
-    $modules = @("PSReadLine", "PSFzf", "Terminal-Icons")
+    $modules = @("PSReadLine", "Terminal-Icons")
     foreach ($mod in $modules) {
         if (Get-Module -ListAvailable $mod -ErrorAction SilentlyContinue) {
             Write-Ok "$mod (already installed)"
