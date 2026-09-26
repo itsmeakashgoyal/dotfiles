@@ -33,6 +33,11 @@ the menu automatically. Destructive or long-running commands (`cleanup`,
 `update`, `sync`, `init`, `ssh-setup`, `secrets`, `zcompile`) always confirm
 before running, even with `--no-confirm`.
 
+**Not available on Windows**: `tv`'s interactive picker corrupts the terminal
+there (confirmed directly — Tab/arrow-key selection stops responding and the
+terminal is left broken after it closes), so `menu` exits immediately on
+Windows with a pointer to `dutils --help` instead. See `docs/WINDOWS.md`.
+
 ### `manifest` — regenerate package lists from `packages.toml`
 
 ```bash

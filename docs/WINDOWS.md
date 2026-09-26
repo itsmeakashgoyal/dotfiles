@@ -108,21 +108,21 @@ as a bare command exactly like on macOS/Linux — no more typing
 `python scripts\dutils\dutils <command>`. Open a new terminal after running/re-running
 `windows.ps1` to pick up the `PATH` change.
 
-`dutils --help` and `dutils menu` both filter to commands tagged for the platform
-they're running on by default — on Windows you won't see `vulns`/`install-nvim`/`diff`
-etc. cluttering the list. Pass `--all` (`dutils --help --all`, `dutils menu --all`) to
-see every command grouped by platform (Cross-platform / macOS + Linux / macOS only /
-Linux only) instead.
+`dutils --help` filters to commands tagged for the platform it's running on by
+default — on Windows you won't see `vulns`/`install-nvim`/`diff`/`menu` etc. cluttering
+the list. Pass `--all` (`dutils --help --all`) to see every command grouped by platform
+(Cross-platform / macOS + Linux / macOS only / Linux only) instead.
 
-`dutils menu`'s fuzzy-picker itself (fed via `tv` reading plain stdin) works reliably
-on Windows, but the preview pane (each command's own `--help` text) is skipped there —
-`tv` runs preview commands through `television/.config/television/config.toml`'s
-`shell` setting (`zsh`), which doesn't exist on Windows, and there's no safe way to
-verify a Windows-specific workaround without a live interactive `tv` session. The
-picker still works fully; you just won't see the preview pane on Windows specifically.
+`dutils menu` is **not available on Windows** — confirmed directly, not assumed. Its
+interactive `tv` picker corrupts the terminal there (Tab/arrow-key selection stops
+responding, and the terminal is left broken after the picker closes); this looks like
+`tv` needing raw console/keyboard access while stdin is simultaneously fed piped entries
+via `subprocess`, which Windows' console handling doesn't separate the way a Unix tty
+does. Rather than ship a half-working picker, `dutils menu` exits immediately on
+Windows with a message pointing at `dutils --help` / `dutils <command> --help` instead.
 
 **What works on Windows**: `health`, `check`, `diagnose`, `sysinfo`, `packages`,
-`manifest`, `theme`, `secrets`, `ssh-setup`, `detect-os`, `menu`, `init`, `update`, `new`,
+`manifest`, `theme`, `secrets`, `ssh-setup`, `detect-os`, `init`, `update`, `new`,
 `sync`, `edit`, `bench`, `profile` — all confirmed directly, not assumed.
 
 **What's intentionally not available on native Windows** (needs WSL2 or Git Bash
@@ -130,6 +130,7 @@ instead — this repo's own stated daily-driver path for POSIX-shell tooling): `
 `debug`, `ytd`. These fail with a clear message pointing at WSL2 rather than a raw
 Python traceback. `zcompile` (zsh-only) and `vulns`/`install-nvim`/`macos-defaults`
 (genuinely platform-specific) correctly no-op or error on Windows by design — not bugs.
+`menu` is unavailable on Windows for the terminal-corruption reason above.
 
 `bench`/`profile` use hyperfine + `pwsh -NoLogo -Command exit` / the
 `DOTFILES_PROFILE_DEBUG` timing already built into the PowerShell profile (see above) —

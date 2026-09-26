@@ -298,7 +298,7 @@ ALL_PLATFORMS = ("macos", "linux", "windows")
 
 COMMANDS: dict[str, tuple] = {
     # name              (function,          description,                                                platforms)
-    "menu":           (cmd_menu,           "Interactive picker for every dutils command",                 ALL_PLATFORMS),
+    "menu":           (cmd_menu,           "Interactive picker for every dutils command",                 ("macos", "linux")),
     "init":           (cmd_init,           "First-run setup wizard for a new machine",                    ALL_PLATFORMS),
     "update":         (cmd_update,         "Update Homebrew/Nix/mise/zinit/Neovim packages",               ALL_PLATFORMS),
     "sync":           (cmd_sync,           "Pull latest dotfiles, re-stow, and update",                    ALL_PLATFORMS),

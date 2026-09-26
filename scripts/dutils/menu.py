@@ -65,32 +65,19 @@ def _current_platform() -> str:
 
 
 def pick_with_tv(entries: list[str]) -> str:
-    """Fuzzy-pick through television, previewing each command's own --help
-    where that can be done reliably.
+    """Fuzzy-pick through television, previewing each command's own --help.
 
-    tv runs preview/action commands through config.toml's `shell` setting
-    (zsh) unconditionally — not just when the command happens to need shell
-    features. On Windows zsh doesn't exist at all, so no preview command
-    could run there regardless of its own syntax; worse, confirmed directly
-    that PowerShell specifically requires the `&` call operator before a
-    quoted path ("path1" "path2" args is a syntax error there, unlike bash/
-    zsh/cmd), so even a correctly-quoted command isn't safe to assume works
-    without verifying which shell actually ends up running it — something
-    that can't be checked without a live interactive tv session. Skipping
-    the preview entirely on Windows is the reliable choice over a
-    plausible-but-unverified one; the fuzzy-pick itself needs no shell at
-    all and is confirmed to work everywhere.
+    macOS/Linux only — main() exits before this is ever called on Windows
+    (tv as an interactive TUI corrupts the terminal there, confirmed
+    directly; not something fixable by adjusting this command string).
     """
-    args = ["tv", "--input-header", "dutils — pick a command"]
-    if _current_platform() != "windows":
-        # {0} is tv's own first-field extraction (done internally before the
-        # command string is built), so this is plain "program arg1 arg2"
-        # with no pipes/$()/|| — simpler and less fragile than the previous
-        # `$(echo {} | cut -d" " -f1)` / `||` fallback, and still valid
-        # bash/zsh syntax (unlike on Windows, quoting a leading path doesn't
-        # need a call operator there).
-        preview = f'"{sys.executable}" "{DUTILS}" {{0}} --help'
-        args += ["--preview-command", preview, "--preview-header", "{}"]
+    # {0} is tv's own first-field extraction (done internally before the
+    # command string is built), so this is plain "program arg1 arg2" with
+    # no pipes/$()/|| — simpler and less fragile than the previous
+    # `$(echo {} | cut -d" " -f1)` / `||` fallback.
+    preview = f'"{sys.executable}" "{DUTILS}" {{0}} --help'
+    args = ["tv", "--input-header", "dutils — pick a command",
+            "--preview-command", preview, "--preview-header", "{}"]
     try:
         result = subprocess.run(
             args,
@@ -141,6 +128,22 @@ def confirm(command: str) -> bool:
 
 
 def main() -> None:
+    # Confirmed directly (not just the source/preview bugs fixed earlier):
+    # tv as an interactive TUI here corrupts the terminal on Windows — Tab/
+    # Up/Down stop responding and the picker leaves the terminal broken
+    # after it closes. This isn't a syntax issue fixable by adjusting
+    # commands; it's tv needing raw console/keyboard access while stdin is
+    # simultaneously being fed piped entries via subprocess, which Windows'
+    # console handling doesn't seem to separate the way a Unix tty does.
+    # Removed entirely rather than left half-working — use `dutils --help`
+    # or `dutils <command> --help` directly instead.
+    if _current_platform() == "windows":
+        print("dutils menu isn't available on Windows — its interactive picker")
+        print("corrupts the terminal there (confirmed directly, not a guess).")
+        print("Use `dutils --help` to browse commands, or `dutils <command> --help`")
+        print("for a specific one.")
+        sys.exit(1)
+
     parser = argparse.ArgumentParser(
         prog="dutils menu",
         description="Interactive picker for every dutils command",
