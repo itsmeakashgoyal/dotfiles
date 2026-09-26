@@ -518,6 +518,65 @@ endif
 }
 
 # ==============================================================================
+# Windows Terminal Theme
+# ==============================================================================
+function Install-TerminalTheme {
+    Write-Section "Windows Terminal Theme"
+
+    # Store-installed vs unpackaged Windows Terminal use different settings
+    # locations; check both.
+    $settingsPath = @(
+        "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json",
+        "$env:LOCALAPPDATA\Microsoft\Windows Terminal\settings.json"
+    ) | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+    if (-not $settingsPath) {
+        Write-Fail "Windows Terminal settings.json not found — skipping (install Windows Terminal for a themed prompt)"
+        return
+    }
+
+    # Tracked in the repo (settings/windows-terminal/gruvbox-dark.json), not
+    # hardcoded here — one reviewable file, consistent with settings/iterm/
+    # and settings/sublime/ for the same kind of GUI-app config export on
+    # macOS.
+    $schemeFile = Join-Path $DOTFILES_DIR "settings\windows-terminal\gruvbox-dark.json"
+    if (-not (Test-Path $schemeFile)) {
+        Write-Fail "Color scheme file not found: $schemeFile — skipping"
+        return
+    }
+
+    try {
+        $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
+        $gruvboxDark = Get-Content $schemeFile -Raw | ConvertFrom-Json
+
+        # Replace any prior "Gruvbox Dark" entry (re-run safety) and keep the rest.
+        $settings.schemes = @($settings.schemes | Where-Object { $_.name -ne "Gruvbox Dark" }) + $gruvboxDark
+
+        if (-not $settings.profiles.defaults) {
+            $settings.profiles | Add-Member -MemberType NoteProperty -Name defaults -Value ([PSCustomObject]@{}) -Force
+        }
+        $settings.profiles.defaults | Add-Member -MemberType NoteProperty -Name colorScheme -Value "Gruvbox Dark" -Force
+
+        if (-not $settings.profiles.defaults.font) {
+            $settings.profiles.defaults | Add-Member -MemberType NoteProperty -Name font -Value ([PSCustomObject]@{}) -Force
+        }
+        $settings.profiles.defaults.font | Add-Member -MemberType NoteProperty -Name face -Value "JetBrainsMono NF" -Force
+
+        # Back up before touching the user's live settings — this is app
+        # state outside $DOTFILES_DIR, not something re-running the installer
+        # can regenerate.
+        $backupPath = "$settingsPath.backup.$(Get-Date -Format 'yyyyMMddHHmmss')"
+        Copy-Item $settingsPath $backupPath
+        ($settings | ConvertTo-Json -Depth 20) | Set-Content -Path $settingsPath -Encoding UTF8
+
+        Write-Ok "Windows Terminal set to Gruvbox Dark + JetBrainsMono NF (backup: $backupPath)"
+    }
+    catch {
+        Write-Fail "Windows Terminal theme update failed (non-fatal): $_"
+    }
+}
+
+# ==============================================================================
 # Health Check
 # ==============================================================================
 function Test-Installation {
@@ -651,7 +710,10 @@ function Main {
     Install-GuiConfig
     Install-SublimePackageControl
 
-    # Step 5: Health check
+    # Step 5: Windows Terminal theme
+    Install-TerminalTheme
+
+    # Step 6: Health check
     Test-Installation
 
     Write-Banner "Setup Complete!"

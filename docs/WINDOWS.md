@@ -174,7 +174,7 @@ What's already been found and fixed on this setup, roughly in order of impact:
   dot-sources that on every later start (regenerating only when the tool binary
   changes). The subprocess spawn — the expensive part on Windows — happens only
   on a cache miss. For starship specifically you can also drop the prompt
-  subprocess entirely with [the native prompt option](#native-prompt-dotfiles_promptnative).
+  subprocess entirely with [the native prompt option](#native-prompt-the-default).
 - **`PSFzf` import** (~430ms) — real functionality (`Ctrl+T`/`Ctrl+R` fzf
   bindings); no free win available there.
 
@@ -213,7 +213,7 @@ for `git rev-parse HEAD`, which does no tree walk).
 specific repo (`git fsmonitor--daemon status` from inside it) — a "not running" result
 usually means something is blocking it (corporate EDR restricting low-level directory
 watch APIs, or the repo living on a network/mapped drive rather than local NTFS).
-Otherwise, consider [the native prompt](#native-prompt-dotfiles_promptnative), which
+Otherwise, consider [the native prompt](#native-prompt-the-default), which
 sidesteps `git.exe` entirely.
 
 ### Tofu box / missing icon in the prompt (e.g. a diamond before the branch name)
@@ -228,12 +228,12 @@ this automatically for Windows Terminal; other terminal apps need it set manuall
 
 ### Windows Terminal theme or env var changes don't apply
 
-`scripts/setup/windows.ps1`'s `Install-TerminalTheme` merges a Tokyo Night color scheme
-(`settings/windows-terminal/tokyo-night.json` — tracked in this repo, not hardcoded in
+`scripts/setup/windows.ps1`'s `Install-TerminalTheme` merges a Gruvbox Dark color scheme
+(`settings/windows-terminal/gruvbox-dark.json` — tracked in this repo, not hardcoded in
 the script) into your Windows Terminal `settings.json` and sets it as the default
 profile color scheme + font, backing up the original first
 (`settings.json.backup.<timestamp>`, next to the original — safe to delete once you've
-confirmed you don't need it). It only overwrites the `Tokyo Night` scheme entry and the
+confirmed you don't need it). It only overwrites the `Gruvbox Dark` scheme entry and the
 `profiles.defaults` color scheme/font — your own profiles, keybindings, and any other
 scheme stay untouched.
 

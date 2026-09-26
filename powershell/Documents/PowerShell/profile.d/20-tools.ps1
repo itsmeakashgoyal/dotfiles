@@ -96,7 +96,7 @@ if (_cmd eza) {
 # bat (cat replacement)
 # ==============================================================================
 if (_cmd bat) {
-    $env:BAT_THEME = 'tokyonight_night'
+    $env:BAT_THEME = 'gruvbox-dark'
     $env:BAT_STYLE = 'numbers,changes,header'
 
     function cat  {

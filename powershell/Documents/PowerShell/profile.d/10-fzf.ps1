@@ -25,13 +25,15 @@ if ((_cmd fzf) -and (Get-Module -ListAvailable PSFzf)) {
 }
 
 if ($__psfzfImported) {
+    # Gruvbox Dark — matches PSReadLine's colors, bat's $BAT_THEME, the native
+    # prompt, and the Windows Terminal scheme (settings/windows-terminal/gruvbox-dark.json).
     $env:FZF_DEFAULT_OPTS = @'
 --height=50% --layout=reverse --border=rounded --cycle
 --bind=ctrl-j:down,ctrl-k:up
---color=fg:#c0caf5,bg:#1a1b26,hl:#bb9af7
---color=fg+:#c0caf5,bg+:#292e42,hl+:#7dcfff
---color=info:#7aa2f7,prompt:#7dcfff,pointer:#7dcfff
---color=marker:#9ece6a,spinner:#9ece6a,header:#9ece6a
+--color=fg:#ebdbb2,bg:#282828,hl:#d3869b
+--color=fg+:#ebdbb2,bg+:#3c3836,hl+:#8ec07c
+--color=info:#83a598,prompt:#fe8019,pointer:#fe8019
+--color=marker:#b8bb26,spinner:#b8bb26,header:#b8bb26
 '@
 
     # Use ripgrep as FZF source when inside a git repo, fd otherwise

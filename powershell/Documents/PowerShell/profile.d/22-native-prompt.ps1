@@ -118,7 +118,8 @@ function __dotfiles_native_git_info {
 }
 
 # ==============================================================================
-# Tokyo Night ANSI helpers — same palette as starship.toml/fzf/bat/PSReadLine
+# Gruvbox Dark ANSI helpers — same palette as fzf/bat/PSReadLine and the
+# Windows Terminal scheme (settings/windows-terminal/gruvbox-dark.json)
 # ==============================================================================
 $script:__dotfiles_esc = [char]27
 function __dotfiles_native_fg {
@@ -152,18 +153,18 @@ function prompt {
         $path = '~' + $path.Substring($HOME.Length)
     }
 
-    $line = "$($script:__dotfiles_bold)$($script:__dotfiles_italic)$(__dotfiles_native_fg '7AA2F7')$path$($script:__dotfiles_reset)"
+    $line = "$($script:__dotfiles_bold)$($script:__dotfiles_italic)$(__dotfiles_native_fg '83A598')$path$($script:__dotfiles_reset)"
 
     $gitInfo = __dotfiles_native_git_info $PWD.Path
     if ($gitInfo) {
         if ($gitInfo.Sha) {
             $short = $gitInfo.Sha.Substring(0, [Math]::Min(7, $gitInfo.Sha.Length))
-            $line += " $(__dotfiles_native_fg '565F89')($short)$($script:__dotfiles_reset)"
+            $line += " $(__dotfiles_native_fg '928374')($short)$($script:__dotfiles_reset)"
         }
         if ($gitInfo.Branch) {
-            $line += " on $(__dotfiles_native_fg 'BB9AF7')$($gitInfo.Branch)$($script:__dotfiles_reset)"
+            $line += " on $(__dotfiles_native_fg 'D3869B')$($gitInfo.Branch)$($script:__dotfiles_reset)"
         } elseif ($gitInfo.Sha) {
-            $line += " on $(__dotfiles_native_fg 'BB9AF7')HEAD (detached)$($script:__dotfiles_reset)"
+            $line += " on $(__dotfiles_native_fg 'D3869B')HEAD (detached)$($script:__dotfiles_reset)"
         }
     }
 
@@ -173,7 +174,7 @@ function prompt {
         $durationMs = ($lastCmd.EndExecutionTime - $lastCmd.StartExecutionTime).TotalMilliseconds
         if ($durationMs -ge 2000) {
             $seconds = [Math]::Round($durationMs / 1000, 1)
-            $line += " $($script:__dotfiles_italic)$(__dotfiles_native_fg '9ECE6A')took ${seconds}s$($script:__dotfiles_reset)"
+            $line += " $($script:__dotfiles_italic)$(__dotfiles_native_fg 'B8BB26')took ${seconds}s$($script:__dotfiles_reset)"
         }
     }
 
@@ -191,7 +192,7 @@ function prompt {
     # frequently near-invisible (it was: this exact bug is why the ❯ all but
     # vanished after every prompt block). Always give it an explicit,
     # visible color instead.
-    $charColor = if ($exitCodeForPrompt -ne 0) { "$($script:__dotfiles_bold)$(__dotfiles_native_fg 'F7768E')" } elseif ($isViCommandMode) { "$($script:__dotfiles_bold)$(__dotfiles_native_fg 'C0CAF5')" } else { __dotfiles_native_fg '7DCFFF' }
+    $charColor = if ($exitCodeForPrompt -ne 0) { "$($script:__dotfiles_bold)$(__dotfiles_native_fg 'FB4934')" } elseif ($isViCommandMode) { "$($script:__dotfiles_bold)$(__dotfiles_native_fg 'EBDBB2')" } else { __dotfiles_native_fg 'FE8019' }
 
     $promptText = "`n$line`n$charColor$charSymbol$($script:__dotfiles_reset) "
     Set-PSReadLineOption -ExtraPromptLineCount ($promptText.Split("`n").Length - 1)

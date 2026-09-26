@@ -28,21 +28,23 @@ if (Get-Module -ListAvailable PSReadLine) {
     Set-PSReadLineOption -HistorySearchCursorMovesToEnd
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
     Set-PSReadLineOption -PredictionViewStyle ListView
-    # Tokyo Night palette — same one 10-fzf.ps1's $FZF_DEFAULT_OPTS and
-    # 20-tools.ps1's $BAT_THEME use, so prompt/fzf/bat/editing colors all match.
+    # Gruvbox Dark palette — same one 10-fzf.ps1's $FZF_DEFAULT_OPTS,
+    # 20-tools.ps1's $BAT_THEME, and 22-native-prompt.ps1 use, so prompt/fzf/
+    # bat/editing colors and the Windows Terminal scheme
+    # (settings/windows-terminal/gruvbox-dark.json) all match.
     Set-PSReadLineOption -Colors @{
-        Command            = '#7AA2F7'
-        Parameter          = '#7DCFFF'
-        String             = '#9ECE6A'
-        Operator           = '#E0AF68'
-        Variable           = '#BB9AF7'
-        Comment            = '#565F89'
-        InlinePrediction   = '#565F89'
-        ListPrediction     = '#7DCFFF'
-        ListPredictionSelected = '#283457'
-        Selection          = '#283457'
-        Emphasis           = '#F7768E'
-        Error              = '#F7768E'
+        Command            = '#83A598'
+        Parameter          = '#8EC07C'
+        String             = '#B8BB26'
+        Operator           = '#FE8019'
+        Variable           = '#D3869B'
+        Comment            = '#928374'
+        InlinePrediction   = '#928374'
+        ListPrediction     = '#8EC07C'
+        ListPredictionSelected = '#504945'
+        Selection          = '#504945'
+        Emphasis           = '#FB4934'
+        Error              = '#FB4934'
     }
 }
 
