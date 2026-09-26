@@ -4,10 +4,11 @@
 -- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/tokyonight.lua
 -- ░▓▓▓▓▓▓▓▓▓▓
 --
--- Tokyo Night: the palette the whole toolchain coordinates on (terminal, bat,
--- fzf, delta). Provides the tokyonight-night / tokyonight-day colorschemes that
--- current-theme.lua selects based on `dutils theme`. gruvbox is kept installed
--- as a fallback.
+-- Tokyo Night: kept installed as current-theme.lua's fallback, in case
+-- gruvbox.nvim (the default — see colorscheme.lua) ever fails to load. Also
+-- still what macOS/Linux's ghostty + `dutils theme` coordinate the terminal
+-- (bat/fzf/delta) around — this doesn't touch that, only the editor's
+-- default colorscheme itself.
 return {
     "folke/tokyonight.nvim",
     priority = 1000,

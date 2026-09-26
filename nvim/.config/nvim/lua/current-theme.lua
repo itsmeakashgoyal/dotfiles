@@ -6,8 +6,11 @@
 --
 -- Active colorscheme, kept separate so switching themes is a one-line change.
 -- Honors `dutils theme`, which writes ~/.config/dotfiles/theme = dark|light|auto:
--- "light" → tokyonight-day, anything else → tokyonight-night. Falls back to
--- gruvbox if tokyonight isn't available.
+-- "light" → gruvbox with background=light, anything else → background=dark.
+-- gruvbox is one colorscheme name that respects `vim.o.background` (unlike
+-- tokyonight's separate tokyonight-day/tokyonight-night names), so the light/
+-- dark switch is a background setting here, not a different colorscheme name.
+-- Falls back to tokyonight if gruvbox isn't available.
 local mode = "dark"
 local f = io.open(vim.fn.expand("~/.config/dotfiles/theme"), "r")
 if f then
@@ -18,7 +21,7 @@ if f then
     end
 end
 
-local scheme = mode == "light" and "tokyonight-day" or "tokyonight-night"
-if not pcall(vim.cmd.colorscheme, scheme) then
-    vim.cmd.colorscheme("gruvbox")
+vim.o.background = mode
+if not pcall(vim.cmd.colorscheme, "gruvbox") then
+    vim.cmd.colorscheme(mode == "light" and "tokyonight-day" or "tokyonight-night")
 end

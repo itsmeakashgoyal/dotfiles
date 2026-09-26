@@ -14,8 +14,9 @@
 #   - bat/fzf/delta : follow the terminal's ANSI palette (see 01-exports.zsh /
 #                 git config), so they match whatever ghostty is showing — no
 #                 per-tool switch needed.
-#   - neovim    : current-theme.lua reads ~/.config/dotfiles/theme and picks
-#                 tokyonight-day / tokyonight-night on next launch.
+#   - neovim    : defaults to gruvbox (not Tokyo Night — see docs/THEME.md);
+#                 current-theme.lua reads ~/.config/dotfiles/theme and toggles
+#                 gruvbox's light/dark background on next launch.
 #   - starship  : intentionally left monochrome (dimmed) — palette-neutral.
 #
 # Usage: dutils theme [dark|light|auto|toggle|status]
@@ -69,10 +70,10 @@ def _report(mode: str) -> None:
     section("Active theme")
     print(f"  mode: {mode}  (palette: Tokyo Night)")
     if mode == "auto":
-        print("  ghostty → follows macOS appearance · nvim → night (dark)")
+        print("  ghostty → follows macOS appearance · nvim → gruvbox dark")
     else:
         print(f"  ghostty → TokyoNight {'Day' if mode == 'light' else 'Night'} · "
-              f"nvim → tokyonight-{'day' if mode == 'light' else 'night'}")
+              f"nvim → gruvbox {'light' if mode == 'light' else 'dark'}")
     print("  bat/fzf/delta → follow the terminal's ANSI palette (match automatically)")
 
 

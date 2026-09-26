@@ -1,9 +1,19 @@
-# Theming (Tokyo Night, coordinated)
+# Theming (Tokyo Night, coordinated — except Neovim, see below)
 
-One palette — **Tokyo Night** — across the whole terminal toolchain, with a
+One palette — **Tokyo Night** — across the terminal toolchain, with a
 light/dark switch. The trick that keeps it simple: the **terminal is the source
 of truth**, and the CLI tools follow its ANSI palette, so switching is mostly
-"switch the terminal + Neovim" and everything else matches for free.
+"switch the terminal" and everything else matches for free.
+
+**Neovim is the one exception**: it now defaults to **gruvbox** (`current-theme.lua`
+tries `gruvbox` first, falling back to `tokyonight-day`/`-night` only if
+gruvbox.nvim fails to load), so it no longer visually matches ghostty's Tokyo
+Night by default. The light/dark switch below still works for Neovim — it just
+toggles gruvbox's light/dark variant (`vim.o.background`) instead of switching
+colorscheme names. If you want Neovim back on Tokyo Night to match the
+terminal again, swap gruvbox/tokyonight's roles in `current-theme.lua` and
+`colorscheme.lua`/`tokyonight.lua` (`lazy = false` needs to move with
+whichever one is primary — see the comments in those files for why).
 
 ## What follows what
 
@@ -13,7 +23,7 @@ of truth**, and the CLI tools follow its ANSI palette, so switching is mostly
 | **bat** | `BAT_THEME=ansi` — renders with the terminal's ANSI colours (matches in light *and* dark) |
 | **fzf** | `FZF_DEFAULT_OPTS` uses ANSI colour indices, so the picker follows the terminal too |
 | **delta** | `syntax-theme = base16-256` — already ANSI-following |
-| **neovim** | `folke/tokyonight.nvim`; `current-theme.lua` picks `tokyonight-day`/`-night` from the switch |
+| **neovim** | `ellisonleao/gruvbox.nvim` (default, independent of the terminal's own theme); `current-theme.lua` toggles its light/dark variant from the switch, falling back to `folke/tokyonight.nvim`'s `tokyonight-day`/`-night` if gruvbox isn't available |
 | **starship** | left intentionally monochrome/dimmed — palette-neutral, looks right on any background |
 | **yazi** | left on its built-in theme (works on any background) |
 
@@ -21,15 +31,18 @@ of truth**, and the CLI tools follow its ANSI palette, so switching is mostly
 
 ```bash
 dutils theme            # status (default) — show the current mode
-dutils theme dark       # pin dark  (TokyoNight Night)
-dutils theme light      # pin light (TokyoNight Day)
+dutils theme dark       # pin dark  (ghostty: TokyoNight Night; nvim: gruvbox dark)
+dutils theme light      # pin light (ghostty: TokyoNight Day; nvim: gruvbox light)
 dutils theme toggle     # flip dark ↔ light
 dutils theme auto       # follow the macOS light/dark appearance (default)
 ```
 
 - **auto** (the default) means ghostty tracks the macOS system appearance — flip
   macOS to light/dark and the terminal + CLI tools follow. Neovim uses the dark
-  (night) variant in auto mode.
+  gruvbox variant in auto mode (same underlying "not literally light → dark"
+  check as before this switched from tokyonight — auto mode doesn't currently
+  read the live macOS appearance for Neovim's side, just whatever
+  `~/.config/dotfiles/theme` last had written to it).
 - **dark/light** pin the theme regardless of the OS by writing
   `~/.config/ghostty/theme.local` (a gitignored, per-machine optional include)
   and `~/.config/dotfiles/theme` (read by Neovim).
