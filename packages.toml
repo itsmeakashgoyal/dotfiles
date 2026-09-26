@@ -727,10 +727,20 @@ desc      = "Ghostty terminal config"
 platforms = ["macos", "linux"]
 
 # Windows has no Stow; windows.ps1 links these with its own symlink function.
+#
+# windows_target is explicit (not the "$env:USERPROFILE\<target>" default)
+# because "Documents" is frequently NOT "$env:USERPROFILE\Documents" — OneDrive
+# Known Folder Move (common on corporate-managed machines) redirects it to
+# "$env:USERPROFILE\OneDrive - <Tenant>\Documents". PowerShell's own $PROFILE
+# always resolves through that redirection, so the naive default would symlink
+# a file PowerShell never actually loads — two different files, one silently
+# unused, with no error anywhere in the install. GetFolderPath('MyDocuments')
+# asks Windows for the real path instead.
 [[stow]]
-package   = "powershell"
-target    = "Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
-source    = "powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
-desc      = "PowerShell profile (thin loader for profile.d/*.ps1)"
-platforms = ["windows"]
-critical  = true
+package        = "powershell"
+target         = "Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
+source         = "powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
+desc           = "PowerShell profile (thin loader for profile.d/*.ps1)"
+platforms      = ["windows"]
+critical       = true
+windows_target = '$([Environment]::GetFolderPath("MyDocuments"))\PowerShell\Microsoft.PowerShell_profile.ps1'

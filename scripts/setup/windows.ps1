@@ -50,7 +50,7 @@ $SYMLINK_MAP = @{
     "starship\.config\starship"                                        = "$env:USERPROFILE\.config\starship"
     "yazi\.config\yazi"                                                = "$env:USERPROFILE\.config\yazi"
     "readline\.inputrc"                                                = "$env:USERPROFILE\.inputrc"
-    "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+    "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$([Environment]::GetFolderPath("MyDocuments"))\PowerShell\Microsoft.PowerShell_profile.ps1"
     # END GENERATED: symlinks
 
     # Sublime Text — link each settings file into the User packages dir so the
@@ -414,10 +414,13 @@ function Install-Symlinks {
         if (-not (New-DotfileSymlink -Source $entry.Key -Target $entry.Value)) { $blocked++ }
     }
 
-    # Also link profile for Windows PowerShell 5.1
+    # Also link profile for Windows PowerShell 5.1. Same OneDrive Known Folder
+    # Move concern as the generated PowerShell 7 entry (see packages.toml's
+    # powershell [[stow]] entry) — Documents isn't always $env:USERPROFILE\Documents.
+    $documentsDir = [Environment]::GetFolderPath('MyDocuments')
     if (-not (New-DotfileSymlink `
                 -Source "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" `
-                -Target "$env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1")) { $blocked++ }
+                -Target "$documentsDir\WindowsPowerShell\Microsoft.PowerShell_profile.ps1")) { $blocked++ }
 
     if ($blocked -gt 0) {
         Write-Host ""
