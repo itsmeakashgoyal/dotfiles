@@ -707,6 +707,19 @@ target    = ".local/bin"
 desc      = "Custom scripts + the dutils CLI on PATH"
 platforms = ["macos", "linux"]
 
+# Windows equivalent of the entry above: Stow doesn't run there, so this is a
+# real file (bin/.local/bin/dutils.ps1, a thin wrapper), not a symlink to the
+# bare scripts/dutils/dutils Python script, and it's its own [[stow]] entry
+# (single file, not the whole .local/bin directory) so its own symlink
+# resolves cleanly to a real file rather than through a directory reparse
+# point. windows.ps1 also adds its target directory to PATH once.
+[[stow]]
+package   = "bin"
+target    = ".local/bin/dutils.ps1"
+source    = "bin/.local/bin/dutils.ps1"
+desc      = "dutils CLI wrapper for native PowerShell (bare `dutils` command)"
+platforms = ["windows"]
+
 [[stow]]
 package = "readline"
 target  = ".inputrc"

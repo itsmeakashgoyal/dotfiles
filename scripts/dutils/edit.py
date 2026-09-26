@@ -18,16 +18,25 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from dutil import fail  # noqa: E402
+import manifest as mf  # noqa: E402
+import osdetect  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent.parent
 
 
 def _stow_packages() -> list[str]:
-    result = subprocess.run(
-        ["make", "-C", str(REPO), "print-STOW_PACKAGES"],
-        capture_output=True, text=True,
-    )
-    return result.stdout.split() if result.returncode == 0 else []
+    # Reads packages.toml directly (the single source of truth — see
+    # CLAUDE.md) instead of shelling out to `make print-STOW_PACKAGES`, which
+    # doesn't work on Windows at all: Scoop's GNU Make can't run recipes
+    # without a POSIX shell present (confirmed directly — even a bare
+    # `@echo` target fails with "CreateProcess(NULL, echo ...) failed").
+    if osdetect.is_windows():
+        platform_key = "windows"
+    elif osdetect.is_linux():
+        platform_key = "linux"
+    else:
+        platform_key = "macos"
+    return mf.load().stow_packages(platforms=(platform_key,))
 
 
 def _pick(packages: list[str]) -> str | None:

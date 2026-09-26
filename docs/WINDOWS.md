@@ -96,6 +96,35 @@ done — it's meant for diagnosing a specific slowdown, not left on permanently.
 
 ---
 
+## `dutils` on Windows
+
+`dutils` (`scripts/dutils/dutils`) is the cross-platform maintenance CLI — `make health`/
+`check`/`sysinfo`/etc. are thin aliases to it on macOS/Linux, and there is no `make`
+equivalent on Windows at all (Scoop's GNU Make can't run recipes without a POSIX shell
+present — confirmed directly, even a bare `@echo` target fails). Since a recent fix,
+`windows.ps1` symlinks a small wrapper (`bin/.local/bin/dutils.ps1`) onto
+`%USERPROFILE%\.local\bin` and adds that directory to `PATH`, so `dutils <command>` works
+as a bare command exactly like on macOS/Linux — no more typing
+`python scripts\dutils\dutils <command>`. Open a new terminal after running/re-running
+`windows.ps1` to pick up the `PATH` change.
+
+**What works on Windows**: `health`, `check`, `diagnose`, `sysinfo`, `packages`,
+`manifest`, `theme`, `secrets`, `ssh-setup`, `detect-os`, `menu`, `init`, `update`, `new`,
+`sync`, `edit`, `bench`, `profile` — all confirmed directly, not assumed.
+
+**What's intentionally not available on native Windows** (needs WSL2 or Git Bash
+instead — this repo's own stated daily-driver path for POSIX-shell tooling): `diff`,
+`debug`, `ytd`. These fail with a clear message pointing at WSL2 rather than a raw
+Python traceback. `zcompile` (zsh-only) and `vulns`/`install-nvim`/`macos-defaults`
+(genuinely platform-specific) correctly no-op or error on Windows by design — not bugs.
+
+`bench`/`profile` use hyperfine + `pwsh -NoLogo -Command exit` / the
+`DOTFILES_PROFILE_DEBUG` timing already built into the PowerShell profile (see above) —
+a different mechanism than zsh's `hyperfine ... "zsh -i -c exit"` / zprof, reaching the
+same goal, since neither zsh nor zprof exist on Windows.
+
+---
+
 ## Troubleshooting
 
 ### Prompt / starship / tv / atuin keybindings don't load at all

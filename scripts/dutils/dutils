@@ -10,6 +10,7 @@
 import os
 import platform
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -63,12 +64,38 @@ def _exec_python(script: str, args: list[str]) -> None:
 
 
 def _exec_shell(script: str, args: list[str]) -> None:
-    """Replace the current process with a shell script in SCRIPT_DIR."""
+    """Replace the current process with a shell script in SCRIPT_DIR.
+
+    Invokes the interpreter explicitly (parsed from the script's own shebang)
+    rather than exec'ing the script file directly and relying on the OS to
+    honor the shebang line. Windows has no shebang support at all, so the
+    latter always raised OSError: Exec format error — confirmed directly,
+    regardless of whether bash/zsh were even installed. Explicit invocation
+    works identically on every platform and doesn't depend on the file's
+    executable bit either.
+    """
     path = SCRIPT_DIR / script
     if not path.exists():
         print(f"Error: script not found: {path}", file=sys.stderr)
         sys.exit(1)
-    os.execvp(str(path), [str(path)] + args)
+
+    interpreter = "bash"
+    try:
+        first_line = path.read_text(encoding="utf-8").splitlines()[0]
+        if first_line.startswith("#!"):
+            interpreter = Path(first_line[2:].split()[-1]).name
+    except (OSError, IndexError):
+        pass
+
+    if shutil.which(interpreter) is None:
+        print(f"Error: this command needs '{interpreter}', which isn't on PATH.\n"
+              f"Native Windows PowerShell doesn't have it — use WSL2 (the "
+              f"recommended daily-driver path for POSIX-shell tooling; see "
+              f"docs/WINDOWS.md) or Git Bash instead.",
+              file=sys.stderr)
+        sys.exit(1)
+
+    os.execvp(interpreter, [interpreter, str(path)] + args)
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Commands
@@ -210,13 +237,50 @@ def cmd_packages(args: list[str]) -> None:
 def cmd_bench(_args: list[str]) -> None:
     if shutil.which("hyperfine") is None:
         print("Error: hyperfine is not installed.\n"
-              "Install: brew install hyperfine (macOS) or make nix-switch (Linux)",
+              "Install: brew install hyperfine (macOS) / make nix-switch (Linux) / "
+              "scoop install hyperfine (Windows)",
               file=sys.stderr)
         sys.exit(1)
+    # hyperfine itself is cross-platform (confirmed on Windows via Scoop); only
+    # the shell being benchmarked differs. -NoLogo just suppresses the "PS
+    # 7.x.x" version banner during the run — confirmed directly that
+    # `pwsh -NoLogo -Command exit` genuinely loads $PROFILE like a real
+    # interactive session does (not -NoProfile), so this measures the same
+    # thing `zsh -i -c exit` measures on the other platforms.
+    if platform.system() == "Windows":
+        if shutil.which("pwsh") is None:
+            print("Error: pwsh (PowerShell 7) not found on PATH.", file=sys.stderr)
+            sys.exit(1)
+        # subprocess.run, not os.execvp: confirmed directly that os.execvp's
+        # argv-to-command-line joining on Windows mangles a single list item
+        # containing embedded spaces ("pwsh -NoLogo -Command exit") — clap
+        # (hyperfine's arg parser) ends up seeing -NoLogo/-Command/exit as
+        # separate top-level tokens instead of one quoted command string.
+        # subprocess.run's Windows quoting handles this correctly.
+        result = subprocess.run(["hyperfine", "--warmup", "5", "--shell=none",
+                                  "pwsh -NoLogo -Command exit"])
+        sys.exit(result.returncode)
     os.execvp("hyperfine", ["hyperfine", "--warmup", "5", "--shell=none", "zsh -i -c exit"])
 
 
 def cmd_profile(_args: list[str]) -> None:
+    # Windows equivalent of profile_zsh.sh's zprof-based per-function timing:
+    # drive the profile.d/*.ps1 per-file (and, for 00-psreadline.ps1/
+    # 20-tools.ps1, per-section) timing already built into the PowerShell
+    # profile itself, gated behind $DOTFILES_PROFILE_DEBUG (see
+    # Microsoft.PowerShell_profile.ps1 and docs/WINDOWS.md). No zprof
+    # equivalent exists for PowerShell, so this is a different mechanism
+    # reaching the same goal rather than a straight port.
+    if platform.system() == "Windows":
+        if shutil.which("pwsh") is None:
+            print("Error: pwsh (PowerShell 7) not found on PATH.", file=sys.stderr)
+            sys.exit(1)
+        print("Profiling PowerShell profile load (profile.d/*.ps1 timing)...\n")
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command",
+             "$env:DOTFILES_PROFILE_DEBUG=1; & $PROFILE"]
+        )
+        sys.exit(result.returncode)
     # profile_zsh.sh has a zsh shebang and lives alongside this file; exec it
     # directly (the previous only-via-`make bench-detail` path).
     _exec_shell("profile_zsh.sh", [])

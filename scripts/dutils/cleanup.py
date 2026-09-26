@@ -31,6 +31,18 @@ def _run_uninstall(steps: str, force: bool) -> None:
     caller's environment - uninstall.sh's own BASH_SOURCE-based self-location
     figures out the repo root correctly on its own once invoked this way.
     """
+    # Without this check, subprocess.run raises an uncaught FileNotFoundError
+    # when bash is absent — confirmed directly on Windows (native PowerShell
+    # has no bash). check=False only covers a non-zero *exit code*, it
+    # doesn't stop the executable-not-found case from raising at all.
+    if shutil.which("bash") is None:
+        _info(
+            "'bash' not found — uninstall.sh needs it, and native Windows "
+            "PowerShell doesn't have it. Use WSL2 or Git Bash, or run "
+            "scripts/setup/windows.ps1 -Force to re-symlink over what this "
+            "would have removed instead."
+        )
+        return
     env = os.environ.copy()
     env["STEPS"] = steps
     if force:

@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from dutil import ok, fail, run, section  # noqa: E402
+import osdetect  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent.parent
 
@@ -36,8 +37,22 @@ def main() -> None:
     section("Pulling latest dotfiles")
     results["git pull"] = run(["git", "-C", str(REPO), "pull", "--ff-only"])
 
-    section("Re-stowing packages")
-    results["make run"] = run(["make", "-C", str(REPO), "run"])
+    # `make run` needs Stow, which has no Windows path at all (confirmed
+    # directly: `make run` fails immediately at check-stow with "stow is not
+    # installed", and Scoop's GNU Make can't run recipes without a POSIX
+    # shell present regardless). windows.ps1 is the Windows equivalent of
+    # re-applying symlinks after a pull — it's idempotent (only replaces
+    # symlinks that already point into this repo, same as Stow re-linking),
+    # so re-running it here is the right analogue, not a workaround.
+    if osdetect.is_windows():
+        section("Re-linking (windows.ps1)")
+        results["windows.ps1"] = run([
+            "pwsh", "-ExecutionPolicy", "Bypass", "-File",
+            str(REPO / "scripts" / "setup" / "windows.ps1"), "-SkipPackages",
+        ])
+    else:
+        section("Re-stowing packages")
+        results["make run"] = run(["make", "-C", str(REPO), "run"])
 
     # Best-effort: keep the compiled .zwc in step with any pulled/re-stowed zsh
     # changes. Not gated — a compile hiccup shouldn't fail the whole sync (zsh

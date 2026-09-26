@@ -49,6 +49,7 @@ $SYMLINK_MAP = @{
     "fastfetch\.config\fastfetch"                                      = "$env:USERPROFILE\.config\fastfetch"
     "starship\.config\starship"                                        = "$env:USERPROFILE\.config\starship"
     "yazi\.config\yazi"                                                = "$env:USERPROFILE\.config\yazi"
+    "bin\.local\bin\dutils.ps1"                                        = "$env:USERPROFILE\.local\bin\dutils.ps1"
     "readline\.inputrc"                                                = "$env:USERPROFILE\.inputrc"
     "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$([Environment]::GetFolderPath("MyDocuments"))\PowerShell\Microsoft.PowerShell_profile.ps1"
     # END GENERATED: symlinks
@@ -433,6 +434,30 @@ function Install-Symlinks {
 }
 
 # ==============================================================================
+# PATH
+# ==============================================================================
+function Install-LocalBinOnPath {
+    Write-Section "PATH"
+
+    # Puts dutils on PATH as a bare `dutils` command — mirrors what the `bin`
+    # Stow package does on macOS/Linux (~/.local/bin, added to PATH by the
+    # shell config). bin\.local\bin\dutils.ps1 is symlinked into
+    # $env:USERPROFILE\.local\bin by $SYMLINK_MAP above; this just makes sure
+    # that directory is actually on PATH so it resolves as a bare command.
+    $localBin = "$env:USERPROFILE\.local\bin"
+    $currentPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+    $entries = @(($currentPath -split ';') | Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\') })
+    if ($entries -contains $localBin.TrimEnd('\')) {
+        Write-Ok "$localBin already on PATH"
+        return
+    }
+
+    $newPath = if ($currentPath) { "$currentPath;$localBin" } else { $localBin }
+    [Environment]::SetEnvironmentVariable('PATH', $newPath, 'User')
+    Write-Ok "Added $localBin to PATH (open a new terminal to pick it up)"
+}
+
+# ==============================================================================
 # Neovim Setup
 # ==============================================================================
 function Install-NeovimPlugins {
@@ -697,6 +722,7 @@ function Main {
     # Step 2: Symlinks
     if (-not $SkipSymlinks) {
         Install-Symlinks
+        Install-LocalBinOnPath
     }
     else {
         Write-Step "Skipping symlink creation (-SkipSymlinks)"
