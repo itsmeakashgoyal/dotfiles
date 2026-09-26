@@ -4,19 +4,26 @@
 # ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/00-psreadline.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# PSReadLine (editing + Vi mode) and Terminal-Icons. Dot-sourced by the profile.
+# PSReadLine (editing) and Terminal-Icons. Dot-sourced by the profile.
 
 $__dbg = [bool]$env:DOTFILES_PROFILE_DEBUG
 $__sw = if ($__dbg) { [System.Diagnostics.Stopwatch]::StartNew() }
 
 # ==============================================================================
-# PSReadLine — better editing + Vi mode
+# PSReadLine — better editing
 # ==============================================================================
+# Emacs, not Vi: Vi's modal editing has a Command mode that intercepts plain
+# letters as motions instead of inserting them (`k`/`j` for history, `h`/`l`
+# for cursor movement, etc.) — easy to land in accidentally (Esc) and from
+# the outside just looks like "the k key stopped working". Emacs mode has no
+# modes to land in at all, and already provides Ctrl+A/E/K/U/W/L natively
+# (verified directly against this PSReadLine version — no custom
+# `Set-PSReadLineKeyHandler` calls needed to get them, unlike Vi Insert mode).
 if (Get-Module -ListAvailable PSReadLine) {
     Import-Module PSReadLine
     if ($__dbg) { Write-Host ("    - {0,6:N0}ms Import-Module PSReadLine" -f $__sw.Elapsed.TotalMilliseconds) -ForegroundColor DarkMagenta }
 
-    Set-PSReadLineOption -EditMode Vi
+    Set-PSReadLineOption -EditMode Emacs
     Set-PSReadLineOption -BellStyle None
     Set-PSReadLineOption -HistorySearchCursorMovesToEnd
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
@@ -37,22 +44,6 @@ if (Get-Module -ListAvailable PSReadLine) {
         Emphasis           = '#F7768E'
         Error              = '#F7768E'
     }
-
-    # Keep useful Emacs bindings in Insert mode (mirrors 13-vi-mode.zsh)
-    Set-PSReadLineKeyHandler -ViMode Insert -Chord 'Ctrl+a' -Function BeginningOfLine
-    Set-PSReadLineKeyHandler -ViMode Insert -Chord 'Ctrl+e' -Function EndOfLine
-    Set-PSReadLineKeyHandler -ViMode Insert -Chord 'Ctrl+k' -Function KillLine
-    Set-PSReadLineKeyHandler -ViMode Insert -Chord 'Ctrl+u' -Function BackwardKillLine
-    Set-PSReadLineKeyHandler -ViMode Insert -Chord 'Ctrl+w' -Function BackwardKillWord
-    Set-PSReadLineKeyHandler -ViMode Insert -Chord 'Ctrl+l' -Function ClearScreen
-
-    # jk / kj to exit insert mode
-    Set-PSReadLineKeyHandler -ViMode Insert -Chord 'j,k'    -Function ViCommandMode
-    Set-PSReadLineKeyHandler -ViMode Insert -Chord 'k,j'    -Function ViCommandMode
-
-    # History search with j/k in normal mode
-    Set-PSReadLineKeyHandler -ViMode Command -Chord 'k' -Function HistorySearchBackward
-    Set-PSReadLineKeyHandler -ViMode Command -Chord 'j' -Function HistorySearchForward
 }
 
 # ==============================================================================
