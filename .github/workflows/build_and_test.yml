@@ -892,6 +892,82 @@ jobs:
           Smoke @('health')
           Write-Host "✅ dutils commands test complete (Windows)"
 
+      - name: Verify windows.ps1 -Uninstall leaves no artifacts
+        shell: pwsh
+        env:
+          CI: "true"
+        run: |
+          Write-Host "🧹 Verifying windows.ps1 -Uninstall (dry-run, then for real)..."
+          $ps1 = "$env:USERPROFILE\dotfiles\scripts\setup\windows.ps1"
+
+          Write-Host "--- Dry-run ---"
+          & $ps1 -Uninstall -DryRun -Force
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::windows.ps1 -Uninstall -DryRun exited with code $LASTEXITCODE"
+            exit 1
+          }
+
+          # -PurgeScoop isn't exercised here — it removes Scoop itself, which
+          # this same job has no further need of, but is a bigger blast radius
+          # than this smoke test needs to cover for a one-line switch.
+          Write-Host "--- Real uninstall ---"
+          & $ps1 -Uninstall -Force
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::windows.ps1 -Uninstall exited with code $LASTEXITCODE"
+            exit 1
+          }
+
+          # Assert every artifact the installer creates is actually gone.
+          $failures = 0
+
+          $profilePath = $PROFILE.CurrentUserCurrentHost
+          if (Test-Path $profilePath) {
+            Write-Host "::error::PowerShell profile symlink still present at $profilePath"
+            $failures++
+          }
+
+          $nvimConfig = "$env:LOCALAPPDATA\nvim"
+          if (Test-Path $nvimConfig) {
+            Write-Host "::error::Neovim config symlink still present at $nvimConfig"
+            $failures++
+          }
+
+          $nvimData = "$env:LOCALAPPDATA\nvim-data"
+          if (Test-Path $nvimData) {
+            Write-Host "::error::Generated Neovim data still present at $nvimData"
+            $failures++
+          }
+
+          $localBin = "$env:USERPROFILE\.local\bin"
+          $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+          $pathEntries = @(($userPath -split ';') | ForEach-Object { $_.TrimEnd('\') })
+          if ($pathEntries -contains $localBin.TrimEnd('\')) {
+            Write-Host "::error::$localBin still on the user PATH"
+            $failures++
+          }
+
+          # Spot-check a couple of Scoop packages rather than all of them —
+          # proves the removal path actually runs `scoop uninstall`, without
+          # this step's runtime scaling with every entry in $SCOOP_PACKAGES.
+          foreach ($pkg in @("git", "atuin")) {
+            if (scoop list $pkg 2>$null | Select-String -SimpleMatch $pkg) {
+              Write-Host "::error::Scoop package '$pkg' still installed"
+              $failures++
+            }
+          }
+
+          # Scoop itself must still be there — -PurgeScoop was never passed.
+          if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+            Write-Host "::error::Scoop itself was removed despite -PurgeScoop not being passed"
+            $failures++
+          }
+
+          if ($failures -gt 0) {
+            Write-Host "::error::$failures artifact(s) left behind after -Uninstall"
+            exit 1
+          }
+          Write-Host "✅ windows.ps1 -Uninstall left no artifacts behind"
+
   # Job 4: Summary and notification
   summary:
     name: Test Summary
