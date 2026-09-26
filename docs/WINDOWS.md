@@ -114,6 +114,13 @@ etc. cluttering the list. Pass `--all` (`dutils --help --all`, `dutils menu --al
 see every command grouped by platform (Cross-platform / macOS + Linux / macOS only /
 Linux only) instead.
 
+`dutils menu`'s fuzzy-picker itself (fed via `tv` reading plain stdin) works reliably
+on Windows, but the preview pane (each command's own `--help` text) is skipped there —
+`tv` runs preview commands through `television/.config/television/config.toml`'s
+`shell` setting (`zsh`), which doesn't exist on Windows, and there's no safe way to
+verify a Windows-specific workaround without a live interactive `tv` session. The
+picker still works fully; you just won't see the preview pane on Windows specifically.
+
 **What works on Windows**: `health`, `check`, `diagnose`, `sysinfo`, `packages`,
 `manifest`, `theme`, `secrets`, `ssh-setup`, `detect-os`, `menu`, `init`, `update`, `new`,
 `sync`, `edit`, `bench`, `profile` — all confirmed directly, not assumed.

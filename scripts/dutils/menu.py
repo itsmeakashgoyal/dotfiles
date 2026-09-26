@@ -65,21 +65,35 @@ def _current_platform() -> str:
 
 
 def pick_with_tv(entries: list[str]) -> str:
-    """Fuzzy-pick through television, previewing each command's own --help."""
-    preview = (
-        f'{sys.executable} {DUTILS} '
-        '"$(echo {} | cut -d" " -f1)" --help 2>&1 '
-        f'|| {sys.executable} {DUTILS} --help'
-    )
+    """Fuzzy-pick through television, previewing each command's own --help
+    where that can be done reliably.
+
+    tv runs preview/action commands through config.toml's `shell` setting
+    (zsh) unconditionally — not just when the command happens to need shell
+    features. On Windows zsh doesn't exist at all, so no preview command
+    could run there regardless of its own syntax; worse, confirmed directly
+    that PowerShell specifically requires the `&` call operator before a
+    quoted path ("path1" "path2" args is a syntax error there, unlike bash/
+    zsh/cmd), so even a correctly-quoted command isn't safe to assume works
+    without verifying which shell actually ends up running it — something
+    that can't be checked without a live interactive tv session. Skipping
+    the preview entirely on Windows is the reliable choice over a
+    plausible-but-unverified one; the fuzzy-pick itself needs no shell at
+    all and is confirmed to work everywhere.
+    """
+    args = ["tv", "--input-header", "dutils — pick a command"]
+    if _current_platform() != "windows":
+        # {0} is tv's own first-field extraction (done internally before the
+        # command string is built), so this is plain "program arg1 arg2"
+        # with no pipes/$()/|| — simpler and less fragile than the previous
+        # `$(echo {} | cut -d" " -f1)` / `||` fallback, and still valid
+        # bash/zsh syntax (unlike on Windows, quoting a leading path doesn't
+        # need a call operator there).
+        preview = f'"{sys.executable}" "{DUTILS}" {{0}} --help'
+        args += ["--preview-command", preview, "--preview-header", "{}"]
     try:
         result = subprocess.run(
-            [
-                "tv",
-                "--source-command",  "cat",
-                "--preview-command", preview,
-                "--input-header",    "dutils — pick a command",
-                "--preview-header",  "{}",
-            ],
+            args,
             input="\n".join(entries),
             # Only stdout is captured (that's where the selection comes back).
             # television draws its TUI on stderr, so stderr must stay attached
