@@ -289,47 +289,90 @@ def cmd_profile(_args: list[str]) -> None:
 # Registry
 # ──────────────────────────────────────────────────────────────────────────────
 
+# Platform tags per command — confirmed by direct testing (see docs/WINDOWS.md's
+# "dutils on Windows" section), not guessed. A command's own code may still be
+# reachable on a platform it isn't tagged for (Python doesn't stop you), but
+# "tagged" means: does something genuinely useful there, verified directly.
+# Untagged/all three: works the same way everywhere.
+ALL_PLATFORMS = ("macos", "linux", "windows")
+
 COMMANDS: dict[str, tuple] = {
-    "menu":           (cmd_menu,           "Interactive picker for every dutils command"),
-    "init":           (cmd_init,           "First-run setup wizard for a new machine"),
-    "update":         (cmd_update,         "Update Homebrew/Nix/mise/zinit/Neovim packages"),
-    "sync":           (cmd_sync,           "Pull latest dotfiles, re-stow, and update"),
-    "cleanup":        (cmd_cleanup,        "Clean up dotfiles, Homebrew, Neovim, tmux"),
-    "edit":           (cmd_edit,           "Open a Stow package's config in $EDITOR"),
-    "new":            (cmd_new,            "Scaffold a new Stow package and register it"),
-    "health":         (cmd_health,         "Quick health check (symlinks, tools, configs)"),
-    "check":          (cmd_check,          "Full installation verification with score"),
-    "diagnose":       (cmd_diagnose,       "Run all diagnostics (health + system + packages)"),
-    "sysinfo":        (cmd_sysinfo,        "Display system information"),
-    "packages":       (cmd_packages,       "Compare installed packages against packages.toml"),
-    "manifest":       (cmd_manifest,       "Render packages.toml into the per-manager lists"),
-    "vulns":          (cmd_vulns,          "Scan installed Homebrew packages for CVEs (macOS, brew 7+)"),
-    "bench":          (cmd_bench,          "Benchmark zsh startup time (needs hyperfine)"),
-    "profile":        (cmd_profile,        "Profile zsh startup with zprof (per-function)"),
-    "ssh-setup":      (cmd_ssh_setup,      "Set up SSH keys + config for personal & work GitHub"),
-    "ssh-keygen":     (cmd_ssh_setup,      "Alias of ssh-setup (back-compat)"),
-    "secrets":        (cmd_secrets,        "Manage encrypted secrets (age + your SSH key)"),
-    "theme":          (cmd_theme,          "Switch the coordinated Tokyo Night theme (light/dark)"),
-    "zcompile":       (cmd_zcompile,       "Precompile zsh config to .zwc for faster startup"),
-    "detect-os":      (cmd_detect_os,      "Detect current OS and architecture"),
-    "diff":           (cmd_diff,           "Interactive file diff with tv and live watching"),
-    "install-nvim":   (cmd_install_nvim,   "Install latest Neovim (Linux only)"),
-    "list-functions": (cmd_list_functions, "List all custom zsh functions"),
-    "debug":          (cmd_debug,          "Run a script with debug tracing (bash -x)"),
-    "ytd":            (cmd_yt_download,    "Download YouTube videos/playlists in high quality"),
+    # name              (function,          description,                                                platforms)
+    "menu":           (cmd_menu,           "Interactive picker for every dutils command",                 ALL_PLATFORMS),
+    "init":           (cmd_init,           "First-run setup wizard for a new machine",                    ALL_PLATFORMS),
+    "update":         (cmd_update,         "Update Homebrew/Nix/mise/zinit/Neovim packages",               ALL_PLATFORMS),
+    "sync":           (cmd_sync,           "Pull latest dotfiles, re-stow, and update",                    ALL_PLATFORMS),
+    "cleanup":        (cmd_cleanup,        "Clean up dotfiles, Homebrew, Neovim, tmux",                    ALL_PLATFORMS),
+    "edit":           (cmd_edit,           "Open a Stow package's config in $EDITOR",                      ALL_PLATFORMS),
+    "new":            (cmd_new,            "Scaffold a new Stow package and register it",                  ALL_PLATFORMS),
+    "health":         (cmd_health,         "Quick health check (symlinks, tools, configs)",                ALL_PLATFORMS),
+    "check":          (cmd_check,          "Full installation verification with score",                   ALL_PLATFORMS),
+    "diagnose":       (cmd_diagnose,       "Run all diagnostics (health + system + packages)",             ALL_PLATFORMS),
+    "sysinfo":        (cmd_sysinfo,        "Display system information",                                   ALL_PLATFORMS),
+    "packages":       (cmd_packages,       "Compare installed packages against packages.toml",             ALL_PLATFORMS),
+    "manifest":       (cmd_manifest,       "Render packages.toml into the per-manager lists",               ALL_PLATFORMS),
+    "vulns":          (cmd_vulns,          "Scan installed Homebrew packages for CVEs (brew 7+)",           ("macos",)),
+    "bench":          (cmd_bench,          "Benchmark shell startup time (needs hyperfine)",                ALL_PLATFORMS),
+    "profile":        (cmd_profile,        "Profile shell startup, per-function/per-file timing",           ALL_PLATFORMS),
+    "ssh-setup":      (cmd_ssh_setup,      "Set up SSH keys + config for personal & work GitHub",           ALL_PLATFORMS),
+    "ssh-keygen":     (cmd_ssh_setup,      "Alias of ssh-setup (back-compat)",                              ALL_PLATFORMS),
+    "secrets":        (cmd_secrets,        "Manage encrypted secrets (age + your SSH key)",                 ALL_PLATFORMS),
+    "theme":          (cmd_theme,          "Switch the coordinated Tokyo Night theme (light/dark)",         ALL_PLATFORMS),
+    "zcompile":       (cmd_zcompile,       "Precompile zsh config to .zwc for faster startup",              ("macos", "linux")),
+    "detect-os":      (cmd_detect_os,      "Detect current OS and architecture",                            ALL_PLATFORMS),
+    "diff":           (cmd_diff,           "Interactive file diff with tv and live watching (needs bash)",  ("macos", "linux")),
+    "install-nvim":   (cmd_install_nvim,   "Install latest Neovim (Linux only)",                            ("linux",)),
+    "list-functions": (cmd_list_functions, "List all custom zsh functions",                                 ("macos", "linux")),
+    "debug":          (cmd_debug,          "Run a script with debug tracing (needs bash)",                  ("macos", "linux")),
+    "ytd":            (cmd_yt_download,    "Download YouTube videos/playlists in high quality (needs bash)", ("macos", "linux")),
 }
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Help / Version
 # ──────────────────────────────────────────────────────────────────────────────
 
-def show_help() -> None:
+def _current_platform() -> str:
+    system = platform.system()
+    if system == "Darwin":
+        return "macos"
+    if system == "Linux":
+        return "linux"
+    if system == "Windows":
+        return "windows"
+    return "macos"
+
+
+# Rendering order for `--all` — narrowest-to-broadest doesn't matter as much
+# as Cross-platform coming first, since that's most of the list.
+_PLATFORM_GROUPS: list[tuple[tuple, str]] = [
+    (ALL_PLATFORMS,      "Cross-platform"),
+    (("macos", "linux"), "macOS + Linux (needs bash/zsh)"),
+    (("macos",),         "macOS only"),
+    (("linux",),         "Linux only"),
+]
+
+
+def show_help(show_all: bool = False) -> None:
+    current = _current_platform()
     print(f"dutils v{VERSION} — Dotfiles Utility Tools\n")
     print("Usage: dutils <command> [options]\n")
-    print("Commands:")
-    for name, (_, desc) in COMMANDS.items():
-        print(f"  \033[36m{name:<18}\033[0m {desc}")
-    print(f"  \033[36m{'help':<18}\033[0m Show this help message")
+
+    if show_all:
+        print(f"Commands (all platforms — this machine is {current}):")
+        for group_platforms, label in _PLATFORM_GROUPS:
+            names = [n for n, (_, _, p) in COMMANDS.items() if p == group_platforms]
+            if not names:
+                continue
+            print(f"\n  {label}:")
+            for name in names:
+                print(f"    \033[36m{name:<18}\033[0m {COMMANDS[name][1]}")
+    else:
+        print(f"Commands (for {current} — pass --all to see every platform):")
+        for name, (_, desc, cmd_platforms) in COMMANDS.items():
+            if current in cmd_platforms:
+                print(f"  \033[36m{name:<18}\033[0m {desc}")
+
+    print(f"\n  \033[36m{'help':<18}\033[0m Show this help message")
     print(f"  \033[36m{'version':<18}\033[0m Show version information")
     print("\nFor command help:  dutils <command> --help")
     print("\nExamples:")
@@ -353,11 +396,12 @@ def main() -> None:
         show_help()
         sys.exit(0)
 
-    command = sys.argv[1]
-    rest    = sys.argv[2:]
+    command  = sys.argv[1]
+    rest     = sys.argv[2:]
+    show_all = "--all" in sys.argv[1:] or "-a" in sys.argv[1:]
 
-    if command in ("-h", "--help", "help"):
-        show_help()
+    if command in ("-h", "--help", "help", "--all", "-a"):
+        show_help(show_all=show_all)
     elif command in ("-v", "--version", "version"):
         show_version()
     elif command in COMMANDS:

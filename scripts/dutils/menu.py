@@ -27,6 +27,7 @@ import argparse
 import importlib.machinery
 import importlib.util
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -50,6 +51,17 @@ def load_commands() -> dict[str, tuple]:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.COMMANDS
+
+
+def _current_platform() -> str:
+    system = platform.system()
+    if system == "Darwin":
+        return "macos"
+    if system == "Linux":
+        return "linux"
+    if system == "Windows":
+        return "windows"
+    return "macos"
 
 
 def pick_with_tv(entries: list[str]) -> str:
@@ -125,12 +137,16 @@ def main() -> None:
                         help="run immediately (destructive commands still confirm)")
     parser.add_argument("--no-tv", action="store_true",
                         help="force the numbered prompt even when television is installed")
+    parser.add_argument("--all", action="store_true",
+                        help="also list commands not tagged for this platform "
+                             "(they may error or no-op — see docs/WINDOWS.md)")
     args, passthrough = parser.parse_known_args()
 
     commands = load_commands()
+    current = _current_platform()
     width = max(len(name) for name in commands)
-    entries = [f"{name.ljust(width)}  {desc}" for name, (_, desc) in commands.items()
-               if name != "menu"]
+    entries = [f"{name.ljust(width)}  {desc}" for name, (_, desc, platforms) in commands.items()
+               if name != "menu" and (args.all or current in platforms)]
 
     interactive = sys.stdin.isatty() and sys.stdout.isatty()
     if not interactive:

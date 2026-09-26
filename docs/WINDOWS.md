@@ -108,6 +108,12 @@ as a bare command exactly like on macOS/Linux — no more typing
 `python scripts\dutils\dutils <command>`. Open a new terminal after running/re-running
 `windows.ps1` to pick up the `PATH` change.
 
+`dutils --help` and `dutils menu` both filter to commands tagged for the platform
+they're running on by default — on Windows you won't see `vulns`/`install-nvim`/`diff`
+etc. cluttering the list. Pass `--all` (`dutils --help --all`, `dutils menu --all`) to
+see every command grouped by platform (Cross-platform / macOS + Linux / macOS only /
+Linux only) instead.
+
 **What works on Windows**: `health`, `check`, `diagnose`, `sysinfo`, `packages`,
 `manifest`, `theme`, `secrets`, `ssh-setup`, `detect-os`, `menu`, `init`, `update`, `new`,
 `sync`, `edit`, `bench`, `profile` — all confirmed directly, not assumed.
