@@ -49,12 +49,27 @@ if (_cmd rg) {
     function rgf {
         param([string]$Query = '')
         if (-not (_cmd tv)) { Write-Warning 'television (tv) not found'; return }
+        if (-not (_cmd nvim)) { Write-Warning 'nvim not found'; return }
         $result = rg --line-number --no-heading --color=always --smart-case $Query | tv --ansi
         if ($result) {
             $parts = $result -split ':', 3
-            & ${env:EDITOR:-nvim} "+$($parts[1])" $parts[0]
+            # ${env:EDITOR:-nvim} is bash syntax, not PowerShell — it was being
+            # parsed as a literal env-var named "EDITOR:-nvim" (always $null,
+            # confirmed directly), so this threw on every use. $env:EDITOR is
+            # set to nvim by default in the main profile; ?? covers the case
+            # a user overrides it to something else.
+            & ($env:EDITOR ?? 'nvim') "+$($parts[1])" $parts[0]
         }
     }
+}
+
+# Fuzzy-find a file with tv, open it in nvim (mirrors zsh's fv()).
+function fv {
+    if (-not (_cmd fd)) { Write-Warning 'fd not found'; return }
+    if (-not (_cmd tv)) { Write-Warning 'television (tv) not found'; return }
+    if (-not (_cmd nvim)) { Write-Warning 'nvim not found'; return }
+    $selected = fd --type f --hidden --exclude .git | tv
+    if ($selected) { nvim $selected }
 }
 
 # ==============================================================================
@@ -63,12 +78,34 @@ if (_cmd rg) {
 if (_cmd eza) {
     $EZA_BASE = 'eza --icons --group-directories-first --color=always'
 
-    function ls   { Invoke-Expression "$EZA_BASE $args" }
-    function ll   { Invoke-Expression "$EZA_BASE -la --git --git-repos $args" }
-    function la   { Invoke-Expression "$EZA_BASE -a $args" }
-    function l    { Invoke-Expression "$EZA_BASE -l $args" }
-    function lt   { Invoke-Expression "$EZA_BASE --tree --level=2 $args" }
-    function llt  { Invoke-Expression "$EZA_BASE --tree --level=3 -la --git $args" }
+    # Confirmed directly (reproducible in any directory, repo or not): unlike
+    # GNU ls, this eza build does NOT default to the current directory when
+    # given zero positional args — bare `eza` prints nothing at all, silently.
+    # Since `ls`/`ll`/etc. are typed bare far more often than with an explicit
+    # path, every one of these was broken for its single most common usage
+    # until an explicit `.` is passed through.
+    function script:_ezaArgs { if ($args) { $args } else { @('.') } }
+
+    # PowerShell resolves a built-in alias before a same-named function
+    # (confirmed directly: `ls`/`cat`/`man` all silently ran the built-in
+    # Get-ChildItem/Get-Content/help instead of these, every time) — remove
+    # the alias first so the function below actually takes over.
+    Remove-Item Alias:ls -Force -ErrorAction SilentlyContinue
+    function ls   { Invoke-Expression "$EZA_BASE $(_ezaArgs @args)" }
+    function ll   { Invoke-Expression "$EZA_BASE -la --git --git-repos $(_ezaArgs @args)" }
+    function la   { Invoke-Expression "$EZA_BASE -a $(_ezaArgs @args)" }
+    function l    { Invoke-Expression "$EZA_BASE -l $(_ezaArgs @args)" }
+    function lt   { Invoke-Expression "$EZA_BASE --tree --level=2 $(_ezaArgs @args)" }
+    function llt  { Invoke-Expression "$EZA_BASE --tree --level=3 -la --git $(_ezaArgs @args)" }
+
+    # zsh's tre() pipes GNU `tree` through `less` — Windows has neither by
+    # default. eza's own --tree view already covers colorized/git-aware tree
+    # output (this is also why the scoop `tree` package was dropped — nothing
+    # here needs it over eza), paged through `more` since there's no `less`.
+    function tre  {
+        param([Parameter(ValueFromRemainingArguments)][string[]]$Args)
+        Invoke-Expression "$EZA_BASE --tree --git-ignore $(_ezaArgs @Args)" | more
+    }
 } else {
     # Fallback: colorized Get-ChildItem
     function ll { Get-ChildItem -Force @args }
@@ -82,6 +119,8 @@ if (_cmd bat) {
     $env:BAT_THEME = 'gruvbox-dark'
     $env:BAT_STYLE = 'numbers,changes,header'
 
+    # Same alias-shadowing issue as ls above — cat/man are also built-in aliases.
+    Remove-Item Alias:cat, Alias:man -Force -ErrorAction SilentlyContinue
     function cat  {
         param([Parameter(ValueFromRemainingArguments)][string[]]$Args)
         bat @Args

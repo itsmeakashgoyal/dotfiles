@@ -19,6 +19,12 @@
 # Shared helpers used across every section file below.
 function _cmd { param($Name) [bool](Get-Command $Name -ErrorAction SilentlyContinue) }
 
+# Default editor, matching zsh's 01-exports.zsh — nothing else in this profile
+# set these, so anything relying on $env:EDITOR (e.g. rgf in 20-tools.ps1) had
+# no fallback of its own beyond a literal, always-empty value.
+if (-not $env:EDITOR) { $env:EDITOR = 'nvim' }
+if (-not $env:VISUAL) { $env:VISUAL = $env:EDITOR }
+
 # `<tool> init <shell>` spawns the tool on every prompt/shell start — the
 # expensive part on Windows (per-process spawn + EDR/AV overhead). Cache the
 # generated init to a file and dot-source that instead, regenerating only

@@ -76,8 +76,13 @@ dutils cleanup -y all            # clean everything, no prompts
 
 Components: `dotfiles` (remove Stow symlinks), `homebrew` (uninstall Homebrew + all packages),
 `nvim` (remove Neovim config/data/cache), `tmux` (remove tmux config), `all`. The `dotfiles` and
-`homebrew` components delegate to [`scripts/setup/uninstall.sh`](../setup/uninstall.sh) so there's
-one implementation of "how teardown actually works" shared with `make uninstall`.
+`homebrew` components delegate to [`scripts/setup/uninstall.sh`](../setup/uninstall.sh) on
+macOS/Linux so there's one implementation of "how teardown actually works" shared with
+`make uninstall`. On Windows (no `uninstall.sh`/`make` there), `dotfiles` instead runs
+`windows.ps1 -Uninstall -SymlinksOnly` — just the symlinks/PATH entry, matching this
+component's own scope; `homebrew` no-ops (there's no Homebrew on Windows). The full Windows
+teardown (Scoop packages, terminal theme, PowerShell modules too) is a separate, explicit
+`windows.ps1 -Uninstall` call — see [docs/WINDOWS.md](../../docs/WINDOWS.md).
 
 ### `ssh-setup` — SSH keys + config for personal & work GitHub
 

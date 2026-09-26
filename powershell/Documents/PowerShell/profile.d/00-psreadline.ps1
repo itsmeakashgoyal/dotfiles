@@ -28,10 +28,9 @@ if (Get-Module -ListAvailable PSReadLine) {
     Set-PSReadLineOption -HistorySearchCursorMovesToEnd
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
     Set-PSReadLineOption -PredictionViewStyle ListView
-    # Gruvbox Dark palette — same one 10-fzf.ps1's $FZF_DEFAULT_OPTS,
-    # 20-tools.ps1's $BAT_THEME, and 22-native-prompt.ps1 use, so prompt/fzf/
-    # bat/editing colors and the Windows Terminal scheme
-    # (settings/windows-terminal/gruvbox-dark.json) all match.
+    # Gruvbox Dark palette — same one 20-tools.ps1's $BAT_THEME and
+    # 22-native-prompt.ps1 use, so prompt/bat/editing colors and the Windows
+    # Terminal scheme (settings/windows-terminal/gruvbox-dark.json) all match.
     Set-PSReadLineOption -Colors @{
         Command            = '#83A598'
         Parameter          = '#8EC07C'

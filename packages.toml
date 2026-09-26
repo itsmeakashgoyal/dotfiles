@@ -151,7 +151,9 @@ desc     = "JSON processor"
 category = "Essential CLI Tools"
 brew     = "jq"
 nix      = "jq"
-scoop    = "jq"
+# No scoop: confirmed directly nothing in the Windows profile/dutils path
+# invokes jq (unlike zsh's pr-checkout, which does) — installed there would
+# be pure dead weight.
 
 [[package]]
 name     = "lazygit"
@@ -200,7 +202,11 @@ desc     = "Directory tree"
 category = "Essential CLI Tools"
 brew     = "tree"
 nix      = "tree"
-scoop    = "tree"
+# No scoop: Windows already ships tree.com built in, and eza's own --tree view
+# (see profile.d/20-tools.ps1's `tre` function) already covers colorized/
+# git-aware tree output — confirmed directly this scoop package wasn't even
+# installed despite being in this list, and dutils check silently passed
+# anyway because it found the built-in tree.com instead.
 
 [[package]]
 name     = "television"
@@ -750,3 +756,4 @@ desc           = "PowerShell profile (thin loader for profile.d/*.ps1)"
 platforms      = ["windows"]
 critical       = true
 windows_target = '$([Environment]::GetFolderPath("MyDocuments"))\PowerShell\Microsoft.PowerShell_profile.ps1'
+

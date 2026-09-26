@@ -73,12 +73,39 @@ def package_manager() -> tuple[str, str]:
     }[current_platform()]
 
 
+def _windows_my_documents() -> str:
+    """The real Documents path — same value PowerShell's own
+    [Environment]::GetFolderPath("MyDocuments") resolves to, including any
+    OneDrive Known Folder Move redirection (common on corporate-managed
+    machines). Read from the registry key that backs it rather than assuming
+    $env:USERPROFILE\\Documents, which is wrong whenever KFM is active.
+    """
+    import winreg
+
+    with winreg.OpenKey(
+        winreg.HKEY_CURRENT_USER,
+        r"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders",
+    ) as key:
+        value, _ = winreg.QueryValueEx(key, "Personal")
+    return os.path.expandvars(value)
+
+
 def stow_target(entry: "mf.StowEntry") -> Path:
     """Absolute path a Stow entry lands on for this platform."""
     if not osdetect.is_windows():
         return Path.home() / entry.target
 
     target = entry.win_target
+    # windows_target entries can be a $([Environment]::GetFolderPath(...))
+    # expression (see packages.toml's powershell entry) rather than a plain
+    # $env:VAR token — the substitution loop below only ever handled the
+    # latter, so this resolved to the literal, non-existent expression text
+    # and always reported the PowerShell profile symlink as missing.
+    target = re.sub(
+        r'\$\(\[Environment\]::GetFolderPath\("MyDocuments"\)\)',
+        _windows_my_documents().replace("\\", "\\\\"),
+        target,
+    )
     for var, default in (
         ("$env:USERPROFILE",  str(Path.home())),
         ("$env:LOCALAPPDATA", os.environ.get("LOCALAPPDATA", str(Path.home()))),
@@ -277,7 +304,14 @@ class ConsoleRenderer:
         print()
 
         if failed > 0:
-            print(f"  {_c(Colors.RED, '⚠ ACTION:')} Run: cd ~/dotfiles && make install")
+            # `make install` doesn't exist on Windows — this told every failing
+            # Windows check to run a command that would just error immediately.
+            fix = (
+                r".\scripts\setup\windows.ps1"
+                if osdetect.is_windows()
+                else "cd ~/dotfiles && make install"
+            )
+            print(f"  {_c(Colors.RED, '⚠ ACTION:')} Run: {fix}")
         elif warned > 0:
             print(f"  {_c(Colors.YELLOW, '💡 Some optional tools are missing (see above).')}")
         else:
@@ -493,10 +527,17 @@ class FullVerification(SystemChecker):
         self.check_cmd("Neovim", "nvim")
         self.check_link("Config link", str(nvim_config))
         self.check_condition("init.lua", (nvim_config / "init.lua").is_file())
-        self.check_condition(
-            "Lazy.nvim",
-            (home / ".local" / "share" / "nvim" / "lazy" / "lazy.nvim").is_dir(),
+        # Neovim keeps plugin data under one XDG-style `~/.local/share/nvim`
+        # on macOS/Linux, but under a single `%LOCALAPPDATA%\nvim-data` on
+        # Windows (see windows.ps1's $NVIM_DATA) — the hardcoded Unix path
+        # here always false-WARNed on Windows even when lazy.nvim was
+        # correctly installed.
+        lazy_root = (
+            Path(os.environ.get("LOCALAPPDATA", str(home))) / "nvim-data"
+            if platform_key == "windows"
+            else home / ".local" / "share" / "nvim"
         )
+        self.check_condition("Lazy.nvim", (lazy_root / "lazy" / "lazy.nvim").is_dir())
 
         log.section("GIT")
         self.check_condition("Git config", (home / ".config" / "git" / "config").is_file())

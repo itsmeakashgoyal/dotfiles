@@ -42,6 +42,14 @@ def _run_uninstall(steps: str, force: bool) -> None:
         args = [pwsh, "-NoLogo", "-ExecutionPolicy", "Bypass", "-File", str(WINDOWS_PS1), "-Uninstall"]
         if force:
             args.append("-Force")
+        # "unstow,sweep" is cleanup_dotfiles's step set — its own description
+        # promises just "Remove dotfile symlinks", not the full teardown
+        # (Scoop packages, terminal theme, modules) windows.ps1 -Uninstall
+        # does by default. -SymlinksOnly keeps that promise on Windows too;
+        # the full teardown stays reachable only via a direct, explicit
+        # windows.ps1 -Uninstall call (see docs/WINDOWS.md), not through here.
+        if steps == "unstow,sweep":
+            args.append("-SymlinksOnly")
         subprocess.run(args, check=False)
         return
 
@@ -79,12 +87,27 @@ def cleanup_homebrew(force: bool = False) -> None:
 
 def cleanup_nvim() -> None:
     print("Cleaning Neovim configuration...")
-    dirs = [
-        HOME / ".config" / "nvim",
-        HOME / ".local" / "share" / "nvim",
-        HOME / ".local" / "state" / "nvim",
-        HOME / ".cache" / "nvim",
-    ]
+    if osdetect.is_windows():
+        # Neovim's config/data/state/cache all live under different paths on
+        # Windows than the XDG dirs below (see windows.ps1's $NVIM_CONFIG/
+        # $NVIM_DATA) — none of those four hardcoded Unix paths ever existed
+        # there, so this silently did nothing on Windows while still
+        # reporting success. Reuse check.py's own manifest-driven resolution
+        # (already fixed for OneDrive KFM) instead of a third hardcoded copy.
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "verify"))
+        from check import nvim_config_dir  # noqa: E402
+
+        dirs = [
+            nvim_config_dir(),
+            Path(os.environ.get("LOCALAPPDATA", str(HOME))) / "nvim-data",
+        ]
+    else:
+        dirs = [
+            HOME / ".config" / "nvim",
+            HOME / ".local" / "share" / "nvim",
+            HOME / ".local" / "state" / "nvim",
+            HOME / ".cache" / "nvim",
+        ]
     for d in dirs:
         if d.is_symlink():
             d.unlink()

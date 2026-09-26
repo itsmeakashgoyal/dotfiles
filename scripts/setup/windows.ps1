@@ -16,10 +16,13 @@
 # every package it manages (opt-in: Scoop is a general package manager, more
 # likely to be used for things outside these dotfiles than this script
 # installed, so unlike uninstall.sh's mandatory Homebrew/Nix removal, purging
-# it here is not the default).
+# it here is not the default). Add -SymlinksOnly to remove just the symlinks
+# and PATH entry — this is what `dutils cleanup dotfiles` calls, mirroring
+# the "unstow,sweep"-only scope of that same component on macOS/Linux.
 #   .\windows.ps1 -Uninstall
 #   .\windows.ps1 -Uninstall -DryRun
 #   .\windows.ps1 -Uninstall -Force -PurgeScoop
+#   .\windows.ps1 -Uninstall -Force -SymlinksOnly
 
 #Requires -Version 5.1
 
@@ -29,7 +32,8 @@ param(
     [switch]$SkipSymlinks,
     [switch]$Uninstall,
     [switch]$DryRun,
-    [switch]$PurgeScoop
+    [switch]$PurgeScoop,
+    [switch]$SymlinksOnly
 )
 
 Set-StrictMode -Version Latest
@@ -97,13 +101,11 @@ $SCOOP_PACKAGES = @(
     "gh"          # GitHub CLI
     "delta"       # Better git diff (Rust)
     "hyperfine"   # Command-line benchmarking tool (Rust)
-    "jq"          # JSON processor
     "lazygit"     # Terminal UI for git
     "mise"        # Runtime version manager (replaces pyenv)
     "uv"          # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
     "starship"    # Cross-shell prompt (default, replaced Powerlevel10k)
     "ripgrep"     # Better grep (Rust)
-    "tree"        # Directory tree
     "television"  # Fuzzy finder with channels (Rust)
     "yazi"        # Terminal file manager (Rust)
     "zoxide"      # Smart cd (Rust)
@@ -626,55 +628,21 @@ function Install-TerminalTheme {
 function Test-Installation {
     Write-Section "Health Check"
 
-    $tools = @("nvim", "git", "ripgrep", "fd", "bat", "lazygit", "node", "python3")
-    $passed = 0
-    $total = $tools.Count
-
-    foreach ($tool in $tools) {
-        # ripgrep binary is 'rg', python3 might be 'python'
-        $cmd = switch ($tool) {
-            "ripgrep" { "rg" }
-            "python3" { if (Get-Command python3 -ErrorAction SilentlyContinue) { "python3" } else { "python" } }
-            default { $tool }
-        }
-        if (Get-Command $cmd -ErrorAction SilentlyContinue) {
-            Write-Ok "$tool"
-            $passed++
-        }
-        else {
-            Write-Fail "$tool not found"
-        }
-    }
-
-    # Check symlinks
-    Write-Host ""
-    Write-Step "Checking symlinks..."
-    foreach ($entry in $SYMLINK_MAP.GetEnumerator()) {
-        $target = $entry.Value
-        if (Test-Path $target) {
-            $item = Get-Item $target -Force
-            if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
-                Write-Ok "$target (symlink)"
-                $passed++
-            }
-            else {
-                Write-Fail "$target (exists but not a symlink)"
-            }
-        }
-        else {
-            Write-Fail "$target (missing)"
-        }
-        $total++
-    }
-
-    Write-Host ""
-    Write-Host "  Score: $passed/$total checks passed" -ForegroundColor $(if ($passed -eq $total) { "Green" } else { "Yellow" })
+    # Used to be a hand-maintained, 8-tool list that couldn't help drifting
+    # from packages.toml (checked 8 of the 34 packages this script actually
+    # installs — a failed `mise` or `delta` install was invisible here despite
+    # `dutils health` already knowing how to check the real manifest, and
+    # correctly resolving the OneDrive-safe PowerShell profile symlink, on
+    # every platform). Delegate to it instead of maintaining a second copy.
+    $py = if (Get-Command python3 -ErrorAction SilentlyContinue) { "python3" } else { "python" }
+    & $py (Join-Path $DOTFILES_DIR "scripts\verify\check.py") --quick
+    $passed = ($LASTEXITCODE -eq 0)
 
     # In CI, an incomplete health check is a real failure, not just a status
     # line — mirrors install.sh's `[[ -n "$CI" ]]` strictness convention.
     # Interactive/personal runs stay lenient (report and continue).
-    if ($env:CI -and $passed -ne $total) {
-        Write-Host "::error::Health check incomplete: $passed/$total" -ForegroundColor Red
+    if ($env:CI -and -not $passed) {
+        Write-Host "::error::Health check reported failures" -ForegroundColor Red
         exit 1
     }
 }
@@ -685,7 +653,13 @@ function Test-Installation {
 function Install-PsModules {
     Write-Section "PowerShell Modules"
 
-    $modules = @("PSReadLine", "Terminal-Icons")
+    # PSReadLine only needs installing on Windows PowerShell (Desktop edition,
+    # 5.1) — its inbox version there is a genuinely old 2.0.0 that predates
+    # -Colors/prediction support. pwsh (Core) already ships a current one
+    # (confirmed directly: 7.6.6 bundles 2.4.5 — newer than what Install-Module
+    # was pulling down here, 2.4.4 — so this was pure wasted install time on
+    # modern PowerShell, not a functional gap).
+    $modules = if ($PSVersionTable.PSEdition -eq "Desktop") { @("PSReadLine", "Terminal-Icons") } else { @("Terminal-Icons") }
     foreach ($mod in $modules) {
         if (Get-Module -ListAvailable $mod -ErrorAction SilentlyContinue) {
             Write-Ok "$mod (already installed)"
@@ -878,15 +852,22 @@ function Invoke-Uninstall {
     if ($DryRun) { Write-Warning-Line "DRY-RUN MODE — nothing will actually be changed." }
 
     Write-Host ""
-    Write-Host "  This removes every symlink windows.ps1 created, its PATH entry," -ForegroundColor Cyan
-    Write-Host "  generated Neovim data, the PowerShell modules it installed, and" -ForegroundColor Cyan
-    Write-Host "  reverts the Windows Terminal theme." -ForegroundColor Cyan
-    if ($PurgeScoop) {
-        Write-Warning-Line "Also purging Scoop entirely (-PurgeScoop) — every package it manages goes too."
+    if ($SymlinksOnly) {
+        Write-Host "  This removes every symlink windows.ps1 created and its PATH entry" -ForegroundColor Cyan
+        Write-Host "  only — Scoop packages, Neovim data, PowerShell modules, and the" -ForegroundColor Cyan
+        Write-Host "  Windows Terminal theme are left as-is." -ForegroundColor Cyan
     }
     else {
-        Write-Host "  Scoop's own packages this script installed will be removed; Scoop" -ForegroundColor Cyan
-        Write-Host "  itself is left alone unless you pass -PurgeScoop." -ForegroundColor Cyan
+        Write-Host "  This removes every symlink windows.ps1 created, its PATH entry," -ForegroundColor Cyan
+        Write-Host "  generated Neovim data, the PowerShell modules it installed, and" -ForegroundColor Cyan
+        Write-Host "  reverts the Windows Terminal theme." -ForegroundColor Cyan
+        if ($PurgeScoop) {
+            Write-Warning-Line "Also purging Scoop entirely (-PurgeScoop) — every package it manages goes too."
+        }
+        else {
+            Write-Host "  Scoop's own packages this script installed will be removed; Scoop" -ForegroundColor Cyan
+            Write-Host "  itself is left alone unless you pass -PurgeScoop." -ForegroundColor Cyan
+        }
     }
     Write-Host "  The repo, your dotfiles' own git history, and your data (atuin" -ForegroundColor Cyan
     Write-Host "  history, ssh keys, secrets) are left untouched." -ForegroundColor Cyan
@@ -899,10 +880,13 @@ function Invoke-Uninstall {
 
     Remove-DotfileSymlinks
     Remove-LocalBinFromPath
-    Remove-GeneratedNvimData
-    Uninstall-PsModules
-    Restore-TerminalTheme
-    Remove-ScoopPackages
+
+    if (-not $SymlinksOnly) {
+        Remove-GeneratedNvimData
+        Uninstall-PsModules
+        Restore-TerminalTheme
+        Remove-ScoopPackages
+    }
 
     Write-Host ""
     if ($DryRun) {
@@ -945,11 +929,32 @@ function Main {
         exit 1
     }
 
+    # Each step wrapped in try/catch — same reasoning as the PowerShell
+    # profile's own per-file loader: with $ErrorActionPreference = "Stop" at
+    # script scope, one step's uncaught error (a network hiccup in Sublime's
+    # download, a malformed Windows Terminal settings.json, ...) used to kill
+    # the *entire* script, silently skipping every step after it, including
+    # the final health check. Surface the failure, keep going, and report a
+    # summary at the end instead — mirrors uninstall.sh's own Summary block.
+    $__failures = @()
+    function Invoke-Step {
+        param([string]$Name, [scriptblock]$Body)
+        try {
+            & $Body
+        }
+        catch {
+            Write-Fail "$Name failed: $_"
+            $script:__failures += $Name
+        }
+    }
+
     # Step 1: Scoop
     if (-not $SkipPackages) {
-        Write-Section "Package Manager"
-        Install-Scoop
-        Install-ScoopPackages
+        Invoke-Step "Package Manager" {
+            Write-Section "Package Manager"
+            Install-Scoop
+            Install-ScoopPackages
+        }
     }
     else {
         Write-Step "Skipping package installation (-SkipPackages)"
@@ -957,8 +962,10 @@ function Main {
 
     # Step 2: Symlinks
     if (-not $SkipSymlinks) {
-        Install-Symlinks
-        Install-LocalBinOnPath
+        Invoke-Step "Symlinks" {
+            Install-Symlinks
+            Install-LocalBinOnPath
+        }
     }
     else {
         Write-Step "Skipping symlink creation (-SkipSymlinks)"
@@ -966,19 +973,28 @@ function Main {
 
     # Step 3: PowerShell modules
     if (-not $SkipPackages) {
-        Install-PsModules
+        Invoke-Step "PowerShell Modules" { Install-PsModules }
     }
 
     # Step 4: Neovim + editors
-    Install-NeovimPlugins
-    Install-GuiConfig
-    Install-SublimePackageControl
+    Invoke-Step "Neovim Setup" { Install-NeovimPlugins }
+    Invoke-Step "GUI Configuration" { Install-GuiConfig }
+    Invoke-Step "Sublime Text" { Install-SublimePackageControl }
 
     # Step 5: Windows Terminal theme
-    Install-TerminalTheme
+    Invoke-Step "Windows Terminal Theme" { Install-TerminalTheme }
 
-    # Step 6: Health check
+    # Step 6: Health check (always runs, even if an earlier step failed —
+    # that's exactly when seeing the real state matters most)
     Test-Installation
+
+    if ($__failures.Count -gt 0) {
+        Write-Host ""
+        Write-Host "  ⚠ $($__failures.Count) step(s) failed and were skipped:" -ForegroundColor Yellow
+        $__failures | ForEach-Object { Write-Host "    - $_" -ForegroundColor Yellow }
+        Write-Host "  Everything else above still completed. Re-run windows.ps1 to retry" -ForegroundColor Yellow
+        Write-Host "  just the failed step(s) — steps are idempotent." -ForegroundColor Yellow
+    }
 
     Write-Banner "Setup Complete!"
     Write-Host "  Next steps:" -ForegroundColor Cyan
@@ -988,6 +1004,11 @@ function Main {
     Write-Host "    4. Install a Nerd Font in your terminal (JetBrainsMono NF recommended)"
     Write-Host "    5. Reload your PowerShell profile: . `$PROFILE"
     Write-Host ""
+
+    if ($env:CI -and $__failures.Count -gt 0) {
+        Write-Host "::error::$($__failures.Count) setup step(s) failed: $($__failures -join ', ')" -ForegroundColor Red
+        exit 1
+    }
 }
 
 Main

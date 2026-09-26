@@ -13,13 +13,24 @@ function ...   { Set-Location ..\.. }
 function ....  { Set-Location ..\..\.. }
 function ~     { Set-Location $HOME }
 
+# Navigate up N directories (mirrors zsh's up()).
+function up {
+    param([int]$Levels = 1)
+    $path = '..\' * $Levels
+    Set-Location $path
+}
+
 function mkcd {
     param([string]$Path)
     New-Item -ItemType Directory -Path $Path -Force | Out-Null
     Set-Location $Path
 }
 
-# Remove
+# Remove — rm/rmdir are built-in aliases (Remove-Item) that resolve before a
+# same-named function; confirmed directly that `rm -rf`/`rmdir -parents` threw
+# "parameter cannot be found" errors because the alias, not this function, was
+# running. Remove the aliases so these functions actually take over.
+Remove-Item Alias:rm, Alias:rmdir -Force -ErrorAction SilentlyContinue
 function rm {
     param(
         [switch]$rf,
@@ -120,11 +131,18 @@ function pkill {
 
 function reload { . $PROFILE; Write-Host 'Profile reloaded.' -ForegroundColor Green }
 
+function myip { (Invoke-RestMethod -Uri 'https://ipinfo.io/ip').Trim() }
+if (_cmd fastfetch) { function sysinfo { fastfetch } }
+if (_cmd btop)      { function top     { btop } }
+
 # Sudo (gsudo if available, else elevation prompt)
 if (_cmd gsudo) { Set-Alias sudo gsudo }
 else {
     function sudo {
         param([Parameter(ValueFromRemainingArguments)][string[]]$Args)
-        Start-Process pwsh -Verb RunAs -ArgumentList ("-NoExit", "-Command", ($Args -join ' '))
+        # Fall back to Windows PowerShell if pwsh isn't on PATH (e.g. a
+        # PowerShell-5.1-only machine) rather than throwing "command not found".
+        $shell = if (_cmd pwsh) { 'pwsh' } else { 'powershell' }
+        Start-Process $shell -Verb RunAs -ArgumentList ("-NoExit", "-Command", ($Args -join ' '))
     }
 }

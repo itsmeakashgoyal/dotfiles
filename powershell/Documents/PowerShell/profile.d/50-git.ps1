@@ -9,9 +9,15 @@
 # too — see 09-television.zsh).
 
 function g     { git @args }
+function grt   { Set-Location (git rev-parse --show-toplevel) }
 function gs    { git status -sb }
 function ga    { git add @args }
 function gaa   { git add -A }
+# gc/gp are built-in aliases (Get-Content / Get-ItemProperty) that resolve
+# before a same-named function — confirmed directly that these two ran the
+# wrong command silently (gp never pushed; gc read a file literally named
+# by its args). Remove the aliases so these functions actually take over.
+Remove-Item Alias:gc, Alias:gp -Force -ErrorAction SilentlyContinue
 function gc    { git commit -m @args }
 function gca   { git commit --amend --no-edit }
 function gp    { git push @args }
@@ -103,6 +109,7 @@ function logg {
     $selected = git log --oneline --graph --decorate --color=always | tv --ansi
     if (-not $selected) { return }
     if ($selected -match '[a-f0-9]{7,40}') {
+        if (-not (_cmd nvim)) { Write-Warning 'nvim not found'; return }
         git show $Matches[0] | nvim -
     }
 }

@@ -179,20 +179,17 @@ function prompt {
     }
 
     $exitCodeForPrompt = if (-not $origDollarQuestion) { $origLastExitCode } else { 0 }
-    # Guarded: this type comes from the PSReadLine module (00-psreadline.ps1
-    # loads before this file in normal profile order, so it's normally
-    # available) — but a prompt function throwing would leave the shell
-    # with no usable prompt at all, so never let a missing/unloaded
-    # PSReadLine take the whole prompt down over a vi-mode cosmetic.
-    $isViCommandMode = $false
-    try { $isViCommandMode = [Microsoft.PowerShell.PSConsoleReadLine]::InViCommandMode() } catch {}
-    $charSymbol = if ($isViCommandMode) { '❮' } else { '❯' }
     # Bare "dim" with no color underneath rides on whatever the terminal's
     # default foreground happens to be — on a dark background that's
     # frequently near-invisible (it was: this exact bug is why the ❯ all but
     # vanished after every prompt block). Always give it an explicit,
     # visible color instead.
-    $charColor = if ($exitCodeForPrompt -ne 0) { "$($script:__dotfiles_bold)$(__dotfiles_native_fg 'FB4934')" } elseif ($isViCommandMode) { "$($script:__dotfiles_bold)$(__dotfiles_native_fg 'EBDBB2')" } else { __dotfiles_native_fg 'FE8019' }
+    #
+    # No vi-mode branch here: 00-psreadline.ps1 hardcodes Emacs mode (see its
+    # own comment on why), so InViCommandMode() can never return true in this
+    # profile — a vi-mode indicator would be permanently-dead code.
+    $charSymbol = '❯'
+    $charColor = if ($exitCodeForPrompt -ne 0) { "$($script:__dotfiles_bold)$(__dotfiles_native_fg 'FB4934')" } else { __dotfiles_native_fg 'FE8019' }
 
     $promptText = "`n$line`n$charColor$charSymbol$($script:__dotfiles_reset) "
     Set-PSReadLineOption -ExtraPromptLineCount ($promptText.Split("`n").Length - 1)

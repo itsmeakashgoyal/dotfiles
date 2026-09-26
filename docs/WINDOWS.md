@@ -96,6 +96,29 @@ done — it's meant for diagnosing a specific slowdown, not left on permanently.
 
 ---
 
+## Package manager: Scoop
+
+Scoop, not winget or Chocolatey — considered directly, not by default. Winget has no
+equivalent to Scoop's `nerd-fonts` bucket (used for the JetBrainsMono/FiraCode fonts)
+and uncertain coverage for smaller Rust/Go CLI tools like `television`; Chocolatey's
+community packages run arbitrary install scripts, which fight the same AV/EDR
+file-locking `Repair-ScoopBuckets` already exists to work around, rather than avoiding
+it. Both alternatives would also mean a non-trivial rewrite: `scoop`/`brew`/`nix` are
+hardcoded, parallel keys throughout the manifest loader/renderer/verifier
+(`scripts/lib/manifest.py`, `scripts/dutils/manifest.py`, `scripts/verify/check.py`),
+not an abstracted "Windows package manager" concept. Revisit if this setup ever wants
+to install actual GUI applications (not just symlink their config) — winget's
+proper-installer integration is a better fit for that than Scoop's app-bucket model,
+but nothing here does that today.
+
+Two packages were dropped from the Windows list as dead weight (kept on macOS/Linux,
+where they're actually used): `tree` (Windows ships `tree.com` built in, and eza's own
+`--tree` view — see the `tre` function below — already covers colorized/git-aware tree
+output) and `jq` (nothing in the Windows profile/dutils path invokes it, unlike zsh's
+`pr-checkout`).
+
+---
+
 ## `dutils` on Windows
 
 `dutils` (`scripts/dutils/dutils`) is the cross-platform maintenance CLI — `make health`/
@@ -124,6 +147,13 @@ Windows with a message pointing at `dutils --help` / `dutils <command> --help` i
 **What works on Windows**: `health`, `check`, `diagnose`, `sysinfo`, `packages`,
 `manifest`, `theme`, `secrets`, `ssh-setup`, `detect-os`, `init`, `update`, `new`,
 `sync`, `edit`, `bench`, `profile` — all confirmed directly, not assumed.
+
+`dutils new` also registers the scaffolded package in `packages.toml` and re-runs
+`dutils manifest generate` for you (previously it only edited the Makefile directly,
+so a new package never actually reached `windows.ps1`'s symlink map — confirmed via a
+live end-to-end test on this machine). It isn't wired up for Windows automatically
+(there's no way to know what `windows_target` a brand-new package needs), so it prints
+a follow-up note telling you to add `platforms = ["windows"]` yourself once you know.
 
 **What's intentionally not available on native Windows** (needs WSL2 or Git Bash
 instead — this repo's own stated daily-driver path for POSIX-shell tooling): `diff`,
@@ -170,13 +200,49 @@ Homebrew/Nix removal) because Scoop is a general-purpose package manager on Wind
 more likely to be relied on for things outside these dotfiles than Homebrew/Nix
 typically are on macOS/Linux.
 
-`dutils cleanup dotfiles` runs this same path on Windows (`osdetect.is_windows()` in
-`scripts/dutils/cleanup.py` branches to `pwsh windows.ps1 -Uninstall` instead of
-`bash uninstall.sh`) — `dutils cleanup dotfiles -y` for the non-interactive form.
+**`-SymlinksOnly`** removes just the symlinks and the PATH entry, nothing else —
+this is what `dutils cleanup dotfiles` calls on Windows (`osdetect.is_windows()` in
+`scripts/dutils/cleanup.py` branches to `pwsh windows.ps1 -Uninstall -SymlinksOnly`
+instead of `bash uninstall.sh`), matching that component's own description ("Remove
+dotfile symlinks") rather than silently also tearing down Scoop packages, the terminal
+theme, and PowerShell modules — which it used to do, unscoped. The full teardown above
+stays reachable only via a direct `windows.ps1 -Uninstall` call. `dutils cleanup
+dotfiles -y` for the non-interactive symlinks-only form.
+
+**If a step fails partway through** (setup or uninstall): each step is wrapped so one
+failure — a network hiccup downloading Sublime's Package Control, a malformed
+`settings.json` — doesn't take the rest of the script down with it. `windows.ps1`
+reports which step(s) failed at the end, still runs the health check, and every step
+is safe to just re-run (each one checks what's already done before redoing it).
 
 ---
 
 ## Troubleshooting
+
+### `gp`/`gc`/`rm`/`rmdir`/`ls`/`cat`/`man` silently did the wrong thing (fixed)
+
+**Symptom**: `gp` didn't push (and didn't error either); `rm -rf`/`rmdir -parents`
+threw `A parameter cannot be found that matches parameter name 'rf'`; `ls`/`cat`/`man`
+ran plain `Get-ChildItem`/`Get-Content`/`help` instead of the eza/bat-powered versions.
+
+**Cause**: PowerShell resolves a built-in alias before a same-named function —
+`gp`→`Get-ItemProperty`, `gc`→`Get-Content`, `rm`/`rmdir`/`ls`/`cat`/`man` are all
+built-in aliases too. The functions in `profile.d/*.ps1` defining the same names never
+actually ran. Confirmed directly (`Get-Command gp` reported `CommandType: Alias`, not
+`Function`) and fixed by removing the conflicting alias right before each function
+definition. If you're on an older clone, `git pull` and open a new terminal.
+
+**Also fixed while verifying this**: bare `ls`/`ll`/`la`/`l`/`lt`/`llt` (no path
+argument) printed nothing at all — confirmed directly, reproducible in any directory —
+because this eza build doesn't default to the current directory like GNU `ls` does
+when given zero positional args. All six now explicitly pass `.` when called bare.
+
+### New shell functions
+
+Matching a curated subset of their zsh equivalents (`zsh/.config/zsh/conf.d/`):
+`grt` (cd to git repo root), `myip` (public IP), `sysinfo`/`top` (fastfetch/btop
+aliases), `tre` (eza tree view, piped through `more`), `up N` (cd up N directories),
+`fv` (fuzzy-find a file with `tv`, open in nvim).
 
 ### Prompt / starship / tv / atuin keybindings don't load at all
 
