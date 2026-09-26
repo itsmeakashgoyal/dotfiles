@@ -6,13 +6,30 @@
 #
 # Windows setup: install Scoop, packages, create symlinks, configure Neovim.
 # Run as: powershell -ExecutionPolicy Bypass -File scripts/setup/windows.ps1
+#
+# Pass -Uninstall for the reverse: removes every symlink in $SYMLINK_MAP, the
+# PATH entry this script adds, generated Neovim data, the PowerShell modules
+# it installed, and reverts the Windows Terminal theme (from the backup this
+# script made before touching it) — the Windows counterpart to
+# scripts/setup/uninstall.sh. Combine with -DryRun to preview, -Force to skip
+# the confirmation prompt, and -PurgeScoop to ALSO remove Scoop itself and
+# every package it manages (opt-in: Scoop is a general package manager, more
+# likely to be used for things outside these dotfiles than this script
+# installed, so unlike uninstall.sh's mandatory Homebrew/Nix removal, purging
+# it here is not the default).
+#   .\windows.ps1 -Uninstall
+#   .\windows.ps1 -Uninstall -DryRun
+#   .\windows.ps1 -Uninstall -Force -PurgeScoop
 
 #Requires -Version 5.1
 
 param(
     [switch]$Force,
     [switch]$SkipPackages,
-    [switch]$SkipSymlinks
+    [switch]$SkipSymlinks,
+    [switch]$Uninstall,
+    [switch]$DryRun,
+    [switch]$PurgeScoop
 )
 
 Set-StrictMode -Version Latest
@@ -685,9 +702,228 @@ function Install-PsModules {
 }
 
 # ==============================================================================
+# Uninstall
+# ==============================================================================
+# Confirmation gate, honoring -Force/-DryRun the same way scripts/setup/
+# uninstall.sh's confirm_gate does.
+function Confirm-Uninstall {
+    param([string]$Prompt)
+    if ($DryRun) { Write-Step "[dry-run] would ask: $Prompt"; return $true }
+    if ($Force) { return $true }
+    $yn = Read-Host "  ? $Prompt [y/N]"
+    return $yn -match '^[Yy]$'
+}
+
+function Remove-DotfileSymlinks {
+    Write-Section "Removing Symlinks"
+
+    $removed = 0
+    $targets = @($SYMLINK_MAP.Values)
+    # Windows PowerShell 5.1 links its profile to a different path than the
+    # generated pwsh entry (see Install-Symlinks) — not in $SYMLINK_MAP itself.
+    $documentsDir = [Environment]::GetFolderPath('MyDocuments')
+    $targets += "$documentsDir\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+
+    foreach ($target in $targets) {
+        if (-not (Test-Path $target)) { continue }
+        $item = Get-Item $target -Force
+        if (-not ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            Write-Fail "$target exists but isn't a symlink — leaving it alone (may be a -Force backup target)"
+            continue
+        }
+        if ($DryRun) {
+            Write-Step "[dry-run] would remove symlink: $target"
+        }
+        else {
+            Remove-Item $target -Force
+            Write-Ok "Removed symlink: $target"
+        }
+        $removed++
+    }
+
+    if ($removed -eq 0) { Write-Ok "No dotfiles symlinks found." }
+}
+
+function Remove-LocalBinFromPath {
+    Write-Section "PATH"
+
+    $localBin = "$env:USERPROFILE\.local\bin"
+    $currentPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+    $entries = @(($currentPath -split ';') | Where-Object { $_ })
+    $kept = @($entries | Where-Object { $_.TrimEnd('\') -ne $localBin.TrimEnd('\') })
+
+    if ($kept.Count -eq $entries.Count) {
+        Write-Ok "$localBin not on PATH — nothing to remove."
+        return
+    }
+    if ($DryRun) {
+        Write-Step "[dry-run] would remove $localBin from the user PATH"
+        return
+    }
+    [Environment]::SetEnvironmentVariable('PATH', ($kept -join ';'), 'User')
+    Write-Ok "Removed $localBin from PATH"
+}
+
+function Remove-GeneratedNvimData {
+    Write-Section "Generated Neovim Data"
+
+    # lazy.nvim plugins + nvim state/shada/cache all live under one dir on
+    # Windows (unlike macOS/Linux's separate data/state/cache XDG dirs) —
+    # regenerated on next launch, so safe to wipe entirely.
+    if (Test-Path $NVIM_DATA) {
+        if ($DryRun) { Write-Step "[dry-run] would remove $NVIM_DATA" }
+        else { Remove-Item $NVIM_DATA -Recurse -Force; Write-Ok "Removed $NVIM_DATA" }
+    }
+    else {
+        Write-Ok "$NVIM_DATA not present — nothing to remove."
+    }
+}
+
+function Uninstall-PsModules {
+    Write-Section "PowerShell Modules"
+
+    # Only the ones Install-PsModules installs — PSReadLine ships inbox, so
+    # removing a user-scope copy just reverts to that, never leaves the shell
+    # without one.
+    foreach ($mod in @("PSReadLine", "Terminal-Icons")) {
+        if (-not (Get-InstalledModule $mod -ErrorAction SilentlyContinue)) {
+            Write-Ok "$mod (not installed via PowerShellGet — nothing to remove)"
+            continue
+        }
+        if ($DryRun) {
+            Write-Step "[dry-run] would uninstall module: $mod"
+            continue
+        }
+        try {
+            Uninstall-Module $mod -AllVersions -Force -ErrorAction Stop
+            Write-Ok "Uninstalled $mod"
+        }
+        catch {
+            Write-Fail "Could not uninstall $mod (non-fatal): $_"
+        }
+    }
+}
+
+function Restore-TerminalTheme {
+    Write-Section "Windows Terminal Theme"
+
+    $settingsPath = @(
+        "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json",
+        "$env:LOCALAPPDATA\Microsoft\Windows Terminal\settings.json"
+    ) | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+    if (-not $settingsPath) {
+        Write-Ok "Windows Terminal not found — nothing to revert."
+        return
+    }
+
+    # Install-TerminalTheme always makes a timestamped backup before writing;
+    # the newest one is the pre-Gruvbox state.
+    $backup = Get-ChildItem -Path (Split-Path $settingsPath) -Filter "$(Split-Path $settingsPath -Leaf).backup.*" -ErrorAction SilentlyContinue |
+        Sort-Object Name -Descending | Select-Object -First 1
+
+    if (-not $backup) {
+        Write-Ok "No settings.json backup found — theme left as-is (nothing this script can safely revert)."
+        return
+    }
+
+    if ($DryRun) {
+        Write-Step "[dry-run] would restore $settingsPath from $($backup.Name)"
+        return
+    }
+    Copy-Item $backup.FullName $settingsPath -Force
+    Write-Ok "Restored Windows Terminal settings from $($backup.Name)"
+}
+
+function Remove-ScoopPackages {
+    Write-Section "Scoop Packages"
+
+    if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+        Write-Ok "Scoop not installed — nothing to remove."
+        return
+    }
+
+    $allPkgs = @($SCOOP_PACKAGES) + @($SCOOP_BUCKET_PACKAGES.Values | ForEach-Object { $_ })
+    foreach ($pkg in $allPkgs) {
+        if (-not (Test-ScoopPackageInstalled -Package $pkg)) { continue }
+        if ($DryRun) {
+            Write-Step "[dry-run] would run: scoop uninstall $pkg"
+            continue
+        }
+        if (Invoke-Scoop uninstall $pkg) { Write-Ok "Removed $pkg" }
+        else { Write-Fail "Could not remove $pkg (non-fatal)" }
+    }
+
+    if ($PurgeScoop) {
+        Write-Warning-Line "Purging Scoop itself — this removes EVERY package it manages, not just the ones above."
+        if ($DryRun) {
+            Write-Step "[dry-run] would run: scoop uninstall scoop --purge"
+            return
+        }
+        if (Invoke-Scoop uninstall scoop --purge) { Write-Ok "Scoop fully removed" }
+        else { Write-Fail "Scoop self-uninstall failed — remove $env:USERPROFILE\scoop manually if needed" }
+    }
+    else {
+        Write-Ok "Scoop itself left installed (pass -PurgeScoop to remove it entirely)."
+    }
+}
+
+function Write-Warning-Line {
+    param([string]$Message)
+    Write-Host "  ! $Message" -ForegroundColor Yellow
+}
+
+function Invoke-Uninstall {
+    Write-Banner "Dotfiles Windows Uninstall"
+    if ($DryRun) { Write-Warning-Line "DRY-RUN MODE — nothing will actually be changed." }
+
+    Write-Host ""
+    Write-Host "  This removes every symlink windows.ps1 created, its PATH entry," -ForegroundColor Cyan
+    Write-Host "  generated Neovim data, the PowerShell modules it installed, and" -ForegroundColor Cyan
+    Write-Host "  reverts the Windows Terminal theme." -ForegroundColor Cyan
+    if ($PurgeScoop) {
+        Write-Warning-Line "Also purging Scoop entirely (-PurgeScoop) — every package it manages goes too."
+    }
+    else {
+        Write-Host "  Scoop's own packages this script installed will be removed; Scoop" -ForegroundColor Cyan
+        Write-Host "  itself is left alone unless you pass -PurgeScoop." -ForegroundColor Cyan
+    }
+    Write-Host "  The repo, your dotfiles' own git history, and your data (atuin" -ForegroundColor Cyan
+    Write-Host "  history, ssh keys, secrets) are left untouched." -ForegroundColor Cyan
+    Write-Host ""
+
+    if (-not (Confirm-Uninstall "Proceed with uninstall?")) {
+        Write-Fail "Uninstall aborted."
+        return
+    }
+
+    Remove-DotfileSymlinks
+    Remove-LocalBinFromPath
+    Remove-GeneratedNvimData
+    Uninstall-PsModules
+    Restore-TerminalTheme
+    Remove-ScoopPackages
+
+    Write-Host ""
+    if ($DryRun) {
+        Write-Host "  Dry-run complete — no changes were made." -ForegroundColor Green
+    }
+    else {
+        Write-Host "  Dotfiles uninstalled." -ForegroundColor Green
+        Write-Host "  Open a new terminal for the PATH change to take effect." -ForegroundColor Cyan
+        Write-Host "  The repo is still at: $DOTFILES_DIR (delete it manually if you want it gone)." -ForegroundColor Cyan
+    }
+}
+
+# ==============================================================================
 # Main
 # ==============================================================================
 function Main {
+    if ($Uninstall) {
+        Invoke-Uninstall
+        return
+    }
+
     Write-Banner "Dotfiles Windows Setup"
 
     # Check we're running as admin (needed for symlinks on older Windows)

@@ -16,31 +16,43 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
 from dutil import ok as _ok, info as _info, confirm as _confirm  # noqa: E402
+import osdetect  # noqa: E402
 
 HOME = Path.home()
 UNINSTALL_SH = Path(__file__).resolve().parent.parent / "setup" / "uninstall.sh"
+WINDOWS_PS1 = Path(__file__).resolve().parent.parent / "setup" / "windows.ps1"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _run_uninstall(steps: str, force: bool) -> None:
-    """Delegate to scripts/setup/uninstall.sh for the given steps.
+    """Delegate to scripts/setup/uninstall.sh (macOS/Linux) or
+    scripts/setup/windows.ps1 -Uninstall (native Windows) for the given steps.
 
     Resolved by path, not by sourcing DOTFILES_DIR/XDG_DOTFILES_DIR from the
-    caller's environment - uninstall.sh's own BASH_SOURCE-based self-location
-    figures out the repo root correctly on its own once invoked this way.
+    caller's environment - each script's own self-location figures out the
+    repo root correctly on its own once invoked this way.
     """
+    if osdetect.is_windows():
+        pwsh = shutil.which("pwsh") or shutil.which("powershell")
+        if pwsh is None:
+            _info("Neither 'pwsh' nor 'powershell' found on PATH — cannot run windows.ps1 -Uninstall.")
+            return
+        args = [pwsh, "-NoLogo", "-ExecutionPolicy", "Bypass", "-File", str(WINDOWS_PS1), "-Uninstall"]
+        if force:
+            args.append("-Force")
+        subprocess.run(args, check=False)
+        return
+
     # Without this check, subprocess.run raises an uncaught FileNotFoundError
-    # when bash is absent — confirmed directly on Windows (native PowerShell
-    # has no bash). check=False only covers a non-zero *exit code*, it
-    # doesn't stop the executable-not-found case from raising at all.
+    # when bash is absent — e.g. a from-source Python install with no shell
+    # environment set up yet. check=False only covers a non-zero *exit code*,
+    # it doesn't stop the executable-not-found case from raising at all.
     if shutil.which("bash") is None:
         _info(
-            "'bash' not found — uninstall.sh needs it, and native Windows "
-            "PowerShell doesn't have it. Use WSL2 or Git Bash, or run "
-            "scripts/setup/windows.ps1 -Force to re-symlink over what this "
-            "would have removed instead."
+            "'bash' not found — uninstall.sh needs it. Use WSL2 or Git Bash "
+            "if this is meant to be a POSIX shell."
         )
         return
     env = os.environ.copy()

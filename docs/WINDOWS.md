@@ -139,6 +139,43 @@ same goal, since neither zsh nor zprof exist on Windows.
 
 ---
 
+## Uninstall
+
+`make uninstall` (→ `scripts/setup/uninstall.sh`) needs `make` and `bash`, neither of
+which exist natively on Windows. `windows.ps1`'s `-Uninstall` switch is the Windows
+counterpart — same one-confirmation, fully-reversed teardown, just a different
+mechanism:
+
+```powershell
+.\scripts\setup\windows.ps1 -Uninstall            # interactive
+.\scripts\setup\windows.ps1 -Uninstall -DryRun    # preview every action, change nothing
+.\scripts\setup\windows.ps1 -Uninstall -Force     # skip the confirmation prompt
+```
+
+It removes, in order: every symlink in `$SYMLINK_MAP` (+ the Windows PowerShell 5.1
+profile link) → the `%USERPROFILE%\.local\bin` PATH entry `Install-LocalBinOnPath` added →
+generated Neovim data (`%LOCALAPPDATA%\nvim-data` — lazy.nvim plugins, state, shada,
+cache) → the `PSReadLine`/`Terminal-Icons` modules `Install-PsModules` installed → the
+Windows Terminal Gruvbox theme, reverted from the timestamped backup `Install-TerminalTheme`
+made before ever touching `settings.json` → every Scoop package this script installed
+(`$SCOOP_PACKAGES` + the nerd-font bucket packages).
+
+**What it never touches**: the repo itself, your git config content, ssh keys, secrets,
+and atuin history — same guarantee `uninstall.sh` makes on macOS/Linux.
+
+**Scoop itself is left installed by default** — pass `-PurgeScoop` to also remove it
+completely (`scoop uninstall scoop --purge`, taking every package it manages with it,
+not just this repo's). This is opt-in rather than mandatory (unlike `uninstall.sh`'s
+Homebrew/Nix removal) because Scoop is a general-purpose package manager on Windows —
+more likely to be relied on for things outside these dotfiles than Homebrew/Nix
+typically are on macOS/Linux.
+
+`dutils cleanup dotfiles` runs this same path on Windows (`osdetect.is_windows()` in
+`scripts/dutils/cleanup.py` branches to `pwsh windows.ps1 -Uninstall` instead of
+`bash uninstall.sh`) — `dutils cleanup dotfiles -y` for the non-interactive form.
+
+---
+
 ## Troubleshooting
 
 ### Prompt / starship / tv / atuin keybindings don't load at all

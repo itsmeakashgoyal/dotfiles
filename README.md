@@ -233,6 +233,23 @@ rm -rf ~/dotfiles
 
 See [docs/NIX.md](docs/NIX.md) for Nix-specific removal notes.
 
+**Windows** has no `make`/Stow, so `windows.ps1` has its own `-Uninstall` mode
+instead — removes every symlink it created, its PATH entry, generated Neovim
+data, the PowerShell modules it installed, and reverts the Windows Terminal
+theme (from the backup it made before touching it):
+
+```powershell
+.\scripts\setup\windows.ps1 -Uninstall
+.\scripts\setup\windows.ps1 -Uninstall -DryRun    # preview first
+.\scripts\setup\windows.ps1 -Uninstall -Force     # skip the confirmation prompt
+```
+
+Scoop packages this script installed are removed too by default; Scoop itself
+is left alone unless you also pass `-PurgeScoop` (opt-in — Scoop is a general
+package manager, more likely to be used for things outside these dotfiles than
+Homebrew/Nix typically are). `dutils cleanup dotfiles` runs the same thing on
+Windows. See [docs/WINDOWS.md](docs/WINDOWS.md) for details.
+
 ---
 
 ## Repository Structure
