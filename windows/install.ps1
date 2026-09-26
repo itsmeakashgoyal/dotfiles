@@ -1,17 +1,17 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ install.ps1
+# ░▓ file   ▓ windows/install.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Windows installer entry point — equivalent to install.sh for macOS/Linux.
 #
 # Usage (run in PowerShell as Administrator or with Developer Mode enabled):
 #   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-#   .\install.ps1
+#   .\windows\install.ps1
 #
 # Or one-liner from a fresh machine:
-#   irm https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/windows/install.ps1 | iex
 
 #Requires -Version 5.1
 
@@ -25,8 +25,10 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 # $PSScriptRoot is empty when run via the `irm | iex` one-liner (no file on
-# disk to locate), so fall back to the historical default in that case.
-$DOTFILES_DIR = if ($PSScriptRoot) { $PSScriptRoot } else { "$env:USERPROFILE\dotfiles" }
+# disk to locate), so fall back to the historical default in that case. When
+# run from a local clone, this file lives at <repo>\windows\install.ps1, so
+# the repo root is one level up.
+$DOTFILES_DIR = if ($PSScriptRoot) { Split-Path $PSScriptRoot -Parent } else { "$env:USERPROFILE\dotfiles" }
 $REPO_URL = "https://github.com/itsmeakashgoyal/dotfiles.git"
 
 # ==============================================================================
@@ -153,7 +155,7 @@ function Main {
 
     # Step 3-5: Delegate to setup script
     Write-Step "3/5" "Running Windows setup..."
-    $setupScript = Join-Path $DOTFILES_DIR "scripts\setup\windows.ps1"
+    $setupScript = Join-Path $DOTFILES_DIR "windows\windows.ps1"
 
     if (-not (Test-Path $setupScript)) {
         Write-Fail "Setup script not found: $setupScript"

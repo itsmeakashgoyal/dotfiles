@@ -45,7 +45,7 @@ dotfiles/
 └── starship/    → ~/.config/starship/     Cross-shell prompt (default)
 ```
 
-`powershell/`, `brew/`, and `nix/` are top-level directories too, but none are Stow packages: `powershell/` mirrors the same package-shaped layout but is deliberately **not** in `STOW_PACKAGES` (Windows uses its own symlink function instead of Stow — see [Windows](#windows)); `brew/` and `nix/` are plain package-manager manifests (`brew/Brewfile`, `nix/home.nix`) consumed by `scripts/setup/macos.sh`/`nix.sh`, not directories Stow ever touches.
+`windows/powershell/`, `brew/`, and `nix/` are top-level(-ish) directories too, but none are Stow packages: `windows/powershell/` mirrors the same package-shaped layout but is deliberately **not** in `STOW_PACKAGES` (Windows uses its own symlink function instead of Stow — see [Windows](#windows)); `brew/` and `nix/` are plain package-manager manifests (`brew/Brewfile`, `nix/home.nix`) consumed by `scripts/setup/macos.sh`/`nix.sh`, not directories Stow ever touches.
 
 ---
 
@@ -141,8 +141,8 @@ scripts/
 │   ├── nix.sh            ← installs Nix + applies nix/home.nix (Linux CLI tools)
 │   ├── sublime.sh        ← Sublime Text config deployment (macOS)
 │   ├── iterm.sh          ← iTerm2 plist deployment (macOS)
-│   ├── uninstall.sh      ← full teardown: shell, symlinks, Nix, Homebrew
-│   └── windows.ps1       ← Windows equivalent (Scoop, symlinks, PS modules)
+│   └── uninstall.sh      ← full teardown: shell, symlinks, Nix, Homebrew
+│                             (Windows' own setup/uninstall lives in windows/ instead — see below)
 │
 ├── verify/
 │   ├── check.sh          ← thin shim, execs check.py
@@ -223,24 +223,38 @@ The zsh-config-test step actually sources `.zshrc` (not just `.zshenv`) and asse
 
 ## Windows
 
-Windows has a separate, non-Stow installation path since GNU Stow doesn't run natively there:
+Windows has a separate, non-Stow installation path since GNU Stow doesn't run natively
+there — everything Windows-only (installer, setup/uninstall script, PowerShell profile,
+Windows Terminal theme) lives under one `windows/` directory:
 
 ```text
-install.ps1                          ← entry point (mirrors install.sh)
+windows/
+├── install.ps1                ← entry point (mirrors install.sh)
+├── windows.ps1                 ← the real installer/uninstaller (below)
+├── windows-terminal/
+│   └── gruvbox-dark.json      ← color scheme Install-TerminalTheme merges in
+└── powershell/
+    └── Documents/PowerShell/
+        ├── Microsoft.PowerShell_profile.ps1
+        └── profile.d/*.ps1     ← mirrors zsh's conf.d/ modules
+```
+
+```text
+windows/install.ps1                  ← entry point (mirrors install.sh)
      │  clone/update repo, checks Admin/Developer Mode
      ▼
-scripts/setup/windows.ps1
+windows/windows.ps1
      ├── Scoop package manager + package list
      ├── New-DotfileSymlink          ← hand-rolled symlink function per
      │                                  entry in $SYMLINK_MAP (cross-referenced
      │                                  against STOW_PACKAGES, kept in sync by hand)
      ├── PowerShell modules (PSReadLine, Terminal-Icons)
      ├── Neovim GUI config (ginit.vim for nvim-qt/Neovide)
-     └── Test-Installation           ← health check; exits non-zero under
-                                        $env:CI when incomplete
+     └── Test-Installation           ← delegates to `dutils health`, exits
+                                        non-zero under $env:CI when incomplete
 ```
 
-`powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1` mirrors the zsh conf.d functionality (aliases, television/atuin fuzzy-finder bindings) for native PowerShell use — television replaces fzf entirely and atuin provides history search, the same split as `zsh/.config/zsh/conf.d/09-television.zsh`/`10-atuin.zsh`. The recommended daily-driver path for the actual dev shell (nvim/tmux/zsh/git/television/atuin/fastfetch/bin scripts) is **WSL2** — all 8 Stow packages work there completely unmodified, since WSL2 is just Ubuntu from Stow's point of view.
+`windows/powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1` mirrors the zsh conf.d functionality (aliases, television/atuin fuzzy-finder bindings) for native PowerShell use — television replaces fzf entirely and atuin provides history search, the same split as `zsh/.config/zsh/conf.d/09-television.zsh`/`10-atuin.zsh`. The recommended daily-driver path for the actual dev shell (nvim/tmux/zsh/git/television/atuin/fastfetch/bin scripts) is **WSL2** — all 8 Stow packages work there completely unmodified, since WSL2 is just Ubuntu from Stow's point of view.
 
 See [docs/WINDOWS.md](WINDOWS.md) for the config toggles this profile exposes (an opt-in zero-subprocess native prompt, deferred mise activation, startup profiling) and for troubleshooting steps found while hardening this path (OneDrive-redirected `$PROFILE`, `powershell` vs `pwsh` encoding issues, large-repo git/starship performance).
 

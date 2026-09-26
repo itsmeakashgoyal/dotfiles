@@ -1,7 +1,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/00-psreadline.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/profile.d/00-psreadline.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # PSReadLine (editing) and Terminal-Icons. Dot-sourced by the profile.
@@ -30,7 +30,7 @@ if (Get-Module -ListAvailable PSReadLine) {
     Set-PSReadLineOption -PredictionViewStyle ListView
     # Gruvbox Dark palette — same one 20-tools.ps1's $BAT_THEME and
     # 22-native-prompt.ps1 use, so prompt/bat/editing colors and the Windows
-    # Terminal scheme (settings/windows-terminal/gruvbox-dark.json) all match.
+    # Terminal scheme (windows/windows-terminal/gruvbox-dark.json) all match.
     Set-PSReadLineOption -Colors @{
         Command            = '#83A598'
         Parameter          = '#8EC07C'

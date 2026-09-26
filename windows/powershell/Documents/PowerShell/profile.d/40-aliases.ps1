@@ -1,7 +1,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/40-aliases.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/profile.d/40-aliases.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Unix-like aliases and functions (navigation, file ops, system, sudo).

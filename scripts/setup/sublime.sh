@@ -9,7 +9,7 @@
 # into Sublime's per-OS User packages dir (so the repo stays the live source of
 # truth), and install Package Control so the packages listed in
 # `Package Control.sublime-settings` auto-install on first launch. Non-interactive.
-# (Windows is handled by scripts/setup/windows.ps1 via $SYMLINK_MAP.)
+# (Windows is handled by windows/windows.ps1 via $SYMLINK_MAP.)
 
 # Skip in CI (no GUI editor there).
 if [[ -n "${CI:-}" ]]; then

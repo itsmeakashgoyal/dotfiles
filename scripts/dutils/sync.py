@@ -48,7 +48,7 @@ def main() -> None:
         section("Re-linking (windows.ps1)")
         results["windows.ps1"] = run([
             "pwsh", "-ExecutionPolicy", "Bypass", "-File",
-            str(REPO / "scripts" / "setup" / "windows.ps1"), "-SkipPackages",
+            str(REPO / "windows" / "windows.ps1"), "-SkipPackages",
         ])
     else:
         section("Re-stowing packages")

@@ -1,7 +1,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/30-python.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/profile.d/30-python.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # uv: Python virtual environment management. Mirrors mkvenv/rmvenv/venv in

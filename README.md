@@ -126,7 +126,7 @@ exec zsh
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/install.ps1 | iex
+irm https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/windows/install.ps1 | iex
 ```
 
 **Option B — already cloned:**
@@ -134,7 +134,7 @@ irm https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/install.ps
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 cd ~\dotfiles
-.\install.ps1
+.\windows\install.ps1
 ```
 
 **What it installs automatically:**
@@ -239,16 +239,18 @@ data, the PowerShell modules it installed, and reverts the Windows Terminal
 theme (from the backup it made before touching it):
 
 ```powershell
-.\scripts\setup\windows.ps1 -Uninstall
-.\scripts\setup\windows.ps1 -Uninstall -DryRun    # preview first
-.\scripts\setup\windows.ps1 -Uninstall -Force     # skip the confirmation prompt
+.\windows\windows.ps1 -Uninstall
+.\windows\windows.ps1 -Uninstall -DryRun    # preview first
+.\windows\windows.ps1 -Uninstall -Force     # skip the confirmation prompt
 ```
 
 Scoop packages this script installed are removed too by default; Scoop itself
 is left alone unless you also pass `-PurgeScoop` (opt-in — Scoop is a general
 package manager, more likely to be used for things outside these dotfiles than
-Homebrew/Nix typically are). `dutils cleanup dotfiles` runs the same thing on
-Windows. See [docs/WINDOWS.md](docs/WINDOWS.md) for details.
+Homebrew/Nix typically are). `dutils cleanup dotfiles` runs a narrower
+`-SymlinksOnly` version of this on Windows — just the symlinks/PATH entry,
+matching that component's own scope. See [docs/WINDOWS.md](docs/WINDOWS.md)
+for details.
 
 ---
 
@@ -260,15 +262,15 @@ dotfiles/
 ├── zsh/                       → ~/.config/zsh/          Zsh shell configuration
 ├── nvim/                      → ~/.config/nvim/         Neovim editor setup
 ├── tmux/                      → ~/.config/tmux/         Tmux multiplexer
-├── powershell/                → ~/Documents/PowerShell/ PowerShell profile (Windows)
 ├── packages.toml              THE package manifest — every tool, every platform
 ├── brew/                      Brewfile — generated from packages.toml (macOS)
 ├── nix/                       Home Manager flake — Linux packages (replaces linuxbrew)
 ├── scripts/                   Setup, verification, and the dutils CLI
 ├── settings/                  App preferences (iTerm, Sublime)
+├── windows/                   Everything Windows-only: installer, setup script,
+│                              PowerShell profile, Windows Terminal theme
 ├── docs/                      Guides + this README's banner/demo assets
 ├── install.sh                 Main installer (macOS/Linux)
-├── install.ps1                Main installer (Windows)
 ├── bootstrap.sh               One-liner bootstrap for fresh machines
 └── Makefile                   Stow management & diagnostics
 ```
@@ -284,7 +286,7 @@ every Stow package it links. The per-manager lists are **generated** from it:
 | --- | --- |
 | Homebrew formulae & casks | `brew/Brewfile` |
 | Nix packages | `nix/home.nix` |
-| Scoop apps + Windows symlink map | `scripts/setup/windows.ps1` |
+| Scoop apps + Windows symlink map | `windows/windows.ps1` |
 | apt bootstrap deps | `scripts/setup/linux.sh` |
 | `STOW_PACKAGES` | `Makefile` |
 

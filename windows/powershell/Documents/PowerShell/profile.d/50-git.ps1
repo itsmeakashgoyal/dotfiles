@@ -1,7 +1,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/50-git.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/profile.d/50-git.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Git shortcuts + television-driven interactive pickers, mirroring the fuzzy

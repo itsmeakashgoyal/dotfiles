@@ -39,6 +39,20 @@ def _stow_packages() -> list[str]:
     return mf.load().stow_packages(platforms=(platform_key,))
 
 
+def _package_dir(pkg: str) -> Path:
+    """Top-level directory a package's files live under.
+
+    Usually REPO/<pkg>, but a [[stow]] entry with an explicit `source` (e.g.
+    `powershell`, nested under `windows/`) can point at a different top-level
+    directory than its package name — derive it from the entry instead of
+    assuming, so this stays correct for any future package like it.
+    """
+    for entry in mf.load().stow:
+        if entry.package == pkg and entry.repo_path.endswith(entry.target):
+            return REPO / entry.repo_path[: -len(entry.target)].rstrip("/")
+    return REPO / pkg
+
+
 def _pick(packages: list[str]) -> str | None:
     if shutil.which("fzf"):
         result = subprocess.run(
@@ -80,7 +94,7 @@ def main() -> None:
         sys.exit(1)
 
     editor = os.environ.get("EDITOR", "nvim")
-    os.execvp(editor, [editor, str(REPO / pkg)])
+    os.execvp(editor, [editor, str(_package_dir(pkg))])
 
 
 if __name__ == "__main__":

@@ -1,14 +1,14 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # PowerShell profile — Linux/macOS feel on Windows
 # Tools: ripgrep · television (tv) · atuin · bat · eza · zoxide · mise · uv · starship · PSReadLine
 #
 # This profile is intentionally thin: it resolves its own location (it's a
-# symlink into the dotfiles repo, created by scripts/setup/windows.ps1) and
+# symlink into the dotfiles repo, created by windows/windows.ps1) and
 # dot-sources the section files in profile.d/, mirroring how zsh sources
 # conf.d/*.zsh. Add or edit a section by dropping a NN-name.ps1 in profile.d/.
 #

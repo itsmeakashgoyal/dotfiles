@@ -15,7 +15,6 @@ name: Test Dotfiles Setup
     paths:
       - ".github/workflows/build_and_test*.yml"
       - "install.sh"
-      - "install.ps1"
       - "bootstrap.sh"
       - "Makefile"
       - "scripts/**"
@@ -24,7 +23,7 @@ name: Test Dotfiles Setup
       - "zsh/**"
       - "nvim/**"
       - "tmux/**"
-      - "powershell/**"
+      - "windows/**"
   pull_request:
     branches: ["master", "main"]
   workflow_dispatch:
@@ -817,7 +816,7 @@ jobs:
         env:
           CI: "true"
         run: |
-          & "$env:USERPROFILE\dotfiles\scripts\setup\windows.ps1"
+          & "$env:USERPROFILE\dotfiles\windows\windows.ps1"
           if ($LASTEXITCODE -ne 0) {
             Write-Host "::error::windows.ps1 exited with code $LASTEXITCODE"
             exit $LASTEXITCODE
@@ -898,7 +897,7 @@ jobs:
           CI: "true"
         run: |
           Write-Host "🧹 Verifying windows.ps1 -Uninstall (dry-run, then for real)..."
-          $ps1 = "$env:USERPROFILE\dotfiles\scripts\setup\windows.ps1"
+          $ps1 = "$env:USERPROFILE\dotfiles\windows\windows.ps1"
 
           Write-Host "--- Dry-run ---"
           & $ps1 -Uninstall -DryRun -Force

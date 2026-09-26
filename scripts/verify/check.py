@@ -307,7 +307,7 @@ class ConsoleRenderer:
             # `make install` doesn't exist on Windows — this told every failing
             # Windows check to run a command that would just error immediately.
             fix = (
-                r".\scripts\setup\windows.ps1"
+                r".\windows\windows.ps1"
                 if osdetect.is_windows()
                 else "cd ~/dotfiles && make install"
             )
@@ -664,14 +664,14 @@ class PackageChecker(SystemChecker):
             "macos":   'Install: /bin/bash -c "$(curl -fsSL '
                        'https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
             "linux":   "Install: make nix-setup",
-            "windows": "Install: powershell -File scripts/setup/windows.ps1",
+            "windows": "Install: powershell -File windows/windows.ps1",
         }[self.platform]
 
     def _install_missing_hint(self) -> str:
         return {
             "macos":   f"brew bundle --file={repo_root() / 'brew' / 'Brewfile'}",
             "linux":   "make nix-switch",
-            "windows": "powershell -File scripts/setup/windows.ps1",
+            "windows": "powershell -File windows/windows.ps1",
         }[self.platform]
 
     def _report_manager_version(self, manager: str, label: str) -> None:

@@ -1,7 +1,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/10-television.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/profile.d/10-television.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Television (tv) — sole fuzzy finder, replaces fzf/PSFzf entirely, matching

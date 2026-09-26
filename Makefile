@@ -296,10 +296,10 @@ windows: ## Show Windows setup instructions
 	@echo "  Run in PowerShell (as Admin or with Developer Mode enabled):"
 	@echo ""
 	@echo "  $(GREEN)Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser$(CLR)"
-	@echo "  $(GREEN).\\install.ps1$(CLR)"
+	@echo "  $(GREEN).\\windows\\install.ps1$(CLR)"
 	@echo ""
 	@echo "  Or run the setup script directly:"
-	@echo "  $(GREEN)powershell -ExecutionPolicy Bypass -File scripts\\setup\\windows.ps1$(CLR)"
+	@echo "  $(GREEN)powershell -ExecutionPolicy Bypass -File windows\\windows.ps1$(CLR)"
 	@echo ""
 	@echo "  Flags: -Force (overwrite existing), -SkipPackages, -SkipSymlinks"
 

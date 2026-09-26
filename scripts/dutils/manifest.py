@@ -190,8 +190,8 @@ def render_stow(m: mf.Manifest) -> list[str]:
 REGIONS: dict[str, tuple[Path, object]] = {
     "brew":         (REPO / "brew" / "Brewfile",                   render_brew),
     "nix":          (REPO / "nix" / "home.nix",                    render_nix),
-    "scoop":        (REPO / "scripts" / "setup" / "windows.ps1",   render_scoop),
-    "symlinks":     (REPO / "scripts" / "setup" / "windows.ps1",   render_symlinks),
+    "scoop":        (REPO / "windows" / "windows.ps1",             render_scoop),
+    "symlinks":     (REPO / "windows" / "windows.ps1",             render_symlinks),
     "apt":          (REPO / "scripts" / "setup" / "linux.sh",      render_apt),
     "apt-optional": (REPO / "scripts" / "setup" / "linux.sh",      render_apt_optional),
     "stow":         (REPO / "Makefile",                            render_stow),

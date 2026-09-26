@@ -1,11 +1,11 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ scripts/setup/windows.ps1
+# ░▓ file   ▓ windows/windows.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Windows setup: install Scoop, packages, create symlinks, configure Neovim.
-# Run as: powershell -ExecutionPolicy Bypass -File scripts/setup/windows.ps1
+# Run as: powershell -ExecutionPolicy Bypass -File windows/windows.ps1
 #
 # Pass -Uninstall for the reverse: removes every symlink in $SYMLINK_MAP, the
 # PATH entry this script adds, generated Neovim data, the PowerShell modules
@@ -47,10 +47,10 @@ $PSNativeCommandUseErrorActionPreference = $false
 # ==============================================================================
 # Configuration
 # ==============================================================================
-# This script lives at <repo>\scripts\setup\windows.ps1, so the repo root is
-# two levels up from $PSScriptRoot. Falls back to the historical default if
+# This script lives at <repo>\windows\windows.ps1, so the repo root is one
+# level up from $PSScriptRoot. Falls back to the historical default if
 # $PSScriptRoot is ever empty (e.g. dot-sourced in an unusual context).
-$DOTFILES_DIR = if ($PSScriptRoot) { Split-Path (Split-Path $PSScriptRoot -Parent) -Parent } else { "$env:USERPROFILE\dotfiles" }
+$DOTFILES_DIR = if ($PSScriptRoot) { Split-Path $PSScriptRoot -Parent } else { "$env:USERPROFILE\dotfiles" }
 $NVIM_CONFIG = "$env:LOCALAPPDATA\nvim"
 $NVIM_DATA = "$env:LOCALAPPDATA\nvim-data"
 
@@ -63,16 +63,16 @@ $NVIM_DATA = "$env:LOCALAPPDATA\nvim-data"
 # equivalent wired up yet.
 $SYMLINK_MAP = @{
     # BEGIN GENERATED: symlinks (dutils manifest generate)
-    "git\.config\git"                                                  = "$env:USERPROFILE\.config\git"
-    "nvim\.config\nvim"                                                = "$env:LOCALAPPDATA\nvim"
-    "television\.config\television"                                    = "$env:USERPROFILE\.config\television"
-    "atuin\.config\atuin"                                              = "$env:USERPROFILE\.config\atuin"
-    "fastfetch\.config\fastfetch"                                      = "$env:USERPROFILE\.config\fastfetch"
-    "starship\.config\starship"                                        = "$env:USERPROFILE\.config\starship"
-    "yazi\.config\yazi"                                                = "$env:USERPROFILE\.config\yazi"
-    "bin\.local\bin\dutils.ps1"                                        = "$env:USERPROFILE\.local\bin\dutils.ps1"
-    "readline\.inputrc"                                                = "$env:USERPROFILE\.inputrc"
-    "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$([Environment]::GetFolderPath("MyDocuments"))\PowerShell\Microsoft.PowerShell_profile.ps1"
+    "git\.config\git"                                                          = "$env:USERPROFILE\.config\git"
+    "nvim\.config\nvim"                                                        = "$env:LOCALAPPDATA\nvim"
+    "television\.config\television"                                            = "$env:USERPROFILE\.config\television"
+    "atuin\.config\atuin"                                                      = "$env:USERPROFILE\.config\atuin"
+    "fastfetch\.config\fastfetch"                                              = "$env:USERPROFILE\.config\fastfetch"
+    "starship\.config\starship"                                                = "$env:USERPROFILE\.config\starship"
+    "yazi\.config\yazi"                                                        = "$env:USERPROFILE\.config\yazi"
+    "bin\.local\bin\dutils.ps1"                                                = "$env:USERPROFILE\.local\bin\dutils.ps1"
+    "readline\.inputrc"                                                        = "$env:USERPROFILE\.inputrc"
+    "windows\powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$([Environment]::GetFolderPath("MyDocuments"))\PowerShell\Microsoft.PowerShell_profile.ps1"
     # END GENERATED: symlinks
 
     # Sublime Text — link each settings file into the User packages dir so the
@@ -438,7 +438,7 @@ function Install-Symlinks {
     # powershell [[stow]] entry) — Documents isn't always $env:USERPROFILE\Documents.
     $documentsDir = [Environment]::GetFolderPath('MyDocuments')
     if (-not (New-DotfileSymlink `
-                -Source "powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" `
+                -Source "windows\powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" `
                 -Target "$documentsDir\WindowsPowerShell\Microsoft.PowerShell_profile.ps1")) { $blocked++ }
 
     if ($blocked -gt 0) {
@@ -581,11 +581,11 @@ function Install-TerminalTheme {
         return
     }
 
-    # Tracked in the repo (settings/windows-terminal/gruvbox-dark.json), not
+    # Tracked in the repo (windows/windows-terminal/gruvbox-dark.json), not
     # hardcoded here — one reviewable file, consistent with settings/iterm/
     # and settings/sublime/ for the same kind of GUI-app config export on
     # macOS.
-    $schemeFile = Join-Path $DOTFILES_DIR "settings\windows-terminal\gruvbox-dark.json"
+    $schemeFile = Join-Path $DOTFILES_DIR "windows\windows-terminal\gruvbox-dark.json"
     if (-not (Test-Path $schemeFile)) {
         Write-Fail "Color scheme file not found: $schemeFile — skipping"
         return

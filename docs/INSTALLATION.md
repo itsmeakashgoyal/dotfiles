@@ -111,7 +111,7 @@ The installer runs through these stages in order:
 Windows doesn't use Stow or this same `install.sh` — see the [README's Windows section](../README.md) for the one-line installer. Two usage patterns are both supported:
 
 - **WSL2** (recommended for the actual dev shell): install Ubuntu via WSL2, then follow the Linux instructions above from inside it — all 8 Stow packages work completely unmodified there.
-- **Native PowerShell**: `install.ps1` clones the repo and delegates to `scripts/setup/windows.ps1`, which installs packages via Scoop, creates symlinks with a hand-rolled equivalent of Stow, and sets up a native PowerShell profile.
+- **Native PowerShell**: `windows/install.ps1` clones the repo and delegates to `windows/windows.ps1`, which installs packages via Scoop, creates symlinks with a hand-rolled equivalent of Stow, and sets up a native PowerShell profile.
 
 Many people use both: WSL2 for nvim/tmux/zsh/git day to day, native PowerShell/Windows Terminal for everything else.
 

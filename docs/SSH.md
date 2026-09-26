@@ -117,7 +117,7 @@ Nothing else to change — the key and the commit email both follow the alias.
 
 - **macOS / Linux** — `~/.ssh/config` and `~/.config/git/` are Stow-managed;
   keys and `config-local` are machine-local (never committed).
-- **Windows** — `scripts/setup/windows.ps1` symlinks `~/.config/git`, so the
+- **Windows** — `windows/windows.ps1` symlinks `~/.config/git`, so the
   same git config (and `config-local`) apply. `~/.ssh/config` works with the
   built-in OpenSSH client. If `ssh-add` can't reach an agent, start it once:
   ```powershell

@@ -66,7 +66,7 @@ they drive need their tools on `PATH`:
   Control. Non-interactive. Per-OS dir:
   - macOS: `~/Library/Application Support/Sublime Text/Packages/User`
   - Linux: `~/.config/sublime-text/Packages/User`
-- **Windows** — handled by `scripts/setup/windows.ps1` (the sublime entries in
+- **Windows** — handled by `windows/windows.ps1` (the sublime entries in
   `$SYMLINK_MAP` + `Install-SublimePackageControl`); User dir is
   `%APPDATA%\Sublime Text\Packages\User`.
 

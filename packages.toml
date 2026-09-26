@@ -12,9 +12,9 @@
 #
 #   brew         -> brew/Brewfile
 #   nix          -> nix/home.nix          (home.packages list)
-#   scoop        -> scripts/setup/windows.ps1  ($SCOOP_PACKAGES)
+#   scoop        -> windows/windows.ps1        ($SCOOP_PACKAGES)
 #   apt          -> scripts/setup/linux.sh     (system bootstrap deps)
-#   [[stow]]     -> scripts/setup/windows.ps1  ($SYMLINK_MAP) + Makefile
+#   [[stow]]     -> windows/windows.ps1        ($SYMLINK_MAP) + Makefile
 #
 # Each of those regions is delimited by BEGIN/END GENERATED markers; everything
 # outside the markers stays hand-written. `dutils manifest check` re-renders and
@@ -751,7 +751,7 @@ platforms = ["macos", "linux"]
 [[stow]]
 package        = "powershell"
 target         = "Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
-source         = "powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
+source         = "windows/powershell/Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
 desc           = "PowerShell profile (thin loader for profile.d/*.ps1)"
 platforms      = ["windows"]
 critical       = true

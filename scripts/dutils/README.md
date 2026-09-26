@@ -50,7 +50,7 @@ dutils manifest stow-packages   # space-separated Stow list (used by the Makefil
 
 [`packages.toml`](../../packages.toml) is the single source of truth for every
 tool and Stow package. `generate` renders it into `brew/Brewfile`,
-`nix/home.nix`, `scripts/setup/windows.ps1` (Scoop list + symlink map),
+`nix/home.nix`, `windows/windows.ps1` (Scoop list + symlink map),
 `scripts/setup/linux.sh` (apt deps) and the `Makefile`'s `STOW_PACKAGES`,
 rewriting only the text between `BEGIN GENERATED` / `END GENERATED` markers.
 

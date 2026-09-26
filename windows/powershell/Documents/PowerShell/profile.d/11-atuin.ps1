@@ -1,7 +1,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/11-atuin.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/profile.d/11-atuin.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Atuin — magical shell history

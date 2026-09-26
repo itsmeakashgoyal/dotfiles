@@ -1,7 +1,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/20-tools.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/profile.d/20-tools.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # CLI tool integrations: ripgrep, eza, bat, zoxide, mise, starship.

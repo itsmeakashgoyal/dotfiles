@@ -86,7 +86,7 @@ cd ~/projects/internal-app && mise use node@20   # per-project
 
 `mkvenv`/`venv`/`rmvenv` work identically on macOS, Linux, and native Windows —
 same names, same arguments, same behavior. `zsh/.config/zsh/conf.d/08-python.zsh`
-defines them for zsh (macOS/Linux/WSL2); `powershell/.../Microsoft.PowerShell_profile.ps1`
+defines them for zsh (macOS/Linux/WSL2); `windows/powershell/.../Microsoft.PowerShell_profile.ps1`
 defines the same three for native Windows PowerShell. The only thing that
 differs under the hood is which activation script gets sourced (`bin/activate`
 vs. `Scripts\Activate.ps1`) — uv creates the right one for the OS it's running
@@ -233,7 +233,7 @@ above for quick, throwaway, or exploratory environments.
 
 **`mkvenv`/`venv`/`rmvenv`: "uv is not installed"**
 → `brew install uv` (macOS) / already in `nix/home.nix` on Linux / already in
-`scripts/setup/windows.ps1`'s Scoop package list on Windows. Re-run `make install`
+`windows/windows.ps1`'s Scoop package list on Windows. Re-run `make install`
 or install it directly, then open a new shell.
 
 **A freshly created venv's `python --version` isn't what you expected**

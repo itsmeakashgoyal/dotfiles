@@ -20,7 +20,7 @@ import osdetect  # noqa: E402
 
 HOME = Path.home()
 UNINSTALL_SH = Path(__file__).resolve().parent.parent / "setup" / "uninstall.sh"
-WINDOWS_PS1 = Path(__file__).resolve().parent.parent / "setup" / "windows.ps1"
+WINDOWS_PS1 = Path(__file__).resolve().parent.parent.parent / "windows" / "windows.ps1"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -28,7 +28,7 @@ WINDOWS_PS1 = Path(__file__).resolve().parent.parent / "setup" / "windows.ps1"
 
 def _run_uninstall(steps: str, force: bool) -> None:
     """Delegate to scripts/setup/uninstall.sh (macOS/Linux) or
-    scripts/setup/windows.ps1 -Uninstall (native Windows) for the given steps.
+    windows/windows.ps1 -Uninstall (native Windows) for the given steps.
 
     Resolved by path, not by sourcing DOTFILES_DIR/XDG_DOTFILES_DIR from the
     caller's environment - each script's own self-location figures out the

@@ -10,7 +10,7 @@ A dotfiles repository using **GNU Stow** to manage symlinks on macOS and Linux. 
 dotfiles/nvim/.config/nvim/init.lua  →  stow nvim  →  ~/.config/nvim/init.lua (symlink)
 ```
 
-**Windows is also supported**, but via a separate, non-Stow path: `install.ps1` + `scripts/setup/windows.ps1` create symlinks with a hand-rolled PowerShell function instead (Stow doesn't run natively on Windows). See the `powershell/` package and the Windows subsection below. The recommended daily-driver path for the actual dev shell is still WSL2, where all the Stow packages work unmodified.
+**Windows is also supported**, but via a separate, non-Stow path: `windows/install.ps1` + `windows/windows.ps1` create symlinks with a hand-rolled PowerShell function instead (Stow doesn't run natively on Windows). Everything Windows-only lives under `windows/` — see the `windows/powershell/` package and the Windows subsection below. The recommended daily-driver path for the actual dev shell is still WSL2, where all the Stow packages work unmodified.
 
 ## Common Commands
 
@@ -64,7 +64,7 @@ list. The per-manager lists are *generated* from it and delimited by `# BEGIN GE
 | --- | --- |
 | `brew` | `brew/Brewfile` |
 | `nix` | `nix/home.nix` (`home.packages`) |
-| `scoop` / `symlinks` | `scripts/setup/windows.ps1` (`$SCOOP_PACKAGES` / `$SYMLINK_MAP`) |
+| `scoop` / `symlinks` | `windows/windows.ps1` (`$SCOOP_PACKAGES` / `$SYMLINK_MAP`) |
 | `apt` / `apt-optional` | `scripts/setup/linux.sh` |
 | `stow` | `Makefile` (`STOW_PACKAGES`) |
 
@@ -87,12 +87,12 @@ single-space trailing comments rather than aligned columns.
 - `bin/` → `~/.local/bin/` — Custom scripts (yank, zoxide-edit) + a `dutils` symlink into `scripts/dutils/`, so stowing `bin` puts the `dutils` CLI on `PATH` automatically
 - `atuin/` → `~/.config/atuin/` — Shell history search
 - `fastfetch/` → `~/.config/fastfetch/` — System info display
-- `starship/` → `~/.config/starship/` — Cross-shell prompt; **the default on zsh** (`starship.toml`). The config is deliberately **minimal**: no language/tool modules and no `git_status`, because starship eagerly spawns a module's binary as soon as the module appears in `format` (it is not lazy), which costs a subprocess per render — badly so on Windows ARM, where Scoop installs emulated x64 builds. On **PowerShell the default is the zero-subprocess native prompt** (`powershell/.../profile.d/22-native-prompt.ps1`); set `DOTFILES_PROMPT=starship` to opt back in. Set `DOTFILES_PROMPT=p10k` to switch back to Powerlevel10k (`zsh/.config/zsh/.p10k.zsh` + zinit), which stays fully wired. The `DOTFILES_PROMPT` knob is at the top of `.zshrc` (section 1); it must be set before `.zshrc` runs (not in `99-private.zsh`, which loads too late)
+- `starship/` → `~/.config/starship/` — Cross-shell prompt; **the default on zsh** (`starship.toml`). The config is deliberately **minimal**: no language/tool modules and no `git_status`, because starship eagerly spawns a module's binary as soon as the module appears in `format` (it is not lazy), which costs a subprocess per render — badly so on Windows ARM, where Scoop installs emulated x64 builds. On **PowerShell the default is the zero-subprocess native prompt** (`windows/powershell/.../profile.d/22-native-prompt.ps1`); set `DOTFILES_PROMPT=starship` to opt back in. Set `DOTFILES_PROMPT=p10k` to switch back to Powerlevel10k (`zsh/.config/zsh/.p10k.zsh` + zinit), which stays fully wired. The `DOTFILES_PROMPT` knob is at the top of `.zshrc` (section 1); it must be set before `.zshrc` runs (not in `99-private.zsh`, which loads too late)
 - `ghostty/` → `~/.config/ghostty/` — Ghostty terminal config (macOS; trying alongside iTerm2, see `settings/iterm/`)
 - `yazi/` → `~/.config/yazi/` — Yazi terminal file manager (minimal config, built-in theme)
 - `readline/` → `~/.inputrc` — GNU Readline config for bash/python/psql and other libreadline sub-shells (zsh has its own line editor and ignores it)
 
-`powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `scripts/setup/windows.ps1`'s own symlink function instead (see Windows section below). The profile is a thin loader that resolves its own symlink and dot-sources `profile.d/*.ps1` (mirroring zsh's `conf.d/`); `profile.d/` lives only in the repo (found via the symlink's target), so it needs no separate symlink.
+`windows/powershell/` mirrors this same layout for `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`, but is deliberately **not** in `STOW_PACKAGES` — Windows uses `windows/windows.ps1`'s own symlink function instead (see Windows section below). The profile is a thin loader that resolves its own symlink and dot-sources `profile.d/*.ps1` (mirroring zsh's `conf.d/`); `profile.d/` lives only in the repo (found via the symlink's target), so it needs no separate symlink.
 
 ### Zsh Configuration Layout
 `zsh/.config/zsh/conf.d/` contains numbered modular config files sourced in order:
@@ -121,14 +121,14 @@ single-space trailing comments rather than aligned columns.
 - `scripts/lib/os-detect.sh` — OS detection only (`os::is_mac`/`os::is_linux`/`os::arch`/`os::detail`), split out from `core.sh` specifically because it has none of core.sh's side effects — safe to source from zsh's interactive startup too. `scripts/lib/osdetect.py` mirrors the same API for Python scripts.
 - `scripts/verify/check.sh` → `check.py` — Health/verification checks (`--quick`, `--full`, `--packages`, `--system`). Manifest-driven and cross-platform: it resolves the repo via `$DOTFILES_DIR`/its own location (never a hardcoded `~/dotfiles`), and checks the platform's real package manager (brew on macOS, nix on Linux, scoop on Windows) rather than assuming Homebrew.
 - `scripts/lib/manifest.py` — `packages.toml` loader shared by the generator and the verifier
-- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh` (Sublime Text: symlinks `settings/sublime/` into the per-OS User dir + installs Package Control; **macOS + Linux**, Windows handled by `windows.ps1`), `iterm.sh`, `macos-defaults.sh` (curated `defaults write` driven by a `DEFAULTS` data table; snapshots the previous values to `$XDG_STATE_HOME/dotfiles/macos-defaults.snapshot` on first apply so `make macos-defaults undo=1` can revert, and supports `dry=1`; run via `make macos-defaults`, not in the default install flow) (`iterm.sh`/`macos-defaults.sh` are macOS-only), `uninstall.sh`, `windows.ps1` (Windows). There is no `macos.sh`.
+- `scripts/setup/` — OS-specific setup: `linux.sh` (apt deps), `nix.sh` (Nix/Home Manager, Linux CLI tools), `sublime.sh` (Sublime Text: symlinks `settings/sublime/` into the per-OS User dir + installs Package Control; **macOS + Linux**, Windows handled by `windows/windows.ps1`), `iterm.sh`, `macos-defaults.sh` (curated `defaults write` driven by a `DEFAULTS` data table; snapshots the previous values to `$XDG_STATE_HOME/dotfiles/macos-defaults.snapshot` on first apply so `make macos-defaults undo=1` can revert, and supports `dry=1`; run via `make macos-defaults`, not in the default install flow) (`iterm.sh`/`macos-defaults.sh` are macOS-only), `uninstall.sh`. There is no `macos.sh`. Windows' own setup/uninstall script lives in `windows/windows.ps1` instead, not here.
 - `scripts/setup/macos.sh` + `brew/Brewfile` — Homebrew bundle installation (macOS only — Linux uses Nix instead, see `nix.sh`/`nix/home.nix`)
 
 ### Installation Flow
 `install.sh` self-locates `DOTFILES_DIR` → sources `core.sh` → set default shell → OS branch (macOS: `scripts/setup/macos.sh`; Linux: `scripts/setup/linux.sh` + `scripts/setup/nix.sh`) → `sublime.sh` (macOS + Linux) + macOS-only `iterm.sh` → `make run` (stow all) → health verification
 
 ### Windows
-Separate path, no Stow: `install.ps1` → `scripts/setup/windows.ps1` (Scoop packages, hand-rolled symlinks via `$SYMLINK_MAP`, PowerShell modules, `Test-Installation` health check that exits non-zero under `$env:CI`). Not yet required in CI (`test-windows` job is soft-gated/`continue-on-error`).
+Separate path, no Stow, everything under `windows/`: `windows/install.ps1` → `windows/windows.ps1` (Scoop packages, hand-rolled symlinks via `$SYMLINK_MAP`, PowerShell modules, `Test-Installation` health check — delegates to `dutils health`, exits non-zero under `$env:CI` on failure). Not yet required in CI (`test-windows` job is soft-gated/`continue-on-error`).
 
 ### CI/CD
 `.github/workflows/build_and_test.yml`:

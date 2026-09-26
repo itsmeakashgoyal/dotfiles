@@ -2,7 +2,7 @@
 
 [← Back to README](../README.md)
 
-Windows uses a separate, non-Stow install path (`install.ps1` → `scripts/setup/windows.ps1`)
+Windows uses a separate, non-Stow install path (`windows/install.ps1` → `windows/windows.ps1`)
 — see [Installation](INSTALLATION.md#windows) for the one-liner and
 [Architecture](ARCHITECTURE.md#windows) for how it's structured. This page covers the
 Windows-specific configuration knobs and the issues actually hit while hardening that
@@ -42,7 +42,7 @@ half of that). It is worse again on **Windows ARM**: Scoop ships no ARM64 manife
 `starship.exe` is an x64 build running under Prism emulation, and so is every binary a
 language module would spawn.
 
-`powershell/Documents/PowerShell/profile.d/22-native-prompt.ps1` is an alternative
+`windows/powershell/Documents/PowerShell/profile.d/22-native-prompt.ps1` is an alternative
 `function prompt {}` that reads git state directly from `.git`'s own files (`HEAD`,
 `refs/heads/<branch>`, `packed-refs`) instead of shelling out to `git.exe` — no
 subprocess spawn at all. Measured **~4ms average** render time, regardless of repo
@@ -177,9 +177,9 @@ counterpart — same one-confirmation, fully-reversed teardown, just a different
 mechanism:
 
 ```powershell
-.\scripts\setup\windows.ps1 -Uninstall            # interactive
-.\scripts\setup\windows.ps1 -Uninstall -DryRun    # preview every action, change nothing
-.\scripts\setup\windows.ps1 -Uninstall -Force     # skip the confirmation prompt
+.\windows\windows.ps1 -Uninstall            # interactive
+.\windows\windows.ps1 -Uninstall -DryRun    # preview every action, change nothing
+.\windows\windows.ps1 -Uninstall -Force     # skip the confirmation prompt
 ```
 
 It removes, in order: every symlink in `$SYMLINK_MAP` (+ the Windows PowerShell 5.1
@@ -256,7 +256,7 @@ instead of `%USERPROFILE%\Documents`), PowerShell's real `$PROFILE` lives under 
 OneDrive path. If the installer symlinked to the plain, unredirected path instead, it
 created a file PowerShell never actually loads — two different files, one of them
 silently unused. (Fixed as of this repo tracking `[Environment]::GetFolderPath('MyDocuments')`
-instead of hardcoding `$env:USERPROFILE\Documents` in `scripts/setup/windows.ps1` — if
+instead of hardcoding `$env:USERPROFILE\Documents` in `windows/windows.ps1` — if
 you're on an older clone, `git pull` first.)
 
 **Fix**:
@@ -266,7 +266,7 @@ $PROFILE   # shows the path PowerShell actually uses — compare it by eye again
            # $env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
 cd ~\dotfiles
 git pull
-pwsh -ExecutionPolicy Bypass -File scripts\setup\windows.ps1 -Force
+pwsh -ExecutionPolicy Bypass -File windows\windows.ps1 -Force
 ```
 
 Then open a **brand-new** terminal (not just `. $PROFILE`).
@@ -287,7 +287,7 @@ always reads scripts as UTF-8 regardless of BOM.
 **Fix**: use `pwsh`, not `powershell`:
 
 ```powershell
-pwsh -ExecutionPolicy Bypass -File scripts\setup\windows.ps1 -Force
+pwsh -ExecutionPolicy Bypass -File windows\windows.ps1 -Force
 ```
 
 ### `✗ Target exists (use -Force to overwrite): ...\.config\git`
@@ -298,7 +298,7 @@ re-run with `-Force`:
 
 ```powershell
 Move-Item "$env:USERPROFILE\.config\git" "$env:USERPROFILE\.config\git.backup"
-pwsh -ExecutionPolicy Bypass -File scripts\setup\windows.ps1 -Force
+pwsh -ExecutionPolicy Bypass -File windows\windows.ps1 -Force
 ```
 
 ### PowerShell startup takes ~2 seconds
@@ -379,13 +379,13 @@ actually being used, or the terminal's font setting isn't a Nerd Font variant at
 `starship.toml`'s `[git_branch]` explicitly sets `symbol = ""` for exactly this reason
 (its built-in default is a Powerline glyph that's font-dependent). If you see this
 elsewhere, confirm the terminal font is set to `JetBrainsMono NF` (installed via the
-Scoop `nerd-fonts` bucket) — `scripts/setup/windows.ps1`'s `Install-TerminalTheme` sets
+Scoop `nerd-fonts` bucket) — `windows/windows.ps1`'s `Install-TerminalTheme` sets
 this automatically for Windows Terminal; other terminal apps need it set manually.
 
 ### Windows Terminal theme or env var changes don't apply
 
-`scripts/setup/windows.ps1`'s `Install-TerminalTheme` merges a Gruvbox Dark color scheme
-(`settings/windows-terminal/gruvbox-dark.json` — tracked in this repo, not hardcoded in
+`windows/windows.ps1`'s `Install-TerminalTheme` merges a Gruvbox Dark color scheme
+(`windows/windows-terminal/gruvbox-dark.json` — tracked in this repo, not hardcoded in
 the script) into your Windows Terminal `settings.json` and sets it as the default
 profile color scheme + font, backing up the original first
 (`settings.json.backup.<timestamp>`, next to the original — safe to delete once you've

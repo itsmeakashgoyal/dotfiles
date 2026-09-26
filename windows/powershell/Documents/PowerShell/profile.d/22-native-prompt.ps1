@@ -1,7 +1,7 @@
 #
 #  ▓▓▓▓▓▓▓▓▓▓
 # ░▓ author ▓ Akash Goyal
-# ░▓ file   ▓ powershell/Documents/PowerShell/profile.d/22-native-prompt.ps1
+# ░▓ file   ▓ windows/powershell/Documents/PowerShell/profile.d/22-native-prompt.ps1
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # THE DEFAULT PROMPT on PowerShell — a zero-subprocess prompt that renders the
@@ -119,7 +119,7 @@ function __dotfiles_native_git_info {
 
 # ==============================================================================
 # Gruvbox Dark ANSI helpers — same palette as fzf/bat/PSReadLine and the
-# Windows Terminal scheme (settings/windows-terminal/gruvbox-dark.json)
+# Windows Terminal scheme (windows/windows-terminal/gruvbox-dark.json)
 # ==============================================================================
 $script:__dotfiles_esc = [char]27
 function __dotfiles_native_fg {

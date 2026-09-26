@@ -31,7 +31,7 @@ set.list = true
 
 -- Python binary: prefer python3, but fall back to python (Windows' Scoop
 -- package installs it as "python", not "python3" - see
--- scripts/setup/windows.ps1's own verify step for the same fallback).
+-- windows/windows.ps1's own verify step for the same fallback).
 local python_bin = vim.fn.executable("python3") == 1 and "python3" or "python"
 
 -- Python-specific options
