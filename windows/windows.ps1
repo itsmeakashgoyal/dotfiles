@@ -598,12 +598,20 @@ function Install-TerminalTheme {
         # Replace any prior "Gruvbox Dark" entry (re-run safety) and keep the rest.
         $settings.schemes = @($settings.schemes | Where-Object { $_.name -ne "Gruvbox Dark" }) + $gruvboxDark
 
-        if (-not $settings.profiles.defaults) {
+        # `Set-StrictMode -Version Latest` (top of this script) makes accessing
+        # a property that doesn't exist on a PSCustomObject a terminating
+        # error ("The property 'font' cannot be found on this object")
+        # instead of just returning $null — confirmed directly on a fresh CI
+        # runner's settings.json, where `profiles.defaults` exists but is
+        # empty, so `.font` on it threw. `.PSObject.Properties['name']` is
+        # the StrictMode-safe existence check; it returns $null rather than
+        # throwing when the property isn't there.
+        if (-not $settings.profiles.PSObject.Properties['defaults']) {
             $settings.profiles | Add-Member -MemberType NoteProperty -Name defaults -Value ([PSCustomObject]@{}) -Force
         }
         $settings.profiles.defaults | Add-Member -MemberType NoteProperty -Name colorScheme -Value "Gruvbox Dark" -Force
 
-        if (-not $settings.profiles.defaults.font) {
+        if (-not $settings.profiles.defaults.PSObject.Properties['font']) {
             $settings.profiles.defaults | Add-Member -MemberType NoteProperty -Name font -Value ([PSCustomObject]@{}) -Force
         }
         $settings.profiles.defaults.font | Add-Member -MemberType NoteProperty -Name face -Value "JetBrainsMono NF" -Force
@@ -634,6 +642,15 @@ function Test-Installation {
     # `dutils health` already knowing how to check the real manifest, and
     # correctly resolving the OneDrive-safe PowerShell profile symlink, on
     # every platform). Delegate to it instead of maintaining a second copy.
+    # check.py prints box-drawing characters (═, ║, ╔, ...); Python defaults to
+    # the console's codepage on Windows (cp1252, not UTF-8) when nothing else
+    # says otherwise, which raises UnicodeEncodeError on those characters and
+    # crashes the whole health check — confirmed directly on a CI runner
+    # (`runneradmin`'s default console isn't UTF-8). Same fix the CI workflow's
+    # own dutils smoke test already uses.
+    $env:PYTHONIOENCODING = "utf-8"
+    [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+
     $py = if (Get-Command python3 -ErrorAction SilentlyContinue) { "python3" } else { "python" }
     & $py (Join-Path $DOTFILES_DIR "scripts\verify\check.py") --quick
     $passed = ($LASTEXITCODE -eq 0)
