@@ -985,7 +985,9 @@ jobs:
             }
           }
           else {
-            Write-Host "⚠ Scoop wasn't present before this step ran (its own install must have failed earlier in this job) — skipping the Scoop-specific assertions, nothing here to check."
+            Write-Host "⚠ Scoop wasn't present before this step ran (its own install"
+            Write-Host "  must have failed earlier in this job) — skipping the"
+            Write-Host "  Scoop-specific assertions, nothing here to check."
           }
 
           if ($failures -gt 0) {
