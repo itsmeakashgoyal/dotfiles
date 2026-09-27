@@ -816,6 +816,13 @@ jobs:
         env:
           CI: "true"
         run: |
+          # $LASTEXITCODE only changes when a *native* command runs; if the
+          # invoked script happens to run none at all, it's left at whatever
+          # it was before (often $null in a fresh step) - and `$null -ne 0`
+          # is $true in PowerShell, so an unconditional `-ne 0` check treats
+          # "nothing ran" as "it failed". Reset it first so a clean run reads
+          # as success.
+          $global:LASTEXITCODE = 0
           & "$env:USERPROFILE\dotfiles\windows\windows.ps1"
           if ($LASTEXITCODE -ne 0) {
             Write-Host "::error::windows.ps1 exited with code $LASTEXITCODE"
@@ -899,17 +906,32 @@ jobs:
           Write-Host "🧹 Verifying windows.ps1 -Uninstall (dry-run, then for real)..."
           $ps1 = "$env:USERPROFILE\dotfiles\windows\windows.ps1"
 
+          # $LASTEXITCODE only changes when a *native* command actually runs;
+          # a dry-run (or a real run where e.g. Scoop was never installed)
+          # can execute zero of them, leaving it at whatever it was before
+          # ($null in a fresh step) - and `$null -ne 0` is $true in
+          # PowerShell, so an unconditional `-ne 0` check misreads "nothing
+          # ran" as "it failed". Reset before each invocation.
           Write-Host "--- Dry-run ---"
+          $global:LASTEXITCODE = 0
           & $ps1 -Uninstall -DryRun -Force
           if ($LASTEXITCODE -ne 0) {
             Write-Host "::error::windows.ps1 -Uninstall -DryRun exited with code $LASTEXITCODE"
             exit 1
           }
 
+          # Capture this *before* the real uninstall runs — the assertions
+          # below about Scoop/its packages only make sense if Scoop was
+          # actually present to begin with (e.g. its own install step failed
+          # for an unrelated environment reason, nothing here would have
+          # anything to remove, and that's not this step's failure to report).
+          $scoopWasPresent = [bool](Get-Command scoop -ErrorAction SilentlyContinue)
+
           # -PurgeScoop isn't exercised here — it removes Scoop itself, which
           # this same job has no further need of, but is a bigger blast radius
           # than this smoke test needs to cover for a one-line switch.
           Write-Host "--- Real uninstall ---"
+          $global:LASTEXITCODE = 0
           & $ps1 -Uninstall -Force
           if ($LASTEXITCODE -ne 0) {
             Write-Host "::error::windows.ps1 -Uninstall exited with code $LASTEXITCODE"
@@ -945,20 +967,25 @@ jobs:
             $failures++
           }
 
-          # Spot-check a couple of Scoop packages rather than all of them —
-          # proves the removal path actually runs `scoop uninstall`, without
-          # this step's runtime scaling with every entry in $SCOOP_PACKAGES.
-          foreach ($pkg in @("git", "atuin")) {
-            if (scoop list $pkg 2>$null | Select-String -SimpleMatch $pkg) {
-              Write-Host "::error::Scoop package '$pkg' still installed"
+          if ($scoopWasPresent) {
+            # Spot-check a couple of Scoop packages rather than all of them —
+            # proves the removal path actually runs `scoop uninstall`, without
+            # this step's runtime scaling with every entry in $SCOOP_PACKAGES.
+            foreach ($pkg in @("git", "atuin")) {
+              if (scoop list $pkg 2>$null | Select-String -SimpleMatch $pkg) {
+                Write-Host "::error::Scoop package '$pkg' still installed"
+                $failures++
+              }
+            }
+
+            # Scoop itself must still be there — -PurgeScoop was never passed.
+            if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+              Write-Host "::error::Scoop itself was removed despite -PurgeScoop not being passed"
               $failures++
             }
           }
-
-          # Scoop itself must still be there — -PurgeScoop was never passed.
-          if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
-            Write-Host "::error::Scoop itself was removed despite -PurgeScoop not being passed"
-            $failures++
+          else {
+            Write-Host "⚠ Scoop wasn't present before this step ran (its own install must have failed earlier in this job) — skipping the Scoop-specific assertions, nothing here to check."
           }
 
           if ($failures -gt 0) {
