@@ -24,6 +24,13 @@ an `originals/` folder, which looks copyable — it isn't safe to rely on:
 `osxphotos` reads the same database Photos.app does, so it exports the right
 files with the right associations, without ever modifying the library.
 
+**Already have a flat folder of exported photos/videos instead of a
+`.photoslibrary`** (e.g. a Screenshots or screen-recording backup, or photos
+already pulled out of Photos)? There's no library database to query there,
+so `osxphotos` doesn't apply — use `dutils organize-media` instead, which
+sorts by filesystem date. See
+[scripts/dutils/README.md](../scripts/dutils/README.md).
+
 ## Quick reference
 
 | Command | What it does |

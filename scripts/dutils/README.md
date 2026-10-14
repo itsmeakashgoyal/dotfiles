@@ -190,6 +190,33 @@ a table.
 dutils debug my-script.sh arg1 arg2
 ```
 
+### `organize-media` — sort a flat photo/video backup into year/month folders
+
+```bash
+dutils organize-media ~/Workspace/Screenshots --dry-run   # preview first
+dutils organize-media ~/Workspace/Screenshots              # move in place
+dutils organize-media ~/Workspace/Screenshots --dest ~/Pictures/Sorted --copy
+```
+
+For a folder of already-exported photos/videos (not a Photos.app library —
+see `osxphotos` above for that case) with no capture-date database to query.
+Sorts each file straight into `<dest>/<year>/<month>/` (e.g. `2024/September/`,
+no `Photos`/`Videos` split), bucketed by the **media's actual creation date**
+read from its embedded metadata — EXIF `DateTimeOriginal`/`CreateDate` for
+photos, QuickTime `CreateDate`/`MediaCreateDate`/`TrackCreateDate` for videos
+— via `exiftool` (offers a one-time `brew install exiftool` if it's missing).
+Any file with no such metadata (most plain screenshots, for example) falls
+back to its filesystem birth time automatically, file by file; the summary
+reports how many files used that fallback. `--date-source birth` skips
+metadata entirely and always uses filesystem birth time;
+`--month-format number` gives `09` instead of `September`. Defaults: moves
+files **in place** inside the source folder (no `--dest` needed), only
+touches top-level files (existing subfolders are left alone unless
+`--recursive` is passed), and never overwrites — a name collision gets a
+`(2)`, `(3)`, ... suffix instead. Safe to re-run: it skips already-organized
+`YYYY` folders rather than re-processing them. Always `--dry-run` first on a
+backup you care about.
+
 ## Script Organization
 
 ```text
@@ -206,6 +233,7 @@ scripts/dutils/
 ├── install_nvim.py             # install-nvim subcommand
 ├── print_functions.py          # list-functions subcommand
 ├── run_with_xtrace.sh          # debug subcommand
+├── organize_media.py           # organize-media subcommand (sort photo/video backups by year/month)
 ├── profile_zsh.sh              # zsh startup profiler (invoked by `make bench-detail`, not dutils)
 └── README.md                   # this file
 ```

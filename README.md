@@ -317,6 +317,7 @@ rewritten — everything else in those files stays hand-written.
 | **[Theming](docs/THEME.md)** | Coordinated Tokyo Night across ghostty/bat/fzf/delta/nvim with a light/dark switch (`dutils theme`) |
 | **[Sublime Text](docs/SUBLIME.md)** | Cross-platform Sublime IDE — LSP (C/C++/Python), Terminus, builds, Tokyo Night; symlinked settings |
 | **[OSXPhotos](docs/OSXPHOTOS.md)** | Backing up the macOS Photos library (originals, edits, Live Photos) by month |
+| **[organize-media](scripts/dutils/README.md)** | Sorting an *already-exported* flat photo/video backup folder (no Photos library involved) into year/month folders (`dutils organize-media`) |
 | **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues, debug workflow, uninstalling |
 | **[Architecture](docs/ARCHITECTURE.md)** | Deep dive: Stow internals, Zsh flow, scripts, CI, XDG |

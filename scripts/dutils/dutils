@@ -207,6 +207,10 @@ def cmd_yt_download(args: list[str]) -> None:
     _exec_shell("yt_download.sh", args)
 
 
+def cmd_organize_media(args: list[str]) -> None:
+    _exec_python("organize_media.py", args)
+
+
 # ── Verification / diagnostics (delegate to scripts/verify/check.py) ──────────
 # These mirror the `make health|check|diagnose|sysinfo|packages` targets, but
 # via dutils they also work on Windows (which has no make). Extra args pass
@@ -325,6 +329,7 @@ COMMANDS: dict[str, tuple] = {
     "list-functions": (cmd_list_functions, "List all custom zsh functions",                                 ("macos", "linux")),
     "debug":          (cmd_debug,          "Run a script with debug tracing (needs bash)",                  ("macos", "linux")),
     "ytd":            (cmd_yt_download,    "Download YouTube videos/playlists in high quality (needs bash)", ("macos", "linux")),
+    "organize-media": (cmd_organize_media, "Sort a flat photo/video backup folder into year/month by media creation date", ALL_PLATFORMS),
 }
 
 # ──────────────────────────────────────────────────────────────────────────────
