@@ -31,7 +31,7 @@ Then open a new terminal — env vars set this way don't reach already-running p
 
 ### Native prompt (the default)
 
-**This is the default prompt on PowerShell.** Starship — still the default for zsh on
+**This is the default prompt on PowerShell.** Starship — the zsh fallback prompt (Powerlevel10k is the zsh default) on
 macOS/Linux via the shared `starship.toml` — spawns a fresh `starship.exe` process on
 every single prompt render. On a machine with
 real-time EDR/AV scanning every new process, that's not the "a few ms" cost starship

@@ -49,7 +49,7 @@
     mise # Runtime version manager (replaces pyenv)
     python314 # Python >= 3.14, the repo standard (dutils; see scripts/lib/pyreq.py) (Homebrew: python@3.14)
     uv # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
-    starship # Cross-shell prompt (default, replaced Powerlevel10k)
+    starship # Cross-shell prompt (zsh fallback: DOTFILES_PROMPT=starship; default is Powerlevel10k)
     ripgrep # Better grep (Rust)
     tree # Directory tree
     television # Fuzzy finder with channels (Rust)

@@ -192,7 +192,7 @@ scoop    = "uv"
 
 [[package]]
 name     = "starship"
-desc     = "Cross-shell prompt (default, replaced Powerlevel10k)"
+desc     = "Cross-shell prompt (zsh fallback: DOTFILES_PROMPT=starship; default is Powerlevel10k)"
 category = "Essential CLI Tools"
 brew     = "starship"
 nix      = "starship"
@@ -703,7 +703,7 @@ desc    = "Fastfetch system info"
 [[stow]]
 package = "starship"
 target  = ".config/starship"
-desc    = "Starship prompt (the default prompt)"
+desc    = "Starship prompt config (zsh fallback; PowerShell opt-in)"
 
 [[stow]]
 package = "yazi"

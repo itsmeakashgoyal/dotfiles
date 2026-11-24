@@ -7,14 +7,18 @@
 #
 # ==============================================================================
 # 1. PROMPT SELECTION
-# One knob for the whole file: "starship" (default) or "p10k". Change the value
+# One knob for the whole file: "p10k" (default) or "starship". Change the value
 # here, or set DOTFILES_PROMPT in the environment before zsh starts. (It can't
 # be set in 99-private.zsh - that's sourced too late, after the prompt loads.)
 # The three gates below (instant prompt, p10k config, theme) all read this.
 # ==============================================================================
-: "${DOTFILES_PROMPT:=starship}"
+: "${DOTFILES_PROMPT:=p10k}"
 
-# p10k's instant prompt must be the very first thing, before any output. Only
+# Startup logo goes BEFORE p10k's instant prompt: output printed after it would
+# corrupt the instant prompt (p10k's rule), output before it is fine.
+source "$ZDOTDIR/conf.d/00-logo.zsh"
+
+# p10k's instant prompt must come before any other output-producing init. Only
 # under p10k; Starship has no equivalent.
 if [[ "$DOTFILES_PROMPT" == "p10k" \
       && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -131,7 +135,7 @@ fi
 # (N) glob qualifier silently skips if the dir is empty or pattern has no match.
 # ==============================================================================
 for _config in "$ZDOTDIR/conf.d"/*.zsh(N); do
-    [[ "$_config" == */01-exports.zsh || "$_config" == */03-startup.zsh ]] && continue
+    [[ "$_config" == */0[013]-*.zsh ]] && continue   # logo, exports, startup: sourced above
     source "$_config"
 done
 unset _config

@@ -107,7 +107,7 @@ $SCOOP_PACKAGES = @(
     "mise"        # Runtime version manager (replaces pyenv)
     "python"      # Python >= 3.14, the repo standard (dutils; see scripts/lib/pyreq.py)
     "uv"          # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
-    "starship"    # Cross-shell prompt (default, replaced Powerlevel10k)
+    "starship"    # Cross-shell prompt (zsh fallback: DOTFILES_PROMPT=starship; default is Powerlevel10k)
     "ripgrep"     # Better grep (Rust)
     "television"  # Fuzzy finder with channels (Rust)
     "yazi"        # Terminal file manager (Rust)
