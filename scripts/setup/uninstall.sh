@@ -249,6 +249,7 @@ remove_tool_data() {
         "${XDG_STATE_HOME:-$HOME/.local/state}/nvim"   # nvim state (undo/shada/lock)
         "${XDG_CACHE_HOME:-$HOME/.cache}/nvim"         # nvim cache
         "$HOME/linuxtoolbox"                           # install_nvim.py backup dir
+        "${DOTFILES_DIR}/tmux/.config/tmux/plugins"    # TPM + tmux plugins (gitignored)
         "/tmp/dotfiles.log"                            # core.sh log
     )
     for p in "${data_paths[@]}"; do

@@ -231,6 +231,12 @@ EOF
     log::info "[STEP 8/8] Stowing dotfile packages..."
     _stow_packages
 
+    # tmux plugins (TPM): needs ~/.config/tmux linked, so it runs after stowing.
+    if [[ "$DRY_RUN" == "1" ]]; then
+        log::substep "[dry-run] scripts/setup/tmux.sh (TPM + tmux plugins)"
+    else
+        run_script "tmux" || log::warning "tmux plugin setup failed (non-fatal): start tmux and press prefix + I"
+    fi
     if [[ "$DRY_RUN" == "1" ]]; then
         log::success "Dry run complete — no changes were made."
         log::info "Re-run without --dry-run to apply."

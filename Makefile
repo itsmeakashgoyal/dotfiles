@@ -81,6 +81,11 @@ iterm: ## Setup iTerm2 (Gruvbox Dynamic Profile, hotkey window, prefs)
 	@echo "$(YELLOW)Setting up iTerm2...$(CLR)"
 	@bash scripts/setup/iterm.sh
 
+.PHONY: tmux
+tmux: ## Install TPM + tmux plugins (update=1 to also update them)
+	@echo "$(YELLOW)Setting up tmux plugins...$(CLR)"
+	@bash scripts/setup/tmux.sh $(if $(update),--update,)
+
 .PHONY: macos-defaults
 macos-defaults: ## Apply curated macOS system defaults (undo=1 to revert, dry=1 to preview)
 	@echo "$(YELLOW)Applying macOS defaults...$(CLR)"

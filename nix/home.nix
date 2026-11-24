@@ -52,6 +52,7 @@
     starship # Cross-shell prompt (zsh fallback: DOTFILES_PROMPT=starship; default is Powerlevel10k)
     ripgrep # Better grep (Rust)
     tree # Directory tree
+    tmux # Terminal multiplexer (plugins via TPM: scripts/setup/tmux.sh)
     television # Fuzzy finder with channels (Rust)
     yazi # Terminal file manager (Rust)
     zoxide # Smart cd (Rust)

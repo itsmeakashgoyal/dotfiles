@@ -61,6 +61,7 @@ What `install.sh` does, in order:
 | Shell | zsh set as login shell | same |
 | Apps | Sublime Text + iTerm2 settings | Sublime Text settings |
 | Symlinks | `make run` (Stow all packages) | same |
+| tmux plugins | TPM + every `@plugin` (`make tmux`) | same |
 | Verify | quick health check | same |
 
 The install log is written to `/tmp/dotfiles.log`.
@@ -237,7 +238,7 @@ Neither touches the repo, `~/.ssh`, secrets, git config content or shell history
 | Stow reports a conflict | A real file is in the way: `mv ~/.config/nvim ~/.config/nvim.backup && make run` |
 | Git ignores the dotfiles config | Remove `~/.gitconfig` (it overrides `~/.config/git/config`) |
 | Linux: a Nix tool isn't found | `exec zsh`; still missing → `home-manager generations` / `make nix-switch` |
-| tmux plugins missing (no resurrect/continuum, `⌃h/j/k/l` not crossing into nvim) | `rm -rf ~/.config/tmux/plugins`, then start tmux: they install themselves in ~15s (or `prefix I`) |
+| tmux plugins missing (no resurrect/continuum, `⌃h/j/k/l` not crossing into nvim) | `make tmux` (installs TPM + plugins; `update=1` also updates them) |
 | Broken zsh completions | `rm -f ~/.config/zsh/.zcompdump* && exec zsh` |
 | Windows: wall of parser errors running `windows.ps1` | Use `pwsh` (PowerShell 7), not `powershell` |
 | Windows: plain `PS C:\>` prompt, profile not loading | Compare `$PROFILE` with the linked path; `git pull`, re-run `windows.ps1 -Force`, open a new terminal |

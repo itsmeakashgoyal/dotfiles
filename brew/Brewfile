@@ -46,6 +46,7 @@ brew "uv"                  # Fast Python venv/package manager (Rust) - works wit
 brew "starship"            # Cross-shell prompt (zsh fallback: DOTFILES_PROMPT=starship; default is Powerlevel10k)
 brew "ripgrep"             # Better grep (Rust)
 brew "tree"                # Directory tree
+brew "tmux"                # Terminal multiplexer (plugins via TPM: scripts/setup/tmux.sh)
 brew "television"          # Fuzzy finder with channels (Rust)
 brew "yazi"                # Terminal file manager (Rust)
 brew "zoxide"              # Smart cd (Rust)

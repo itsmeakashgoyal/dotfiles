@@ -569,6 +569,9 @@ class FullVerification(SystemChecker):
             self.check_cmd("Tmux", "tmux", flag="-V")
             self.check_link("Config link", str(home / ".config" / "tmux"))
             self.check_condition("tmux.conf", (home / ".config" / "tmux" / "tmux.conf").is_file())
+            tpm_ok = (home / ".config" / "tmux" / "plugins" / "tpm").is_dir()
+            self.check_condition("tmux plugins (TPM)", tpm_ok,
+                                 detail="" if tpm_ok else "run: make tmux")
 
         # Every tool packages.toml says this platform installs. Adding a package
         # there is enough — no parallel list to update here.

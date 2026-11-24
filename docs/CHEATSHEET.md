@@ -268,6 +268,7 @@ The left `⌥` acts as Meta (sends `Esc+`), and the right `⌥` types special ch
 | `make stow pkg=x` / `make unstow pkg=x` / `make list` | Stow / unstow one package / list packages |
 | `make health` / `check` / `menu` / `manifest` / `bench-real` | Same as the matching `dutils` commands |
 | `make iterm` / `make sublime` / `make apps` | Set up iTerm2 / Sublime Text / both |
+| `make tmux` (`update=1`) | Install (and update) TPM + tmux plugins |
 | `make macos-defaults` (`undo=1`, `dry=1`) | Apply the curated macOS defaults (`undo=1` reverts, `dry=1` previews) |
 | `make nix-switch` / `make uninstall` | Apply `home.nix` (Linux) / uninstall gracefully |
 

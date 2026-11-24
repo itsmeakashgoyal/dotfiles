@@ -220,6 +220,15 @@ nix      = "tree"
 # anyway because it found the built-in tree.com instead.
 
 [[package]]
+name     = "tmux"
+desc     = "Terminal multiplexer (plugins via TPM: scripts/setup/tmux.sh)"
+category = "Essential CLI Tools"
+brew     = "tmux"
+nix      = "tmux"
+version_flag = "-V"
+check    = "none"  # TMUX section in check.py verifies it
+
+[[package]]
 name     = "television"
 desc     = "Fuzzy finder with channels (Rust)"
 category = "Essential CLI Tools"
