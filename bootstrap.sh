@@ -8,6 +8,11 @@
 # Bootstrap: download dotfiles from GitHub then run install.sh.
 # Use this for a fresh machine where the repo doesn't exist yet.
 #
+# Needs NO git and NO SSH key: it clones over public HTTPS, or downloads a
+# tarball when git isn't installed yet (fresh macOS only has a git stub) and
+# turns it into a real clone once install.sh has installed git. SSH keys and
+# your personal/work identities come afterwards, from `dutils init`.
+#
 # Usage:
 #   bash <(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/bootstrap.sh)
 #
@@ -59,8 +64,30 @@ _run_install() {
 # ------------------------------------------------------------------------------
 # Download
 # ------------------------------------------------------------------------------
+# A real git on PATH? (/usr/bin/git on a fresh Mac is a stub that pops up the
+# Command Line Tools installer instead of running.)
+_have_git() {
+    command -v git >/dev/null 2>&1 || return 1
+    [[ "$(uname)" != "Darwin" ]] && return 0
+    xcode-select -p >/dev/null 2>&1 || [[ "$(command -v git)" != /usr/bin/git ]]
+}
+
+# Tarball download → real clone, once install.sh has provided git.
+_convert_to_clone() {
+    [[ -d "$TARGET/.git" ]] && return 0
+    _have_git || { _warn "git still not available; re-run bootstrap later to get a clone"; return 0; }
+    _info "Turning the downloaded tarball into a git clone..."
+    git -C "$TARGET" init -q
+    git -C "$TARGET" symbolic-ref HEAD refs/heads/master
+    git -C "$TARGET" remote add origin "$REPO.git"
+    git -C "$TARGET" fetch -q origin master
+    git -C "$TARGET" reset -q origin/master
+    git -C "$TARGET" branch -q --set-upstream-to=origin/master 2>/dev/null || true
+    _success "Clone ready (remote: $REPO.git)"
+}
+
 _download() {
-    if command -v git >/dev/null 2>&1; then
+    if _have_git; then
         _info "Cloning with git..."
         git clone "$REPO" "$TARGET"
     elif command -v curl >/dev/null 2>&1; then
@@ -87,8 +114,12 @@ main() {
 
     if [[ -d "$TARGET" ]]; then
         _warn "Dotfiles directory already exists: $TARGET"
-        if _confirm "Remove it and re-download?"; then
-            rm -rf "$TARGET"
+        # Never delete it (it may hold uncommitted work): move it aside instead.
+        if _confirm "Move it to a backup and re-download?"; then
+            local backup
+            backup="${TARGET}.backup.$(date +%Y%m%d-%H%M%S)"
+            mv "$TARGET" "$backup"
+            _info "Previous copy kept at $backup"
         else
             if [[ ! -f "$TARGET/install.sh" ]]; then
                 _error "install.sh not found in existing directory."
@@ -110,7 +141,8 @@ main() {
     echo ""
     if _confirm "Run install.sh now?"; then
         _run_install
-        _success "Bootstrap complete!"
+        _convert_to_clone
+        _success "Bootstrap complete! Next: dutils init  (git identities, SSH keys, theme)"
     else
         _warn "Skipped. Run manually: bash $TARGET/install.sh"
     fi

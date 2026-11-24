@@ -145,7 +145,7 @@ does. Rather than ship a half-working picker, `dutils menu` exits immediately on
 Windows with a message pointing at `dutils --help` / `dutils <command> --help` instead.
 
 **What works on Windows**: `health`, `check`, `diagnose`, `sysinfo`, `packages`,
-`manifest`, `theme`, `secrets`, `ssh-setup`, `detect-os`, `init`, `update`, `new`,
+`manifest`, `theme`, `secrets`, `git-setup`, `detect-os`, `init`, `update`, `new`,
 `sync`, `edit`, `bench`, `profile` — all confirmed directly, not assumed.
 
 `dutils new` also registers the scaffolded package in `packages.toml` and re-runs

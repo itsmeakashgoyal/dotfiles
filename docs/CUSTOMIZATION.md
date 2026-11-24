@@ -30,9 +30,9 @@ Modular configs live in `zsh/.config/zsh/conf.d/`. Every `*.zsh` file in that di
 | `television.zsh` | Television fuzzy finder, smart autocomplete, key bindings |
 | `git.zsh` | Git-specific aliases and functions |
 | `options.zsh` | Zsh options, history, completion settings |
-| `private.zsh` | Machine-local overrides (gitignored) |
+| `99-private.zsh` | Machine-local work exports/secrets (gitignored, owner-only) |
 
-To add your own config, create a new `.zsh` file in `conf.d/` or use `private.zsh` for secrets and machine-specific values.
+To add your own config, create a new `.zsh` file in `conf.d/` or use `99-private.zsh` for secrets and machine-specific values.
 
 ---
 

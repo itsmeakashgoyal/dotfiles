@@ -8,29 +8,17 @@
 	defaultBranch = main
 
 [user]
-	name = Akash Goyal
-	email = ag.akgoyal@gmail.com
+	# No identity in this tracked file on purpose: each machine gets its
+	# identities from `dutils git-setup` (personal + any number of work
+	# profiles, matched by folder / GitHub org / enterprise host), stored
+	# OUTSIDE the repo in ~/.config/dotfiles/git/. Until that's run, git refuses
+	# to commit instead of silently using the wrong email.
+	useConfigOnly = true
 
-# Machine-local identity override (gitignored, per-machine; safe to be absent).
-# On a work machine, ~/.config/git/config-local sets the work email as the
-# DEFAULT for normally-cloned repos, so the public repo never has to hardcode a
-# work address and every machine stays generic. Created by `dutils ssh-setup`
-# (work profile). It sits BEFORE the personal includeIfs below on purpose, so
-# personal repos still override back to gmail. Missing file = silently ignored.
+# Generated per machine by `dutils git-setup` (see docs/SSH.md). Missing file =
+# silently ignored, so a fresh machine still works for everything but commits.
 [include]
-	path = ~/.config/git/config-local
-
-# Personal repos: any repo cloned under ~/personal/ uses gmail
-[includeIf "gitdir:~/personal/"]
-	path = ~/.config/git/config-personal
-
-# Personal repos, identified by remote: any repo whose remote uses the
-# `github-private` SSH host alias (see ~/.ssh/config → personal key) commits
-# with the gmail identity, regardless of where it lives on disk. This is what
-# makes ~/dotfiles itself (remote git@github-private:...) use gmail while the
-# work email stays the global default for everything else. Requires git >= 2.36.
-[includeIf "hasconfig:remote.*.url:git@github-private:*/**"]
-	path = ~/.config/git/config-personal
+	path = ~/.config/dotfiles/git/config
 
 # ============================================================================
 # Aliases
@@ -41,27 +29,27 @@
 	c = clone --recursive
 	ca = !git add -A && git commit -av
 	amend = commit --amend --reuse-message=HEAD
-	
+
 	# Branch management
 	go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
 	branches = branch --all
-	dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
-	
+	dm = "!git branch --merged | grep -vE '^\\*|^[[:space:]]*(main|master|develop)$' | xargs -n 1 git branch -d"
+
 	# Logs and diffs
 	l = log --pretty=oneline -n 20 --graph --abbrev-commit
 	d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
-	
+
 	# Submodules
 	ps = pull --recurse-submodules
 	sm-init = submodule update --init --recursive
 	sm-update = submodule update --recursive --remote
-	
+
 	# Search
 	fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
 	fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
-	
+
 	# Utilities
-	whoami = config user.email
+	whoami = "!echo \"$(git config user.name) <$(git config user.email)>\""
 	contributors = shortlog --summary --numbered
 	# Open the current repo (or the current branch's PRs) in the browser via gh.
 	open = "!gh repo view --web"
@@ -75,11 +63,9 @@
 	pager = delta
 	whitespace = space-before-tab,-indent-with-non-tab,trailing-space
 	trustctime = false
-	precomposeunicode = false
 	untrackedCache = true
 	autocrlf = input
 	safecrlf = warn
-	filemode = false
 	# Built-in filesystem watcher (git >=2.37, no external Watchman needed):
 	# `git status`/diff-index normally stat every tracked file on every call,
 	# which is what makes starship's git_status module slow-to-timeout on
@@ -99,6 +85,15 @@
 [branch]
 	sort = -committerdate
 
+[column]
+	ui = auto
+
+[tag]
+	sort = version:refname
+
+[commit]
+	verbose = true
+
 [color]
 	ui = auto
 
@@ -109,7 +104,8 @@
 	navigate = true
 	side-by-side = true
 	line-numbers = true
-	syntax-theme = base16-256
+	# No syntax-theme here: delta reads $BAT_THEME (gruvbox-dark/-light, set
+	# by the shell from `dutils theme`), so diffs match the terminal.
 
 [interactive]
 	diffFilter = delta --color-only
@@ -118,6 +114,8 @@
 # Diff & Merge
 # ============================================================================
 [diff]
+	algorithm = histogram
+	colorMoved = default
 	renames = copies
 	mnemonicprefix = true
 
@@ -126,50 +124,59 @@
 
 [merge]
 	log = true
-	tool = vimdiff3
+	conflictStyle = zdiff3
+	tool = nvimdiff
 
 [mergetool]
 	prompt = false
-
-[mergetool "vimdiff3"]
-	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
+	keepBackup = false
 
 # ============================================================================
-# Push & Pull
+# Push, Pull & Fetch
 # ============================================================================
 [push]
 	default = current
+	autoSetupRemote = true
 	followTags = true
+
+[pull]
+	rebase = true
+
+[rebase]
+	autoStash = true
+	autoSquash = true
+	updateRefs = true
+
+[fetch]
+	prune = true
 
 # ============================================================================
 # Utilities
 # ============================================================================
 [rerere]
 	enabled = true
+	autoUpdate = true
 
 [grep]
 	extendRegexp = true
 	lineNumber = true
 
 [help]
-	autocorrect = 1
+	autocorrect = prompt
 
 # ============================================================================
 # GitHub Integration
 # ============================================================================
 [url "git@github.com:"]
 	insteadOf = "gh:"
-	pushInsteadOf = "github:"
-	pushInsteadOf = "git://github.com/"
-
-[url "git://github.com/"]
-	insteadOf = "github:"
 
 [credential "https://github.com"]
-	helper = !/usr/bin/gh auth git-credential
+	helper =
+	helper = !gh auth git-credential
 
 [credential "https://gist.github.com"]
-	helper = !/usr/bin/gh auth git-credential
+	helper =
+	helper = !gh auth git-credential
 [filter "lfs"]
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process

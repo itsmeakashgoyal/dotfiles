@@ -14,19 +14,20 @@ This is a personal dotfiles repo. The following practices are enforced to preven
 
 ### What is gitignored
 
-- `zsh/.config/zsh/conf.d/private.zsh` — machine-local secrets, API keys, work tokens
+- `zsh/.config/zsh/conf.d/99-private.zsh` (and `windows/.../profile.d/99-private.ps1`) — machine-local work exports, API keys, tokens. Kept owner-only (`chmod 600`; `.zshrc` re-applies it) and never compiled to `.zwc`
+- Git identities (`~/.config/dotfiles/git/`, written by `dutils git-setup`) live outside the repo entirely
 - Any `*.env` files
 - SSH private keys
 
 ### Where to put secrets
 
-**Always** use `private.zsh` for:
+**Always** use `99-private.zsh` for:
 - API tokens (`GITHUB_TOKEN`, `OPENAI_API_KEY`, etc.)
 - Work-specific environment variables
 - Machine-specific PATH additions
 - Credentials of any kind
 
-See [`zsh/.config/zsh/conf.d/private.zsh.example`](zsh/.config/zsh/conf.d/private.zsh.example) for a template.
+`dutils init` creates a starter `99-private.zsh` with the right permissions.
 
 ### What NOT to commit
 
@@ -51,7 +52,7 @@ pre-commit install
 
 ## SSH Key Hardening
 
-The included `dutils ssh-setup` (`scripts/dutils/ssh_setup.py`) generates **Ed25519** keys (preferred over RSA) for separate personal and work GitHub identities — see [docs/SSH.md](docs/SSH.md). After generation:
+The included `dutils git-setup` (`scripts/dutils/git_setup.py`) generates **Ed25519** keys (preferred over RSA) for separate personal and work GitHub identities — see [docs/SSH.md](docs/SSH.md). After generation:
 
 1. Add a passphrase to your key
 2. Use `ssh-agent` or macOS Keychain to avoid re-entering it

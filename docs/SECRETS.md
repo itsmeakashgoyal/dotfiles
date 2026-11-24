@@ -23,8 +23,8 @@ secrets/.config/foo/token.age    ↔  ~/.config/foo/token
 - **Plaintext never lives in the repo** — it only exists at the real target
   under `$HOME` after you decrypt.
 - Encryption recipient = your personal SSH **public** key; decryption identity =
-  the matching **private** key (default `~/.ssh/id_ed25519_private`, from
-  `dutils ssh-setup`). Override with `DOTFILES_AGE_IDENTITY`.
+  the matching **private** key (default: the `personal` profile's key from
+  `dutils git-setup`). Override with `DOTFILES_AGE_IDENTITY`.
 
 ## Commands
 
@@ -51,7 +51,7 @@ git add secrets/ && git commit -m "secrets: add ssh config"
 
 **New machine**
 ```bash
-dutils ssh-setup --profile personal # ensure the SSH key exists first
+dutils git-setup                    # ensure the personal SSH key exists first
 dutils secrets decrypt --all        # restore every secret to $HOME
 ```
 

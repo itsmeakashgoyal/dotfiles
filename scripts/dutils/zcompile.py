@@ -38,7 +38,11 @@ def main() -> None:
     for p in (zdotdir / ".zshrc", zdotdir / ".p10k.zsh"):
         if p.is_file():
             targets.append(p)
-    targets += sorted((zdotdir / "conf.d").glob("*.zsh"))
+    # 99-private.zsh holds tokens: never copy it into a second (.zwc) file.
+    targets += sorted(p for p in (zdotdir / "conf.d").glob("*.zsh") if p.name != "99-private.zsh")
+    stale = zdotdir / "conf.d" / "99-private.zsh.zwc"
+    if stale.exists():
+        stale.unlink()
 
     if not targets:
         warn("No zsh files found to compile.")

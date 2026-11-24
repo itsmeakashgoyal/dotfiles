@@ -117,21 +117,16 @@ Many people use both: WSL2 for nvim/tmux/zsh/git day to day, native PowerShell/W
 
 ---
 
-## (Optional) SSH Key Setup
-
-Generate SSH keys and `~/.ssh/config` aliases for separate **personal** and
-**work** GitHub identities (cross-platform):
+## After install: git identities, SSH keys, theme
 
 ```bash
-dutils ssh-setup                       # interactive: personal / work / both
-dutils ssh-setup --profile personal -e you@gmail.com
-dutils ssh-setup --profile work -e you@company.com --name "Your Name"
+dutils init          # one wizard: identities + SSH keys, secrets, theme, private overrides
 ```
 
-Per profile it generates an Ed25519 key (never clobbering an existing one), sets
-`600`/`644` perms, writes an idempotent `Host` alias into `~/.ssh/config`, adds
-the key to `ssh-agent`, and copies the public key to your clipboard. The `Host`
-alias makes the git commit email follow the remote automatically.
+Git identities are per machine and never stored in the repo. `dutils git-setup`
+(run by `init`) asks for your personal details plus any number of work profiles
+(email, GitHub orgs and/or enterprise host, work folder). It picks or generates
+an SSH key per profile, after which every repo commits with the right email and
+key automatically. Until then git refuses to commit rather than guess.
 
-See **[docs/SSH.md](SSH.md)** for the full model (how the identity is chosen per
-repo, `config-local`, enterprise hosts, Windows notes).
+See **[docs/SSH.md](SSH.md)** for the full model.

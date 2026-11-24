@@ -22,7 +22,7 @@ sys.path.insert(0, str(SCRIPT_DIR.parent / "lib"))
 from dutil import ok, info, step, warn, section, confirm  # noqa: E402
 
 HOME = Path.home()
-CONFIG_LOCAL = HOME / ".config" / "git" / "config-local"
+GIT_PROFILES = HOME / ".config" / "dotfiles" / "git" / "profiles.json"
 PRIVATE_ZSH = HOME / ".config" / "zsh" / "conf.d" / "99-private.zsh"
 SECRETS_DIR = SCRIPT_DIR.parent.parent / "secrets"
 
@@ -33,44 +33,22 @@ def _sibling(script: str, *args: str) -> None:
 
 
 def step_identity(yes: bool) -> None:
-    section("1. Git identity")
-    info("The repo defaults to your personal (gmail) identity. A work machine "
-         "can set a different DEFAULT here (kept in ~/.config/git/config-local, "
-         "gitignored). Personal repos via the github-private remote stay gmail "
-         "either way.")
-    if CONFIG_LOCAL.exists():
-        info(f"config-local already present ({CONFIG_LOCAL}). Leaving it as-is.")
+    section("1. Git identities + SSH keys")
+    info("Personal plus any number of work profiles. Each repo picks the right "
+         "email and SSH key automatically (by folder, GitHub org or enterprise "
+         "host). Stored in ~/.config/dotfiles/git/, outside the repo.")
+    if GIT_PROFILES.exists():
+        info("Profiles already set up — showing them (edit: dutils git-setup).")
+        _sibling("git_setup.py", "status")
         return
-    if not confirm("Is this a WORK machine (set a work email as the default)?"):
-        info("Keeping the personal default. Nothing written.")
-        return
-    name = input("  Work git author name [Akash Goyal]: ").strip() or "Akash Goyal"
-    email = input("  Work git email: ").strip()
-    if not email:
-        warn("No email given — skipping.")
-        return
-    CONFIG_LOCAL.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG_LOCAL.write_text(
-        "# Machine-local git identity (gitignored, per-machine).\n"
-        "# Written by `dutils init`. Personal repos still override to gmail via\n"
-        "# the github-private includeIf in the tracked config.\n"
-        "[user]\n"
-        f"\tname = {name}\n"
-        f"\temail = {email}\n"
-    )
-    ok(f"Wrote {CONFIG_LOCAL}")
-
-
-def step_ssh(yes: bool) -> None:
-    section("2. SSH keys")
-    if yes or confirm("Set up SSH keys now (personal / work)?"):
-        _sibling("ssh_setup.py")
+    if yes or confirm("Set up git identities now?"):
+        _sibling("git_setup.py")
     else:
-        info("Skipped. Run later: dutils ssh-setup")
+        warn("Skipped — git will refuse to commit until you run: dutils git-setup")
 
 
 def step_secrets(yes: bool) -> None:
-    section("3. Secrets")
+    section("2. Secrets")
     ages = list(SECRETS_DIR.rglob("*.age")) if SECRETS_DIR.exists() else []
     if not ages:
         info("No encrypted secrets in the repo yet — nothing to restore.")
@@ -83,13 +61,14 @@ def step_secrets(yes: bool) -> None:
 
 
 def step_theme(yes: bool) -> None:
-    section("4. Theme")
+    section("3. Theme (Gruvbox)")
+    info("Gruvbox Dark everywhere by default; this picks the TERMINAL mode.")
     if yes:
-        _sibling("theme.py", "auto")
+        _sibling("theme.py", "apply")
         return
-    print("  1) auto (follow macOS)   2) dark   3) light   4) skip")
-    choice = input("  Choose [1/2/3/4]: ").strip()
-    mode = {"1": "auto", "2": "dark", "3": "light"}.get(choice)
+    print("  1) dark (default)   2) light   3) auto (follow the OS)   4) skip")
+    choice = input("  Choose [1/2/3/4]: ").strip() or "1"
+    mode = {"1": "dark", "2": "light", "3": "auto"}.get(choice)
     if mode:
         _sibling("theme.py", mode)
     else:
@@ -97,26 +76,29 @@ def step_theme(yes: bool) -> None:
 
 
 def step_private(yes: bool) -> None:
-    section("5. Machine-local shell overrides")
+    section("4. Machine-local shell overrides (work exports, tokens)")
     if PRIVATE_ZSH.exists():
-        info(f"{PRIVATE_ZSH.name} already present. Leaving it as-is.")
+        PRIVATE_ZSH.chmod(0o600)
+        info(f"{PRIVATE_ZSH.name} already present (permissions set to owner-only).")
         return
     if not PRIVATE_ZSH.parent.exists():
         info("zsh conf.d not found (stow the zsh package first) — skipping.")
         return
-    if yes or confirm("Create a starter 99-private.zsh (gitignored) for secrets/overrides?"):
+    if yes or confirm("Create a starter 99-private.zsh (gitignored) for work exports/secrets?"):
         PRIVATE_ZSH.write_text(
             "#!/usr/bin/env zsh\n"
-            "# Machine-local overrides — gitignored, sourced last.\n"
-            "# Put secrets, per-machine PATH tweaks, and extra `hash -d` bookmarks here.\n"
+            "# Machine-local overrides: gitignored, owner-only (chmod 600), sourced last.\n"
+            "# Work exports, tokens, per-machine PATH tweaks and `hash -d` bookmarks.\n"
+            "#   export ARTIFACTORY_USER=...\n"
             "#   export SOME_TOKEN=...\n"
             "#   hash -d work=~/work\n"
         )
-        ok(f"Created {PRIVATE_ZSH}")
+        PRIVATE_ZSH.chmod(0o600)
+        ok(f"Created {PRIVATE_ZSH} (owner-only)")
 
 
 def step_health(yes: bool) -> None:
-    section("6. Health check")
+    section("5. Health check")
     check = SCRIPT_DIR.parent / "verify" / "check.py"
     if not check.exists():
         return
@@ -137,7 +119,6 @@ def main() -> None:
     info("Each step is optional and safe to re-run. Ctrl-C to stop anytime.")
 
     step_identity(args.yes)
-    step_ssh(args.yes)
     step_secrets(args.yes)
     step_theme(args.yes)
     step_private(args.yes)

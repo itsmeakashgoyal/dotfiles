@@ -1,135 +1,117 @@
-# SSH keys & multi-account Git identity
+# Git identities & SSH keys
 
-Cross-platform (macOS / Linux / Windows) setup for using **separate GitHub
-identities** — personal and company/professional — from one machine, with the
-right commit email and the right SSH key chosen automatically per repo.
+One command sets up personal **and** any number of work/company GitHub accounts
+on macOS, Linux and Windows:
 
-The whole thing hangs on one idea: **an SSH `Host` alias per account.** You
-clone/push through the alias, and both the SSH key *and* the git commit email
-follow from it. No per-repo `git config user.email`, no per-machine hand-edits.
+```bash
+dutils git-setup          # wizard: personal profile, then "add a work profile?"
+```
+
+After that you clone with the **normal URL from GitHub's copy button** and each
+repo picks the right email, SSH key and (optionally) commit signing by itself.
+There are no special host aliases to remember.
 
 ```text
-git@github-private:you/repo.git   → personal key  + gmail identity
-git@github.com:org/repo.git       → default key   + work identity (machine default)
+git clone git@github.com:acme/app.git        → work identity + work key   (org rule)
+git clone git@github.acme.com:team/svc.git   → work identity + work key   (enterprise host rule)
+git clone git@github.com:you/dotfiles.git    → personal identity + key    (your username is a personal "org")
+cd ~/work && git init scratch                → work identity              (folder rule)
+anything else                                → the machine's default profile
 ```
 
----
+## Where things live
 
-## One command: `dutils ssh-setup`
+Nothing machine-specific is in the repo. The tracked `git/.config/git/config`
+has **no** `user.email`: it sets `user.useConfigOnly = true` (git refuses to
+commit rather than guess) and includes a per-machine file:
 
-Cross-platform (Python — works on Windows too, which has no bash):
+| File | What |
+|---|---|
+| `~/.config/dotfiles/git/profiles.json` | Source of truth, written by `dutils git-setup` |
+| `~/.config/dotfiles/git/config` | Generated: default identity + `includeIf` rules + URL rewrites |
+| `~/.config/dotfiles/git/<profile>.gitconfig` | Generated: name, email, `core.sshCommand`, signing |
+| `~/.config/dotfiles/git/allowed_signers` | Generated when signing is on (`git log --show-signature`) |
+| `~/.ssh/config.d/dotfiles` | Generated `Host` blocks, `Include`d at the top of `~/.ssh/config` |
+
+Re-running is always safe. `dutils git-setup apply` regenerates everything from
+`profiles.json`; your own `~/.ssh/config` content is left untouched.
+
+## A profile
+
+```json
+"work": {
+  "name": "Your Name",
+  "email": "you@acme.com",
+  "orgs": ["acme", "acme-labs"],          // GitHub orgs on github.com
+  "hosts": ["github.acme.com"],           // GitHub Enterprise hosts
+  "dirs": ["~/work/"],                    // folders whose repos are always work
+  "aliases": ["github-work"],             // ssh alias (also matched as a remote)
+  "key": "~/.ssh/id_ed25519_work",
+  "sign": true                            // SSH-sign commits and tags
+}
+```
+
+How a repo resolves (later wins): **default profile < folder rules < remote
+rules**. So a personal repo cloned inside `~/work/` still commits as personal.
+
+How the key is chosen:
+
+- SSH URLs for a non-default profile's orgs are rewritten to its alias
+  (`url.<alias>.insteadOf`), so `git clone` already uses the right key.
+- Enterprise hosts get their own `Host` block with the profile's key.
+- Every repo that resolves to a profile pins its key via `core.sshCommand`.
+- Plain `github.com` uses the default profile's key.
+
+## Commands
 
 ```bash
-dutils ssh-setup                       # interactive: personal / work / both
-dutils ssh-setup --profile personal -e you@gmail.com
-dutils ssh-setup --profile work -e you@company.com --name "Your Name"
-dutils ssh-setup --all                 # set up both, prompting per profile
+dutils git-setup                     # wizard (first run), or menu to add/edit/remove
+dutils git-setup status [PATH]       # profiles + which identity PATH (default: cwd) gets
+dutils git-setup add acme            # add/update a profile interactively
+dutils git-setup add acme -y --email you@acme.com --org acme \
+    --host github.acme.com --dir ~/work --sign    # …or non-interactively
+dutils git-setup default personal    # change this machine's default
+dutils git-setup remove acme
+dutils git-setup test                # ssh -T every profile: "Hi <user>!"
+dutils git-setup apply               # regenerate from profiles.json
+git whoami                           # name <email> for the current repo
 ```
 
-`ssh-keygen` is kept as a back-compat alias of `ssh-setup`.
+The wizard lets you pick an existing key in `~/.ssh` or generate a new ed25519
+key. It copies the public key to the clipboard; add it at
+<https://github.com/settings/keys> (as an *Authentication* key, and also as a
+*Signing* key if you turned signing on).
 
-For each profile it:
+## Fresh machine
 
-1. **Generates an Ed25519 key** at `~/.ssh/<key-name>` (only if missing — it
-   never clobbers an existing key), and sets `600`/`644` perms on POSIX. On
-   Windows, OpenSSH uses NTFS ACLs, so a key created under your own profile is
-   already private.
-2. **Writes an idempotent `Host` block** into `~/.ssh/config` (re-running
-   updates its own block in place, delimited by `# >>> dutils ssh-setup` markers
-   — it never duplicates or touches hand-written entries).
-3. **Adds the key to the agent** (best effort; on macOS with `--apple-use-keychain`).
-4. **Prints the public key and copies it to the clipboard** so you can paste it
-   into GitHub → *Settings → SSH and GPG keys* for the matching account.
+The chicken-and-egg problem (you need git and a key to clone the repo that sets
+up git and keys) doesn't apply:
 
-Built-in profiles:
+1. `bootstrap.sh` clones over **public HTTPS**, or downloads a tarball when git
+   isn't installed yet, and turns it into a real clone once install.sh has
+   installed git.
+2. `dutils init` runs `git-setup`, then offers to switch the dotfiles remote
+   from HTTPS to SSH. Your username is in the personal profile's orgs, so
+   that remote uses your personal key automatically.
 
-| Profile | Host alias | Key file | Git identity |
-| --- | --- | --- | --- |
-| `personal` | `github-private` | `~/.ssh/id_ed25519_private` | gmail, via the includeIf below |
-| `work` | `github-work` | `~/.ssh/id_ed25519_work` | machine default (config-local) |
+## Migrating from the old setup
 
-Override any of it with `--alias`, `--key-name`, `--host` (e.g. an enterprise
-GitHub host), `--key-type rsa`, `-y` (non-interactive), `--no-clipboard`.
-
----
-
-## How the git identity follows the remote
-
-The tracked git config ([`git/.config/git/config`](../git/.config/git/config))
-sets a **safe personal default** and layers overrides in this order (last match
-wins per key):
-
-```gitconfig
-[user]
-	name  = Akash Goyal
-	email = ag.akgoyal@gmail.com        # public-safe default
-
-[include]
-	path = ~/.config/git/config-local   # per-machine work default (gitignored)
-
-[includeIf "gitdir:~/personal/"]
-	path = ~/.config/git/config-personal # gmail, for ~/personal/ repos
-
-[includeIf "hasconfig:remote.*.url:git@github-private:*/**"]
-	path = ~/.config/git/config-personal # gmail, for any github-private remote
-```
-
-Result, on any machine:
-
-| Repo | Resolves to | Why |
-| --- | --- | --- |
-| remote `git@github-private:*` (incl. this dotfiles repo) | **gmail** | `hasconfig` includeIf, last match wins |
-| any repo, when `config-local` exists (work machine) | **work email** | `[include] config-local` overrides the default |
-| any repo, no `config-local` (personal machine) | **gmail** | tracked default; missing include is ignored |
-
-- **`config-personal`** is tracked (gmail is fine to be public).
-- **`config-local`** is **gitignored** and written per-machine by
-  `dutils ssh-setup` (work profile). Because it's the machine *default*, it
-  catches work repos cloned with ordinary `github.com`/enterprise remotes — the
-  common case a remote-alias rule can't see. It never leaks a work email into
-  the public repo, and every machine stays generic (no hand-edits to tracked
-  files). `hasconfig:remote.*.url` requires **git ≥ 2.36**.
-
-Check what a repo will use:
+The previous design (gmail hardcoded in the tracked config, `config-local` for
+the work email, `git@github-private:` remotes) is imported with:
 
 ```bash
-git config user.email
-git config --show-origin user.email   # which file decided it
+dutils git-setup migrate
 ```
 
----
+It creates `personal` and `work` profiles from those files and keeps
+`github-private` as an alias, so existing remotes keep working. Afterwards,
+`~/.config/git/config-local` and `config-personal` are no longer read and can be
+deleted.
 
-## Pointing an existing repo at an identity
+## Notes
 
-```bash
-# make this repo push as personal
-git remote set-url origin git@github-private:you/repo.git
-
-# make this repo push as work
-git remote set-url origin git@github-work:org/repo.git
-```
-
-Nothing else to change — the key and the commit email both follow the alias.
-
----
-
-## Platform notes
-
-- **macOS / Linux** — `~/.ssh/config` and `~/.config/git/` are Stow-managed;
-  keys and `config-local` are machine-local (never committed).
-- **Windows** — `windows/windows.ps1` symlinks `~/.config/git`, so the
-  same git config (and `config-local`) apply. `~/.ssh/config` works with the
-  built-in OpenSSH client. If `ssh-add` can't reach an agent, start it once:
-  ```powershell
-  Set-Service ssh-agent -StartupType Automatic
-  Start-Service ssh-agent
-  ```
-
----
-
-## Verifying a key works
-
-```bash
-ssh -T git@github-private     # → "Hi <you>! You've successfully authenticated…"
-ssh -T git@github-work
-```
+- `includeIf hasconfig:remote.*.url` needs git ≥ 2.36.
+- On macOS, keys are added to the agent with the passphrase kept in the Keychain
+  (`UseKeychain yes`). On Windows, start the agent once:
+  `Set-Service ssh-agent -StartupType Automatic; Start-Service ssh-agent`.
+- `dutils secrets` uses the personal profile's key as its age identity.

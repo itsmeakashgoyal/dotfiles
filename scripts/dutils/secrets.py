@@ -39,9 +39,21 @@ DOTFILES_DIR = Path(__file__).resolve().parents[2]
 SECRETS_DIR = DOTFILES_DIR / "secrets"
 RECIPIENTS = SECRETS_DIR / ".recipients"
 
-# Decryption identity: personal SSH key by default (matches `dutils ssh-setup`),
-# overridable for machines that name it differently.
-IDENTITY = Path(os.environ.get("DOTFILES_AGE_IDENTITY", HOME / ".ssh" / "id_ed25519_private"))
+# Decryption identity: $DOTFILES_AGE_IDENTITY, else the "personal" profile's SSH
+# key from `dutils git-setup`, else the legacy ~/.ssh/id_ed25519_private.
+def _default_identity() -> Path:
+    import json
+    profiles = HOME / ".config" / "dotfiles" / "git" / "profiles.json"
+    try:
+        key = json.loads(profiles.read_text())["profiles"]["personal"]["key"]
+        if key:
+            return Path(key).expanduser()
+    except (OSError, ValueError, KeyError):
+        pass
+    return HOME / ".ssh" / "id_ed25519_private"
+
+
+IDENTITY = Path(os.environ.get("DOTFILES_AGE_IDENTITY") or _default_identity())
 DEFAULT_PUBKEY = Path(str(IDENTITY) + ".pub")
 
 
@@ -77,7 +89,7 @@ def cmd_init(_args) -> None:
     SECRETS_DIR.mkdir(parents=True, exist_ok=True)
     if not DEFAULT_PUBKEY.exists():
         fail(f"SSH public key not found: {DEFAULT_PUBKEY}\n"
-             f"Run `dutils ssh-setup --profile personal` first, or set "
+             f"Run `dutils git-setup` (personal profile) first, or set "
              f"DOTFILES_AGE_IDENTITY to your key path.")
         sys.exit(1)
     pub = DEFAULT_PUBKEY.read_text().strip()
