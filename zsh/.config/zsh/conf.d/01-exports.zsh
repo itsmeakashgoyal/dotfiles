@@ -242,3 +242,7 @@ export PATH
 
 # uv / other installers that drop a PATH shim in ~/.local/bin
 [[ -f "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"
+
+# Installers that append to ~/.zshrc (never read here: ZDOTDIR is ~/.config/zsh)
+# need their PATH lines here instead. Only added when present on this machine.
+[[ -d "$HOME/.lmstudio/bin" ]] && path+=("$HOME/.lmstudio/bin")   # LM Studio CLI (lms)

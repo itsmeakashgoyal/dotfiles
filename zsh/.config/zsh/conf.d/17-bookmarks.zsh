@@ -29,3 +29,9 @@ for _name in "${(k)_dotfiles_bookmarks[@]}"; do
 done
 unset _name
 unset _dotfiles_bookmarks
+
+# Prompt shows real paths (~/dotfiles), not these bookmark names (~df): with
+# auto_name_dirs set, Powerlevel10k builds its dir segment by replacing only
+# $HOME with ~ instead of using zsh's %~ (which abbreviates via named dirs).
+# `cd ~df` etc. keep working; titles use ${PWD:t}, starship never used %~.
+setopt auto_name_dirs
