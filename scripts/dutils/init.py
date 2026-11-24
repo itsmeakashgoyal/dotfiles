@@ -6,7 +6,7 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # First-run setup wizard — the "new machine" flow. Ties the other dutils pieces
-# together (git identity, SSH keys, theme, secrets, private overrides) with a
+# together (git identities, SSH keys, theme, private overrides) with a
 # short series of optional, idempotent prompts, so a fresh machine goes from
 # `make install` to fully personalized with one command. Safe to re-run.
 #
@@ -24,7 +24,6 @@ from dutil import ok, info, step, warn, section, confirm  # noqa: E402
 HOME = Path.home()
 GIT_PROFILES = HOME / ".config" / "dotfiles" / "git" / "profiles.json"
 PRIVATE_ZSH = HOME / ".config" / "zsh" / "conf.d" / "99-private.zsh"
-SECRETS_DIR = SCRIPT_DIR.parent.parent / "secrets"
 
 
 def _sibling(script: str, *args: str) -> None:
@@ -47,21 +46,8 @@ def step_identity(yes: bool) -> None:
         warn("Skipped — git will refuse to commit until you run: dutils git-setup")
 
 
-def step_secrets(yes: bool) -> None:
-    section("2. Secrets")
-    ages = list(SECRETS_DIR.rglob("*.age")) if SECRETS_DIR.exists() else []
-    if not ages:
-        info("No encrypted secrets in the repo yet — nothing to restore.")
-        return
-    info(f"{len(ages)} encrypted secret(s) found.")
-    if yes or confirm("Decrypt them to $HOME now?"):
-        _sibling("secrets.py", "decrypt", "--all")
-    else:
-        info("Skipped. Run later: dutils secrets decrypt --all")
-
-
 def step_theme(yes: bool) -> None:
-    section("3. Theme (Gruvbox)")
+    section("2. Theme (Gruvbox)")
     info("Gruvbox Dark everywhere by default; this picks the TERMINAL mode.")
     if yes:
         _sibling("theme.py", "apply")
@@ -76,7 +62,7 @@ def step_theme(yes: bool) -> None:
 
 
 def step_private(yes: bool) -> None:
-    section("4. Machine-local shell overrides (work exports, tokens)")
+    section("3. Machine-local shell overrides (work exports, tokens)")
     if PRIVATE_ZSH.exists():
         PRIVATE_ZSH.chmod(0o600)
         info(f"{PRIVATE_ZSH.name} already present (permissions set to owner-only).")
@@ -98,7 +84,7 @@ def step_private(yes: bool) -> None:
 
 
 def step_health(yes: bool) -> None:
-    section("5. Health check")
+    section("4. Health check")
     check = SCRIPT_DIR.parent / "verify" / "check.py"
     if not check.exists():
         return
@@ -119,7 +105,6 @@ def main() -> None:
     info("Each step is optional and safe to re-run. Ctrl-C to stop anytime.")
 
     step_identity(args.yes)
-    step_secrets(args.yes)
     step_theme(args.yes)
     step_private(args.yes)
     step_health(args.yes)

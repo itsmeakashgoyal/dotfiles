@@ -6,7 +6,7 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # OS detection only, mirroring scripts/lib/os-detect.sh's API for this
-# repo's standalone Python scripts (check.py, cleanup.py, install_nvim.py).
+# repo's standalone Python scripts (check.py, cleanup.py).
 
 import platform
 

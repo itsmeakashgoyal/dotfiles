@@ -34,7 +34,6 @@
     # BEGIN GENERATED: nix (dutils manifest generate)
     # Essential CLI Tools
     git # Real git (macOS ships only a Command Line Tools stub)
-    age # Modern file encryption (secrets, via dutils secrets)
     atuin # Shell history search (Rust)
     bat # Cat with syntax highlighting (Rust)
     eza # Better ls (Rust)
@@ -45,7 +44,6 @@
     git-extras # Extra git commands
     hyperfine # Command-line benchmarking tool (Rust)
     jq # JSON processor
-    lazygit # Terminal UI for git
     mise # Runtime version manager (replaces pyenv)
     python314 # Python >= 3.14, the repo standard (dutils; see scripts/lib/pyreq.py) (Homebrew: python@3.14)
     uv # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters

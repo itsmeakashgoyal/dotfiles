@@ -24,34 +24,11 @@
 # Aliases
 # ============================================================================
 [alias]
-	# Basic shortcuts
 	s = status
-	c = clone --recursive
-	ca = !git add -A && git commit -av
 	amend = commit --amend --reuse-message=HEAD
-
-	# Branch management
-	go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
-	branches = branch --all
-	dm = "!git branch --merged | grep -vE '^\\*|^[[:space:]]*(main|master|develop)$' | xargs -n 1 git branch -d"
-
-	# Logs and diffs
-	l = log --pretty=oneline -n 20 --graph --abbrev-commit
-	d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
-
-	# Submodules
-	ps = pull --recurse-submodules
-	sm-init = submodule update --init --recursive
-	sm-update = submodule update --recursive --remote
-
-	# Search
-	fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
-	fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
-
-	# Utilities
+	# name <email> this repo commits as (see `dutils git-setup`)
 	whoami = "!echo \"$(git config user.name) <$(git config user.email)>\""
-	contributors = shortlog --summary --numbered
-	# Open the current repo (or the current branch's PRs) in the browser via gh.
+	# Open the repo / its pull requests in the browser (gh)
 	open = "!gh repo view --web"
 	prs = "!gh pr list --web"
 

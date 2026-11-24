@@ -891,7 +891,7 @@ def brew_vulns_summary() -> None:
 
     Runs in the --all/diagnose flow only; never affects the exit code — the
     advisory database drifts over time, so a finding here is news to act on, not
-    a broken install. Full report / filtering lives in `dutils vulns`.
+    a broken install. Full report / filtering: `brew vulns`.
     """
     import shutil
     log.section("SECURITY (brew vulns)")
@@ -911,7 +911,7 @@ def brew_vulns_summary() -> None:
                     if ln.strip().startswith("Found ")), None)
     if summary:
         log.substep(summary)
-        log.substep("Full report: dutils vulns   (filter: dutils vulns --severity high)")
+        log.substep("Full report: brew vulns   (filter: brew vulns --severity high)")
     else:
         log.substep("No known vulnerabilities reported.")
 

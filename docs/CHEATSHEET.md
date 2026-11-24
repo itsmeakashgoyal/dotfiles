@@ -3,7 +3,6 @@
 Everything you can type or press in this setup. `⌃` Ctrl · `⌥` Option · `⌘` Cmd · `⇧` Shift · **prefix** = tmux `⌃a` · `<leader>` = nvim `Space`.
 
 - [Shell](#shell)
-- [Bookmarks](#bookmarks)
 - [Python](#python)
 - [Git](#git)
 - [tmux](#tmux)
@@ -32,78 +31,26 @@ The command line is in vi mode and every line starts in insert mode. The Powerle
 | `Tab` after a space | Television autocomplete |
 | `Tab` mid-word or on an empty line | Normal zsh completion |
 
-**Abbreviations:** type the trigger, then press `Space` to expand it.
-
-| Type | Becomes |
-| --- | --- |
-| `cp file.txt _bak` | `cp -a file.txt{,.bak-YYYYmmdd-HHMM}` |
-| `echo hi _xrg wc` | `echo hi \| xargs -I {} wc {}` |
-| `<cmd> newdir _ind` | `mkdir -p newdir && <cmd>` |
-| `_chmo` | Pick a file with fzf and run `chmod +x` on it |
-
-**Listing and viewing files**
+**Files and navigation**
 
 | Command | Does |
 | --- | --- |
-| `l` / `ll` | `eza` long list of all files (`l` adds git status, `ll` puts directories first) |
-| `lt` | Tree view, 2 levels deep |
-| `cat` / `catn` | `bat` with syntax highlighting / plain |
-| `tre` | `tree` including hidden files, skipping `.git` and `node_modules`, paged |
+| `l` / `ll` / `ls` | `eza` long list: all files with git status / directories first / files sorted by size |
+| `lt` / `ld` / `lf` / `lh` | Tree (2 levels) / only directories / only files / hidden files |
+| `cat` / `catn` / `preview` | `bat` with syntax highlighting / plain / with line numbers |
 | `file.md` (or `.txt` `.yaml` `.json`) | Typing just a filename opens it in nvim |
-
-**Moving around**
-
-| Command | Does |
-| --- | --- |
 | `cd <partial>` | zoxide jump by frecency (`cd` is zoxide) |
-| `cx <dir>` / `mkcd <dir>` | `cd` into a directory and list it / create a directory and `cd` into it |
-| `up 3` / `grt` / `cdf` | Go up 3 directories / to the git repo root / to the front Finder window's folder |
-| `tvd` / `fv` | Pick a directory with tv and `cd` into it / pick a file and open it in nvim |
-
-**Global aliases:** these work anywhere in a command, e.g. `ls G foo`.
-
-| Alias | Expands to |
-| --- | --- |
-| `C` / `L` | `\| pbcopy` / `\| less` |
-| `G` | `\| grep -i --color=always` |
-| `T` / `S` | `\| tail -n +2` (skip the first line) / strip leading whitespace |
-| `W` | View the output in nvim as markdown (`q` quits) |
-| `H` / `V` | `--help` / `--version` |
-| `NUL` / `R` | `> /dev/null 2>&1` / `2>&1 \| tee output.txt` |
+| `grt` | `cd` to the git repo root |
+| `tvd` / `tve` | Pick a directory with tv and `cd` into it / pick something with tv and open it in nvim |
 
 **Utilities**
 
 | Command | Does |
 | --- | --- |
-| `serve [port]` | Serve the current directory over HTTP (default port 8000) |
-| `extract <archive>` / `targz <dir>` | Extract any common archive format / create a `.tar.gz` |
-| `fs [path]` / `du` / `df` | Size of a path / disk usage sorted by size / free disk space |
-| `diff a b` | Word-level colored diff (`git diff --no-index`) |
-| `fk` / `pkill` | Pick a process with tv and kill it (`fk` sends `-9`, `pkill` sends `-15`) |
-| `myip` / `ip_info` / `disks` | Public IP / local and public IPs / disk and mount info |
-| `update` / `caffeinate1h` | Update macOS, Homebrew and global npm packages / keep the Mac awake for 1 hour |
-
-**Docker**
-
-| Command | Does |
-| --- | --- |
-| `dps` / `dpa` / `di` | Running containers / all containers / images |
-| `dbash <name>` / `dcip <name>` | Open a shell inside a container / show the container's IP address |
-| `dstop` / `drm` / `drmf` / `dri` | Stop / remove / stop and remove all containers, remove all images (each asks first) |
-| `dcp` / `dip` / `dnp` / `dsp` | Prune containers / images / networks / everything unused |
-
-## Bookmarks
-
-Each bookmark works anywhere a path does, e.g. `cd ~df`, `nvim ~cfg/zsh/.zshrc`. A bookmark only exists if its target directory exists.
-
-| Bookmark | Path |
-| --- | --- |
-| `~df` | `~/dotfiles` |
-| `~cfg` | `~/.config` |
-| `~zdot` | `$ZDOTDIR` (`~/.config/zsh`) |
-| `~dl` | `~/Downloads` |
-| `~dev` | `~/ws` |
-| `~ltb` | `~/linuxtoolbox` |
+| `cmd C` | Pipe the output to the clipboard (`\| pbcopy`) |
+| `du` / `df` | Disk usage of everything here, sorted / free disk space |
+| `myip` / `path` / `c` | Public IP / `PATH`, one entry per line / clear |
+| `caffeinate1h` | Keep the Mac awake for 1 hour |
 
 ## Python
 
@@ -119,33 +66,14 @@ Each bookmark works anywhere a path does, e.g. `cd ~df`, `nvim ~cfg/zsh/.zshrc`.
 
 ## Git
 
-**Git aliases** (from `git/.config/git/config`), used as `git <alias>`:
+Identities and SSH keys per repo: `dutils git-setup` (see [Setup](SETUP.md#git-identities--ssh-keys)).
 
 | Command | Does |
 | --- | --- |
-| `git s` / `git l` / `git d` | `status` / one-line graph of the last 20 commits / diff with stats |
-| `git go <branch>` | Switch to a branch, creating it if it doesn't exist |
-| `git amend` / `git ca` | Amend the last commit, keeping its message / stage everything and commit (`-av`) |
-| `git dm` | Delete branches already merged (keeps main, master and develop) |
-| `git fc <text>` / `git fm <text>` | Find commits whose diff adds or removes `<text>` / whose message contains it |
-| `git whoami` | Show the identity git uses in this repo |
-| `git open` / `git prs` | Open the repo / its PR list in the browser (gh) |
-| `git c <url>` / `git sm-init` / `git sm-update` | Clone with submodules / initialize submodules / update them |
-
-**Shell shortcuts:** the `tv` pickers run when you give no argument.
-
-| Command | Does |
-| --- | --- |
-| `gs` / `glog` | `git status` / pretty graph log |
-| `gco [branch]` / `gcr` | Check out a local branch / fetch, then check out a remote branch (picker) |
-| `gch` | Check out one of the last 10 branches you were on |
-| `gct` / `gpr` | Check out a tag / a GitHub PR (picker) |
-| `gbd [branch]` / `delete-branches` | Delete a branch (type `delete` to confirm) / delete branches one at a time in a loop |
-| `gcmsg msg` / `gcam msg` | Commit / stage everything and commit |
-| `gac "msg"` / `gacs "msg"` | Stage everything, commit and push (`gacs` adds a sign-off) |
-| `gstam msg` / `gstab msg` | Stash everything / stash a backup but keep the changes |
-| `gundo [n]` / `nah` | Undo the last n commits, keeping the changes / discard all changes to the Trash (asks first) |
-| `gc` | ⚠️ `git clean -fxd` (deletes untracked and ignored files) |
+| `git s` | `git status` |
+| `git amend` | Amend the last commit, keeping its message |
+| `git whoami` | `name <email>` this repo commits as |
+| `git open` / `git prs` | Open the repo / its pull requests in the browser (gh) |
 
 ## tmux
 
@@ -160,7 +88,7 @@ The prefix is `⌃a`. Press `⌃a ⌃a` to send it to a nested session. Windows 
 | `prefix n` / `p` / `Space` | Next / previous / last window (`⌃n` / `⌃p` also work) |
 | `prefix N` / `P` / `X` | Move the window right / left / kill a window by number (prompts) |
 | `prefix B` / `prefix E` | Move the pane to its own window / bring a pane back in |
-| `prefix g` / `prefix o` | Open lazygit / run an app (prompts) in a new window |
+| `prefix o` | Run an app (prompts) in a new window |
 | `prefix ⌃e` / `prefix b` | Pick a session with tv in a popup / switch to the last session |
 | `prefix d` / `prefix s` / `prefix $` | Detach / session tree / rename the session (tmux defaults) |
 | `prefix I` / `prefix U` | Install / update TPM plugins |
@@ -185,7 +113,7 @@ The prefix is `⌃a`. Press `⌃a ⌃a` to send it to a nested session. Windows 
 ## Neovim
 
 The leader key is `Space`. Press `<leader>?` to list the keymaps for the current buffer, or `<leader>pk` to search all keymaps.
-Main plugins: lazy.nvim, telescope, snacks, harpoon, oil, mason and native LSP, conform, treesitter, trouble, nvim-dap, neotest, diffview, lazygit (via snacks), yanky, mini.surround and mini.comment, ufo, aerial, which-key, supermaven, gruvbox.
+Main plugins: lazy.nvim, telescope, snacks, harpoon, oil, mason and native LSP, conform, treesitter, trouble, nvim-dap, neotest, diffview, yanky, mini.surround and mini.comment, ufo, aerial, which-key, supermaven, gruvbox.
 
 | Keys | Does |
 | --- | --- |
@@ -205,7 +133,7 @@ Main plugins: lazy.nvim, telescope, snacks, harpoon, oil, mason and native LSP, 
 | `<leader>ld` / `<leader>D` / `<leader>lx` | Diagnostics for the line / the buffer / toggle diagnostics on and off |
 | `<leader>f` / `<leader>cf` / `<leader>rs` | Format with LSP / format with conform (works on a selection) / restart LSP |
 | `<leader>xw` / `xd` / `xq` / `xl` / `xt` | Trouble: workspace / document diagnostics, quickfix, location list, todos |
-| `<leader>lg` / `<leader>gl` / `<leader>gbr` | lazygit / lazygit log / pick a git branch and switch to it |
+| `<leader>gbr` | Pick a git branch and switch to it |
 | `<leader>gd` / `gD` / `gH` | Diffview: toggle / history of this file / history of the repo |
 | `<leader>db` / `dc` / `di` / `do` / `dO` | Debug: breakpoint / continue / step into / over / out |
 | `<leader>dB` / `du` / `de` / `dr` / `dt` | Debug: conditional breakpoint / UI / evaluate / restart / stop |
@@ -246,20 +174,19 @@ The left `⌥` acts as Meta (sends `Esc+`), and the right `⌥` types special ch
 
 | Command | Does |
 | --- | --- |
-| `dutils menu` / `dutils init` | Interactive command picker / first-run wizard (git identities and SSH keys, secrets, theme) |
+| `dutils menu` / `dutils init` | Interactive command picker / first-run wizard (git identities and SSH keys, theme, private overrides) |
 | `dutils sync` / `dutils update` | Pull the latest dotfiles, re-stow and update / update Homebrew, Nix, mise, zinit and Neovim |
 | `dutils health` / `check` / `diagnose` | Quick check / full check with a score / every diagnostic |
 | `dutils packages` / `dutils manifest generate` | Compare installed tools against `packages.toml` / regenerate the package lists |
 | `dutils edit <pkg>` / `dutils new <pkg>` | Open a package's config / create a new Stow package |
 | `dutils git-setup` | Set up git identities and SSH keys (`status`, `add`, `test`) |
-| `dutils secrets init/add/decrypt/edit/list` | Manage age-encrypted secrets |
 | `dutils theme [dark\|light\|auto\|apply]` | Switch the terminal theme (Gruvbox) |
 | `dutils bench` / `dutils bench --real` | Shell startup time / real per-prompt lag (zsh-bench) |
 | `dutils profile` / `dutils zcompile` | Profile zsh startup / precompile zsh config |
-| `dutils vulns` / `dutils cleanup [component]` | Scan Homebrew packages for CVEs / remove dotfiles, Homebrew, nvim or tmux config |
+| `dutils cleanup [component]` | Remove dotfiles, Homebrew, nvim or tmux config |
 | `dutils ytd [-a] [-q 1080] <url>` | Download a YouTube video or playlist (`-a` audio only, `-n` dry run) |
 | `dutils organize-media <dir> [--dry-run]` | Sort a flat photo/video folder into `YYYY/MM` folders (`--dest D --copy` to copy elsewhere) |
-| `dutils diff` / `sysinfo` / `list-functions` | Live diff of two picked files / system info / list custom zsh functions |
+| `dutils sysinfo` | System information |
 
 | Make target | Does |
 | --- | --- |

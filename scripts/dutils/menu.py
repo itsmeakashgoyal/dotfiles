@@ -36,7 +36,7 @@ DUTILS     = SCRIPT_DIR / "dutils"
 
 # Commands that are interactive, destructive or long-running enough that the
 # menu should always confirm, even under --no-confirm.
-ALWAYS_CONFIRM = {"cleanup", "update", "sync", "init", "git-setup", "ssh-setup", "secrets", "zcompile"}
+ALWAYS_CONFIRM = {"cleanup", "update", "sync", "init", "git-setup", "ssh-setup", "zcompile"}
 
 
 def load_commands() -> dict[str, tuple]:

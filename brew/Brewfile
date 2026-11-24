@@ -28,7 +28,6 @@ end
 # BEGIN GENERATED: brew (dutils manifest generate)
 # Essential CLI Tools
 brew "git"                 # Real git (macOS ships only a Command Line Tools stub)
-brew "age"                 # Modern file encryption (secrets, via dutils secrets)
 brew "atuin"               # Shell history search (Rust)
 brew "bat"                 # Cat with syntax highlighting (Rust)
 brew "eza"                 # Better ls (Rust)
@@ -39,7 +38,6 @@ brew "git-delta"           # Better git diff (Rust)
 brew "git-extras"          # Extra git commands
 brew "hyperfine"           # Command-line benchmarking tool (Rust)
 brew "jq"                  # JSON processor
-brew "lazygit"             # Terminal UI for git
 brew "mise"                # Runtime version manager (replaces pyenv)
 brew "python@3.14"         # Python >= 3.14, the repo standard (dutils; see scripts/lib/pyreq.py)
 brew "uv"                  # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters

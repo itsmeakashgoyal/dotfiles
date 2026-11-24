@@ -54,7 +54,6 @@ repos:
             install\.sh|
             scripts/lib/core\.sh|
             scripts/lib/os-detect\.sh|
-            scripts/dutils/diff_files_interactive\.sh|
             scripts/dutils/profile_zsh\.sh|
             scripts/setup/macos\.sh|
             scripts/setup/macos-defaults\.sh|

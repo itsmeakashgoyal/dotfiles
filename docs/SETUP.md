@@ -6,7 +6,6 @@ How to install, personalize, update and remove these dotfiles on macOS, Linux an
 - [Install](#install)
 - [First run](#first-run)
 - [Git identities & SSH keys](#git-identities--ssh-keys)
-- [Secrets](#secrets)
 - [Machine-local settings](#machine-local-settings)
 - [Keeping up to date](#keeping-up-to-date)
 - [Health checks](#health-checks)
@@ -112,10 +111,9 @@ dutils init        # -y accepts the default at each step
 ```
 
 1. Git identities + SSH keys (`dutils git-setup`)
-2. Decrypt secrets to `$HOME` (`dutils secrets decrypt --all`)
-3. Terminal theme: dark / light / auto (`dutils theme`)
-4. Create an owner-only `99-private.zsh` for machine-local exports
-5. Quick health check
+2. Terminal theme: dark / light / auto (`dutils theme`)
+3. Create an owner-only `99-private.zsh` for machine-local exports
+4. Quick health check
 
 Then `exec zsh`.
 
@@ -148,22 +146,6 @@ How it works:
 **Fresh machine:** bootstrap clones over HTTPS, so no key is needed up front. After `git-setup`
 creates your keys, `dutils init` offers to switch the dotfiles remote from HTTPS to SSH.
 
-## Secrets
-
-Files are encrypted with `age` to your personal SSH key and stored as `secrets/**/*.age`
-(mirroring `$HOME`); plaintext only exists at the real path under `$HOME`.
-
-```bash
-dutils secrets init                  # once: seed secrets/.recipients from your SSH public key
-dutils secrets add ~/.ssh/config     # encrypt a $HOME file into the repo, then commit secrets/
-dutils secrets edit ~/.config/x      # decrypt → $EDITOR → re-encrypt (creates if new)
-dutils secrets decrypt --all         # new machine: restore everything (-f to overwrite)
-dutils secrets list                  # what's managed and whether it's present
-```
-
-On a new machine run `dutils git-setup` first so the personal key exists. To let another machine
-decrypt, add its SSH public key to `secrets/.recipients` and re-encrypt each secret.
-
 ## Machine-local settings
 
 Work exports, tokens and per-machine tweaks go in a gitignored, owner-only (`chmod 600`) file
@@ -176,7 +158,6 @@ that is sourced last:
 
 ```zsh
 export SOME_TOKEN=...
-hash -d work=~/work      # bookmark: cd ~work
 ```
 
 `DOTFILES_PROMPT` can't be set here (it's read before this file loads).
@@ -226,7 +207,7 @@ Windows:
 .\windows\windows.ps1 -Uninstall           # -Force: no prompt; -PurgeScoop: also remove Scoop; -SymlinksOnly
 ```
 
-Neither touches the repo, `~/.ssh`, secrets, git config content or shell history.
+Neither touches the repo, `~/.ssh`, git config content or shell history.
 
 ## Troubleshooting
 

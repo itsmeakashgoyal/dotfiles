@@ -40,7 +40,7 @@ if (_cmd rg) {
 
     # Interactive ripgrep → television (live search, opens result in $EDITOR).
     # tv reads stdin as its source when invoked with no channel — confirmed
-    # directly, same usage pattern as fzf's own piping (06-git.zsh's
+    # directly, same usage pattern as fzf's own piping (the former zsh helper.s
     # `... | tv | ...` functions rely on the same thing). No preview pane
     # here: tv's ad-hoc --preview-command field-splitting/shell-execution
     # behavior isn't something I could safely verify without risking a hung

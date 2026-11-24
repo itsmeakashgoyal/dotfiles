@@ -44,7 +44,7 @@ irm https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/windows/in
 **Then, on every new machine:**
 
 ```bash
-dutils init     # git identities + SSH keys, secrets, theme, private overrides
+dutils init     # git identities + SSH keys, theme, private overrides
 exec zsh
 ```
 
@@ -69,7 +69,7 @@ Keybindings, aliases and every command: **[docs/CHEATSHEET.md](docs/CHEATSHEET.m
 | Shell | Zsh + zinit, Powerlevel10k (starship fallback), atuin, zoxide, television, vi mode |
 | Editor | Neovim (lazy.nvim, LSP, Harpoon), Sublime Text |
 | Terminal | iTerm2 Dynamic Profile (⌥Space drop-down), tmux |
-| CLI | eza, bat, fd, ripgrep, delta, lazygit, yazi, btop, gh |
+| CLI | eza, bat, fd, ripgrep, delta, yazi, gh |
 | Languages | Python 3.14 via mise + uv |
 | Git | Per-repo work/personal identity and SSH key (`dutils git-setup`) |
 | Packages | One manifest (`packages.toml`) → Homebrew, Nix, Scoop |
@@ -78,8 +78,8 @@ Keybindings, aliases and every command: **[docs/CHEATSHEET.md](docs/CHEATSHEET.m
 
 | Guide | For |
 | --- | --- |
-| [Setup](docs/SETUP.md) | Install, first run, git identities, secrets, updating, uninstalling, troubleshooting |
-| [Cheatsheet](docs/CHEATSHEET.md) | Keys, aliases, bookmarks, tmux, Neovim, `dutils` and `make` commands |
+| [Setup](docs/SETUP.md) | Install, first run, git identities, updating, uninstalling, troubleshooting |
+| [Cheatsheet](docs/CHEATSHEET.md) | Keys, aliases, tmux, Neovim, `dutils` and `make` commands |
 | [Customize](docs/CUSTOMIZE.md) | Theme, prompt, iTerm2, Python, adding tools, machine-local settings |
 | [Contributing](CONTRIBUTING.md) | Repo layout and rules for changes |
 

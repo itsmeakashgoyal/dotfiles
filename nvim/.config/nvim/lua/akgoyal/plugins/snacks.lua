@@ -4,7 +4,7 @@
 -- ░▓ file   ▓ nvim/.config/nvim/lua/akgoyal/plugins/snacks.lua
 -- ░▓▓▓▓▓▓▓▓▓▓
 --
--- Snacks: quality-of-life utility collection — fuzzy picker, lazygit integration, dashboard,
+-- Snacks: quality-of-life utility collection — fuzzy picker, dashboard,
 -- and buffer management.
 return {
     -- HACK: docs @ https://github.com/folke/snacks.nvim/blob/main/docs
@@ -117,20 +117,6 @@ return {
         },
         -- NOTE: Keymaps
         keys = {
-            {
-                "<leader>lg",
-                function()
-                    require("snacks").lazygit()
-                end,
-                desc = "Lazygit",
-            },
-            {
-                "<leader>gl",
-                function()
-                    require("snacks").lazygit.log()
-                end,
-                desc = "Lazygit Logs",
-            },
             {
                 "<leader>rN",
                 function()

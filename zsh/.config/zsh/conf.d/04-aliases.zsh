@@ -49,16 +49,7 @@ alias path='print -l $path' # Print PATH entries
 # ------------------------------------------------------------------------------
 # Global Aliases (can be used anywhere in command line)
 # ------------------------------------------------------------------------------
-alias -g C='| pbcopy'              # Copy to clipboard (macOS)
-alias -g G='| grep -i --color=always' # Grep with color
-alias -g H=" --help"               # Show help
-alias -g L="| less"                # Pipe to less
-alias -g NUL="> /dev/null 2>&1"    # Silence output
-alias -g R="2>&1 | tee output.txt" # Redirect and save output
-alias -g S='| sed "s/^[[:space:]]*//"' # Strip leading whitespace
-alias -g T="| tail -n +2"          # Skip first line
-alias -g V=" --version"
-alias -g W='| nvim -c "setlocal buftype=nofile bufhidden=wipe filetype=markdown" -c "nnoremap <buffer> q :q!<CR>" -' # View in nvim as markdown
+alias -g C='| pbcopy'              # Copy to clipboard: `cmd C`
 
 # Suffix aliases (auto-open files by extension)
 alias -s md=nvim

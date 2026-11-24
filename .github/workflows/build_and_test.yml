@@ -256,7 +256,6 @@ jobs:
             "rg:ripgrep"
             "nvim:neovim"
             "delta:git-delta"
-            "lazygit:lazygit"
           )
           for pkg in "${packages[@]}"; do
             binary="${pkg%%:*}"
@@ -310,12 +309,11 @@ jobs:
           source "$HOME/.zshenv" || { echo "::error::Could not source .zshenv"; exit 1; }
           source "$ZDOTDIR/.zshrc" || { echo "::error::Could not source .zshrc"; exit 1; }
 
-          # Test that core aliases/functions actually loaded. (gco is a repo-native
-          # function defined in 06-git.zsh, not the OMZ git-plugin alias, so it
-          # doesn't depend on Zinit's async turbo-mode timing here.)
+          # Test that core aliases/functions actually loaded (all repo-native,
+          # so they don't depend on Zinit's async turbo-mode timing here).
           echo "Testing basic commands..."
           missing=0
-          for cmd in l ll gs gco; do
+          for cmd in l ll ta mkvenv; do
             if ! type "$cmd" >/dev/null 2>&1; then
               echo "::error::'$cmd' is not defined after sourcing the zsh config"
               missing=1
@@ -381,7 +379,6 @@ jobs:
           smoke --strict manifest check
           smoke --strict menu --dry-run
           # Read-only checks - run for real; nonzero tolerated (CI misses some):
-          smoke list-functions
           smoke health
           smoke packages
           smoke check
@@ -567,7 +564,7 @@ jobs:
           # means a first-time user's install silently dropped a tool, so this
           # fails the job rather than just warning.
           echo "🔍 Checking Nix-provided tools..."
-          packages=( bat eza tv rg nvim delta lazygit fd zoxide atuin )
+          packages=( bat eza tv rg nvim delta fd zoxide atuin )
           for binary in "${packages[@]}"; do
             if command -v "$binary" &> /dev/null; then
               echo "  ✅ $binary"
@@ -668,7 +665,6 @@ jobs:
           smoke --strict manifest check
           smoke --strict menu --dry-run
           # Read-only checks - run for real; nonzero tolerated (CI misses some):
-          smoke list-functions
           smoke health
           smoke packages
           smoke check

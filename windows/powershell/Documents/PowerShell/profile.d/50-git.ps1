@@ -5,7 +5,7 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Git shortcuts + television-driven interactive pickers, mirroring the fuzzy
-# functions in zsh/.config/zsh/conf.d/06-git.zsh (ported from fzf to tv there
+# functions from the former zsh git helpers (ported from fzf to tv there
 # too — see 09-television.zsh).
 
 function g     { git @args }
@@ -38,7 +38,7 @@ function grs   { git restore @args }
 # Extracts a branch name from a `git branch`/`git branch -vv` line, current
 # branch or not (`git branch -vv`'s leading "* " on the checked-out branch
 # is a separate whitespace-delimited token — a plain first-word split, as
-# 06-git.zsh's `awk '{print $1}'` does, would return "*" instead of the name
+# the former zsh helpers' `awk '{print $1}'` does, would return "*" instead of the name
 # on that one line).
 function script:_gitBranchFromLine {
     param([string]$Line)

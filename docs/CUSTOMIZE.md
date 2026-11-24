@@ -97,20 +97,10 @@ Zsh config is in `zsh/.config/zsh/`. `.zshrc` sources every
 | --- | --- |
 | Aliases | `conf.d/04-aliases.zsh` |
 | Functions | `conf.d/05-functions.zsh` |
-| Git shell helpers | `conf.d/06-git.zsh` |
-| Space-triggered abbreviations | `conf.d/14-abbreviations.zsh` (`abbrevs` table) |
 | `PATH` / environment variables | `conf.d/01-exports.zsh` |
 | Options, history, completion | `conf.d/02-options.zsh` |
 | A new topic | a new `conf.d/NN-name.zsh` file (pick a free number below 99) |
 | Machine-local settings, work exports, secrets | `conf.d/99-private.zsh` |
-
-**Bookmarks.** Add a `name "path"` line to the `_dotfiles_bookmarks` table in
-`conf.d/17-bookmarks.zsh`, then use `cd ~name`. For bookmarks on one machine
-only, add them to `99-private.zsh`:
-
-```zsh
-hash -d work="$HOME/ws/work-repo"
-```
 
 **Private overrides.** `99-private.zsh` is gitignored and loads last. `.zshrc`
 resets its permissions to owner-only (600). Never put secrets in tracked files.

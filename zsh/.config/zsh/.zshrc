@@ -104,7 +104,6 @@ zinit light zsh-users/zsh-syntax-highlighting
 
 # --- 6e. Turbo plugins — deferred until after first prompt -------------------
 zinit wait lucid for \
-    OMZP::git \
     OMZP::sudo
 
 # --- 6f. Theme (Starship by default, or Powerlevel10k) -----------------------

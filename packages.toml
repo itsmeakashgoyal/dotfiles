@@ -62,14 +62,6 @@ critical = true
 check    = "none"  # CORE section checks git explicitly
 
 [[package]]
-name     = "age"
-desc     = "Modern file encryption (secrets, via dutils secrets)"
-category = "Essential CLI Tools"
-brew     = "age"
-nix      = "age"
-scoop    = "age"
-
-[[package]]
 name     = "atuin"
 desc     = "Shell history search (Rust)"
 category = "Essential CLI Tools"
@@ -154,14 +146,6 @@ nix      = "jq"
 # No scoop: confirmed directly nothing in the Windows profile/dutils path
 # invokes jq (unlike zsh's pr-checkout, which does) — installed there would
 # be pure dead weight.
-
-[[package]]
-name     = "lazygit"
-desc     = "Terminal UI for git"
-category = "Essential CLI Tools"
-brew     = "lazygit"
-nix      = "lazygit"
-scoop    = "lazygit"
 
 [[package]]
 name     = "mise"

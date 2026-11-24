@@ -94,7 +94,6 @@ $SCOOP_PACKAGES = @(
     # BEGIN GENERATED: scoop (dutils manifest generate)
     # Essential CLI Tools
     "git"         # Real git (macOS ships only a Command Line Tools stub)
-    "age"         # Modern file encryption (secrets, via dutils secrets)
     "atuin"       # Shell history search (Rust)
     "bat"         # Cat with syntax highlighting (Rust)
     "eza"         # Better ls (Rust)
@@ -103,7 +102,6 @@ $SCOOP_PACKAGES = @(
     "gh"          # GitHub CLI
     "delta"       # Better git diff (Rust)
     "hyperfine"   # Command-line benchmarking tool (Rust)
-    "lazygit"     # Terminal UI for git
     "mise"        # Runtime version manager (replaces pyenv)
     "python"      # Python >= 3.14, the repo standard (dutils; see scripts/lib/pyreq.py)
     "uv"          # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
