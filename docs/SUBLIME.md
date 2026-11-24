@@ -78,8 +78,10 @@ directly — no re-copy step.
 - Theme: **gruvbox** colors via a **vendored** color scheme
   (`settings/sublime/Gruvbox Dark.sublime-color-scheme`) + the built-in Adaptive
   UI theme — no Package Control theme to resolve, so it works offline / on
-  locked-down networks with no "unable to find colour scheme" errors. Kept
-  separate from the Tokyo Night palette the terminal toolchain uses.
+  locked-down networks with no "unable to find colour scheme" errors. Gruvbox Dark
+  by default, like the terminal; `Gruvbox Light.sublime-color-scheme` is also
+  shipped — set `"theme"`/`"color_scheme"` to `"auto"` to follow the OS (see
+  docs/THEME.md).
 - Tab bar is restyled via a User theme override
   (`settings/sublime/Adaptive.sublime-theme`): gruvbox-tinted tabs, a clear
   active tab (lifted background + bold bright label, inactive tabs muted grey),

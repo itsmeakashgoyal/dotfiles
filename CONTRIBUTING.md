@@ -7,7 +7,7 @@ Thank you for your interest in contributing! This is a personal dotfiles reposit
 ## Ways to Contribute
 
 - **Bug reports** — Something broken after following the README? Open an issue.
-- **New Stow packages** — Add support for a tool not yet covered (e.g., `ghostty`, `wezterm`, `starship`).
+- **New Stow packages** — Add support for a tool not yet covered (e.g., `wezterm`, `lazygit`, `btop`).
 - **Improvements** — Better aliases, smarter functions, CI improvements.
 - **Documentation** — Clearer explanations, missing steps, new guides.
 
@@ -95,7 +95,7 @@ make check
 Follow conventional commits:
 
 ```text
-feat: add ghostty config package
+feat: add lazygit config package
 fix: correct PATH order in exports.zsh
 docs: add vhs recording guide
 chore: update Brewfile with new tools

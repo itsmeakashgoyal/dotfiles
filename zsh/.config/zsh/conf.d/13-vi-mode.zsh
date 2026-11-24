@@ -62,6 +62,9 @@ bindkey '^U' backward-kill-line
 bindkey '^W' backward-kill-word
 bindkey '^L' clear-screen
 bindkey '^?' backward-delete-char   # Backspace works after ESC→insert
+# iTerm2 profile sends ESC b / ESC f for ⌥← / ⌥→ (word jumps; see settings/iterm)
+bindkey '^[b' backward-word
+bindkey '^[f' forward-word
 
 # ------------------------------------------------------------------------------
 # Normal-mode extras

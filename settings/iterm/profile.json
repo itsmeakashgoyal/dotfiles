@@ -1,0 +1,285 @@
+{
+  "_comment": [
+    "iTerm2 Dynamic Profiles - source of truth for the terminal profile.",
+    "Not loaded by iTerm2 directly: `dutils theme` merges `common` into each",
+    "entry of `profiles`, adds the Gruvbox colours for the current terminal mode",
+    "and writes ~/Library/Application Support/iTerm2/DynamicProfiles/dotfiles-gruvbox.json.",
+    "Edit here, then run `dutils theme apply`. Keys are iTerm2's own profile keys.",
+    "`_default: true` marks the profile scripts/setup/iterm.sh makes the default."
+  ],
+  "common": {
+    "Tags": [
+      "dotfiles"
+    ],
+    "Custom Directory": "No",
+    "Normal Font": "JetBrainsMonoNLNFM-Regular 18",
+    "Use Non-ASCII Font": false,
+    "ASCII Anti Aliased": true,
+    "ASCII Ligatures": true,
+    "Horizontal Spacing": 0.9,
+    "Vertical Spacing": 1.09,
+    "Use Bold Font": true,
+    "Use Italic Font": true,
+    "Draw Powerline Glyphs": true,
+    "Cursor Type": 2,
+    "Blinking Cursor": true,
+    "Use Cursor Guide": false,
+    "Faint Text Alpha": 0.5,
+    "Columns": 140,
+    "Rows": 40,
+    "Unlimited Scrollback": true,
+    "Scrollback Lines": 0,
+    "Terminal Type": "xterm-256color",
+    "Character Encoding": 4,
+    "Set Local Environment Vars": 2,
+    "Custom Locale": "en_US.UTF-8",
+    "Mouse Reporting": true,
+    "Silence Bell": true,
+    "Visual Bell": false,
+    "Flashing Bell": false,
+    "Option Key Sends": 2,
+    "Right Option Key Sends": 0,
+    "Close Sessions On End": true,
+    "Prompt Before Closing 2": false,
+    "Jobs to Ignore": [
+      "rlogin",
+      "ssh",
+      "slogin",
+      "telnet"
+    ],
+    "Show Status Bar": false,
+    "Sync Title": false,
+    "Keyboard Map": {
+      "0x2d-0x40000": {
+        "Action": 11,
+        "Text": "0x1f"
+      },
+      "0x32-0x40000": {
+        "Action": 11,
+        "Text": "0x00"
+      },
+      "0x33-0x40000": {
+        "Action": 11,
+        "Text": "0x1b"
+      },
+      "0x34-0x40000": {
+        "Action": 11,
+        "Text": "0x1c"
+      },
+      "0x35-0x40000": {
+        "Action": 11,
+        "Text": "0x1d"
+      },
+      "0x36-0x40000": {
+        "Action": 11,
+        "Text": "0x1e"
+      },
+      "0x37-0x40000": {
+        "Action": 11,
+        "Text": "0x1f"
+      },
+      "0x38-0x40000": {
+        "Action": 11,
+        "Text": "0x7f"
+      },
+      "0x7f-0x100000": {
+        "Action": 11,
+        "Text": "0x15"
+      },
+      "0x7f-0x80000": {
+        "Action": 11,
+        "Text": "0x17"
+      },
+      "0xf700-0x220000": {
+        "Action": 10,
+        "Text": "[1;2A"
+      },
+      "0xf700-0x240000": {
+        "Action": 10,
+        "Text": "[1;5A"
+      },
+      "0xf700-0x260000": {
+        "Action": 10,
+        "Text": "[1;6A"
+      },
+      "0xf700-0x280000": {
+        "Action": 11,
+        "Text": "0x1b 0x1b 0x5b 0x41"
+      },
+      "0xf701-0x220000": {
+        "Action": 10,
+        "Text": "[1;2B"
+      },
+      "0xf701-0x240000": {
+        "Action": 10,
+        "Text": "[1;5B"
+      },
+      "0xf701-0x260000": {
+        "Action": 10,
+        "Text": "[1;6B"
+      },
+      "0xf701-0x280000": {
+        "Action": 11,
+        "Text": "0x1b 0x1b 0x5b 0x42"
+      },
+      "0xf702-0x220000": {
+        "Action": 10,
+        "Text": "[1;2D"
+      },
+      "0xf702-0x240000": {
+        "Action": 10,
+        "Text": "[1;5D"
+      },
+      "0xf702-0x260000": {
+        "Action": 10,
+        "Text": "[1;6D"
+      },
+      "0xf702-0x280000": {
+        "Action": 10,
+        "Text": "b"
+      },
+      "0xf702-0x300000": {
+        "Action": 11,
+        "Text": "0x01"
+      },
+      "0xf703-0x220000": {
+        "Action": 10,
+        "Text": "[1;2C"
+      },
+      "0xf703-0x240000": {
+        "Action": 10,
+        "Text": "[1;5C"
+      },
+      "0xf703-0x260000": {
+        "Action": 10,
+        "Text": "[1;6C"
+      },
+      "0xf703-0x280000": {
+        "Action": 10,
+        "Text": "f"
+      },
+      "0xf703-0x300000": {
+        "Action": 11,
+        "Text": "0x05"
+      },
+      "0xf704-0x20000": {
+        "Action": 10,
+        "Text": "[1;2P"
+      },
+      "0xf705-0x20000": {
+        "Action": 10,
+        "Text": "[1;2Q"
+      },
+      "0xf706-0x20000": {
+        "Action": 10,
+        "Text": "[1;2R"
+      },
+      "0xf707-0x20000": {
+        "Action": 10,
+        "Text": "[1;2S"
+      },
+      "0xf708-0x20000": {
+        "Action": 10,
+        "Text": "[15;2~"
+      },
+      "0xf709-0x20000": {
+        "Action": 10,
+        "Text": "[17;2~"
+      },
+      "0xf70a-0x20000": {
+        "Action": 10,
+        "Text": "[18;2~"
+      },
+      "0xf70b-0x20000": {
+        "Action": 10,
+        "Text": "[19;2~"
+      },
+      "0xf70c-0x20000": {
+        "Action": 10,
+        "Text": "[20;2~"
+      },
+      "0xf70d-0x20000": {
+        "Action": 10,
+        "Text": "[21;2~"
+      },
+      "0xf70e-0x20000": {
+        "Action": 10,
+        "Text": "[23;2~"
+      },
+      "0xf70f-0x20000": {
+        "Action": 10,
+        "Text": "[24;2~"
+      },
+      "0xf729-0x20000": {
+        "Action": 10,
+        "Text": "[1;2H"
+      },
+      "0xf729-0x40000": {
+        "Action": 10,
+        "Text": "[1;5H"
+      },
+      "0xf72b-0x20000": {
+        "Action": 10,
+        "Text": "[1;2F"
+      },
+      "0xf72b-0x40000": {
+        "Action": 10,
+        "Text": "[1;5F"
+      }
+    },
+    "Triggers": [
+      {
+        "action": "iTermEnterWorkgroupTrigger",
+        "contentregex": "",
+        "disabled": false,
+        "eventParams": {
+          "jobName": "claude"
+        },
+        "matchType": 113,
+        "parameter": "builtin.claudeCode",
+        "partial": false,
+        "regex": ""
+      },
+      {
+        "action": "iTermExitWorkgroupTrigger",
+        "contentregex": "",
+        "disabled": false,
+        "eventParams": {
+          "jobName": "claude",
+          "leaderOnly": true
+        },
+        "matchType": 114,
+        "parameter": "",
+        "partial": false,
+        "regex": ""
+      }
+    ]
+  },
+  "profiles": [
+    {
+      "Name": "Gruvbox",
+      "Guid": "D07F11E5-6B0C-4C1A-9E2F-6A3D5B8C0001",
+      "_default": true
+    },
+    {
+      "Name": "Gruvbox Hotkey",
+      "Guid": "D07F11E5-6B0C-4C1A-9E2F-6A3D5B8C0002",
+      "_comment": "Quake-style drop-down terminal on Option+Space from any app/Space (Ctrl+` is VS Code's terminal toggle).",
+      "Window Type": 2,
+      "Screen": -1,
+      "Space": -1,
+      "Rows": 30,
+      "Has Hotkey": true,
+      "HotKey Key Code": 49,
+      "HotKey Characters": " ",
+      "HotKey Characters Ignoring Modifiers": " ",
+      "HotKey Modifier Flags": 524288,
+      "HotKey Activated By Modifier": false,
+      "HotKey Window Animates": true,
+      "HotKey Window AutoHides": true,
+      "HotKey Window Floats": true,
+      "HotKey Window Reopens On Activation": false,
+      "HotKey Window Dock Click Action": 0
+    }
+  ]
+}

@@ -4,10 +4,11 @@
 # ░▓ file   ▓ starship/.config/starship/starship.toml
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Minimal, monochrome prompt: the whole line renders dimmed white, with the
-# directory in bold italic, git status in italic yellow, a `took Xs` command
-# duration, and subtle Nerd Font language icons. No clock / OS icon - kept
-# deliberately spare. Set DOTFILES_PROMPT=p10k to use Powerlevel10k instead
+# Gruvbox-colored prompt, built on the same zero-subprocess discipline as the
+# previous monochrome version: directory → commit hash → branch → ahead/behind
+# → command duration, then a newline before the input character. Still
+# DELIBERATELY NO language/tool modules ($nodejs, $rust, $golang, …) — see the
+# note near the bottom. Set DOTFILES_PROMPT=p10k to use Powerlevel10k instead
 # (see zsh/.config/zsh/.zshrc).
 
 "$schema" = 'https://starship.rs/config-schema.json'
@@ -20,23 +21,14 @@
 # git/.config/git/config) without masking a genuinely hung command.
 command_timeout = 300
 add_newline = true
+palette = "gruvbox_dark"
 
-# Explicit module order (dir → commit hash → branch → duration) wrapped in
-# `(dimmed white)` so the whole line is muted by default and each module's own
-# style provides the accents:
-#   dotfiles (a1b2c3d) on  branch  took 1.2s
-#
-# DELIBERATELY MINIMAL — every module here is either a plain env/file read or a
-# single git ref read. No language/tool modules ($nodejs, $rust, $golang, …):
-# starship collects a module's version eagerly as soon as the module is in this
-# format string — it is NOT lazy about it, so each triggered module spawns its
-# binary (`node --version`, `rustc --version`, …) on EVERY render. That is
-# ~10-30ms each on macOS and far worse on Windows ARM, where Scoop installs x64
-# builds that run under Prism emulation. The directory name already tells you
-# what kind of project you're in, so the icons were pure cost.
-# To bring one back, add it here and re-add its `[module]` block below.
+# Explicit module order (dir → commit hash → branch → duration) on one line,
+# then the input character on its own line:
+#   dotfiles (a1b2c3d) on  master took 1.2s
+#   ❯
 format = """
-[$directory$git_commit$git_branch$cmd_duration](dimmed white)
+$directory$git_commit$git_branch$cmd_duration
 $character"""
 
 # Active Python environment shown on the RIGHT edge of the prompt line instead
@@ -48,48 +40,64 @@ $character"""
 right_format = """$conda${env_var.venv}"""
 
 [directory]
-style = "bold italic white"
+style = "bold italic teal"
 # Show the full path from ~ (e.g. ~/ws/cc-libraries-panel/app/CSXS) instead of
 # Starship's defaults, which truncate to the last 3 dirs AND cut the path at the
 # git repo root (so you'd only ever see the repo folder and below).
 truncate_to_repo = false
 truncation_length = 0
 
+[directory.substitutions]
+# Pure string substitution on path segments — no subprocess, no added cost.
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
 [git_commit]
 # Show a short commit hash on every prompt, not just on a detached HEAD.
 only_detached = false
 format = '[\($hash\)]($style) '
-style = "dimmed white"
+style = "dimmed overlay1"
 
 [git_branch]
-style = "purple"
-# Starship's built-in default symbol is a Powerline glyph that renders as a
-# tofu box on fonts without that specific extension (shows up as a stray
-# diamond before the branch name) — drop it rather than depend on font luck.
-symbol = ""
+# Nerd Fonts are a given in this setup (iTerm2/JetBrainsMono NF, p10k
+# nerdfont-v3, Scoop Nerd Fonts on Windows — see packages.toml) so the
+# plain git-branch glyph here is safe; no tofu-box risk.
+symbol = " "
+style = "bold lavender"
 
 [git_status]
-style = "italic yellow"
-# Disabled: staged/modified/conflicted all require a working-tree diff-index
-# scan, which stays 300-650ms on large repos (illustrator, Autobot) even with
-# git's fsmonitor warmed up and process-spawn overhead accounted for — that
-# was the actual source of the per-Enter lag, confirmed by isolating it with
-# `Measure-Command { starship prompt ... }` outside the prompt chain
-# entirely. git_branch/git_commit stay on; they're single ref reads, not a
-# tree walk, and cost ~80-90ms (pure process-spawn overhead, not fixable
-# from here). Re-enable by deleting this line if the dirty-indicator is worth
-# the latency for your workflow.
+# Disabled: even restricted to ahead/behind only, this still shells out to
+# `git status --porcelain=2` on every render (that's how Starship gets
+# ahead/behind counts — the untracked = "" trick only skips git's own
+# untracked-dir walk, not the status call itself), and measured ~30-40ms
+# extra per prompt even in this (small) repo — confirmed slower in practice.
+# git_branch/git_commit stay on; they're single ref reads, not a git
+# subprocess. Re-enable by deleting this line if you want the indicator back:
 disabled = true
-format = "([$ahead_behind$stashed$staged$modified$conflicted]($style) )"
+format = "[$ahead_behind]($style)"
+style = "italic"
+ahead      = "[⇡${count}](teal) "
+behind     = "[⇣${count}](peach) "
+diverged   = "[⇕⇡${ahead_count}⇣${behind_count}](mauve) "
+conflicted = ""
+deleted    = ""
+renamed    = ""
+modified   = ""
+staged     = ""
+untracked  = ""
+stashed    = ""
 
 [cmd_duration]
-style = "italic"
+style = "italic yellow"
 format = "took [$duration]($style) "
 
 [character]
-success_symbol = "[❯](dimmed white)"
+success_symbol = "[❯](bold green)"
 error_symbol = "[❯](bold red)"
-vimcmd_symbol = "[❮](bold white)"
+vimcmd_symbol = "[❮](bold yellow)"
 
 # Noise off.
 [jobs]
@@ -122,15 +130,43 @@ style = "dimmed green"
 # Language / tool markers — intentionally NOT configured
 # ──────────────────────────────────────────────────────────────────────────────
 # The [lua] [ruby] [nodejs] [rust] [package] [docker_context] [nix_shell] [aws]
-# blocks were removed along with their entries in `format` above. Starship only
-# evaluates modules that appear in `format`, so leaving the blocks here would be
-# dead config — and putting any of them back in `format` re-introduces a
-# per-render subprocess (see the note on `format` at the top of this file).
-#
-# If you want one back, e.g. Node:
+# blocks are deliberately absent, and right_format is NOT "$all" — Starship
+# only evaluates modules that appear in a format string, and "$all" silently
+# pulls in every non-disabled module (including every language version
+# check). Each one is a per-render subprocess spawn: ~10-30ms each on macOS,
+# far worse on Windows ARM, where every binary Scoop installs is emulated
+# x64 under Prism. If you want one back, e.g. Node:
 #   1. add $nodejs to `format`
 #   2. add:  [nodejs]
 #            symbol = "󰎙 "
 #            format = "via [$symbol](green)"
-# Prefer doing that only on machines where the spawn cost is acceptable — not
-# on Windows ARM, where every binary Scoop installs is emulated x64.
+# Prefer doing that only on machines where the spawn cost is acceptable.
+
+[palettes.gruvbox_dark]
+# Standard Gruvbox dark (medium contrast) hex values, mapped onto the same
+# semantic key names used by the Catppuccin-style palettes this was adapted
+# from — so swapping themes later is a palette-block swap, not a module
+# rewrite. (The source this was adapted from had `base` set to a light
+# cream tone by mistake; fixed here to the actual dark bg1 shade.)
+overlay1 = "#a89984"  # fg4 — dim commit hash
+teal     = "#8ec07c"  # bright aqua   — directory, ahead count
+lavender = "#d3869b"  # bright purple — git branch
+mauve    = "#d3869b"  # bright purple — diverged count
+peach    = "#fe8019"  # bright orange — behind count
+green    = "#b8bb26"  # bright green  — success character
+red      = "#fb4934"  # bright red    — error character
+yellow   = "#fabd2f"  # bright yellow — cmd_duration, vimcmd character
+
+[palettes.gruvbox_light]
+# Same keys, Gruvbox light (faded accents for contrast on the cream background).
+# Not selected here: when the terminal is light (`dutils theme light|auto`),
+# .zshrc points STARSHIP_CONFIG at a cached copy of this file with
+# `palette = "gruvbox_light"`, so both palettes stay in this one file.
+overlay1 = "#7c6f64"  # fg4
+teal     = "#427b58"  # faded aqua
+lavender = "#8f3f71"  # faded purple
+mauve    = "#8f3f71"  # faded purple
+peach    = "#af3a03"  # faded orange
+green    = "#79740e"  # faded green
+red      = "#9d0006"  # faded red
+yellow   = "#b57614"  # faded yellow

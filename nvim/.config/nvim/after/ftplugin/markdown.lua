@@ -13,15 +13,16 @@ set.spell = true -- Enable spell checking
 set.linebreak = true
 
 -- added extra highlights for markdown files to render highlights properly
--- thx to Linkarzu
+-- thx to Linkarzu. Gruvbox accents (bright in dark mode, faded in light mode).
 
-local color1_bg = "#ff757f"
-local color2_bg = "#4fd6be"
-local color3_bg = "#7dcfff"
-local color4_bg = "#ff9e64"
-local color5_bg = "#7aa2f7"
-local color6_bg = "#c0caf5"
-local color_fg = "#1F2335"
+local dark = vim.o.background ~= "light"
+local color1_bg = dark and "#fb4934" or "#9d0006" -- red
+local color2_bg = dark and "#8ec07c" or "#427b58" -- aqua
+local color3_bg = dark and "#83a598" or "#076678" -- blue
+local color4_bg = dark and "#fe8019" or "#af3a03" -- orange
+local color5_bg = dark and "#d3869b" or "#8f3f71" -- purple
+local color6_bg = dark and "#fabd2f" or "#b57614" -- yellow
+local color_fg = dark and "#282828" or "#fbf1c7"
 
 vim.cmd(
     string.format([[highlight @markup.heading.1.markdown cterm=bold gui=bold guifg=%s guibg=%s]], color_fg, color1_bg)

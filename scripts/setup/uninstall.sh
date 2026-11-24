@@ -73,7 +73,7 @@ step_enabled() {
 # back to a snapshot if both are unavailable.
 STOW_PACKAGES="${STOW_PACKAGES:-$(make -s -C "${DOTFILES_DIR}" print-STOW_PACKAGES 2>/dev/null || true)}"
 STOW_PACKAGES="${STOW_PACKAGES:-$(python3 "${DOTFILES_DIR}/scripts/dutils/manifest.py" stow-packages 2>/dev/null || true)}"
-: "${STOW_PACKAGES:=zsh git nvim tmux television atuin fastfetch starship yazi bin readline ghostty}"
+: "${STOW_PACKAGES:=zsh git nvim tmux television atuin fastfetch starship yazi bin readline}"
 
 # ------------------------------------------------------------------------------
 # Helpers

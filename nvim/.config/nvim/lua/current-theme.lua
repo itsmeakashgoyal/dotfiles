@@ -4,24 +4,28 @@
 -- ░▓ file   ▓ nvim/.config/nvim/lua/current-theme.lua
 -- ░▓▓▓▓▓▓▓▓▓▓
 --
--- Active colorscheme, kept separate so switching themes is a one-line change.
--- Honors `dutils theme`, which writes ~/.config/dotfiles/theme = dark|light|auto:
--- "light" → gruvbox with background=light, anything else → background=dark.
--- gruvbox is one colorscheme name that respects `vim.o.background` (unlike
--- tokyonight's separate tokyonight-day/tokyonight-night names), so the light/
--- dark switch is a background setting here, not a different colorscheme name.
--- Falls back to tokyonight if gruvbox isn't available.
-local mode = "dark"
-local f = io.open(vim.fn.expand("~/.config/dotfiles/theme"), "r")
-if f then
-    local line = (f:read("l") or ""):gsub("%s+", "")
-    f:close()
-    if line == "light" then
-        mode = "light"
+-- Gruvbox, light or dark to match the terminal (see docs/THEME.md).
+--   1. $DOTFILES_THEME — exported by the shell, already resolved to dark|light
+--   2. ~/.config/dotfiles/theme (written by `dutils theme`) — dark|light|auto;
+--      "auto" leaves 'background' to Neovim's own terminal detection (OSC 11)
+--   3. otherwise dark
+-- gruvbox.nvim is one colorscheme that respects 'background', so light/dark is
+-- just that option. Falls back to the built-in habamax if gruvbox is missing.
+local mode = vim.env.DOTFILES_THEME
+if mode ~= "dark" and mode ~= "light" then
+    local f = io.open(vim.fn.expand("~/.config/dotfiles/theme"), "r")
+    if f then
+        mode = (f:read("l") or ""):gsub("%s+", "")
+        f:close()
     end
 end
 
-vim.o.background = mode
+if mode == "light" or mode == "dark" then
+    vim.o.background = mode
+elseif mode ~= "auto" then
+    vim.o.background = "dark"
+end
+
 if not pcall(vim.cmd.colorscheme, "gruvbox") then
-    vim.cmd.colorscheme(mode == "light" and "tokyonight-day" or "tokyonight-night")
+    vim.cmd.colorscheme("habamax")
 end

@@ -3,10 +3,18 @@
     "font_size": 17,
     "font_options": ["gray_antialias", "subpixel_antialias"],
 
+    // Gruvbox Dark, like the terminal (docs/THEME.md). To follow the OS
+    // light/dark instead, set both "theme" and "color_scheme" to "auto"; the
+    // dark_/light_ keys below are what "auto" picks.
     "theme": "Adaptive.sublime-theme",
     "color_scheme": "Packages/User/Gruvbox Dark.sublime-color-scheme",
+    "dark_theme": "Adaptive.sublime-theme",
+    "light_theme": "Default.sublime-theme",
+    "dark_color_scheme": "Packages/User/Gruvbox Dark.sublime-color-scheme",
+    "light_color_scheme": "Packages/User/Gruvbox Light.sublime-color-scheme",
 
-    "ignored_packages": ["Vintage"],
+    "ignored_packages": ["Vintage",
+    ],
 
     "tab_size": 4,
     "translate_tabs_to_spaces": true,
@@ -96,5 +104,6 @@
         "dist",
         ".idea",
         ".vscode"
-    ]
+    ],
+    "file_icon_theme": "A File Icon (Mono).sublime-file-icons",
 }
