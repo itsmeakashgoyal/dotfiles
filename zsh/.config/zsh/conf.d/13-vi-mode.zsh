@@ -19,7 +19,8 @@ export KEYTIMEOUT=1
 # ------------------------------------------------------------------------------
 # A parameter expansion (not a `$(function)` call), so rendering it forks
 # nothing: (M) keeps $KEYMAP only when it is `vicmd`, and :+ turns that into [N].
-_VI_MODE_INDICATOR='${${(M)KEYMAP:#vicmd}:+%F{yellow}[N]%f}'
+# %3F = yellow; NOT %F{yellow}: its `}` would close the ${...:+...} early.
+_VI_MODE_INDICATOR='${${(M)KEYMAP:#vicmd}:+%3F[N]%f}'
 
 zle-keymap-select() {
     zle reset-prompt

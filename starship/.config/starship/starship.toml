@@ -48,12 +48,14 @@ truncate_to_repo = false
 truncation_length = 0
 
 [directory.substitutions]
-# Pure string substitution on path segments — no subprocess, no added cost.
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
-"Developer" = "󰲋 "
+# Icon IN FRONT of the folder name (pure string substitution, no subprocess).
+# Replacing the name with only an icon hid where you are (e.g. `~/` for
+# ~/Downloads when a glyph didn't render).
+"Documents" = "󰈙 Documents"
+"Downloads" = "󰇚 Downloads"
+"Music" = "󰝚 Music"
+"Pictures" = "󰋩 Pictures"
+"Developer" = "󰲋 Developer"
 
 [git_commit]
 # Show a short commit hash on every prompt, not just on a detached HEAD.
