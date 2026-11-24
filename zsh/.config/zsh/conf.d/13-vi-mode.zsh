@@ -78,3 +78,7 @@ bindkey -M vicmd '?' history-incremental-search-forward
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd 'v' edit-command-line
+
+# `:` in normal mode would open zsh's "execute:" prompt (execute-named-cmd),
+# where typing e.g. `exit` silently does nothing. Disable that trap.
+bindkey -M vicmd -r ':'

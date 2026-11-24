@@ -17,7 +17,7 @@ The command line is in vi mode and every line starts in insert mode. The Powerle
 
 | Keys | Does |
 | --- | --- |
-| `Esc` / `jk` / `kj` | Switch to normal mode |
+| `Esc` / `jk` / `kj` | Switch to normal mode (prompt shows `❮`); press `i` or `a` to type again |
 | `⌃A` / `⌃E` | Jump to the start / end of the line |
 | `⌃K` / `⌃U` | Delete to the end / start of the line |
 | `⌃W` | Delete the previous word |
