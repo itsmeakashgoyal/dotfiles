@@ -4,7 +4,7 @@
 -- ░▓ file   ▓ nvim/.config/nvim/lua/current-theme.lua
 -- ░▓▓▓▓▓▓▓▓▓▓
 --
--- Gruvbox, light or dark to match the terminal (see docs/THEME.md).
+-- Gruvbox, light or dark to match the terminal (see docs/CUSTOMIZE.md).
 --   1. $DOTFILES_THEME — exported by the shell, already resolved to dark|light
 --   2. ~/.config/dotfiles/theme (written by `dutils theme`) — dark|light|auto;
 --      "auto" leaves 'background' to Neovim's own terminal detection (OSC 11)

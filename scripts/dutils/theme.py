@@ -7,7 +7,7 @@
 #
 # Gruvbox everywhere, with one switch for the terminal.
 #
-# Gruvbox Dark everywhere by default (see docs/THEME.md). Sublime Text is
+# Gruvbox Dark everywhere by default (see docs/CUSTOMIZE.md). Sublime Text is
 # static config (Gruvbox Dark; Gruvbox Light ships alongside it). The TERMINAL
 # is switchable: this command pins it to dark/light, or lets it follow the OS
 # (auto). The mode lives in

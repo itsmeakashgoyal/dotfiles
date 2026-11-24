@@ -7,341 +7,82 @@
 <p align="center">
   <a href="https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml"><img src="https://github.com/itsmeakashgoyal/dotfiles/actions/workflows/build_and_test.yml/badge.svg" alt="CI"></a>
   <a href="https://opensource.org/licenses/BSD-2-Clause"><img src="https://img.shields.io/badge/License-BSD_2--Clause-orange.svg" alt="License"></a>
-  <a href="https://www.apple.com/macos/"><img src="https://img.shields.io/badge/macOS-14%2B-blue?logo=apple" alt="macOS"></a>
-  <a href="https://ubuntu.com/"><img src="https://img.shields.io/badge/Linux-Ubuntu%2FDebian-orange?logo=linux" alt="Linux"></a>
-  <a href="https://learn.microsoft.com/powershell/"><img src="https://img.shields.io/badge/Windows-PowerShell-blue?logo=windowsterminal" alt="Windows"></a>
-  <a href="https://www.zsh.org/"><img src="https://img.shields.io/badge/Shell-Zsh-informational?logo=gnu-bash" alt="Shell"></a>
-  <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-0.10%2B-green?logo=neovim" alt="Neovim"></a>
-  <a href="https://starship.rs/"><img src="https://img.shields.io/badge/Prompt-Starship-DD0B78?logo=starship" alt="Starship"></a>
-  <a href="https://github.com/itsmeakashgoyal/dotfiles/commits/master"><img src="https://img.shields.io/github/last-commit/itsmeakashgoyal/dotfiles" alt="Last Commit"></a>
+  <img src="https://img.shields.io/badge/macOS-14%2B-blue?logo=apple" alt="macOS">
+  <img src="https://img.shields.io/badge/Linux-Ubuntu%2FDebian-orange?logo=linux" alt="Linux">
+  <img src="https://img.shields.io/badge/Windows-PowerShell-blue?logo=windowsterminal" alt="Windows">
+  <img src="https://img.shields.io/badge/Prompt-Powerlevel10k-informational" alt="Powerlevel10k">
+  <img src="https://img.shields.io/badge/Python-3.14-yellow?logo=python" alt="Python 3.14">
 </p>
+
+One repo, one command: the same Zsh, Neovim, tmux, Git and modern CLI setup on
+**macOS**, **Linux** and **Windows**, in Gruvbox Dark.
+
+> These dotfiles are personal and overwrite existing configs. Fork and review before running.
 
 <p align="center">
-  A single, automated dotfiles repo for <b>macOS</b>, <b>Linux</b>, and <b>Windows</b> — Neovim, Zsh/PowerShell,
-  Tmux, Git, and a modern CLI toolchain, managed with <a href="https://www.gnu.org/software/stow/">GNU Stow</a>
-  on Unix and native symlinks on Windows. Clone it, run one command, get the same environment everywhere.
+  <img src="docs/assets/demo.gif" alt="Terminal demo: zsh startup, eza listings, the dutils CLI and Neovim" width="850">
 </p>
 
-> **Warning:** These dotfiles are personalized and will overwrite existing configurations.
-> Fork the repo and review the scripts before running on your machine.
+## Install
 
----
-
-## Preview
-
-<p align="center">
-  <img src="docs/assets/demo.gif" alt="Terminal demo: zsh startup banner, eza listings, the dutils CLI, and Neovim" width="850">
-</p>
-
-<p align="center">
-  <sub>Real recording of this repo's actual setup — the startup banner, <code>eza</code>-powered
-  listings, the custom <code>dutils</code> CLI, and Neovim, captured with
-  <a href="https://github.com/charmbracelet/vhs">VHS</a>.</sub>
-</p>
-
----
-
-## Contents
-
-- [What's Included](#whats-included)
-- [Quick Start](#quick-start)
-- [How It Works](#how-it-works)
-- [Uninstall](#uninstall)
-- [Repository Structure](#repository-structure)
-- [Documentation](#documentation)
-- [Resources](#resources)
-- [License](#license)
-
----
-
-## What's Included
-
-| | |
-| --- | --- |
-| **Zsh** | Modular config via `conf.d/`, Zinit plugin manager, Starship prompt (Powerlevel10k available), television fuzzy finder |
-| **Neovim** | Lazy.nvim, LSP, Treesitter, Telescope, autocompletions |
-| **Git** | 40+ aliases, delta diff viewer, XDG-compliant config |
-| **Tmux** | TPM plugin manager, vim-aware pane switching, session persistence |
-| **`dutils`** | One CLI for cleanup, updates, SSH keygen, OS detection, interactive diffing, and more |
-| **CLI tools** | macOS via Homebrew (`brew/Brewfile`); **Linux via Nix + Home Manager** (`nix/`, replaces linuxbrew) — eza, bat, ripgrep, fd, zoxide, and more. See [docs/NIX.md](docs/NIX.md) |
-
----
-
-## Switching prompts
-
-Two prompts ship here: **Starship** (default) and **Powerlevel10k**. The choice is
-a single knob, `DOTFILES_PROMPT`, read at the top of `zsh/.config/zsh/.zshrc`.
-Both stay fully wired — switching never removes anything.
-
-**Try one for a single session** (nothing permanent):
-
-```bash
-DOTFILES_PROMPT=p10k exec zsh        # switch to Powerlevel10k
-DOTFILES_PROMPT=starship exec zsh    # switch to Starship
-```
-
-**Make it permanent** — set it as an environment variable so it's defined before
-`.zshrc` runs. Put it in `~/.zshenv` (or edit the default on the
-`: "${DOTFILES_PROMPT:=starship}"` line at the top of `.zshrc`):
-
-```bash
-echo 'export DOTFILES_PROMPT=p10k' >> ~/.zshenv   # or =starship
-exec zsh
-```
-
-> **Note:** `DOTFILES_PROMPT` must be set *before* `.zshrc` loads, so `~/.zshenv`
-> or your environment works — but `conf.d/99-private.zsh` does **not** (it's
-> sourced after the prompt is already up).
-
-Starship's config is `starship/.config/starship/starship.toml`; Powerlevel10k's
-is `zsh/.config/zsh/.p10k.zsh` (regenerate with `p10k configure`).
-
----
-
-## Quick Start
-
-### macOS / Linux — one-liner bootstrap
+**macOS / Linux** (no git or SSH key needed):
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/bootstrap.sh)"
 ```
 
-### macOS / Linux — standard install
+or from a clone: `git clone https://github.com/itsmeakashgoyal/dotfiles ~/dotfiles && cd ~/dotfiles && make install`
+(add `dry=1` to preview).
 
-```bash
-git clone https://github.com/itsmeakashgoyal/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-make install dry=1    # preview every action, change nothing
-make install          # apply
-exec zsh
-```
-
-> For prerequisites, platform-specific notes, and what the installer does, see **[Installation Guide](docs/INSTALLATION.md)**.
-
-### Windows — one-click install
-
-**Prerequisites:** PowerShell 5.1+ (built-in) or [PowerShell 7+](https://aka.ms/pscore6). No other tools needed — the script installs everything.
-
-**Option A — fresh machine (run in PowerShell):**
+**Windows** (PowerShell):
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm https://raw.githubusercontent.com/itsmeakashgoyal/dotfiles/master/windows/install.ps1 | iex
 ```
 
-**Option B — already cloned:**
+**Then, on every new machine:**
 
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-cd ~\dotfiles
-.\windows\install.ps1
+```bash
+dutils init     # git identities + SSH keys, secrets, theme, private overrides
+exec zsh
 ```
 
-**What it installs automatically:**
+## Everyday use
 
-| Step | What happens |
+| Command | Does |
 | --- | --- |
-| **Scoop** | Package manager bootstrapped if missing |
-| **CLI tools** | ripgrep, television, atuin, bat, eza, fd, zoxide, neovim, lazygit, delta, … |
-| **PS modules** | `PSReadLine`, `Terminal-Icons` |
-| **Symlinks** | PowerShell profile, nvim, git, tmux, television, atuin, fastfetch |
-| **Neovim** | Config linked; lazy.nvim bootstraps on first `nvim` launch |
+| `dutils menu` | Pick any `dutils` command from a fuzzy menu |
+| `dutils update` | Update packages, plugins, Neovim |
+| `dutils health` | Check that everything is linked and installed |
+| `dutils git-setup status` | Which git identity / SSH key this repo uses |
+| `dutils theme dark\|light\|auto` | Switch the terminal theme |
+| `dutils bench --real` | Measure shell speed (zsh-bench) |
+| `make help` | All install / stow targets |
 
-> **Symlinks require** either Administrator privileges or [Developer Mode](ms-settings:developers)
-> enabled (`Settings → System → For Developers`).
+Keybindings, aliases and every command: **[docs/CHEATSHEET.md](docs/CHEATSHEET.md)**.
 
-<details>
-<summary><b>PowerShell profile features</b></summary>
+## What's included
 
-| Shortcut / Alias | What it does |
+| Area | Tools |
 | --- | --- |
-| `Ctrl+T` | television (tv) smart autocomplete — context-aware: files/dirs/branches |
-| `Ctrl+R` | atuin history search |
-| `Alt+C` | tv cd into directory |
-| `Tab` | after a space: tv smart autocomplete; mid-word: native completion |
-| `ls` / `ll` / `la` / `lt` | eza with icons and git status |
-| `cat` | bat with syntax highlighting |
-| `grep` | ripgrep (`rg`) |
-| `find` | fd |
-| `z <dir>` | zoxide smart jump |
-| `rm -rf <path>` | recursive force delete |
-| `rmdir <dir>` | remove directory (with `-p` for empty parents) |
-| `touch` / `mkcd` | create file / mkdir + cd |
-| `gs` / `gc` / `gp` / `glog` | git shortcuts |
-| `gco` / `gcr` / `gbd` | fuzzy checkout local/remote branch, fuzzy delete (plain args still work) |
-| `gpr` / `gct` | fuzzy checkout PR (`gh`) / tag |
-| `logg` | interactive git log with tv, opens selected commit in nvim |
-| `rgf` | ripgrep → tv → open in editor |
+| Shell | Zsh + zinit, Powerlevel10k (starship fallback), atuin, zoxide, television, vi mode |
+| Editor | Neovim (lazy.nvim, LSP, Harpoon), Sublime Text |
+| Terminal | iTerm2 Dynamic Profile (⌥Space drop-down), tmux |
+| CLI | eza, bat, fd, ripgrep, delta, lazygit, yazi, btop, gh |
+| Languages | Python 3.14 via mise + uv |
+| Git | Per-repo work/personal identity and SSH key (`dutils git-setup`) |
+| Packages | One manifest (`packages.toml`) → Homebrew, Nix, Scoop |
 
-</details>
+## Docs
 
----
-
-## How It Works
-
-Every top-level directory (`git/`, `zsh/`, `nvim/`, `tmux/`, …) is a **Stow package**. Each package
-mirrors the target path relative to `$HOME`:
-
-<p align="center">
-  <img src="docs/assets/how-it-works.svg" alt="Diagram: 'stow nvim' symlinks ~/.config/nvim into the repo" width="700">
-</p>
-
-Running `stow <package>` from the repo root creates the correct symlinks automatically. Edits in the
-repo take effect immediately — no re-linking needed.
-
----
-
-## Uninstall
-
-To remove the dotfiles setup from your machine, run from the repo root:
-
-```bash
-cd ~/dotfiles
-make uninstall
-```
-
-After one confirmation, it gracefully and completely reverses the install:
-
-1. **Restores your login shell** to the OS default (`/bin/zsh` on macOS, `/bin/bash` on Linux)
-2. **Removes all dotfile symlinks** (unstows every package) and sweeps any leftovers
-3. **Clears generated caches** (zsh compdump, stow backups)
-4. **Uninstalls Nix** if present — removes Home Manager packages first, then Nix itself
-5. **Uninstalls Homebrew** if present — removes all its packages first, then brew itself
-
-> **⚠️ This is a complete removal.** Both package managers are uninstalled
-> entirely, including any packages you installed **outside** these dotfiles.
-> Your repo, shell history, and personal data (`~/.ssh`, git config, etc.) are
-> left untouched.
-
-**Preview first (recommended)** — shows every action without changing anything:
-
-```bash
-make uninstall dry=1
-```
-
-**Skip the confirmation prompt** (e.g. for scripts/CI):
-
-```bash
-make uninstall force=1
-```
-
-The repo itself is left on disk — delete it manually if you want it gone:
-
-```bash
-rm -rf ~/dotfiles
-```
-
-See [docs/NIX.md](docs/NIX.md) for Nix-specific removal notes.
-
-**Windows** has no `make`/Stow, so `windows.ps1` has its own `-Uninstall` mode
-instead — removes every symlink it created, its PATH entry, generated Neovim
-data, the PowerShell modules it installed, and reverts the Windows Terminal
-theme (from the backup it made before touching it):
-
-```powershell
-.\windows\windows.ps1 -Uninstall
-.\windows\windows.ps1 -Uninstall -DryRun    # preview first
-.\windows\windows.ps1 -Uninstall -Force     # skip the confirmation prompt
-```
-
-Scoop packages this script installed are removed too by default; Scoop itself
-is left alone unless you also pass `-PurgeScoop` (opt-in — Scoop is a general
-package manager, more likely to be used for things outside these dotfiles than
-Homebrew/Nix typically are). `dutils cleanup dotfiles` runs a narrower
-`-SymlinksOnly` version of this on Windows — just the symlinks/PATH entry,
-matching that component's own scope. See [docs/WINDOWS.md](docs/WINDOWS.md)
-for details.
-
----
-
-## Repository Structure
-
-```text
-dotfiles/
-├── git/                       → ~/.config/git/          Git config & aliases
-├── zsh/                       → ~/.config/zsh/          Zsh shell configuration
-├── nvim/                      → ~/.config/nvim/         Neovim editor setup
-├── tmux/                      → ~/.config/tmux/         Tmux multiplexer
-├── packages.toml              THE package manifest — every tool, every platform
-├── brew/                      Brewfile — generated from packages.toml (macOS)
-├── nix/                       Home Manager flake — Linux packages (replaces linuxbrew)
-├── scripts/                   Setup, verification, and the dutils CLI
-├── settings/                  App preferences (iTerm, Sublime)
-├── windows/                   Everything Windows-only: installer, setup script,
-│                              PowerShell profile, Windows Terminal theme
-├── docs/                      Guides + this README's banner/demo assets
-├── install.sh                 Main installer (macOS/Linux)
-├── bootstrap.sh               One-liner bootstrap for fresh machines
-└── Makefile                   Stow management & diagnostics
-```
-
----
-
-## The package manifest
-
-[`packages.toml`](packages.toml) is the single source of truth for every tool this repo installs and
-every Stow package it links. The per-manager lists are **generated** from it:
-
-| Generated region | File |
+| Guide | For |
 | --- | --- |
-| Homebrew formulae & casks | `brew/Brewfile` |
-| Nix packages | `nix/home.nix` |
-| Scoop apps + Windows symlink map | `windows/windows.ps1` |
-| apt bootstrap deps | `scripts/setup/linux.sh` |
-| `STOW_PACKAGES` | `Makefile` |
-
-```bash
-# add or edit a [[package]] entry in packages.toml, then:
-make manifest          # regenerate every list  (alias: dutils manifest generate)
-make manifest-check    # fail if a list drifted (runs in CI)
-dutils manifest list   # show what gets installed on each platform
-```
-
-The health checks read the same file, so `dutils health` / `dutils check` never drift from what's
-actually declared. Only the text between the `BEGIN GENERATED` / `END GENERATED` markers is
-rewritten — everything else in those files stays hand-written.
-
----
-
-## Documentation
-
-| Document | Description |
-| --- | --- |
-| **[Installation](docs/INSTALLATION.md)** | Prerequisites, platform notes, what the installer does |
-| **[Usage](docs/USAGE.md)** | Makefile commands, updating, adding packages, diagnostics |
-| **[Nix (Linux)](docs/NIX.md)** | Nix + Home Manager package management on Linux (replaces linuxbrew) |
-| **[Python](docs/PYTHON.md)** | mise (interpreter versions) + uv (venvs, packages, lockfiles) |
-| **[Windows](docs/WINDOWS.md)** | Config toggles (native prompt, mise activation), troubleshooting (OneDrive profile path, slow startup, large-repo git perf) |
-| **[Git identities & SSH](docs/SSH.md)** | Personal + any number of work profiles (`dutils git-setup`): the right email, SSH key and signing per repo by folder / GitHub org / enterprise host, cross-platform |
-| **[Secrets](docs/SECRETS.md)** | Encrypted secrets in the repo via `age` + your SSH key (`dutils secrets`) |
-| **[Theming](docs/THEME.md)** | Gruvbox Dark everywhere by default (iTerm2, terminal tools, Sublime); terminal switchable with `dutils theme dark\|light\|auto` |
-| **[iTerm2](docs/ITERM.md)** | Dynamic Profile (Gruvbox, natural text editing, ⌥Space drop-down hotkey window), no synced plist |
-| **[Sublime Text](docs/SUBLIME.md)** | Cross-platform Sublime IDE — LSP (C/C++/Python), Terminus, builds, Gruvbox light/dark following the OS; symlinked settings |
-| **[OSXPhotos](docs/OSXPHOTOS.md)** | Backing up the macOS Photos library (originals, edits, Live Photos) by month |
-| **[organize-media](scripts/dutils/README.md)** | Sorting an *already-exported* flat photo/video backup folder (no Photos library involved) into year/month folders (`dutils organize-media`) |
-| **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |
-| **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues, debug workflow, uninstalling |
-| **[Architecture](docs/ARCHITECTURE.md)** | Deep dive: Stow internals, Zsh flow, scripts, CI, XDG |
-| **[Contributing](CONTRIBUTING.md)** | How to contribute, code style, PR process |
-| **[Security](SECURITY.md)** | Secrets management and security practices |
-
----
-
-## Resources
-
-- [GNU Stow](https://www.gnu.org/software/stow/) -- Symlink farm manager
-- [Homebrew](https://brew.sh/) -- Package manager for macOS and Linux
-- [Neovim](https://neovim.io/) -- Hyperextensible text editor
-- [Starship](https://starship.rs/) -- Zsh prompt used by default here ([Powerlevel10k](https://github.com/romkatv/powerlevel10k) is available as an alternative — see [Switching prompts](#switching-prompts))
-- [VHS](https://github.com/charmbracelet/vhs) -- Terminal demo recorder (used for the preview above)
-- [Awesome Dotfiles](https://github.com/webpro/awesome-dotfiles) -- Community dotfiles resources
-
----
+| [Setup](docs/SETUP.md) | Install, first run, git identities, secrets, updating, uninstalling, troubleshooting |
+| [Cheatsheet](docs/CHEATSHEET.md) | Keys, aliases, bookmarks, tmux, Neovim, `dutils` and `make` commands |
+| [Customize](docs/CUSTOMIZE.md) | Theme, prompt, iTerm2, Python, adding tools, machine-local settings |
+| [Contributing](CONTRIBUTING.md) | Repo layout and rules for changes |
 
 ## License
 
-BSD 2-Clause License. See [LICENSE](LICENSE) for details.
-
----
-
-<p align="center"><b>Akash Goyal</b> — <a href="https://github.com/itsmeakashgoyal">@itsmeakashgoyal</a></p>
+BSD 2-Clause. See [LICENSE](LICENSE).

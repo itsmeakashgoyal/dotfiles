@@ -6,7 +6,7 @@
 # ░▓▓▓▓▓▓▓▓▓▓
 #
 # Git identities + SSH keys for any number of accounts (personal, one or more
-# companies), on macOS, Linux and Windows. See docs/SSH.md.
+# companies), on macOS, Linux and Windows. See docs/SETUP.md.
 #
 # Everything machine-specific lives OUTSIDE the repo, in ~/.config/dotfiles/git/:
 #   profiles.json        the source of truth (written by this command)

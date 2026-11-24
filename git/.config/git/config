@@ -15,7 +15,7 @@
 	# to commit instead of silently using the wrong email.
 	useConfigOnly = true
 
-# Generated per machine by `dutils git-setup` (see docs/SSH.md). Missing file =
+# Generated per machine by `dutils git-setup` (see docs/SETUP.md). Missing file =
 # silently ignored, so a fresh machine still works for everything but commits.
 [include]
 	path = ~/.config/dotfiles/git/config

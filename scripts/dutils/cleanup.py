@@ -47,7 +47,7 @@ def _run_uninstall(steps: str, force: bool) -> None:
         # (Scoop packages, terminal theme, modules) windows.ps1 -Uninstall
         # does by default. -SymlinksOnly keeps that promise on Windows too;
         # the full teardown stays reachable only via a direct, explicit
-        # windows.ps1 -Uninstall call (see docs/WINDOWS.md), not through here.
+        # windows.ps1 -Uninstall call (see docs/SETUP.md), not through here.
         if steps == "unstow,sweep":
             args.append("-SymlinksOnly")
         subprocess.run(args, check=False)

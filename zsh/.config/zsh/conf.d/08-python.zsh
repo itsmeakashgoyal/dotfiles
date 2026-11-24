@@ -73,13 +73,13 @@ export UV_PYTHON_PREFERENCE=system
 # ------------------------------------------------------------------------------
 # uv creates the venv and manages packages (`uv pip ...`) - mise (above) only
 # decides which Python interpreter is on PATH when `--python` isn't given.
-# See docs/PYTHON.md for the full mise+uv workflow (multiple envs, switching
+# See docs/CUSTOMIZE.md for the full mise+uv workflow (multiple envs, switching
 # interpreter versions, uv's project mode for lockfile-based reproducibility).
 
 # Create and activate a Python virtual environment
 function mkvenv() {
     if ! command -v uv &>/dev/null; then
-        echo "Error: uv is not installed (see docs/PYTHON.md)"
+        echo "Error: uv is not installed (see docs/CUSTOMIZE.md)"
         return 1
     fi
 

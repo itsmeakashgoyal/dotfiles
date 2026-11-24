@@ -9,7 +9,7 @@
 # the media's actual creation date (month as a name, e.g. "2024/September/",
 # not split into Photos/Videos subfolders).
 #
-# This is deliberately separate from the osxphotos workflow (docs/OSXPHOTOS.md):
+# This is deliberately separate from the osxphotos workflow (docs/CHEATSHEET.md):
 # osxphotos reads Photos.app's library database to export originals, which only
 # works against an actual `.photoslibrary`. This script is for folders that are
 # already just loose files with no such database - e.g. a Screenshots/exports

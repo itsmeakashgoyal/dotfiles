@@ -77,7 +77,7 @@
 
     # Nix Tooling
     nixd # Nix language server (for editing home.nix / flake.nix in nvim)
-    devenv # Reproducible per-project dev environments (see docs/NIX.md)
+    devenv # Reproducible per-project dev environments (see docs/SETUP.md)
 
     # Misc
     rsync # File sync

@@ -122,7 +122,7 @@ cat <<EOF
   │   • Apply changes:   make nix-switch                                 │
   │   • Update versions: make nix-update                                 │
   │                                                                      │
-  │ Full guide: docs/NIX.md                                              │
+  │ Full guide: docs/SETUP.md                                            │
   └──────────────────────────────────────────────────────────────────────┘
 
 EOF

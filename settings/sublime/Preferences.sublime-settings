@@ -3,7 +3,7 @@
     "font_size": 17,
     "font_options": ["gray_antialias", "subpixel_antialias"],
 
-    // Gruvbox Dark, like the terminal (docs/THEME.md). To follow the OS
+    // Gruvbox Dark, like the terminal (docs/CUSTOMIZE.md). To follow the OS
     // light/dark instead, set both "theme" and "color_scheme" to "auto"; the
     // dark_/light_ keys below are what "auto" picks.
     "theme": "Adaptive.sublime-theme",

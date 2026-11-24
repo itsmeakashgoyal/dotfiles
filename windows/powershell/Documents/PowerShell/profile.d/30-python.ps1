@@ -6,7 +6,7 @@
 #
 # uv: Python virtual environment management. Mirrors mkvenv/rmvenv/venv in
 # zsh/.config/zsh/conf.d/08-python.zsh - same names, defaults, and behavior, so
-# the workflow in docs/PYTHON.md is identical on every platform. mise (20-tools)
+# the workflow in docs/CUSTOMIZE.md is identical on every platform. mise (20-tools)
 # still decides which Python interpreter uv uses.
 
 $VENV_DEFAULT_DIR = '.venv'
@@ -34,7 +34,7 @@ function mkvenv {
         [string]$PyVersion
     )
 
-    if (-not (_cmd uv)) { Write-Error "uv is not installed (see docs/PYTHON.md)"; return }
+    if (-not (_cmd uv)) { Write-Error "uv is not installed (see docs/CUSTOMIZE.md)"; return }
     if (Test-Path $EnvDir) { Write-Error "Environment '$EnvDir' already exists"; return }
 
     Write-Host "Creating new virtual environment '$EnvDir'..."

@@ -26,7 +26,7 @@ REPO = Path(__file__).resolve().parent.parent.parent
 
 def _stow_packages() -> list[str]:
     # Reads packages.toml directly (the single source of truth — see
-    # CLAUDE.md) instead of shelling out to `make print-STOW_PACKAGES`, which
+    # CONTRIBUTING.md) instead of shelling out to `make print-STOW_PACKAGES`, which
     # doesn't work on Windows at all: Scoop's GNU Make can't run recipes
     # without a POSIX shell present (confirmed directly — even a bare
     # `@echo` target fails with "CreateProcess(NULL, echo ...) failed").

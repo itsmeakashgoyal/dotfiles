@@ -197,7 +197,7 @@ delete: check-stow ## Delete all stowed dotfiles
 	@echo "$(GREEN)✓ Dotfiles removed! ⚡️$(CLR)"
 
 .PHONY: uninstall
-uninstall: ## Gracefully uninstall everything (shell, symlinks, caches; opt-in packages/Nix)
+uninstall: ## Uninstall everything: shell, symlinks, caches, AND all Homebrew/Nix packages (dry=1 to preview)
 	@STOW_PACKAGES="$(STOW_PACKAGES)" DRY_RUN="$(dry)" FORCE="$(force)" \
 		bash scripts/setup/uninstall.sh
 

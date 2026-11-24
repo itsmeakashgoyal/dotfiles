@@ -365,7 +365,7 @@ check    = "none"
 
 [[package]]
 name     = "devenv"
-desc     = "Reproducible per-project dev environments (see docs/NIX.md)"
+desc     = "Reproducible per-project dev environments (see docs/SETUP.md)"
 category = "Nix Tooling"
 nix      = "devenv"
 check    = "none"

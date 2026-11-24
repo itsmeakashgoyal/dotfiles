@@ -1,7 +1,7 @@
 # secrets/
 
 Encrypted secrets, managed by `dutils secrets` (age + your SSH key). See
-[docs/SECRETS.md](../docs/SECRETS.md) for the full guide.
+[docs/SETUP.md → Secrets](../docs/SETUP.md#secrets) for the full guide.
 
 - Files here are **encrypted** (`*.age`) and mirror `$HOME`, e.g.
   `secrets/.ssh/config.age` ↔ `~/.ssh/config`.

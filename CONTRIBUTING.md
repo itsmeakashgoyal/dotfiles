@@ -1,138 +1,45 @@
 # Contributing
 
-Thank you for your interest in contributing! This is a personal dotfiles repository, but improvements, bug fixes, and new tool configurations are welcome.
+Rules and layout for changing this repo (for humans and AI agents alike).
 
----
+## Layout
 
-## Ways to Contribute
+Each top-level folder is a [GNU Stow](https://www.gnu.org/software/stow/) package that mirrors `$HOME`:
+`stow nvim` links `nvim/.config/nvim` → `~/.config/nvim`. Windows uses `windows/windows.ps1` instead of Stow.
 
-- **Bug reports** — Something broken after following the README? Open an issue.
-- **New Stow packages** — Add support for a tool not yet covered (e.g., `wezterm`, `lazygit`, `btop`).
-- **Improvements** — Better aliases, smarter functions, CI improvements.
-- **Documentation** — Clearer explanations, missing steps, new guides.
+| Path | What |
+| --- | --- |
+| `zsh/` | `.zshenv` + `.config/zsh/` (`.zshrc`, `.p10k.zsh`, numbered `conf.d/*.zsh`) |
+| `git/ nvim/ tmux/ starship/ atuin/ television/ yazi/ fastfetch/ readline/ mise/` | Tool configs (Stow packages) |
+| `bin/` | `~/.local/bin` scripts, incl. the `dutils` CLI symlink |
+| `settings/` | iTerm2 profile (`iterm/profile.json`) and Sublime Text settings |
+| `windows/` | PowerShell profile + `install.ps1` / `windows.ps1` |
+| `scripts/dutils/` | `dutils` CLI (Python ≥ 3.14) |
+| `scripts/setup/` | Per-OS install steps; `scripts/lib/` shared shell/Python helpers; `scripts/verify/` health checks |
+| `packages.toml` | **Single source** of every package on every OS + the Stow package list |
+| `brew/Brewfile`, `nix/home.nix`, `windows/windows.ps1`, `Makefile` | Contain **generated** regions (from `packages.toml`) |
 
----
+## Rules
 
-## Development Workflow
+- **Packages:** edit `packages.toml`, then `dutils manifest generate`. Never hand-edit between `# BEGIN GENERATED` / `# END GENERATED` markers (`dutils manifest check` fails CI on drift).
+- **New Stow package:** `dutils new <name>` (or add the folder + a `[[stow]]` entry, then `dutils manifest generate`).
+- **Secrets / identities:** never commit them. Machine-local exports go in `zsh/.config/zsh/conf.d/99-private.zsh` (gitignored, owner-only). Git identities live in `~/.config/dotfiles/git/` (`dutils git-setup`), the tracked git config has none.
+- **Shell scripts:** `#!/bin/bash`, `set -euo pipefail`, source `scripts/lib/core.sh`, use its `info`/`success`/`warning`/`error` for output, pass `shellcheck -x`. Style is hand-aligned: **don't run `shfmt -w`** on the repo.
+- **Python:** requires ≥ 3.14 (entry points call `scripts/lib/pyreq.py`), stdlib only.
+- **Zsh speed:** nothing may fork at startup or on every prompt when a builtin works (`$OSTYPE` not `uname`, `${commands[x]}` not `$(command -v x)`, `$(<file)` not `cat`). Wrap `tool init zsh` in `cached_init`. Nothing may print after p10k's instant prompt. Check with `dutils bench --real`.
+- **Docs:** how-to only, in `README.md` + `docs/{SETUP,CHEATSHEET,CUSTOMIZE}.md`. Update them with the change.
 
-### 1. Fork & clone
-
-```bash
-git clone https://github.com/<your-username>/dotfiles.git ~/dotfiles-dev
-cd ~/dotfiles-dev
-```
-
-### 2. Install pre-commit hooks
-
-```bash
-pip install pre-commit
-pre-commit install
-```
-
-This runs shellcheck and shfmt automatically before each commit.
-
-### 3. Make your changes
-
-#### Adding a new Stow package
-
-Each package follows the same pattern — mirror the target path under a top-level directory:
-
-```text
-dotfiles/
-└── <toolname>/
-    └── .config/
-        └── <toolname>/
-            └── config_file
-```
-
-Then register it in the `Makefile` (append to the existing list — run `make print-STOW_PACKAGES` to see the current one):
-
-```makefile
-STOW_PACKAGES := git zsh nvim tmux television bin atuin fastfetch <toolname>
-```
-
-And stow it:
+## Check before committing
 
 ```bash
-make stow pkg=<toolname>
+find . -name "*.sh" ! -name profile_zsh.sh -exec shellcheck -x {} +   # lint shell
+dutils manifest check                                               # generated lists in sync
+make health                                                         # links + tools
+dutils bench --real                                                 # if you touched zsh
 ```
 
-#### Modifying Zsh config
+CI (`.github/workflows/build_and_test.yml`) runs lint, then a full install + uninstall on macOS, Ubuntu and Windows.
 
-`conf.d/` files are numbered and sourced in that order (see [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full list):
+## Commits
 
-- Add aliases → `zsh/.config/zsh/conf.d/04-aliases.zsh`
-- Add shell functions → `zsh/.config/zsh/conf.d/05-functions.zsh`
-- Add environment variables → `zsh/.config/zsh/conf.d/01-exports.zsh`
-- Machine-local changes → `zsh/.config/zsh/conf.d/99-private.zsh` (gitignored, never commit)
-
-#### Modifying scripts
-
-All scripts must:
-- Start with `#!/bin/bash`
-- Use `set -euo pipefail`
-- Source `scripts/lib/core.sh` for logging
-- Pass `shellcheck -x` with no errors
-
-### 4. Test locally
-
-```bash
-# Lint all scripts (matches what CI's lint job runs)
-find . -type f \( -name "*.sh" -o -name "dutils" \) ! -path "*/.git/*" -exec shellcheck -x {} +
-
-# Check shell formatting
-shfmt -d scripts/
-
-# Run health check
-make health
-
-# Full verification
-make check
-```
-
-### 5. Commit
-
-Follow conventional commits:
-
-```text
-feat: add lazygit config package
-fix: correct PATH order in exports.zsh
-docs: add vhs recording guide
-chore: update Brewfile with new tools
-```
-
-### 6. Open a Pull Request
-
-- Target the `master` branch
-- Fill in the PR template
-- CI must pass (lint + macOS + Ubuntu tests)
-
----
-
-## Code Style
-
-### Shell scripts
-
-- 4-space indentation
-- `snake_case` for variable and function names
-- Always quote variables: `"$variable"` not `$variable`
-- Use `log_message`, `info`, `success`, `warning`, `error` from `core.sh` for output — never raw `echo` for status messages
-
-### Makefile
-
-- Group related targets under `##@` sections
-- Every public target must have a `## Description` comment (used by `make help`)
-
-### Markdown
-
-- One sentence per line in prose (easier diffs)
-- Code blocks always have a language tag
-
----
-
-## What Won't Be Merged
-
-- Changes that hardcode my personal details (name, email, GitHub handle) — those stay in `git/.config/git/config`
-- New GUI app casks without a clear reason
-- Large binary files
-- Secrets of any kind
+[Conventional commits](https://www.conventionalcommits.org/): `feat(zsh): …`, `fix(git): …`, `docs: …`, `chore: …`. Target `master`; CI must pass.

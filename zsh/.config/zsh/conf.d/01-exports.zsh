@@ -75,7 +75,7 @@ fi
 # ~/.config/dotfiles/theme — dark (default) | light | auto (follow the OS; costs
 # one `defaults` call at startup, only in auto mode). Resolved once here into
 # $DOTFILES_THEME=dark|light, which drives bat + delta ($BAT_THEME), starship's
-# palette (.zshrc 6f) and Neovim (current-theme.lua). See docs/THEME.md.
+# palette (.zshrc 6f) and Neovim (current-theme.lua). See docs/CUSTOMIZE.md.
 () {
     local f="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/theme" mode=dark
     [[ -r $f ]] && mode=${$(<$f)//[[:space:]]/}

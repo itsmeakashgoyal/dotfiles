@@ -154,7 +154,7 @@ def main() -> None:
                         help="force the numbered prompt even when television is installed")
     parser.add_argument("--all", action="store_true",
                         help="also list commands not tagged for this platform "
-                             "(they may error or no-op — see docs/WINDOWS.md)")
+                             "(they may error or no-op — see docs/SETUP.md)")
     args, passthrough = parser.parse_known_args()
 
     commands = load_commands()
