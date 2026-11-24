@@ -163,9 +163,18 @@ The prefix is `⌃a`. Press `⌃a ⌃a` to send it to a nested session. Windows 
 | `prefix g` / `prefix o` | Open lazygit / run an app (prompts) in a new window |
 | `prefix ⌃e` / `prefix b` | Pick a session with tv in a popup / switch to the last session |
 | `prefix d` / `prefix s` / `prefix $` | Detach / session tree / rename the session (tmux defaults) |
-| `prefix [` then `Space`, `Enter` | Copy mode with vi keys: start a selection, copy it; `prefix ]` pastes |
 | `prefix I` / `prefix U` | Install / update TPM plugins |
 | `prefix ⌃s` / `prefix ⌃r` | Save / restore sessions (resurrect; continuum restores them on start) |
+
+**Copy & paste** (everything copied goes to the system clipboard, also over ssh):
+
+| Keys | Does |
+| --- | --- |
+| Drag with the mouse | Select; copied on release (double / triple click: word / line) |
+| `⌥` + drag (iTerm2) | Use the terminal's own selection instead of tmux's, then `⌘C` |
+| `prefix [` → `v` (or `⌃v` block) → `y` | Copy with the keyboard (vi keys to move) |
+| `⌘V` | Paste the system clipboard, same as outside tmux |
+| `prefix ]` | Paste tmux's last copy |
 
 | Shell command | Does |
 | --- | --- |

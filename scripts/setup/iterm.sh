@@ -99,6 +99,9 @@ apply_global_prefs() {
     # tmux -CC integration: open tmux windows as native tabs, hide the client.
     defaults write "$ITERM_DOMAIN" OpenTmuxWindowsIn -int 2
     defaults write "$ITERM_DOMAIN" AutoHideTmuxClientSession -bool true
+    # Let apps (tmux, nvim, ssh sessions) set the clipboard via OSC 52, so
+    # copying inside tmux lands in the macOS clipboard like it does outside.
+    defaults write "$ITERM_DOMAIN" AllowClipboardAccess -bool true
     # Copy on select; keep updates automatic.
     defaults write "$ITERM_DOMAIN" CopySelection -bool true
     defaults write "$ITERM_DOMAIN" SUEnableAutomaticChecks -bool true
