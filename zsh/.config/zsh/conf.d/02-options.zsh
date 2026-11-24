@@ -11,9 +11,8 @@
 # OS-Specific Configuration
 # ------------------------------------------------------------------------------
 # macOS-specific ulimit tweaks
-if [[ "$(uname -s)" == "Darwin" ]]; then
+if [[ $OSTYPE == darwin* ]]; then
     ulimit -n 65536 2>/dev/null # Increase max number of open files
-    ulimit -u 1064 2>/dev/null  # Increase max number of user processes
 fi
 
 # ------------------------------------------------------------------------------

@@ -15,26 +15,26 @@
 # OS Detection and Homebrew Setup
 # ------------------------------------------------------------------------------
 # OS-specific Homebrew setup
-case "$(uname -s)" in
-    Darwin)
-        [[ -x "/opt/homebrew/bin/brew" ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
-        # Prefer Python.org (and other /usr/local tools) over Homebrew.
-        # This avoids pip's PEP 668 "externally managed environment" for Homebrew Python,
-        # while keeping Homebrew available later in PATH.
-        if [[ -d "/usr/local/bin" ]]; then
-            path=(/usr/local/bin ${path:#/usr/local/bin})
-        fi
-        ;;
-    Linux)
-        [[ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        ;;
-esac
+# No `eval "$(brew shellenv)"` here: it forked brew on every login shell (every
+# new macOS terminal tab, ~27ms) to produce values that are fixed per machine.
+# 01-exports.zsh already sets HOMEBREW_* and PATH; only the man/info paths
+# brew shellenv would add are set here.
+if [[ $OSTYPE == darwin* && -d /opt/homebrew ]]; then
+    [[ -n ${MANPATH-} ]] && export MANPATH=":${MANPATH#:}"   # leading ':' = also search default paths
+    export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
+fi
 
 # ------------------------------------------------------------------------------
 # First-run environment setup for login shells
 # ------------------------------------------------------------------------------
 # Ensure XDG directories exist (safe here; avoid in .zshenv)
-mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_RUNTIME_DIR" 2>/dev/null
+# (Only forks mkdir when one is actually missing, i.e. on a fresh machine.)
+() {
+    local d
+    for d in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_RUNTIME_DIR"; do
+        [[ -n $d && ! -d $d ]] && mkdir -p "$d" 2>/dev/null
+    done
+}
 
 # Sensible default permissions for created files/dirs
 umask 022

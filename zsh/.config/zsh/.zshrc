@@ -89,6 +89,9 @@ zinit lucid light-mode for \
 source "$ZDOTDIR/conf.d/03-startup.zsh"
 
 # --- 6c. Core interactive plugins (synchronous) ------------------------------
+# Kept synchronous on purpose: deferring them saved only ~5ms and left the first
+# keystrokes of a new tab unhighlighted/unsuggested (zsh-bench then also
+# reports them as missing).
 zinit lucid light-mode for \
     zsh-users/zsh-autosuggestions
 

@@ -110,16 +110,36 @@ zmodload -F zsh/stat b:zstat 2>/dev/null
 _dotfiles_init_cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/init"
 cached_init() {
     local name="$1"; shift
-    local bin; bin=$(command -v "$1" 2>/dev/null) || return 0
+    local bin=${commands[$1]}; [[ -n $bin ]] || return 0
     local cache="${_dotfiles_init_cache}/${name}.zsh"
     local -a st; zstat -A st +mtime "$bin" 2>/dev/null
-    local key="${bin}:${st[1]:-0}:${ZSH_VERSION}"
+    # Args are part of the key, so changing them (e.g. zoxide's --hook) re-caches.
+    local key="${bin}:${st[1]:-0}:${ZSH_VERSION}:v2:$*"
     if [[ ! -r "$cache" || "$(<"${cache}.key" 2>/dev/null)" != "$key" ]]; then
         mkdir -p "${_dotfiles_init_cache}"
-        "$@" >| "$cache" 2>/dev/null
+        local out; out=$("$@" 2>/dev/null)
+        # Bake out the process spawns the generated scripts still do at EVERY
+        # shell start (measured: atuin uuid ~19ms, starship PROMPT2 ~11ms).
+        case "$name" in
+            atuin)
+                out=${out//'export ATUIN_SESSION=$(atuin uuid)'/'_dotfiles_uuid7; export ATUIN_SESSION=$REPLY'} ;;
+            starship)
+                local p2; p2=$(starship prompt --continuation 2>/dev/null)
+                out=${out//PROMPT2=\"\$\(*--continuation\)\"/PROMPT2=${(qq)p2}} ;;
+        esac
+        print -r -- "$out" >| "$cache"
         print -r -- "$key" >| "${cache}.key"
     fi
     source "$cache"
+}
+
+# UUIDv7 (atuin's session id format: 32 hex chars) without forking `atuin uuid`:
+# 48-bit ms timestamp, version 7, RFC 4122 variant, random bits. Result in $REPLY.
+zmodload zsh/datetime 2>/dev/null
+_dotfiles_uuid7() {
+    local -i ms=$(( ${EPOCHREALTIME%.*} * 1000 + 10#${${EPOCHREALTIME#*.}[1,3]} ))
+    local r; printf -v r '%04x%04x%04x%04x%04x' $RANDOM $RANDOM $RANDOM $RANDOM $RANDOM
+    printf -v REPLY '%012x7%s%x%s%s' $ms ${r[1,3]} $(( 8 + RANDOM % 4 )) ${r[4,6]} ${r[7,18]}
 }
 
 # Ripgrep config file location
@@ -140,7 +160,6 @@ fi
 # Environment Detection and Base Configuration
 # ------------------------------------------------------------------------------
 source "${XDG_DOTFILES_DIR}/scripts/lib/os-detect.sh"
-ARCH_TYPE=$(uname -m)
 
 # Common paths for both OS types
 COMMON_PATHS=(
@@ -160,10 +179,14 @@ if os::is_mac; then
   HOMEBREW_CELLAR="/opt/homebrew/Cellar"
   HOMEBREW_REPOSITORY="/opt/homebrew"
   export HOMEBREW_PREFIX HOMEBREW_CELLAR HOMEBREW_REPOSITORY
+  # Completions for Homebrew-installed tools (what `brew shellenv` adds;
+  # this file runs before compinit).
+  fpath=("${HOMEBREW_PREFIX}/share/zsh/site-functions" ${fpath:#${HOMEBREW_PREFIX}/share/zsh/site-functions})
 
   # macOS specific paths
   OS_PATHS=(
     "/opt/homebrew/bin"
+    "/opt/homebrew/sbin"
     "/opt/homebrew/opt/llvm/bin"
     "/Library/Frameworks/Python.framework/Versions/Current/bin"
     "${HOME}/Library/Python/3.14/bin"
@@ -201,13 +224,15 @@ path=(
 export PATH
 
 # Set parallel make flags based on OS
-if command -v nproc >/dev/null 2>&1; then
-    # Linux
-    export MAKEFLAGS="-j$(nproc)"
-elif command -v sysctl >/dev/null 2>&1; then
-    # macOS
-    export MAKEFLAGS="-j$(sysctl -n hw.ncpu)"
-fi
+# CPU count cached once per machine: `nproc`/`sysctl` would fork on every start.
+() {
+    local f="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/ncpu"
+    if [[ ! -s $f ]]; then
+        mkdir -p "${f:h}"
+        { (( $+commands[nproc] )) && nproc || sysctl -n hw.ncpu; } >| "$f" 2>/dev/null
+    fi
+    [[ -s $f ]] && export MAKEFLAGS="-j$(<$f)"
+}
 
 # ------------------------------------------------------------------------------
 # Third-Party Toolchain PATH Additions

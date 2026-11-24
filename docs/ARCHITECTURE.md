@@ -59,7 +59,7 @@ zsh invoked
             XDG_DOTFILES_DIR, self-located via zsh's %x + :A)
      │
      ▼ (login shell only)
-~/.config/zsh/.zprofile  (PATH additions, Homebrew env)
+~/.config/zsh/.zprofile  (login-only env: Homebrew MANPATH/INFOPATH, XDG dirs; no forks)
      │
      ▼ (interactive shell)
 ~/.config/zsh/.zshrc

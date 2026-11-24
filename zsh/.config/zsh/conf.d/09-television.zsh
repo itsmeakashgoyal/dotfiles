@@ -11,9 +11,10 @@
 #   Ctrl+R  — shell history search
 #   Tab     — tv after space, zsh built-in completion mid-word
 
-# Initialize zoxide if available
-if command -v zoxide >/dev/null 2>&1; then
-    cached_init zoxide zoxide init zsh --cmd cd --hook prompt
+# Initialize zoxide if available. `--hook pwd` records a directory when you
+# cd into it (same ranking data) instead of spawning zoxide on every prompt.
+if (( $+commands[zoxide] )); then
+    cached_init zoxide zoxide init zsh --cmd cd --hook pwd
 fi
 
 # Clipboard helper (used by other scripts)

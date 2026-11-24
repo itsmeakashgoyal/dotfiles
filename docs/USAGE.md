@@ -101,6 +101,7 @@ thing, kept for muscle memory; macOS/Linux only, since Windows has no make).
 | Package audit vs Brewfile | `dutils packages` | `make packages` |
 | Everything (health + system + packages) | `dutils diagnose` | `make diagnose` |
 | Benchmark zsh startup | `dutils bench` | `make bench` |
+| Real interactive lag (first prompt, per-Enter, typing) via zsh-bench | `dutils bench --real` | `make bench-real` |
 | Profile zsh startup (per-function) | `dutils profile` | `make bench-detail` |
 
 - **Health check** — core components (git, brew, zsh, nvim, tmux), symlinks, and

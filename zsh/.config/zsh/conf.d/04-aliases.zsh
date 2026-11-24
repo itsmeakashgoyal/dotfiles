@@ -101,7 +101,7 @@ alias tc='clear && tmux clear-history' # Clear tmux history
 # ------------------------------------------------------------------------------
 # OS-Specific Aliases
 # ------------------------------------------------------------------------------
-case "$(uname -s)" in
+case "$OS_TYPE" in   # Darwin|Linux, set by os-detect.sh (no uname fork)
     Darwin)
         # macOS system update function (more reliable than alias)
         update_system() {

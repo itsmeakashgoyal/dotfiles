@@ -279,6 +279,10 @@ diagnose: ## Run all diagnostic tools (alias for `dutils diagnose`)
 bench: ## Benchmark zsh startup time (alias for `dutils bench`)
 	@$(DUTILS) bench
 
+.PHONY: bench-real
+bench-real: ## Real per-prompt/first-prompt lag via zsh-bench (alias for `dutils bench --real`)
+	@$(DUTILS) bench --real
+
 .PHONY: bench-detail
 bench-detail: ## Profile zsh startup with zprof (alias for `dutils profile`)
 	@$(DUTILS) profile

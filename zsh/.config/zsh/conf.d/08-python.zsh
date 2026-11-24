@@ -37,12 +37,20 @@ export PYTHONUNBUFFERED=1        # Prevent Python from buffering stdout/stderr
 # (confirmed real interactive sessions fire precmd before reading the next
 # command; `zsh -i -c exit`, what `make bench` uses, does not — so this
 # doesn't show up in `make bench` even though it's a real improvement).
-if command -v mise &>/dev/null; then
+#
+# After activating, mise's own precmd hook would spawn `mise hook-env` on EVERY
+# prompt (~15ms per Enter, measured with zsh-bench). Tool versions change when
+# you change directory, so only its chpwd hook is kept. After editing a
+# mise.toml in the current directory, run `cd .` (or `_mise_hook`) to apply it.
+# (The shims dir on PATH, see 01-exports.zsh, covers non-interactive use; the
+# activated PATH avoids the shims' ~15ms-per-call overhead.)
+if (( $+commands[mise] )); then
     autoload -Uz add-zsh-hook
     _mise_lazy_activate() {
         add-zsh-hook -d precmd _mise_lazy_activate
         unfunction _mise_lazy_activate
         eval "$(mise activate zsh)"
+        add-zsh-hook -d precmd _mise_hook_precmd
     }
     add-zsh-hook precmd _mise_lazy_activate
 fi

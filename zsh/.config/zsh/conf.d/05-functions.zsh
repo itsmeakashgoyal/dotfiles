@@ -293,7 +293,7 @@ tks() {
 }
 
 # Per-platform settings
-case "$(uname -s)" in
+case "$OS_TYPE" in   # Darwin|Linux, set by os-detect.sh (no uname fork)
     Darwin)
         # macOS disk info (uses df instead of lsblk)
         function disks() {
@@ -355,7 +355,7 @@ dataurl() {
 }
 
 # macOS: cd to the directory of the frontmost Finder window.
-if [[ "$(uname -s)" == "Darwin" ]]; then
+if [[ $OSTYPE == darwin* ]]; then
     cdf() {
         local target
         target=$(osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as alias)')

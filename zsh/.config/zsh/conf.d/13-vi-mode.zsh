@@ -17,21 +17,19 @@ export KEYTIMEOUT=1
 # ------------------------------------------------------------------------------
 # Mode indicator — shows [N] in right prompt when in normal mode
 # ------------------------------------------------------------------------------
-_vi_mode_indicator() {
-    case "$KEYMAP" in
-        vicmd) echo '%F{yellow}[N]%f' ;;
-        *)     echo '' ;;
-    esac
-}
+# A parameter expansion (not a `$(function)` call), so rendering it forks
+# nothing: (M) keeps $KEYMAP only when it is `vicmd`, and :+ turns that into [N].
+_VI_MODE_INDICATOR='${${(M)KEYMAP:#vicmd}:+%F{yellow}[N]%f}'
 
 zle-keymap-select() {
     zle reset-prompt
 }
 zle -N zle-keymap-select
 
+# Every line starts in insert mode. No `zle reset-prompt` here: the prompt was
+# just drawn, and redrawing it re-ran starship on every Enter (~20ms per prompt).
 zle-line-init() {
     zle -K viins
-    zle reset-prompt
 }
 zle -N zle-line-init
 
@@ -48,8 +46,8 @@ zle -N zle-line-init
 #
 # Guarded so re-sourcing the file (e.g. a manual `source ~/.zshrc`) doesn't
 # stack duplicate copies of the indicator.
-if [[ "$RPROMPT" != *_vi_mode_indicator* ]]; then
-    RPROMPT="${RPROMPT:+$RPROMPT }"'$(_vi_mode_indicator)'
+if [[ "$RPROMPT" != *"(M)KEYMAP:#vicmd"* ]]; then
+    RPROMPT="${RPROMPT:+$RPROMPT }$_VI_MODE_INDICATOR"
 fi
 
 # ------------------------------------------------------------------------------

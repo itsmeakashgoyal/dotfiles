@@ -25,7 +25,13 @@
 # next source, instead of requiring a brand new terminal session.
 [[ -n "${OS_DETECT_LOADED:-}" ]] && type os::is_mac >/dev/null 2>&1 && return 0
 
-OS_TYPE=$(uname)
+# $OSTYPE is set by both bash and zsh, so the common cases need no `uname` fork
+# (this file is sourced on every interactive zsh start).
+case "${OSTYPE:-}" in
+    darwin*) OS_TYPE=Darwin ;;
+    linux*)  OS_TYPE=Linux ;;
+    *)       OS_TYPE=$(uname) ;;
+esac
 readonly OS_TYPE
 
 os::is_mac()   { [[ "$OS_TYPE" == "Darwin" ]]; }

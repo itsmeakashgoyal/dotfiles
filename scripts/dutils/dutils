@@ -244,7 +244,10 @@ def cmd_packages(args: list[str]) -> None:
 
 # ── Shell startup performance ─────────────────────────────────────────────────
 
-def cmd_bench(_args: list[str]) -> None:
+def cmd_bench(args: list[str]) -> None:
+    if args[:1] in (["--real"], ["real"]):
+        _bench_real(args[1:])
+        return
     if shutil.which("hyperfine") is None:
         print("Error: hyperfine is not installed.\n"
               "Install: brew install hyperfine (macOS) / make nix-switch (Linux) / "
@@ -271,6 +274,41 @@ def cmd_bench(_args: list[str]) -> None:
                                   "pwsh -NoLogo -Command exit"])
         sys.exit(result.returncode)
     os.execvp("hyperfine", ["hyperfine", "--warmup", "5", "--shell=none", "zsh -i -c exit"])
+
+
+# zsh-bench (romkatv): measures what you actually feel, in a real pty, which
+# `zsh -i -c exit` can't: time to first prompt, lag after every Enter, typing
+# lag. Thresholds are zsh-bench's own "indistinguishable from zero" values.
+_ZSH_BENCH_LIMITS = [
+    ("first_prompt_lag_ms",  50,  "New tab → prompt visible"),
+    ("first_command_lag_ms", 150, "New tab → first command can run"),
+    ("command_lag_ms",       10,  "Delay after every Enter"),
+    ("input_lag_ms",         20,  "Typing latency"),
+]
+
+
+def _bench_real(args: list[str]) -> None:
+    if platform.system() == "Windows":
+        print("Error: zsh-bench needs zsh (macOS/Linux). On Windows use: dutils bench",
+              file=sys.stderr)
+        sys.exit(1)
+    repo = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "dotfiles" / "zsh-bench"
+    if not (repo / "zsh-bench").exists():
+        repo.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["git", "clone", "-q", "--depth=1",
+                        "https://github.com/romkatv/zsh-bench", str(repo)], check=True)
+    print("Running zsh-bench (real interactive shell in a pty, ~1 min)...")
+    out = subprocess.run([str(repo / "zsh-bench"), "--iters", "16", *args],
+                         capture_output=True, text=True).stdout
+    values = dict(line.split("=", 1) for line in out.splitlines() if "=" in line)
+    print(f"\n  {'metric':<22} {'yours':>9} {'instant ≤':>10}")
+    for key, limit, desc in _ZSH_BENCH_LIMITS:
+        if key in values:
+            ms = float(values[key])
+            mark = "✓" if ms <= limit else "✗"
+            print(f"  {key.removesuffix('_ms'):<22} {ms:>7.1f}ms {limit:>8}ms  {mark} {desc}")
+    if not values:
+        print(out)
 
 
 def cmd_profile(_args: list[str]) -> None:
@@ -322,7 +360,7 @@ COMMANDS: dict[str, tuple] = {
     "packages":       (cmd_packages,       "Compare installed packages against packages.toml",             ALL_PLATFORMS),
     "manifest":       (cmd_manifest,       "Render packages.toml into the per-manager lists",               ALL_PLATFORMS),
     "vulns":          (cmd_vulns,          "Scan installed Homebrew packages for CVEs (brew 7+)",           ("macos",)),
-    "bench":          (cmd_bench,          "Benchmark shell startup time (needs hyperfine)",                ALL_PLATFORMS),
+    "bench":          (cmd_bench,          "Shell startup time (hyperfine); --real: per-prompt lag (zsh-bench)", ALL_PLATFORMS),
     "profile":        (cmd_profile,        "Profile shell startup, per-function/per-file timing",           ALL_PLATFORMS),
     "git-setup":      (cmd_git_setup,      "Git identities + SSH keys: personal & any number of work profiles", ALL_PLATFORMS),
     "ssh-setup":      (cmd_git_setup,      "Alias of git-setup (back-compat)",                              ALL_PLATFORMS),
