@@ -71,11 +71,26 @@ else
   export VISUAL="vim"
 fi
 
-# Bat: https://github.com/sharkdp/bat
-# Follow the terminal's ANSI palette (Tokyo Night) so bat matches whatever the
-# terminal is showing in BOTH light and dark, with no vendored theme to keep in
-# sync. `dutils theme` switches the terminal; bat follows automatically.
-export BAT_THEME="ansi"
+# Theme: Gruvbox everywhere. `dutils theme` stores the TERMINAL mode in
+# ~/.config/dotfiles/theme — dark (default) | light | auto (follow the OS; costs
+# one `defaults` call at startup, only in auto mode). Resolved once here into
+# $DOTFILES_THEME=dark|light, which drives bat + delta ($BAT_THEME), starship's
+# palette (.zshrc 6f) and Neovim (current-theme.lua). See docs/THEME.md.
+() {
+    local f="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/theme" mode=dark
+    [[ -r $f ]] && mode=${$(<$f)//[[:space:]]/}
+    if [[ $mode == auto ]]; then
+        if [[ $OSTYPE == darwin* ]]; then
+            [[ $(defaults read -g AppleInterfaceStyle 2>/dev/null) == Dark ]] && mode=dark || mode=light
+        elif (( $+commands[gsettings] )); then
+            [[ $(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null) == *dark* ]] \
+                && mode=dark || mode=light
+        fi
+    fi
+    [[ $mode == light ]] || mode=dark
+    export DOTFILES_THEME=$mode
+    export BAT_THEME="gruvbox-$mode"
+}
 
 # fzf: styled with ANSI colour *indices* (0-15, and -1 = terminal default) rather
 # than hex, so the picker likewise follows the terminal palette in light or dark.
@@ -151,8 +166,7 @@ if os::is_mac; then
     "/opt/homebrew/bin"
     "/opt/homebrew/opt/llvm/bin"
     "/Library/Frameworks/Python.framework/Versions/Current/bin"
-    "${HOME}/Library/Python/3.13/bin"
-    "/opt/anaconda3/bin"
+    "${HOME}/Library/Python/3.14/bin"
     "${HOME}/.local/bin"
   )
 elif os::is_linux; then
@@ -168,12 +182,18 @@ elif os::is_linux; then
 fi
 
 # Combine the common and OS-specific paths and ensure uniqueness in the final path
+# mise shims first: `python`/`python3` is the mise-managed 3.14 (the standard,
+# see mise/.config/mise/config.toml) even before mise's lazy activation runs and
+# in non-interactive shells. Anaconda goes LAST so its tools stay reachable but
+# its python never shadows the standard one (use `conda activate` for that).
 typeset -U path
 path=(
+  "${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims"
   "${OS_PATHS[@]}"
   "${COMMON_PATHS[@]}"
   $path
 )
+[[ -d /opt/anaconda3/bin ]] && path=(${path:#/opt/anaconda3/bin} /opt/anaconda3/bin)
 
 # ------------------------------------------------------------------------------
 # Export Environment Variables

@@ -19,6 +19,7 @@ if [[ ! -f "$CORE" ]]; then
     echo "Error: core library not found at $CORE" >&2
     exit 1
 fi
+# shellcheck source=scripts/lib/core.sh
 source "$CORE"
 
 trap 'print_error "$LINENO" "$BASH_COMMAND" "$?"' ERR
@@ -56,36 +57,45 @@ _confirm() {
     [[ "$reply" == "y" ]]
 }
 
+# Python >= 3.14 is the repo standard (dutils, health checks). packages.toml
+# already installs it (brew python@3.14 / nix python314 / scoop python); this is
+# the safety net. At runtime scripts/lib/pyreq.py picks a >= 3.14 interpreter
+# even when plain `python3` is older (e.g. macOS's /usr/bin/python3).
+_python_ok() { "$1" -c 'import sys; sys.exit(sys.version_info < (3, 14))' 2>/dev/null; }
+
+_find_python() {
+    local py
+    for py in python3.14 python3.15 python3.16 python3; do
+        command_exists "$py" && _python_ok "$py" && { command -v "$py"; return 0; }
+    done
+    return 1
+}
+
 _ensure_python3() {
-    if command_exists python3; then
-        log::success "Python 3 available: $(python3 --version 2>&1)"
+    local py
+    if py=$(_find_python); then
+        log::success "Python available: $("$py" --version 2>&1) ($py)"
         return 0
     fi
 
-    log::info "Python 3 not found — installing..."
-
-    if os::is_mac; then
-        run brew install python3
-    elif os::is_linux; then
-        if command_exists apt-get; then
-            run sudo apt-get update -qq && run sudo apt-get install -y python3
-        elif command_exists dnf; then
-            run sudo dnf install -y python3
-        elif command_exists pacman; then
-            run sudo pacman -S --noconfirm python
-        elif command_exists brew; then
-            run brew install python3
-        else
-            log::fatal "Cannot install Python 3 automatically. Install it manually and re-run."
+    log::info "Python >= 3.14 not found — installing..."
+    if os::is_mac && command_exists brew; then
+        run brew install python@3.14
+    else
+        # uv ships prebuilt CPython for every distro/arch, so this works even
+        # where the distro's own python3 is older than 3.14.
+        if ! command_exists uv; then
+            run sh -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
+            export PATH="$HOME/.local/bin:$PATH"
         fi
+        run uv python install 3.14
+        export PATH="$HOME/.local/bin:$PATH"
     fi
 
     [[ "$DRY_RUN" == "1" ]] && return 0
 
-    command_exists python3 \
-        || log::fatal "Python 3 installation failed. Install it manually and re-run."
-
-    log::success "Python 3 installed: $(python3 --version 2>&1)"
+    py=$(_find_python) || log::fatal "Python >= 3.14 installation failed. Install it manually and re-run."
+    log::success "Python installed: $("$py" --version 2>&1) ($py)"
 }
 
 _stow_packages() {
@@ -181,10 +191,10 @@ EOF
     fi
     log::success "[STEP 4/8] Packages installed"
 
-    # Python 3 (required by dutils scripts)
-    log::info "[STEP 5/8] Ensuring Python 3..."
+    # Python >= 3.14 (required by dutils scripts)
+    log::info "[STEP 5/8] Ensuring Python >= 3.14..."
     _ensure_python3
-    log::success "[STEP 5/8] Python 3 OK"
+    log::success "[STEP 5/8] Python OK"
 
     # Default shell
     log::info "[STEP 6/8] Setting Zsh as default shell..."

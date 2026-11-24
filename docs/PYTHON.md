@@ -1,5 +1,13 @@
 # Python: mise + uv
 
+> **Python 3.14 is the standard.** `mise/.config/mise/config.toml` (stowed on
+> every platform) makes `python`/`python3` 3.14 in every shell, and
+> `UV_PYTHON_PREFERENCE=system` makes uv use it for new venvs instead of an
+> interpreter it downloaded itself. The repo's own scripts (`dutils`, health
+> checks) require >= 3.14 and re-launch themselves on a suitable interpreter
+> when started with an older one (`scripts/lib/pyreq.py`). Projects can still
+> pin any version with their own `mise.toml` / `.python-version`.
+
 Two tools, two jobs, no overlap:
 
 - **[mise](https://mise.jdx.dev/)** decides *which Python (and Node, and any other
@@ -14,7 +22,7 @@ Neither tool knows about the other; they just compose because uv defaults to
 to the right thing.
 
 ```text
-mise  → picks the interpreter version (python 3.12, node 20, ...)
+mise  → picks the interpreter version (python 3.14 by default, node, ...)
  uv   → creates the venv + installs/locks packages, using that interpreter
 ```
 

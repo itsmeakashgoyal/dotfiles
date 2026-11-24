@@ -41,6 +41,7 @@ brew "hyperfine"           # Command-line benchmarking tool (Rust)
 brew "jq"                  # JSON processor
 brew "lazygit"             # Terminal UI for git
 brew "mise"                # Runtime version manager (replaces pyenv)
+brew "python@3.14"         # Python >= 3.14, the repo standard (dutils; see scripts/lib/pyreq.py)
 brew "uv"                  # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
 brew "starship"            # Cross-shell prompt (default, replaced Powerlevel10k)
 brew "ripgrep"             # Better grep (Rust)

@@ -13,7 +13,7 @@
 alias python="python3" # Use Python 3 by default
 alias pip="pip3"       # Use pip3 by default
 
-alias py3="/opt/anaconda3/bin/python3"
+alias py3="python3"   # the standard 3.14 (mise); conda: `conda activate`
 
 # Python environment variables
 export PYTHONIOENCODING='UTF-8'  # Ensure UTF-8 encoding
@@ -54,6 +54,11 @@ fi
 # pyenv's removal made it worse (an unset, empty path). ".venv" matches the
 # convention most current Python tooling (uv, poetry, VS Code) defaults to.
 VENV_DEFAULT_DIR=".venv"
+
+# uv: prefer the Python on PATH (mise's 3.14, the standard) over interpreters
+# uv downloaded itself, so `uv venv` without --python gets 3.14. Projects that
+# pin a version (.python-version / requires-python) still get theirs.
+export UV_PYTHON_PREFERENCE=system
 
 # ------------------------------------------------------------------------------
 # Virtual Environment Management (uv-backed)

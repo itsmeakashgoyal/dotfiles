@@ -312,10 +312,11 @@ rewritten — everything else in those files stays hand-written.
 | **[Nix (Linux)](docs/NIX.md)** | Nix + Home Manager package management on Linux (replaces linuxbrew) |
 | **[Python](docs/PYTHON.md)** | mise (interpreter versions) + uv (venvs, packages, lockfiles) |
 | **[Windows](docs/WINDOWS.md)** | Config toggles (native prompt, mise activation), troubleshooting (OneDrive profile path, slow startup, large-repo git perf) |
-| **[SSH & Git identity](docs/SSH.md)** | Personal + work SSH keys (`dutils ssh-setup`), per-repo commit identity, cross-platform |
+| **[Git identities & SSH](docs/SSH.md)** | Personal + any number of work profiles (`dutils git-setup`): the right email, SSH key and signing per repo by folder / GitHub org / enterprise host, cross-platform |
 | **[Secrets](docs/SECRETS.md)** | Encrypted secrets in the repo via `age` + your SSH key (`dutils secrets`) |
-| **[Theming](docs/THEME.md)** | Coordinated Tokyo Night across ghostty/bat/fzf/delta/nvim with a light/dark switch (`dutils theme`) |
-| **[Sublime Text](docs/SUBLIME.md)** | Cross-platform Sublime IDE — LSP (C/C++/Python), Terminus, builds, Tokyo Night; symlinked settings |
+| **[Theming](docs/THEME.md)** | Gruvbox Dark everywhere by default (iTerm2, terminal tools, Sublime); terminal switchable with `dutils theme dark\|light\|auto` |
+| **[iTerm2](docs/ITERM.md)** | Dynamic Profile (Gruvbox, natural text editing, ⌥Space drop-down hotkey window), no synced plist |
+| **[Sublime Text](docs/SUBLIME.md)** | Cross-platform Sublime IDE — LSP (C/C++/Python), Terminus, builds, Gruvbox light/dark following the OS; symlinked settings |
 | **[OSXPhotos](docs/OSXPHOTOS.md)** | Backing up the macOS Photos library (originals, edits, Live Photos) by month |
 | **[organize-media](scripts/dutils/README.md)** | Sorting an *already-exported* flat photo/video backup folder (no Photos library involved) into year/month folders (`dutils organize-media`) |
 | **[Customization](docs/CUSTOMIZATION.md)** | Personalizing Git, Zsh, Neovim, Tmux configs |

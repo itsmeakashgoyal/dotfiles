@@ -14,6 +14,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Python >= 3.14 everywhere: re-exec under a suitable interpreter if needed.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import pyreq  # noqa: E402
+
+pyreq.ensure()
+
 VERSION    = "2.0.0"
 # Resolve the symlink itself first, then take its parent - not the other way
 # around. `dutils` is meant to be symlinked from ~/.local/bin (see README),
@@ -121,8 +127,8 @@ def cmd_new(args: list[str]) -> None:
     _exec_python("new.py", args)
 
 
-def cmd_ssh_setup(args: list[str]) -> None:
-    _exec_python("ssh_setup.py", args)
+def cmd_git_setup(args: list[str]) -> None:
+    _exec_python("git_setup.py", args)
 
 
 def cmd_secrets(args: list[str]) -> None:
@@ -318,10 +324,10 @@ COMMANDS: dict[str, tuple] = {
     "vulns":          (cmd_vulns,          "Scan installed Homebrew packages for CVEs (brew 7+)",           ("macos",)),
     "bench":          (cmd_bench,          "Benchmark shell startup time (needs hyperfine)",                ALL_PLATFORMS),
     "profile":        (cmd_profile,        "Profile shell startup, per-function/per-file timing",           ALL_PLATFORMS),
-    "ssh-setup":      (cmd_ssh_setup,      "Set up SSH keys + config for personal & work GitHub",           ALL_PLATFORMS),
-    "ssh-keygen":     (cmd_ssh_setup,      "Alias of ssh-setup (back-compat)",                              ALL_PLATFORMS),
+    "git-setup":      (cmd_git_setup,      "Git identities + SSH keys: personal & any number of work profiles", ALL_PLATFORMS),
+    "ssh-setup":      (cmd_git_setup,      "Alias of git-setup (back-compat)",                              ALL_PLATFORMS),
     "secrets":        (cmd_secrets,        "Manage encrypted secrets (age + your SSH key)",                 ALL_PLATFORMS),
-    "theme":          (cmd_theme,          "Switch the coordinated Tokyo Night theme (light/dark)",         ALL_PLATFORMS),
+    "theme":          (cmd_theme,          "Gruvbox theme (dark default): terminal dark/light/auto",        ALL_PLATFORMS),
     "zcompile":       (cmd_zcompile,       "Precompile zsh config to .zwc for faster startup",              ("macos", "linux")),
     "detect-os":      (cmd_detect_os,      "Detect current OS and architecture",                            ALL_PLATFORMS),
     "diff":           (cmd_diff,           "Interactive file diff with tv and live watching (needs bash)",  ("macos", "linux")),

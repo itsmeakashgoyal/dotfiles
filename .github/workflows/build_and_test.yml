@@ -54,6 +54,12 @@ jobs:
         with:
           fetch-depth: 1
 
+      # dutils and every repo Python script require Python >= 3.14.
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
       - name: Cache shellcheck
         uses: actions/cache@v5
         with:
@@ -166,6 +172,12 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+
+      # dutils and every repo Python script require Python >= 3.14.
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
 
       - name: Display system info
         run: |
@@ -448,6 +460,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      # dutils and every repo Python script require Python >= 3.14.
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
       - name: Display system info
         run: |
           echo "🖥️  System Information"
@@ -729,6 +747,12 @@ jobs:
         with:
           fetch-depth: 1
 
+      # dutils and every repo Python script require Python >= 3.14.
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
       - name: Remove git to simulate a fresh machine
         run: |
           echo "🧹 Removing git to simulate a brand-new machine..."
@@ -796,6 +820,12 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+
+      # dutils and every repo Python script require Python >= 3.14.
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
 
       - name: Display system info
         shell: pwsh

@@ -19,6 +19,10 @@ import os
 import subprocess
 import sys
 
+import pyreq
+
+pyreq.ensure()  # Python >= 3.14 for every script that imports this
+
 _USE_COLOR = sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
 
 

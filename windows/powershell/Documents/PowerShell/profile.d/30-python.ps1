@@ -11,6 +11,10 @@
 
 $VENV_DEFAULT_DIR = '.venv'
 
+# Prefer the Python on PATH (mise's 3.14, the standard) over uv-downloaded
+# interpreters; projects pinning a version still get theirs. Same as zsh.
+$env:UV_PYTHON_PREFERENCE = 'system'
+
 # uv lays venvs out per-OS: Scripts\Activate.ps1 on native Windows, but
 # bin/activate.ps1 (lowercase) when uv itself runs on macOS/Linux - which
 # happens if you're using PowerShell 7+ there instead of zsh. Check both so

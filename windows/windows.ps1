@@ -71,6 +71,7 @@ $SYMLINK_MAP = @{
     "starship\.config\starship"                                                = "$env:USERPROFILE\.config\starship"
     "yazi\.config\yazi"                                                        = "$env:USERPROFILE\.config\yazi"
     "bin\.local\bin\dutils.ps1"                                                = "$env:USERPROFILE\.local\bin\dutils.ps1"
+    "mise\.config\mise"                                                        = "$env:USERPROFILE\.config\mise"
     "readline\.inputrc"                                                        = "$env:USERPROFILE\.inputrc"
     "windows\powershell\Documents\PowerShell\Microsoft.PowerShell_profile.ps1" = "$([Environment]::GetFolderPath("MyDocuments"))\PowerShell\Microsoft.PowerShell_profile.ps1"
     # END GENERATED: symlinks
@@ -81,6 +82,7 @@ $SYMLINK_MAP = @{
     "settings\sublime\Preferences.sublime-settings"      = "$env:APPDATA\Sublime Text\Packages\User\Preferences.sublime-settings"
     "settings\sublime\LSP.sublime-settings"              = "$env:APPDATA\Sublime Text\Packages\User\LSP.sublime-settings"
     "settings\sublime\Gruvbox Dark.sublime-color-scheme"  = "$env:APPDATA\Sublime Text\Packages\User\Gruvbox Dark.sublime-color-scheme"
+    "settings\sublime\Gruvbox Light.sublime-color-scheme" = "$env:APPDATA\Sublime Text\Packages\User\Gruvbox Light.sublime-color-scheme"
     "settings\sublime\Adaptive.sublime-theme"            = "$env:APPDATA\Sublime Text\Packages\User\Adaptive.sublime-theme"
     "settings\sublime\Default.sublime-keymap"            = "$env:APPDATA\Sublime Text\Packages\User\Default.sublime-keymap"
     "settings\sublime\C++ Single File.sublime-build"     = "$env:APPDATA\Sublime Text\Packages\User\C++ Single File.sublime-build"
@@ -103,6 +105,7 @@ $SCOOP_PACKAGES = @(
     "hyperfine"   # Command-line benchmarking tool (Rust)
     "lazygit"     # Terminal UI for git
     "mise"        # Runtime version manager (replaces pyenv)
+    "python"      # Python >= 3.14, the repo standard (dutils; see scripts/lib/pyreq.py)
     "uv"          # Fast Python venv/package manager (Rust) - works with mise-pinned interpreters
     "starship"    # Cross-shell prompt (default, replaced Powerlevel10k)
     "ripgrep"     # Better grep (Rust)
@@ -133,7 +136,6 @@ $SCOOP_PACKAGES = @(
     "wget"        # HTTP downloader
     "make"        # Build tool
     "nodejs"      # Node.js runtime (Neovim providers, LSP servers)
-    "python"      # Python 3 (required by the dutils CLI)
     "tree-sitter" # Neovim treesitter CLI dependency
     # END GENERATED: scoop
 )

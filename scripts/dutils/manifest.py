@@ -24,8 +24,6 @@
 #   dutils manifest list         # show what's installed where
 #   dutils manifest stow-packages  # space-separated Stow list (used by Makefile)
 
-from __future__ import annotations
-
 import argparse
 import difflib
 import re
@@ -33,6 +31,10 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import pyreq  # noqa: E402
+
+pyreq.ensure()
+
 import manifest as mf  # noqa: E402
 
 REPO = mf.REPO_ROOT
@@ -228,17 +230,6 @@ def cmd_generate(m: mf.Manifest, _args: argparse.Namespace) -> int:
 
 
 def cmd_check(m: mf.Manifest, _args: argparse.Namespace) -> int:
-    # The fallback TOML parser only runs on Python < 3.11 (macOS ships 3.9), so
-    # verify it here — where tomllib exists — rather than discovering a
-    # divergence on the machine that can't detect it.
-    if sys.version_info >= (3, 11) and not mf.selftest():
-        print(
-            "✗ The fallback TOML parser in scripts/lib/manifest.py no longer "
-            "agrees with tomllib on packages.toml",
-            file=sys.stderr,
-        )
-        return 1
-
     stale = []
     for path, new in render_all(m).items():
         old = path.read_text(encoding="utf-8")

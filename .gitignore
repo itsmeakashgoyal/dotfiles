@@ -18,6 +18,7 @@
 
 # Compiled Python files
 *.pyc
+__pycache__/
 
 # Folder view configuration files
 *.swp
@@ -41,18 +42,25 @@ result-*
 nix/result
 nix/result-*
 
-# Private Information
+# Private Information — machine-local work exports/secrets (never committed)
 private/*
 zsh/.config/zsh/conf.d/99-private.zsh
+windows/powershell/Documents/PowerShell/profile.d/99-private.ps1
 .claude/
 .codex/
 .scout/
 
-# Machine-local git identity override (per-machine work email; see git config [include])
+# Legacy machine-local git identity files. Identities now live OUTSIDE the repo
+# in ~/.config/dotfiles/git/ (see `dutils git-setup`); `dutils git-setup
+# migrate` imports these and they can then be deleted.
 git/.config/git/config-local
+git/.config/git/config-personal
 
-# Per-machine ghostty theme pin, written by `dutils theme`
-ghostty/.config/ghostty/theme.local
+# iTerm2 is configured through a Dynamic Profile (settings/iterm/profile.json,
+# rendered by `dutils theme`). The full preferences plist is no longer synced:
+# it changes on every launch and hardcodes the username.
+settings/iterm/*.plist
+settings/iterm/*.itermexport
 
 # Compiled zsh bytecode (dutils zcompile) — regenerated per machine
 **/*.zwc

@@ -18,9 +18,12 @@
 #   check.py --help       # show this help
 
 import sys
+from pathlib import Path
 
-if sys.version_info < (3, 7):
-    sys.exit("check.py requires Python 3.7+")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import pyreq  # noqa: E402
+
+pyreq.ensure()
 
 import os
 import platform
@@ -394,9 +397,11 @@ class SystemChecker:
     @staticmethod
     def _git_config(key: str) -> str:
         try:
+            # Resolved from $HOME (not --global, which skips the XDG config and
+            # its includes): that's the machine-default identity from git-setup.
             result = subprocess.run(
-                ["git", "config", "--global", key],
-                capture_output=True, text=True, timeout=5,
+                ["git", "config", key],
+                capture_output=True, text=True, timeout=5, cwd=str(Path.home()),
             )
             return result.stdout.strip()
         except Exception:
@@ -440,6 +445,15 @@ class QuickHealthCheck(SystemChecker):
         self.check_cmd("Git", "git", critical=True)
         manager, label = package_manager()
         self.check_cmd(label, manager, critical=True)
+        # Python >= 3.14 is the repo standard. This process already runs on one
+        # (pyreq re-execs otherwise); also flag an older `python3` first on PATH.
+        self.check_condition("Python >= 3.14", True,
+                             detail=f"{platform.python_version()} ({sys.executable})")
+        plain = shutil.which("python3") or shutil.which("python")
+        if plain:
+            ok = pyreq._version_ok(plain)
+            self.check_condition("python3 on PATH >= 3.14", ok,
+                                 detail=plain if ok else f"{plain} is older — fix PATH or: mise use -g python@3.14")
 
     def _check_shell(self) -> None:
         log.section("SHELL")
@@ -466,8 +480,10 @@ class QuickHealthCheck(SystemChecker):
             or (home / ".gitconfig").is_file()
         )
         self.check_condition("Git config", git_config_exists)
-        self.check_condition("Git user name", bool(self._git_config("user.name")))
-        self.check_condition("Git user email", bool(self._git_config("user.email")))
+        self.check_condition("Git user name", bool(self._git_config("user.name")),
+                             detail="run: dutils git-setup")
+        self.check_condition("Git user email", bool(self._git_config("user.email")),
+                             detail="run: dutils git-setup")
 
     def _check_essential_tools(self) -> None:
         log.section("ESSENTIAL TOOLS")
@@ -544,7 +560,7 @@ class FullVerification(SystemChecker):
         git_name = self._git_config("user.name")
         git_email = self._git_config("user.email")
         for label, val in (("Git user name", git_name), ("Git user email", git_email)):
-            r = CheckResult(label, "pass", val) if val else CheckResult(label, "warn", "not set")
+            r = CheckResult(label, "pass", val) if val else CheckResult(label, "warn", "not set — run: dutils git-setup")
             self.results.append(r)
             renderer.render_check(r)
 

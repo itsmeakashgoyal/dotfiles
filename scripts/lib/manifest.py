@@ -12,14 +12,11 @@
 #   * scripts/dutils/manifest.py  — renders the generated regions
 #   * scripts/verify/check.py     — drives the health/verification checks
 #
-# Because check.py runs on freshly-provisioned machines, this module must work
-# on whatever Python is already there. `tomllib` only landed in 3.11 and macOS
-# still ships 3.9 as /usr/bin/python3, so there's a small fallback parser that
-# understands exactly the subset of TOML packages.toml uses.
-
-from __future__ import annotations
+# Python >= 3.14 is the repo standard (scripts/lib/pyreq.py), so this is
+# plain tomllib.
 
 import re
+import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -33,104 +30,9 @@ PLATFORMS = ("macos", "linux", "windows")
 MANAGER_PLATFORM = {"brew": "macos", "nix": "linux", "scoop": "windows"}
 
 
-# ==============================================================================
-# Minimal TOML reader (fallback for Python < 3.11)
-# ==============================================================================
-
-
-def _parse_scalar(raw: str) -> Any:
-    raw = raw.strip()
-    if raw.startswith("[") and raw.endswith("]"):
-        inner = raw[1:-1].strip()
-        if not inner:
-            return []
-        return [
-            _parse_scalar(part)
-            for part in re.findall(r"\"[^\"]*\"|'[^']*'|[^,\s]+", inner)
-        ]
-    # Literal strings (single quotes) must come first in spirit: they take the
-    # contents verbatim, which is why packages.toml uses them for Windows paths
-    # like '$env:LOCALAPPDATA\nvim' — in a basic (double-quoted) string TOML
-    # would turn that \n into a newline.
-    if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in ("'", '"'):
-        return raw[1:-1]
-    if raw == "true":
-        return True
-    if raw == "false":
-        return False
-    try:
-        return int(raw)
-    except ValueError:
-        return raw
-
-
-def _strip_comment(line: str) -> str:
-    """Drop a trailing # comment, honouring both quoted-string forms."""
-    out: list[str] = []
-    quote = ""
-    for ch in line:
-        if quote:
-            if ch == quote:
-                quote = ""
-        elif ch in ("'", '"'):
-            quote = ch
-        elif ch == "#":
-            break
-        out.append(ch)
-    return "".join(out)
-
-
-def _simple_toml_loads(text: str) -> dict[str, Any]:
-    """Parse the TOML subset packages.toml uses: tables, arrays of tables,
-    strings, booleans, integers and flat string arrays."""
-    doc: dict[str, Any] = {}
-    current: dict[str, Any] | None = None
-
-    for raw_line in text.splitlines():
-        line = _strip_comment(raw_line).strip()
-        if not line:
-            continue
-
-        if line.startswith("[["):
-            name = line[2:].split("]]")[0].strip()
-            current = {}
-            doc.setdefault(name, []).append(current)
-            continue
-
-        if line.startswith("["):
-            name = line[1:].split("]")[0].strip()
-            current = doc.setdefault(name, {})
-            continue
-
-        if "=" in line and current is not None:
-            key, _, value = line.partition("=")
-            current[key.strip()] = _parse_scalar(value)
-
-    return doc
-
-
 def _load_toml(path: Path) -> dict[str, Any]:
-    try:
-        import tomllib
-
-        with path.open("rb") as fh:
-            return tomllib.load(fh)
-    except ImportError:
-        return _simple_toml_loads(path.read_text(encoding="utf-8"))
-
-
-def selftest(path: Path | None = None) -> bool:
-    """Assert the fallback parser agrees with tomllib on the real manifest.
-
-    Only tomllib-capable interpreters can run this, which is exactly where it's
-    useful: CI catches a fallback-parser regression before a Python 3.9 machine
-    (macOS's /usr/bin/python3) silently loads the manifest wrong.
-    """
-    import tomllib
-
-    target = path or MANIFEST_PATH
-    text = target.read_text(encoding="utf-8")
-    return tomllib.loads(text) == _simple_toml_loads(text)
+    with path.open("rb") as fh:
+        return tomllib.load(fh)
 
 
 # ==============================================================================

@@ -172,6 +172,17 @@ nix      = "mise"
 scoop    = "mise"
 
 [[package]]
+name     = "python"
+desc     = "Python >= 3.14, the repo standard (dutils; see scripts/lib/pyreq.py)"
+category = "Essential CLI Tools"
+brew     = "python@3.14"
+nix      = "python314"
+scoop    = "python"
+verify   = "python3"
+critical = true
+check    = "none"  # PYTHON check in check.py verifies the version, not just presence
+
+[[package]]
 name     = "uv"
 desc     = "Fast Python venv/package manager (Rust) - works with mise-pinned interpreters"
 category = "Essential CLI Tools"
@@ -498,14 +509,6 @@ verify   = "node"
 check    = "none"
 
 [[package]]
-name     = "python"
-desc     = "Python 3 (required by the dutils CLI)"
-category = "Windows Only"
-scoop    = "python"
-verify   = "python"
-check    = "none"
-
-[[package]]
 name     = "tree-sitter"
 desc     = "Neovim treesitter CLI dependency"
 category = "Windows Only"
@@ -727,16 +730,15 @@ desc      = "dutils CLI wrapper for native PowerShell (bare `dutils` command)"
 platforms = ["windows"]
 
 [[stow]]
+package = "mise"
+target  = ".config/mise"
+desc    = "mise global runtimes (Python 3.14, the standard)"
+
+[[stow]]
 package = "readline"
 target  = ".inputrc"
 source  = "readline/.inputrc"
 desc    = "GNU Readline config (bash/python/psql)"
-
-[[stow]]
-package   = "ghostty"
-target    = ".config/ghostty"
-desc      = "Ghostty terminal config"
-platforms = ["macos", "linux"]
 
 # Windows has no Stow; windows.ps1 links these with its own symlink function.
 #

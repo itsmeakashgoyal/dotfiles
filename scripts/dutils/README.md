@@ -30,7 +30,7 @@ Uses television (`tv`) when it's installed and falls back to a plain numbered
 prompt otherwise, so it works on a fresh machine. The command registry inside
 [`dutils`](dutils) is the only source of truth — a new subcommand shows up in
 the menu automatically. Destructive or long-running commands (`cleanup`,
-`update`, `sync`, `init`, `ssh-setup`, `secrets`, `zcompile`) always confirm
+`update`, `sync`, `init`, `git-setup`, `secrets`, `zcompile`) always confirm
 before running, even with `--no-confirm`.
 
 **Not available on Windows**: `tv`'s interactive picker corrupts the terminal
@@ -57,13 +57,13 @@ rewriting only the text between `BEGIN GENERATED` / `END GENERATED` markers.
 ### `init` — first-run setup wizard (new machine)
 
 ```bash
-dutils init        # interactive: git identity, SSH keys, secrets, theme, overrides
+dutils init        # interactive: git identities + SSH keys, secrets, theme, overrides
 dutils init -y     # accept the default action at each step (still asks for values)
 ```
 
-Ties the other subcommands together for a fresh machine — sets the work git
-identity (if any), runs `ssh-setup`, decrypts secrets, picks a theme, and seeds
-`99-private.zsh`. Every step is optional and idempotent (safe to re-run).
+Ties the other subcommands together for a fresh machine — runs `git-setup`
+(identities + SSH keys), decrypts secrets, picks the terminal theme, and seeds an
+owner-only `99-private.zsh`. Every step is optional and idempotent (safe to re-run).
 
 ### `cleanup` — remove dotfiles/Homebrew/Neovim/tmux configuration
 
@@ -84,19 +84,19 @@ component's own scope; `homebrew` no-ops (there's no Homebrew on Windows). The f
 teardown (Scoop packages, terminal theme, PowerShell modules too) is a separate, explicit
 `windows.ps1 -Uninstall` call — see [docs/WINDOWS.md](../../docs/WINDOWS.md).
 
-### `ssh-setup` — SSH keys + config for personal & work GitHub
+### `git-setup` — git identities + SSH keys (personal & any number of work profiles)
 
 ```bash
-dutils ssh-setup                                  # interactive: personal / work / both
-dutils ssh-setup --profile personal -e you@gmail.com
-dutils ssh-setup --profile work -e you@company.com --name "Your Name"
+dutils git-setup                       # wizard (first run) / menu to add, edit, remove
+dutils git-setup status [PATH]         # profiles + which identity PATH gets
+dutils git-setup add acme -y --email you@acme.com --org acme --dir ~/work --sign
+dutils git-setup test                  # ssh -T every profile
+dutils git-setup migrate               # import the old config-local/github-private setup
 ```
 
-Cross-platform (macOS/Linux/Windows). Per profile it generates an Ed25519 key (never clobbering an
-existing one), writes an idempotent `Host` alias into `~/.ssh/config`, adds the key to `ssh-agent`,
-and copies the public key to your clipboard. The `Host` alias is what makes the git commit identity
-follow the remote automatically — see [docs/SSH.md](../../docs/SSH.md). `ssh-keygen` is a
-back-compat alias of `ssh-setup`.
+Cross-platform. Profiles live in `~/.config/dotfiles/git/` (outside the repo); each repo picks
+its email, SSH key and signing by folder, GitHub org or enterprise host — clone with normal
+URLs. See [docs/SSH.md](../../docs/SSH.md). `ssh-setup` is a back-compat alias.
 
 ### `secrets` — encrypted secrets via age + your SSH key
 
@@ -111,17 +111,18 @@ dutils secrets list
 Secrets are stored encrypted under `secrets/` mirroring `$HOME`; plaintext never
 enters the repo. Full guide: [docs/SECRETS.md](../../docs/SECRETS.md).
 
-### `theme` — switch the coordinated Tokyo Night theme
+### `theme` — Gruvbox everywhere
 
 ```bash
 dutils theme            # status
-dutils theme dark       # pin dark / light
-dutils theme toggle     # flip dark <-> light
-dutils theme auto       # follow the macOS appearance (default)
+dutils theme dark       # terminal: Gruvbox Dark (default)
+dutils theme light      # terminal: Gruvbox Light
+dutils theme auto       # terminal follows the OS too
+dutils theme apply      # re-render the iTerm2 Dynamic Profile from the saved mode
 ```
 
-Switches ghostty + Neovim; bat/fzf/delta follow the terminal's ANSI palette so
-they match automatically. Full guide: [docs/THEME.md](../../docs/THEME.md).
+Gruvbox Dark everywhere by default (Sublime too); this switches the terminal (iTerm2
+profile, bat/delta, starship, Neovim). Full guide: [docs/THEME.md](../../docs/THEME.md).
 
 ### `zcompile` — precompile zsh config for faster startup
 
@@ -224,9 +225,9 @@ scripts/dutils/
 ├── dutils                      # CLI entry point / dispatcher
 ├── init.py                     # init subcommand (first-run new-machine wizard)
 ├── cleanup.py                  # cleanup subcommand
-├── ssh_setup.py                # ssh-setup subcommand (personal & work SSH keys/config, see docs/SSH.md)
+├── git_setup.py                # git-setup subcommand (identities + SSH keys, see docs/SSH.md)
 ├── secrets.py                  # secrets subcommand (age-encrypted secrets, see docs/SECRETS.md)
-├── theme.py                    # theme subcommand (coordinated Tokyo Night switch, see docs/THEME.md)
+├── theme.py                    # theme subcommand (Gruvbox + iTerm2 Dynamic Profile, see docs/THEME.md)
 ├── zcompile.py                 # zcompile subcommand (precompile zsh config to .zwc)
 ├── vulns.py                    # vulns subcommand (brew vulns CVE scan, macOS)
 ├── diff_files_interactive.sh   # diff subcommand
@@ -258,7 +259,7 @@ Not defined anywhere in this repo — add to your own `.zshrc`/`99-private.zsh` 
 
 ```zsh
 alias dcl='dutils cleanup'
-alias dssh='dutils ssh-setup'
+alias dgit='dutils git-setup'
 alias dos='dutils detect-os'
 alias ddiff='dutils diff'
 alias dlf='dutils list-functions'

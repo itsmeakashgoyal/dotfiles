@@ -107,6 +107,18 @@ if [[ "$DOTFILES_PROMPT" == "p10k" ]]; then
     zinit light romkatv/powerlevel10k
 else
     export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+    # Light terminal (`dutils theme light|auto`): the same config with the
+    # gruvbox_light palette, regenerated only when starship.toml changes.
+    if [[ "$DOTFILES_THEME" == light ]]; then
+        _starship_light="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/starship-light.toml"
+        if [[ ! -r $_starship_light || $STARSHIP_CONFIG -nt $_starship_light ]]; then
+            mkdir -p "${_starship_light:h}"
+            print -r -- "${$(<$STARSHIP_CONFIG)//palette = \"gruvbox_dark\"/palette = \"gruvbox_light\"}" \
+                >| "$_starship_light"
+        fi
+        export STARSHIP_CONFIG=$_starship_light
+        unset _starship_light
+    fi
     cached_init starship starship init zsh
 fi
 
@@ -121,6 +133,11 @@ for _config in "$ZDOTDIR/conf.d"/*.zsh(N); do
 done
 unset _config
 
+# 99-private.zsh (gitignored) holds work exports/tokens: keep it owner-only.
+# Glob qualifiers A/R = group/world-readable, so this forks chmod only when needed.
+_private=("$ZDOTDIR"/conf.d/99-private.zsh(N.A,N.R))
+(( $#_private )) && chmod 600 "${_private[@]}"
+unset _private
 # ==============================================================================
 # 8. ZLE TWEAKS
 # ==============================================================================
@@ -129,9 +146,9 @@ zle_highlight+=(paste:none)  # suppress highlighting of pasted text
 # ==============================================================================
 # 9. CONDA (lazy init)
 # ==============================================================================
+# Anaconda stays at the END of PATH (01-exports.zsh) so its python never shadows
+# the standard mise-managed 3.14; `conda activate <env>` still puts an env first.
 if [[ -f "/opt/anaconda3/bin/conda" ]]; then
-    path=("/opt/anaconda3/bin" ${path:#/opt/anaconda3/bin})
-
     conda() {
         unfunction conda
         local __conda_setup
@@ -146,8 +163,3 @@ if [[ -f "/opt/anaconda3/bin/conda" ]]; then
     }
 fi
 
-# Prefer Python.org's python3 unless a conda env is active.
-# (When CONDA_PREFIX is set, keep conda's python first.)
-if [[ -z "${CONDA_PREFIX:-}" && -d "/usr/local/bin" ]]; then
-    path=(/usr/local/bin ${path:#/usr/local/bin})
-fi

@@ -1,0 +1,14 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ mise/.config/mise/config.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Global runtime versions (mise), same file on macOS, Linux and Windows.
+#
+# Python 3.14 is the standard across this setup: `python`/`python3` in every
+# shell, uv's default for new venvs, and the minimum for the repo's own scripts
+# (scripts/lib/pyreq.py). Projects can still pin another version with their own
+# mise.toml / .python-version.
+[tools]
+python = "3.14"
