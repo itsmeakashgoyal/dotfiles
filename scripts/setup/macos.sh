@@ -20,6 +20,7 @@ if [[ ! -f "$CORE" ]]; then
     echo "Error: core library not found at $CORE" >&2
     exit 1
 fi
+# shellcheck source=scripts/lib/core.sh
 source "$CORE"
 
 # ------------------------------------------------------------------------------
@@ -67,11 +68,13 @@ update_brew() {
         return 1
     fi
 
+    # Refresh formula metadata only. No blanket `brew upgrade` here: install
+    # must not upgrade software the Brewfile doesn't own (it also broke CI when
+    # the runner's preinstalled ruby@3.4 failed to relink). `brew bundle`
+    # installs/upgrades the Brewfile's own entries; upgrading everything else
+    # is `dutils update`'s job.
     info "Updating Homebrew..."
     brew update
-    brew upgrade
-    brew upgrade --cask || true
-    brew cleanup
     success "Homebrew updated"
 }
 
@@ -131,8 +134,8 @@ main() {
     # Install pipx-managed Python CLI tools not available as brew formulae
     install_pipx_packages
 
-    # Final cleanup
-    update_brew
+    # Final cleanup (old versions / download cache)
+    brew cleanup || true
 
     success "
 ###################################################
