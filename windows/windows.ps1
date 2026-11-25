@@ -69,6 +69,7 @@ $SYMLINK_MAP = @{
     "atuin\.config\atuin"                                                      = "$env:USERPROFILE\.config\atuin"
     "fastfetch\.config\fastfetch"                                              = "$env:USERPROFILE\.config\fastfetch"
     "starship\.config\starship"                                                = "$env:USERPROFILE\.config\starship"
+    "eza\.config\eza"                                                          = "$env:APPDATA\eza"
     "yazi\.config\yazi"                                                        = "$env:USERPROFILE\.config\yazi"
     "bin\.local\bin\dutils.ps1"                                                = "$env:USERPROFILE\.local\bin\dutils.ps1"
     "mise\.config\mise"                                                        = "$env:USERPROFILE\.config\mise"

@@ -11,11 +11,16 @@ description = "A channel to select from git branches"
 requirements = ["git"]
 
 [source]
-command = "git --no-pager branch --all --format=\"%(refname:short)\""
-output = "{split: :0}"
+# Local branches by most recent commit, then remote-only branches by plain name
+# (`git checkout <name>` / `git switch <name>` then creates the tracking branch).
+command = """
+{ git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads;
+  git for-each-ref --sort=-committerdate --format='%(refname:lstrip=3)' --exclude='refs/remotes/*/HEAD' refs/remotes;
+} 2>/dev/null | awk 'NF && !seen[$0]++'
+"""
 
 [preview]
-command = "git show -p --stat --pretty=fuller --color=always '{0}'"
+command = "git log --oneline --graph --color=always -30 '{0}' 2>/dev/null || git log --oneline --graph --color=always -30 'origin/{0}'"
 
 [keybindings]
 enter = "actions:checkout"

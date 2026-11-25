@@ -8,7 +8,7 @@
 # GENERATED from packages.toml - run `dutils manifest generate` after
 # adding or removing a [[stow]] entry there.
 # BEGIN GENERATED: stow (dutils manifest generate)
-STOW_PACKAGES := zsh git nvim tmux television atuin fastfetch starship yazi bin mise readline
+STOW_PACKAGES := zsh git nvim tmux television atuin fastfetch starship eza yazi bin mise readline
 # END GENERATED: stow
 
 # dutils: the cross-platform maintenance/introspection CLI. The verification,

@@ -5,10 +5,8 @@
 # ░▓ file   ▓ yazi/.config/yazi/yazi.toml
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Yazi terminal file manager. Kept minimal - uses Yazi's built-in theme rather
-# than vendoring a full flavor (a themed flavor's tmtheme is ~43k lines and
-# Nord would clash with the Gruvbox terminal anyway). To add a flavor later:
-#   ya pkg add <owner/repo>   # e.g. a gruvbox flavor, then set it in theme.toml
+# Yazi terminal file manager. Gruvbox flavor: see theme.toml + package.toml
+# (installed with `ya pkg install`, not vendored).
 
 [mgr]
 show_hidden = true

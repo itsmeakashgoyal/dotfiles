@@ -236,6 +236,14 @@ EOF
         log::substep "[dry-run] scripts/setup/tmux.sh (TPM + tmux plugins)"
     else
         run_script "tmux" || log::warning "tmux plugin setup failed (non-fatal): start tmux and press prefix + I"
+        # yazi flavor/plugins pinned in yazi/.config/yazi/package.toml
+        if command_exists ya; then
+            if ya pkg install >/dev/null 2>&1; then
+                log::success "yazi packages installed"
+            else
+                log::warning "yazi packages not installed (non-fatal): run 'ya pkg install'"
+            fi
+        fi
     fi
     if [[ "$DRY_RUN" == "1" ]]; then
         log::success "Dry run complete — no changes were made."

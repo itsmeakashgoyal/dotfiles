@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ bin/.local/bin/proj
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Project jumper: pick one of your git repos with television (most-visited
+# first, via zoxide), then
+#   proj           print its path            (zsh `p` / ⌃G cd there)
+#   proj --tmux    switch to a tmux session named after it, creating it in
+#                  that directory if needed  (`p` inside tmux, tmux prefix f)
+#   proj --list    just list the repos
+#
+# Repos are found under $DOTFILES_PROJECT_ROOTS (colon-separated), default
+# ~/Workspace ~/ws ~/work ~/personal ~/code ~/projects ~/dotfiles (those that
+# exist), up to 4 levels deep. Worktrees (.git file) count too.
+
+set -euo pipefail
+
+roots=()
+IFS=: read -r -a wanted <<< "${DOTFILES_PROJECT_ROOTS:-$HOME/Workspace:$HOME/ws:$HOME/work:$HOME/personal:$HOME/code:$HOME/projects:$HOME/dotfiles}"
+for r in "${wanted[@]}"; do
+    [[ -d "$r" ]] && roots+=("$r")
+done
+(( ${#roots[@]} )) || { echo "proj: none of the project roots exist" >&2; exit 1; }
+
+list_repos() {
+    local repos
+    repos=$(fd -H -d 4 --prune -E node_modules -E .venv -t d -t f '^\.git$' "${roots[@]}" 2>/dev/null \
+            | sed -E 's#/\.git/?$##' | sort -u)
+    # zoxide's ranking first (most-visited repos on top), then the rest A→Z.
+    {
+        if command -v zoxide >/dev/null 2>&1; then
+            awk 'NR==FNR { repo[$0]=1; next } ($0 in repo)' \
+                <(printf '%s\n' "$repos") <(zoxide query -l 2>/dev/null)
+        fi
+        printf '%s\n' "$repos"
+    } | awk 'NF && !seen[$0]++' | sed "s#^$HOME#~#"
+}
+
+pick() {
+    list_repos | tv --preview-command "git -C {} log --oneline --color=always -15 2>/dev/null" \
+        | sed "s#^~#$HOME#"
+}
+
+mode="${1:-}"
+case "$mode" in
+    --list) list_repos; exit 0 ;;
+    -h|--help) sed -n '8,17p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+esac
+
+dir=$(pick)
+[[ -n "$dir" && -d "$dir" ]] || exit 1
+
+if [[ "$mode" == "--tmux" ]]; then
+    name=$(basename "$dir" | tr '.:' '__')
+    tmux has-session -t "=$name" 2>/dev/null || tmux new-session -d -s "$name" -c "$dir"
+    if [[ -n "${TMUX:-}" ]]; then
+        tmux switch-client -t "=$name"
+    else
+        tmux attach-session -t "=$name"
+    fi
+else
+    printf '%s\n' "$dir"
+fi

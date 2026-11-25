@@ -16,17 +16,10 @@ if [[ $OSTYPE == darwin* ]]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Pager and Man Page Colors
+# Pager (man pages are coloured by bat: MANPAGER in 01-exports.zsh)
 # ------------------------------------------------------------------------------
 export LESS="-iFMRX -#.25"
 export LESSHISTFILE=-
-export LESS_TERMCAP_mb=$'\e[1;31m'
-export LESS_TERMCAP_md=$'\e[1;31m'
-export LESS_TERMCAP_me=$'\e[0m'
-export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[01;33m'
-export LESS_TERMCAP_ue=$'\e[0m'
-export LESS_TERMCAP_us=$'\e[1;4;32m'
 
 # ------------------------------------------------------------------------------
 # History Configuration
@@ -170,7 +163,19 @@ zstyle ':completion:*' matcher-list '' \
   'l:|=* r:|=*'
 
 # Colorize completions using default `ls` colors.
-zstyle ':completion:*' list-colors ''
+# Gruvbox completion colours (ANSI indices, so they follow light/dark). Kept in
+# a local var, not $LS_COLORS, so eza keeps using its own theme.
+#   di dirs blue · ln links aqua · ex executables green · archives red ·
+#   images/media purple · ma = the highlighted menu entry (blue bar)
+() {
+    local -a c=(di='1;34' ln='36' so='35' pi='33' ex='1;32' bd='1;33' cd='1;33'
+                or='31' mi='31' su='1;31' sg='1;31' tw='1;34' ow='1;34'
+                '*.tar=31' '*.tgz=31' '*.gz=31' '*.zip=31' '*.xz=31' '*.dmg=31'
+                '*.png=35' '*.jpg=35' '*.jpeg=35' '*.gif=35' '*.svg=35' '*.pdf=35'
+                '*.mp4=35' '*.mov=35' '*.mp3=35'
+                '*.md=33' '*.json=33' '*.toml=33' '*.yaml=33' '*.yml=33')
+    zstyle ':completion:*' list-colors "${c[@]}" 'ma=1;30;44'
+}
 
 # Allow completion of ..<Tab> to ../ and beyond.
 zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)'
@@ -182,7 +187,10 @@ zstyle ':completion:*:complete:(cd|pushd):*' tag-order 'local-directories named-
 
 # Categorize completion suggestions with headings:
 zstyle ':completion:*' group-name ''
-zstyle ':completion:*:descriptions' format %F{default}%B%{$__AKASH[ITALIC_ON]%}--- %d ---%{$__AKASH[ITALIC_OFF]%}%b%f
+zstyle ':completion:*:descriptions' format %F{3}%B%{$__AKASH[ITALIC_ON]%}── %d ──%{$__AKASH[ITALIC_OFF]%}%b%f
+zstyle ':completion:*:messages'     format %F{4}%{$__AKASH[ITALIC_ON]%}%d%{$__AKASH[ITALIC_OFF]%}%f
+zstyle ':completion:*:warnings'     format %F{1}no matches for: %d%f
+zstyle ':completion:*:corrections'  format %F{2}%B%d (errors: %e)%b%f
 
 # Enable keyboard navigation of completions in menu
 # (not just tab/shift-tab but cursor keys as well):

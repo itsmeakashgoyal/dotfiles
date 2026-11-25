@@ -64,3 +64,7 @@ settings/iterm/*.itermexport
 
 # Compiled zsh bytecode (dutils zcompile) — regenerated per machine
 **/*.zwc
+
+# yazi flavors/plugins: reinstalled from yazi/.config/yazi/package.toml (ya pkg install)
+yazi/.config/yazi/flavors/
+yazi/.config/yazi/plugins/

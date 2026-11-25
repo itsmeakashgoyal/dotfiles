@@ -43,10 +43,13 @@ search_mode = "fuzzy"
 # filter_mode = "global"
 
 ## workspace filtering (filter within git repo tree)
-# workspaces = false
+## On: inside a git repo, ⌃R starts with THIS repo's history; press ⌃R again
+## in the search UI to cycle to directory / session / global.
+workspaces = true
 
 ## which filter mode for shell up-key binding
-# filter_mode_shell_up_key_binding = "global"
+## ↑ cycles commands run in this directory first.
+filter_mode_shell_up_key_binding = "directory"
 
 ## which search mode for shell up-key binding
 # search_mode_shell_up_key_binding = "fuzzy"

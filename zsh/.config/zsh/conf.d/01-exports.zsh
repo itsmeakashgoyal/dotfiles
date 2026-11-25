@@ -92,6 +92,17 @@ fi
     export BAT_THEME="gruvbox-$mode"
 }
 
+# eza reads its Gruvbox theme from here (macOS would otherwise look in
+# ~/Library/Application Support/eza).
+export EZA_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/eza"
+
+# man pages rendered by bat (Gruvbox via $BAT_THEME). MANROFFOPT=-c keeps the
+# formatting codes bat expects.
+if (( $+commands[bat] )); then
+    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+    export MANROFFOPT="-c"
+fi
+
 # fzf: styled with ANSI colour *indices* (0-15, and -1 = terminal default) rather
 # than hex, so the picker likewise follows the terminal palette in light or dark.
 export FZF_DEFAULT_OPTS="--height=50% --layout=reverse --border=rounded --cycle \

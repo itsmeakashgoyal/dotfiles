@@ -1,0 +1,12 @@
+#
+#  ▓▓▓▓▓▓▓▓▓▓
+# ░▓ author ▓ Akash Goyal
+# ░▓ file   ▓ yazi/.config/yazi/theme.toml
+# ░▓▓▓▓▓▓▓▓▓▓
+#
+# Gruvbox flavor (bennyyip/gruvbox-dark, pinned in package.toml). The flavor
+# itself lives in flavors/ (gitignored); install it with `ya pkg install`
+# (install.sh does this).
+[flavor]
+dark  = "gruvbox-dark"
+light = "gruvbox-dark"

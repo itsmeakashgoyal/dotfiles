@@ -10,7 +10,7 @@ Each top-level folder is a [GNU Stow](https://www.gnu.org/software/stow/) packag
 | Path | What |
 | --- | --- |
 | `zsh/` | `.zshenv` + `.config/zsh/` (`.zshrc`, `.p10k.zsh`, numbered `conf.d/*.zsh`) |
-| `git/ nvim/ tmux/ starship/ atuin/ television/ yazi/ fastfetch/ readline/ mise/` | Tool configs (Stow packages) |
+| `git/ nvim/ tmux/ starship/ atuin/ television/ yazi/ eza/ fastfetch/ readline/ mise/` | Tool configs (Stow packages) |
 | `bin/` | `~/.local/bin` scripts, incl. the `dutils` CLI symlink |
 | `settings/` | iTerm2 profile (`iterm/profile.json`) and Sublime Text settings |
 | `windows/` | PowerShell profile + `install.ps1` / `windows.ps1` |

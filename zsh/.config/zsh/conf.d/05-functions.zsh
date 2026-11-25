@@ -5,7 +5,8 @@
 # ░▓ file   ▓ zsh/.config/zsh/conf.d/05-functions.zsh
 # ░▓▓▓▓▓▓▓▓▓▓
 #
-# Shell functions: tmux session helpers (aliases tn/tk/td/tl in 04-aliases.zsh).
+# Shell functions: tmux session helpers (aliases tn/tk/td/tl in 04-aliases.zsh)
+# and the project jumper (p / ⌃G).
 
 # Attach to a session (or pick one; creates `misc` if none given).
 ta() {
@@ -32,3 +33,24 @@ tks() {
     session=$(tmux list-sessions -F "#{session_name}" | tv)
     [[ -n "$session" ]] && tmux kill-session -t "$session"
 }
+
+# Project jumper (bin/.local/bin/proj): pick a git repo, most-visited first.
+# Outside tmux: cd there. Inside tmux: switch to (or create) a session for it.
+p() {
+    if [[ -n "$TMUX" ]]; then
+        proj --tmux
+    else
+        local dir
+        dir=$(proj) && [[ -n "$dir" ]] && cd "$dir"
+    fi
+}
+
+# ⌃G anywhere on the command line runs `p`, then redraws the prompt.
+_dotfiles_proj_widget() {
+    zle -I
+    p </dev/tty
+    zle reset-prompt
+}
+zle -N _dotfiles_proj_widget
+bindkey -M viins '^G' _dotfiles_proj_widget
+bindkey -M vicmd '^G' _dotfiles_proj_widget

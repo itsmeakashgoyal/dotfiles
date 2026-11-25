@@ -31,7 +31,9 @@ dutils theme apply      # re-render from the saved mode
 | iTerm2 (Dynamic Profile) | immediately |
 | bat + delta (`$BAT_THEME`), starship palette | new shell (`exec zsh`) |
 | Neovim | restart Neovim |
-| tmux, fzf, yazi | automatically (they use the terminal's ANSI colours) |
+| tmux status bar, completion menus, fzf | automatically (they use the terminal's ANSI colours) |
+
+Always Gruvbox Dark: eza (`eza/.config/eza/theme.yml`), yazi (flavor in `yazi/.config/yazi/theme.toml`), and man pages (bat, via `$BAT_THEME`).
 
 The mode is saved per machine in `~/.config/dotfiles/theme`. Sublime Text is not
 affected. To make it follow the OS, set both `"theme"` and `"color_scheme"` to
@@ -101,6 +103,10 @@ Zsh config is in `zsh/.config/zsh/`. `.zshrc` sources every
 | Options, history, completion | `conf.d/02-options.zsh` |
 | A new topic | a new `conf.d/NN-name.zsh` file (pick a free number below 99) |
 | Machine-local settings, work exports, secrets | `conf.d/99-private.zsh` |
+
+**Projects.** `p` / `⌃G` / tmux `prefix f` search for git repos under `~/Workspace ~/ws ~/work ~/personal ~/code ~/projects ~/dotfiles`. Change with `export DOTFILES_PROJECT_ROOTS="$HOME/src:$HOME/work"` in `99-private.zsh`.
+
+**Work shortcuts** (build/test commands for a work repo) belong in `99-private.zsh` too, never in tracked files.
 
 **Private overrides.** `99-private.zsh` is gitignored and loads last. `.zshrc`
 resets its permissions to owner-only (600). Never put secrets in tracked files.

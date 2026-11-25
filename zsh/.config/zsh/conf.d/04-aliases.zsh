@@ -19,11 +19,11 @@ alias fd='noglob fd'
 if command -v eza >/dev/null 2>&1; then
   alias l="eza -l --icons --git -a"                         # List all files with git status
   alias lt="eza --tree --level=2 --long --icons --git"      # Tree view, 2 levels deep
-  alias ld="eza -lD"                                        # List only directories
-  alias lf="eza -lF --color=always | grep -v /"             # List only files
+  alias ld="eza -lD --icons"                                # List only directories
+  alias lf="eza -l --only-files --icons"                    # List only files
   alias lh="eza -dl .* --group-directories-first"           # List hidden files
-  alias ll="eza -al --group-directories-first"              # List all, directories first
-  alias ls="eza -lF --color=always --sort=size | grep -v /" # List files by size
+  alias ll="eza -al --icons --group-directories-first"      # List all, directories first
+  alias ls="eza -l --only-files --icons --sort=size"        # List files by size (accepts paths)
 else
   alias l="ls -la"
 fi
@@ -45,6 +45,14 @@ fi
 # ------------------------------------------------------------------------------
 alias c="clear"             # Clear terminal
 alias path='print -l $path' # Print PATH entries
+
+# Typos and shortcuts seen in shell history (cd.. ×20, q ×15, cler)
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias q='exit'
+alias cler='clear'
 
 # ------------------------------------------------------------------------------
 # Global Aliases (can be used anywhere in command line)

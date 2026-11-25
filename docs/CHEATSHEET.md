@@ -26,9 +26,11 @@ The command line is in vi mode and every line starts in insert mode. The Powerle
 | `v` (normal mode) | Edit the current command in `$EDITOR` (nvim) |
 | `k` / `j` (normal mode) | Previous / next history entry |
 | `/` / `?` (normal mode) | Search history backward / forward |
-| `⌃R` | Atuin history search (fuzzy; `Enter` puts the command on the line for editing) |
+| `⌃R` | Atuin history search: this git repo's history first, `⌃R` again cycles to directory / session / everything; `Enter` puts it on the line |
+| `↑` | Previous commands run in this directory |
+| `⌃G` | Project jumper (same as `p`) |
 | `⌃T` | Television smart autocomplete (files, dirs or branches, depending on context) |
-| `Tab` after a space | Television autocomplete |
+| `Tab` after a space | Television autocomplete (`git checkout`/`switch <Tab>`: branches, most recent first) |
 | `Tab` mid-word or on an empty line | Normal zsh completion |
 
 **Files and navigation**
@@ -39,7 +41,9 @@ The command line is in vi mode and every line starts in insert mode. The Powerle
 | `lt` / `ld` / `lf` / `lh` | Tree (2 levels) / only directories / only files / hidden files |
 | `cat` / `catn` / `preview` | `bat` with syntax highlighting / plain / with line numbers |
 | `file.md` (or `.txt` `.yaml` `.json`) | Typing just a filename opens it in nvim |
+| `p` (or `⌃G`) | Pick any of your git repos (most-visited first) and `cd` there; inside tmux it opens/switches to a session for it |
 | `cd <partial>` | zoxide jump by frecency (`cd` is zoxide) |
+| `..` / `...` / `....` | Up 1 / 2 / 3 directories (`cd..` works too) |
 | `grt` | `cd` to the git repo root |
 | `tvd` / `tve` | Pick a directory with tv and `cd` into it / pick something with tv and open it in nvim |
 
@@ -49,7 +53,8 @@ The command line is in vi mode and every line starts in insert mode. The Powerle
 | --- | --- |
 | `cmd C` | Pipe the output to the clipboard (`\| pbcopy`) |
 | `du` / `df` | Disk usage of everything here, sorted / free disk space |
-| `myip` / `path` / `c` | Public IP / `PATH`, one entry per line / clear |
+| `myip` / `path` / `c` / `q` | Public IP / `PATH`, one entry per line / clear / exit |
+| `man <cmd>` | Man page with Gruvbox colours (via bat) |
 | `caffeinate1h` | Keep the Mac awake for 1 hour |
 
 ## Python
@@ -77,7 +82,7 @@ Identities and SSH keys per repo: `dutils git-setup` (see [Setup](SETUP.md#git-i
 
 ## tmux
 
-The prefix is `⌃a`. Press `⌃a ⌃a` to send it to a nested session. Windows and panes are numbered from 1, and the mouse is on.
+Status bar: session (red `⌃a` while the prefix is held), windows (current one highlighted, `Z` = zoomed), git branch of the current pane, time. The prefix is `⌃a`. Press `⌃a ⌃a` to send it to a nested session. Windows and panes are numbered from 1, and the mouse is on.
 
 | Keys | Does |
 | --- | --- |
@@ -89,6 +94,7 @@ The prefix is `⌃a`. Press `⌃a ⌃a` to send it to a nested session. Windows 
 | `prefix N` / `P` / `X` | Move the window right / left / kill a window by number (prompts) |
 | `prefix B` / `prefix E` | Move the pane to its own window / bring a pane back in |
 | `prefix o` | Run an app (prompts) in a new window |
+| `prefix f` | Project jumper popup: pick a repo, open/switch to its session |
 | `prefix ⌃e` / `prefix b` | Pick a session with tv in a popup / switch to the last session |
 | `prefix d` / `prefix s` / `prefix $` | Detach / session tree / rename the session (tmux defaults) |
 | `prefix I` / `prefix U` | Install / update TPM plugins |

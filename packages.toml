@@ -699,6 +699,12 @@ target  = ".config/starship"
 desc    = "Starship prompt config (zsh fallback; PowerShell opt-in)"
 
 [[stow]]
+package        = "eza"
+target         = ".config/eza"
+desc           = "eza Gruvbox theme"
+windows_target = '$env:APPDATA\eza'
+
+[[stow]]
 package = "yazi"
 target  = ".config/yazi"
 desc    = "Yazi terminal file manager"
