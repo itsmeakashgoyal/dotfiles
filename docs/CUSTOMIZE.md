@@ -69,6 +69,10 @@ To set the default profile and the global preferences (the `defaults write`
 lines in `scripts/setup/iterm.sh`), quit iTerm2 and run `make iterm` from
 Terminal.app.
 
+## Rex
+
+Keys, the project jumper and resume rules are in `rex/.config/rex/init.lua` (Lua; full API at <https://www.superlogical.com/rex/docs/reference/lua>). After editing: `rex config check && rex config reload`. App settings (theme, font) live in the app, not the file: `make rex` applies them when **Settings → General → Remote Control** is on; Gruvbox themes are in `rex/.config/rex/themes/` (⇧⌘P → Import Theme File).
+
 ## Sublime Text
 
 Every file in `settings/sublime/` is symlinked into Sublime's `Packages/User`

@@ -734,6 +734,12 @@ target  = ".config/mise"
 desc    = "mise global runtimes (Python 3.14, the standard)"
 
 [[stow]]
+package   = "rex"
+target    = ".config/rex"
+desc      = "Rex terminal: tmux-style keys, project jumper, resume rules, Gruvbox themes"
+platforms = ["macos", "linux"]
+
+[[stow]]
 package = "readline"
 target  = ".inputrc"
 source  = "readline/.inputrc"

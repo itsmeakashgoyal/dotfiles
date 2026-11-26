@@ -79,6 +79,9 @@ source "$ZDOTDIR/conf.d/01-exports.zsh"
 
 # p10k config must be sourced before the theme plugin loads (p10k only).
 [[ "$DOTFILES_PROMPT" == "p10k" && -f "$ZDOTDIR/.p10k.zsh" ]] && source "$ZDOTDIR/.p10k.zsh"
+# Rex: mark prompts (OSC 133) so ⌘↑/⌘↓ jump between commands and Rex can tell
+# when a command is running. Set after .p10k.zsh, which resets POWERLEVEL9K_*.
+[[ "$DOTFILES_PROMPT" == "p10k" && "$TERM_PROGRAM" == "rex" ]] && typeset -g POWERLEVEL9K_TERM_SHELL_INTEGRATION=true
 
 # ==============================================================================
 # 6. PLUGINS — ordered by load mode

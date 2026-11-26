@@ -68,3 +68,6 @@ settings/iterm/*.itermexport
 # yazi flavors/plugins: reinstalled from yazi/.config/yazi/package.toml (ya pkg install)
 yazi/.config/yazi/flavors/
 yazi/.config/yazi/plugins/
+
+# Rex: ssh guard written by `rex terminfo setup` into the (stowed) config dir
+rex/.config/rex/ssh_config

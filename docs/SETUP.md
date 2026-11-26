@@ -61,6 +61,7 @@ What `install.sh` does, in order:
 | Apps | Sublime Text + iTerm2 settings | Sublime Text settings |
 | Symlinks | `make run` (Stow all packages) | same |
 | tmux plugins | TPM + every `@plugin` (`make tmux`) | same |
+| Rex (if installed) | Config, terminfo, Gruvbox theme + font (`make rex`) | — |
 | Verify | quick health check | same |
 
 The install log is written to `/tmp/dotfiles.log`.

@@ -236,6 +236,8 @@ EOF
         log::substep "[dry-run] scripts/setup/tmux.sh (TPM + tmux plugins)"
     else
         run_script "tmux" || log::warning "tmux plugin setup failed (non-fatal): start tmux and press prefix + I"
+        # Rex terminal (macOS, only if installed): config, terminfo, app settings
+        os::is_mac && { run_script "rex" || log::warning "Rex setup failed (non-fatal): make rex"; }
         # yazi flavor/plugins pinned in yazi/.config/yazi/package.toml
         if command_exists ya; then
             if ya pkg install >/dev/null 2>&1; then

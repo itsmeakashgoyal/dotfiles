@@ -68,7 +68,7 @@ Keybindings, aliases and every command: **[docs/CHEATSHEET.md](docs/CHEATSHEET.m
 | --- | --- |
 | Shell | Zsh + zinit, Powerlevel10k (starship fallback), atuin, zoxide, television, vi mode |
 | Editor | Neovim (lazy.nvim, LSP, Harpoon), Sublime Text |
-| Terminal | iTerm2 Dynamic Profile (⌥Space drop-down), tmux |
+| Terminal | iTerm2 Dynamic Profile (⌥Space drop-down) + tmux; Rex (tmux-style keys, project jumper) |
 | CLI | eza, bat, fd, ripgrep, delta, yazi, gh |
 | Languages | Python 3.14 via mise + uv |
 | Git | Per-repo work/personal identity and SSH key (`dutils git-setup`) |

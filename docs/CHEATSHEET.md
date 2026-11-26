@@ -7,6 +7,7 @@ Everything you can type or press in this setup. `⌃` Ctrl · `⌥` Option · `�
 - [Git](#git)
 - [tmux](#tmux)
 - [Neovim](#neovim)
+- [Rex](#rex)
 - [iTerm2](#iterm2)
 - [dutils & make](#dutils--make)
 - [Photos backup](#photos-backup)
@@ -116,6 +117,26 @@ Status bar: session (red `⌃a` while the prefix is held), windows (current one 
 | `tn <name>` / `tk <name>` / `td` | New session / kill a session / detach |
 | `tl` / `tls` / `tks` | List sessions / switch to one (picker) / kill one (picker) |
 
+## Rex
+
+[Rex](https://www.superlogical.com/rex/docs) is a terminal with tmux built in (sessions survive quitting the app). Inside Rex, use Rex instead of tmux; iTerm2 + tmux keep working as before. The prefix is `⌃a`, like tmux.
+
+| Keys | Does |
+| --- | --- |
+| `⌃a \|` / `⌃a -` | Split right / down |
+| `⌃a h/j/k/l` / `⌃a r` | Move between panes / resize mode (`h/j/k/l`, `⇧` = bigger, `=` balance, `Esc` leave) |
+| `⌃a z` / `⌃a x` / `⌃a B` | Zoom / close pane / move pane to its own tab |
+| `⌃a c` / `⌃a n` / `⌃a p` / `⌃a 1-9` / `⌃a ,` | New tab / next / previous / go to tab / rename tab |
+| `⌃a s` / `⌃a b` / `⌃a N` / `⌃a $` | Switch session / previous session / new session / rename session |
+| `⌃a f` or `⇧⌘O` | Project jumper: pick a repo, open or switch to its session |
+| `⌃a [` | Copy mode (vi keys: `v` select, `y` copy, `/` search, `q` quit) |
+| `⌃a /` / `⌃a w` / `⌃a :` | Find / go to anything / command palette |
+| `⌃a ⌃a` | Send `⌃a` to the shell (start of line) |
+| `⌘D` / `⇧⌘D` / `⌘K` / `⌘P` / `⇧⌘P` | Rex's own: split right / down, sessions, go to anything, command palette |
+| `⌘↑` / `⌘↓` | Jump to the previous / next prompt |
+
+`:Sess [name]` in Neovim saves a session that Rex reopens after a restart (Claude Code / Codex / OpenCode resume automatically). `rex ls`, `rex capture`, `rex send` script it from the shell.
+
 ## Neovim
 
 The leader key is `Space`. Press `<leader>?` to list the keymaps for the current buffer, or `<leader>pk` to search all keymaps.
@@ -202,6 +223,7 @@ The left `⌥` acts as Meta (sends `Esc+`), and the right `⌥` types special ch
 | `make health` / `check` / `menu` / `manifest` / `bench-real` | Same as the matching `dutils` commands |
 | `make iterm` / `make sublime` / `make apps` | Set up iTerm2 / Sublime Text / both |
 | `make tmux` (`update=1`) | Install (and update) TPM + tmux plugins |
+| `make rex` | Rex: load config, terminfo, Gruvbox theme + font in the app |
 | `make macos-defaults` (`undo=1`, `dry=1`) | Apply the curated macOS defaults (`undo=1` reverts, `dry=1` previews) |
 | `make nix-switch` / `make uninstall` | Apply `home.nix` (Linux) / uninstall gracefully |
 

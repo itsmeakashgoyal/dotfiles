@@ -8,7 +8,7 @@
 # GENERATED from packages.toml - run `dutils manifest generate` after
 # adding or removing a [[stow]] entry there.
 # BEGIN GENERATED: stow (dutils manifest generate)
-STOW_PACKAGES := zsh git nvim tmux television atuin fastfetch starship eza yazi bin mise readline
+STOW_PACKAGES := zsh git nvim tmux television atuin fastfetch starship eza yazi bin mise rex readline
 # END GENERATED: stow
 
 # dutils: the cross-platform maintenance/introspection CLI. The verification,
@@ -68,7 +68,7 @@ manifest-check: ## Fail if a generated package list drifted from packages.toml
 ##@ App Settings
 
 .PHONY: apps
-apps: sublime iterm ## Setup all app settings (Sublime Text + iTerm2)
+apps: sublime iterm rex ## Setup all app settings (Sublime Text + iTerm2 + Rex)
 	@echo "$(GREEN)✓ All app settings applied$(CLR)"
 
 .PHONY: sublime
@@ -80,6 +80,11 @@ sublime: ## Setup Sublime Text settings
 iterm: ## Setup iTerm2 (Gruvbox Dynamic Profile, hotkey window, prefs)
 	@echo "$(YELLOW)Setting up iTerm2...$(CLR)"
 	@bash scripts/setup/iterm.sh
+
+.PHONY: rex
+rex: ## Set up Rex terminal (config, terminfo, Gruvbox theme + font in the app)
+	@echo "$(YELLOW)Setting up Rex...$(CLR)"
+	@bash scripts/setup/rex.sh
 
 .PHONY: tmux
 tmux: ## Install TPM + tmux plugins (update=1 to also update them)

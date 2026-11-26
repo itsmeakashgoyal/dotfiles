@@ -23,7 +23,14 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
-export XDG_RUNTIME_DIR="${HOME}/.runtime"
+# XDG_RUNTIME_DIR is owned by the OS: systemd sets /run/user/$UID on Linux, and
+# macOS has none (apps use $TMPDIR). Overriding it broke things that use it as
+# a socket directory: Rex's CLI then looked for a different server and started
+# a second one. Leave it alone; only Linux without systemd gets a private dir.
+if [[ $OSTYPE == linux* && -z ${XDG_RUNTIME_DIR-} ]]; then
+    export XDG_RUNTIME_DIR="${HOME}/.runtime"
+    [[ -d $XDG_RUNTIME_DIR ]] || { mkdir -p -m 700 "$XDG_RUNTIME_DIR" 2>/dev/null; }
+fi
 # Self-locate via the currently-sourced file's real path (%x) rather than
 # hardcoding ~/dotfiles, so this still resolves correctly if the repo lives
 # somewhere else. :A resolves the ~/.zshenv symlink to its real target

@@ -7,3 +7,4 @@
 -- Loads core options and keymaps (no plugins involved).
 require("akgoyal.core.options")
 require("akgoyal.core.keymaps")
+require("akgoyal.core.rex")

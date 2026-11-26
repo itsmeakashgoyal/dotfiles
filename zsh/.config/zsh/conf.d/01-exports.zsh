@@ -228,6 +228,13 @@ path=(
   $path
 )
 [[ -d /opt/anaconda3/bin ]] && path=(${path:#/opt/anaconda3/bin} /opt/anaconda3/bin)
+# Rex puts its own `rex` CLI first on PATH in every terminal it opens; keep it
+# first after the rebuild above (https://www.superlogical.com/rex/docs/automate/cli#path).
+[[ -n ${REX_BIN_DIR-} ]] && path=("$REX_BIN_DIR" ${path:#$REX_BIN_DIR})
+# Outside Rex (iTerm2, scripts): still have `rex`, from the installed server.
+_rex_bin="$HOME/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS"
+[[ -z ${REX_BIN_DIR-} && -x $_rex_bin/rex ]] && path+=("$_rex_bin")
+unset _rex_bin
 
 # ------------------------------------------------------------------------------
 # Export Environment Variables
