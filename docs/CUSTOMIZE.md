@@ -72,7 +72,7 @@ Terminal.app.
 
 ## Rex
 
-Rex looks like the iTerm2 profile: Gruvbox Dark/Light (following `dutils theme`), JetBrainsMonoNL Nerd Font Mono 18, the same character width (-10%) and line height (+9%), no ligatures, blinking block cursor, left ⌥ = Alt, copy on select.
+Rex looks like the iTerm2 profile: Gruvbox Dark/Light (following `dutils theme`), JetBrainsMonoNL Nerd Font Mono 18, the same 10 × 27 pt character cells (width -10%, line height +13%), no ligatures, blinking block cursor, left ⌥ = Alt, copy on select.
 
 | Change | How |
 | --- | --- |

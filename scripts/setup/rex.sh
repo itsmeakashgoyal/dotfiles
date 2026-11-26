@@ -86,15 +86,18 @@ apply_app_settings() {
     done
 
     # Same look as the iTerm2 profile (settings/iterm/profile.json):
-    # JetBrainsMonoNL Nerd Font Mono 18, 0.9 char width (-10%), 1.09 line
-    # height (+9%), no ligatures, blinking block cursor, left ⌥ = Alt (Esc+).
+    # JetBrainsMonoNL Nerd Font Mono 18 with the same cell size as iTerm2:
+    # 10 x 27 pt (measured: iTerm2 via CSI 16 t, Rex via `rex block call size`).
+    # Width -10% matches iTerm2's 0.9; Rex's line metric differs, so +13% (not
+    # 1.09) gives iTerm2's row height. No ligatures, blinking block cursor,
+    # left ⌥ = Alt (Esc+).
     local s=client.setting failed=0 kv
     for kv in \
         "interface.appearance.scheme value=$(theme_scheme)" \
         "interface.appearance.tint value=true" \
         "terminal.typography.font value=${FONT}" \
         "terminal.typography.size value=18" \
-        "terminal.typography.line_height value=9" \
+        "terminal.typography.line_height value=13" \
         "terminal.advanced_fonts.character_spacing value=-10%" \
         "terminal.advanced_fonts.ligatures value=false" \
         "terminal.cursor.style value=block" \
