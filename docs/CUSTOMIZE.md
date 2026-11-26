@@ -29,6 +29,7 @@ dutils theme apply      # re-render from the saved mode
 | Follows `dutils theme` | Applies |
 | --- | --- |
 | iTerm2 (Dynamic Profile) | immediately |
+| Rex (Gruvbox Dark/Light, when the app is open) | immediately |
 | bat + delta (`$BAT_THEME`), starship palette | new shell (`exec zsh`) |
 | Neovim | restart Neovim |
 | tmux status bar, completion menus, fzf | automatically (they use the terminal's ANSI colours) |
@@ -71,7 +72,15 @@ Terminal.app.
 
 ## Rex
 
-Keys, the project jumper and resume rules are in `rex/.config/rex/init.lua` (Lua; full API at <https://www.superlogical.com/rex/docs/reference/lua>). After editing: `rex config check && rex config reload`. App settings (theme, font) live in the app, not the file: `make rex` applies them when **Settings → General → Remote Control** is on; Gruvbox themes are in `rex/.config/rex/themes/` (⇧⌘P → Import Theme File).
+Rex looks like the iTerm2 profile: Gruvbox Dark/Light (following `dutils theme`), JetBrainsMonoNL Nerd Font Mono 18, the same character width (-10%) and line height (+9%), no ligatures, blinking block cursor, left ⌥ = Alt, copy on select.
+
+| Change | How |
+| --- | --- |
+| Keys, project jumper, resume rules | `rex/.config/rex/init.lua` (Lua API: <https://www.superlogical.com/rex/docs/reference/lua>), then `rex config check && rex config reload` |
+| Font, spacing, cursor, theme | The `apply_app_settings` list in `scripts/setup/rex.sh`, then `make rex` (Rex open). Values are what `rex do client.setting.<name> value=…` accepts; a wrong one prints the allowed values |
+| Light / dark | `dutils theme dark\|light\|auto` (switches iTerm2 and Rex together) |
+
+`make rex` needs **Settings → General → Remote Control** on (it turns it on itself when Rex is closed). Theme files: `rex/.config/rex/themes/`, imported once.
 
 ## Sublime Text
 

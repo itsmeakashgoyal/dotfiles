@@ -135,7 +135,7 @@ Status bar: session (red `⌃a` while the prefix is held), windows (current one 
 | `⌘D` / `⇧⌘D` / `⌘K` / `⌘P` / `⇧⌘P` | Rex's own: split right / down, sessions, go to anything, command palette |
 | `⌘↑` / `⌘↓` | Jump to the previous / next prompt |
 
-`:Sess [name]` in Neovim saves a session that Rex reopens after a restart (Claude Code / Codex / OpenCode resume automatically). `rex ls`, `rex capture`, `rex send` script it from the shell.
+Looks like iTerm2 (Gruvbox, same font and spacing); `dutils theme` switches both. `:Sess [name]` in Neovim saves a session that Rex reopens after a restart (Claude Code / Codex / OpenCode resume automatically). `rex ls`, `rex capture`, `rex send` script it from the shell.
 
 ## Neovim
 

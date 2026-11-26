@@ -154,6 +154,31 @@ def apply_iterm(mode: str) -> None:
          "(iTerm2 reloads it live)")
 
 
+# ── Rex ───────────────────────────────────────────────────────────────────────
+REX_BIN = HOME / "Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS/rex"
+
+
+def apply_rex(mode: str) -> None:
+    """Switch Rex's light/dark (Gruvbox Dark/Light themes, see make rex) live."""
+    if not (IS_MAC and REX_BIN.exists()):
+        return
+    import os
+    env = {k: v for k, v in os.environ.items() if k != "XDG_RUNTIME_DIR"}
+    try:
+        out = subprocess.run([str(REX_BIN), "--autostart=false", "client", "ls", "--json"],
+                             capture_output=True, text=True, env=env, timeout=10).stdout
+        apps = [c["client_id"] for c in json.loads(out or "{}").get("clients", [])
+                if (c.get("info") or {}).get("kind") == "app"]
+        for cid in apps:
+            r = subprocess.run([str(REX_BIN), "-C", cid, "do",
+                                "client.setting.interface.appearance.scheme", f"value={mode}"],
+                               capture_output=True, text=True, env=env, timeout=10)
+            if r.returncode == 0:
+                info(f"Rex: switched to {describe(mode)}")
+    except (OSError, ValueError, subprocess.SubprocessError):
+        pass
+
+
 # ── commands ──────────────────────────────────────────────────────────────────
 def describe(mode: str) -> str:
     if mode == "auto":
@@ -172,6 +197,7 @@ def report() -> None:
 def apply(mode: str) -> None:
     write_mode(mode)
     apply_iterm(mode)
+    apply_rex(mode)
 
 
 def main() -> None:
