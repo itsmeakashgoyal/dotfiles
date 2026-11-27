@@ -27,33 +27,12 @@ export PYTHONUNBUFFERED=1        # Prevent Python from buffering stdout/stderr
 # (`mise activate pwsh`) where pyenv has none at all (it hard-forks to a
 # separately-maintained pyenv-win).
 #
-# Measured with `make bench` before committing this: running `eval "$(mise
-# activate zsh)"` unconditionally at startup added ~20-30ms to shell startup
-# on this machine (111ms -> 130-141ms), not the "fast enough to not matter"
-# cost it's sometimes advertised as. Deferred to a one-shot precmd hook
-# instead — the same idea as pyenv's old lazy-init stub above, adapted for
-# the fact that mise's value is an always-on hook, not a single lazily
-# invoked command. This only helps first_command_lag, not first_prompt_lag
-# (confirmed real interactive sessions fire precmd before reading the next
-# command; `zsh -i -c exit`, what `make bench` uses, does not — so this
-# doesn't show up in `make bench` even though it's a real improvement).
-#
-# After activating, mise's own precmd hook would spawn `mise hook-env` on EVERY
-# prompt (~15ms per Enter, measured with zsh-bench). Tool versions change when
-# you change directory, so only its chpwd hook is kept. After editing a
-# mise.toml in the current directory, run `cd .` (or `_mise_hook`) to apply it.
-# (The shims dir on PATH, see 01-exports.zsh, covers non-interactive use; the
-# activated PATH avoids the shims' ~15ms-per-call overhead.)
-if (( $+commands[mise] )); then
-    autoload -Uz add-zsh-hook
-    _mise_lazy_activate() {
-        add-zsh-hook -d precmd _mise_lazy_activate
-        unfunction _mise_lazy_activate
-        eval "$(mise activate zsh)"
-        add-zsh-hook -d precmd _mise_hook_precmd
-    }
-    add-zsh-hook precmd _mise_lazy_activate
-fi
+# No `mise activate`: its shims dir is first on PATH (01-exports.zsh), and a
+# shim picks the version per directory (mise.toml / .python-version) on every
+# call, so nothing has to run when the shell starts or you cd. Measured with
+# zsh-bench: activation cost ~28ms before each new shell's first command; a
+# shim adds ~15ms per python start instead. Use `mise exec -- cmd` / `mise
+# env` for a mise.toml [env] section (only activation would load that).
 
 # Default directory for mkvenv/venv/rmvenv below when no name is given.
 # Previously reused $PYENV_ROOT (~/.pyenv, an absolute path) for this — but

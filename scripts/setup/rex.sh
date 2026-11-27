@@ -90,7 +90,8 @@ apply_app_settings() {
     # 10 x 27 pt (measured: iTerm2 via CSI 16 t, Rex via `rex block call size`).
     # Width -10% matches iTerm2's 0.9; Rex's line metric differs, so +13% (not
     # 1.09) gives iTerm2's row height. No ligatures, blinking block cursor,
-    # left ⌥ = Alt (Esc+).
+    # left ⌥ = Alt (Esc+). Program activity (conf.d/18-rex.zsh, Claude Code,
+    # Codex): tab markers, Dock badge, macOS notifications while in background.
     local s=client.setting failed=0 kv
     for kv in \
         "interface.appearance.scheme value=$(theme_scheme)" \
@@ -103,7 +104,13 @@ apply_app_settings() {
         "terminal.cursor.style value=block" \
         "terminal.cursor.blink value=normal" \
         "terminal.keyboard.option value=left_sends_alt" \
-        "terminal.keyboard.sequence_hints value=true"; do
+        "terminal.keyboard.sequence_hints value=true" \
+        "notifications.activity.tab_activity value=true" \
+        "notifications.activity.system_notifications value=true" \
+        "notifications.activity.status_done value=true" \
+        "notifications.activity.status_error value=true" \
+        "notifications.activity.status_blocked value=true" \
+        "notifications.activity.dock_badge value=true"; do
         rex_do "$client" "${s}.${kv%% *}" "${kv#* }" >/dev/null 2>&1 || { warning "could not set ${kv%% *}"; failed=1; }
     done
     (( failed )) || success "Rex app: Gruvbox ($(theme_scheme)), ${FONT} 18, iTerm2 spacing, block cursor, ⌥=Alt"

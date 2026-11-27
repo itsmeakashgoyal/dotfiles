@@ -68,7 +68,6 @@ The command line is in vi mode and every line starts in insert mode. The Powerle
 | `venv [dir]` | Activate an existing venv |
 | `rmvenv [dir]` | Deactivate the venv if it's active, then delete it |
 | `uv pip install <pkg>` | Install a package into the active venv |
-| `cd .` | Re-apply mise after editing `mise.toml` in the current directory |
 
 ## Git
 
@@ -135,7 +134,7 @@ Status bar: session (red `⌃a` while the prefix is held), windows (current one 
 | `⌘D` / `⇧⌘D` / `⌘K` / `⌘P` / `⇧⌘P` | Rex's own: split right / down, sessions, go to anything, command palette |
 | `⌘↑` / `⌘↓` | Jump to the previous / next prompt |
 
-Looks like iTerm2 (Gruvbox, same font and spacing); `dutils theme` switches both. `:Sess [name]` in Neovim saves a session that Rex reopens after a restart (Claude Code / Codex / OpenCode resume automatically). `rex ls`, `rex capture`, `rex send` script it from the shell.
+Commands running ≥ 10 s show a spinner on their tab, then ✓/✗ and a macOS notification when they finish while you're elsewhere (`REX_STATUS_MIN_SECONDS` changes the threshold; Claude Code/Codex report their own status). Looks like iTerm2 (Gruvbox, same font and spacing); `dutils theme` switches both. `:Sess [name]` in Neovim saves a session that Rex reopens after a restart (Claude Code / Codex / OpenCode resume automatically). `rex ls`, `rex capture`, `rex send` script it from the shell.
 
 ## Neovim
 

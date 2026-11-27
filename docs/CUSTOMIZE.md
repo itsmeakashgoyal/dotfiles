@@ -80,6 +80,8 @@ Rex looks like the iTerm2 profile: Gruvbox Dark/Light (following `dutils theme`)
 | Font, spacing, cursor, theme | The `apply_app_settings` list in `scripts/setup/rex.sh`, then `make rex` (Rex open). Values are what `rex do client.setting.<name> value=…` accepts; a wrong one prints the allowed values |
 | Light / dark | `dutils theme dark\|light\|auto` (switches iTerm2 and Rex together) |
 
+Long-command status (tab spinner → ✓/✗ + notification) comes from `zsh/.config/zsh/conf.d/18-rex.zsh`; set `export REX_STATUS_MIN_SECONDS=30` in `99-private.zsh` to change the 10 s threshold, or add programs to `_rex_interactive` to never show a spinner for them.
+
 `make rex` needs **Settings → General → Remote Control** on (it turns it on itself when Rex is closed). Theme files: `rex/.config/rex/themes/`, imported once.
 
 ## Sublime Text
@@ -138,7 +140,7 @@ and packages.
 | --- | --- |
 | Change the global default | edit `mise/.config/mise/config.toml` (`python = "3.14"`) |
 | Pin a project | `mise use python@3.12` in the project (writes `mise.toml`), or add a `.python-version` |
-| Apply an edited `mise.toml` in the current directory | `cd .` |
+| Run with a `mise.toml` `[env]` section | `mise exec -- <cmd>` (mise runs via shims, not shell activation) |
 | See the active version | `mise current` |
 | Create and activate `.venv` | `mkvenv` (or `mkvenv <name>`, or `mkvenv <name> 3.12`) |
 | Activate an existing venv | `venv` (or `venv <name>`) |
